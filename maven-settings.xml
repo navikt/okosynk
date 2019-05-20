@@ -1,0 +1,53 @@
+<settings>
+    <proxies>
+        <proxy>
+            <id>nav-proxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>webproxy-utvikler.nav.no</host>
+            <port>8088</port>
+            <nonProxyHosts>*.adeo.no</nonProxyHosts>
+        </proxy>
+    </proxies>
+
+    <mirrors>
+        <mirror>
+            <id>NAV internal Nexus</id>
+            <mirrorOf>central</mirrorOf>
+            <url>https://repo.adeo.no/repository/maven-central</url>
+        </mirror>
+    </mirrors>
+
+    <profiles>
+        <profile>
+            <id>internal-repo</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>nexus-internal</id>
+                    <name>NAV internal Nexus</name>
+                    <url>https://repo.adeo.no/repository/maven-releases</url>
+                </repository>
+                <repository>
+                    <id>nexus-nordkorea</id>
+                    <name>nexus-nordkorea</name>
+                    <url>http://maven.adeo.no/nexus/content/groups/public</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>nexus-internal</id>
+                    <name>NAV internal Nexus</name>
+                    <url>https://repo.adeo.no/repository/maven-releases</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>nexus-nordkorea</id>
+                    <name>nexus-nordkorea</name>
+                    <url>http://maven.adeo.no/nexus/content/groups/public</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+</settings>
