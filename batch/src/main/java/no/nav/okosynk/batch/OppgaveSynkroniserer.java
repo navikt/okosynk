@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,21 +27,12 @@ public class OppgaveSynkroniserer {
 
     private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkroniserer.class);
 
-    private final IOppgaveConsumerGateway           oppgaveGateway;
-    private final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway;
     private Supplier<BatchStatus>                   batchStatusSupplier;
 
-    public OppgaveSynkroniserer(
-        final IOppgaveConsumerGateway           oppgaveGateway,
-        final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway,
-        final Supplier<BatchStatus>             batchStatusSupplier) {
-
-        this.oppgaveGateway           = oppgaveGateway;
-        this.oppgaveBehandlingGateway = oppgaveBehandlingGateway;
-        this.batchStatusSupplier      = batchStatusSupplier;
+    public OppgaveSynkroniserer(final Supplier<BatchStatus> batchStatusSupplier) {
+        this.batchStatusSupplier= batchStatusSupplier;
     }
 
-    // public ConsumerStatistics synkroniser(
     public void synkroniser(
         final IOkosynkConfiguration okosynkConfiguration,
         final Collection<Oppgave>   alleOppgaverLestFraBatchen_parm,
@@ -54,22 +43,15 @@ public class OppgaveSynkroniserer {
         final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>(alleOppgaverLestFraBatchen_parm);
 
         final Set<Oppgave> oppgaverLestFraDatabasen   = new HashSet<>();
-        final ConsumerStatistics consumerStatistics_finn =
-            oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
+        final ConsumerStatistics consumerStatistics_finn = ConsumerStatistics.zero(); //oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
 
-        final Set<Oppgave>            oppgaverSomSkalFerdigstilles =
-            finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-        final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres    =
-            finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-        final Set<Oppgave>            oppgaverSomSkalOpprettes     =
-            finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres = finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<Oppgave> oppgaverSomSkalOpprettes = finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
 
-        final ConsumerStatistics consumerStatistics_ferdigstill =
-            ferdigstillOppgaver(okosynkConfiguration, oppgaverSomSkalFerdigstilles, bruker);
-        final ConsumerStatistics consumerStatistics_oppdater =
-            oppdaterOppgaver(okosynkConfiguration, oppgaverSomSkalOppdateres, bruker);
-        final ConsumerStatistics consumerStatistics_opprett =
-            opprettOppgaver(okosynkConfiguration, oppgaverSomSkalOpprettes, bruker);
+        final ConsumerStatistics consumerStatistics_ferdigstill = ferdigstillOppgaver(okosynkConfiguration, oppgaverSomSkalFerdigstilles, bruker);
+        final ConsumerStatistics consumerStatistics_oppdater = oppdaterOppgaver(okosynkConfiguration, oppgaverSomSkalOppdateres, bruker);
+        final ConsumerStatistics consumerStatistics_opprett = opprettOppgaver(okosynkConfiguration, oppgaverSomSkalOpprettes, bruker);
 
         final ConsumerStatistics consumerStatistics_accumulated =
             ConsumerStatistics.addAll(
@@ -139,8 +121,7 @@ public class OppgaveSynkroniserer {
                 consumerStatistics = ConsumerStatistics.zero();
             } else {
                 logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker, oppgaverSomSkalFerdigstilles.size());
-                consumerStatistics =
-                    oppgaveBehandlingGateway.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
+                consumerStatistics = ConsumerStatistics.zero();//oppgaveBehandlingGateway.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
                 logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker, oppgaverSomSkalFerdigstilles.size());
             }
         }
@@ -174,8 +155,7 @@ public class OppgaveSynkroniserer {
         } else {
             logger.info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
             Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream().map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
-            consumerStatistics =
-                oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
+            consumerStatistics = ConsumerStatistics.zero(); //oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
             logger.info("Bruker {} har oppdatert {} oppgaver", bruker, oppgaveOppdateringer.size());
         }
 
@@ -196,8 +176,7 @@ public class OppgaveSynkroniserer {
             consumerStatistics = ConsumerStatistics.zero();
         } else {
             logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
-            consumerStatistics =
-                oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
+            consumerStatistics = ConsumerStatistics.zero(); //oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
             logger.info("Bruker {} har opprettet {} oppgaver", bruker, oppgaver.size());
         }
 

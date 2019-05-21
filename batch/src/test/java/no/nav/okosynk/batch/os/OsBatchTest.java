@@ -25,8 +25,6 @@ public class OsBatchTest extends BatchTest<OsMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
                 BatchTest.getEksekveringsId(),
-                this.getMockedOppgaveGateway(),
-                this.getMockedOppgaveBehandlingGateway(),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper()
             )

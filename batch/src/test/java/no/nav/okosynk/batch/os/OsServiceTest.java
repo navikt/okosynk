@@ -11,11 +11,9 @@ import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.MeldingLinjeFileReaderMock;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,11 +31,11 @@ class OsServiceTest {
 
     private static String inputFilPath = "mypath";
 
-    private IOppgaveConsumerGateway mockedOppgaveGateway =
-        mock(IOppgaveConsumerGateway.class);
-
-    private IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway =
-        mock(IOppgaveBehandlingConsumerGateway.class);
+//    private IOppgaveConsumerGateway mockedOppgaveGateway =
+//        mock(IOppgaveConsumerGateway.class);
+//
+//    private IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway =
+//        mock(IOppgaveBehandlingConsumerGateway.class);
 
     private BatchRepository batchRepository;
     private OsService osService;
@@ -53,9 +51,7 @@ class OsServiceTest {
         osService =
             new OsService(
                 okosynkConfiguration,
-                batchRepository,
-                mockedOppgaveGateway,
-                mockedOppgaveBehandlingGateway
+                batchRepository
             );
     }
 
@@ -136,7 +132,7 @@ class OsServiceTest {
 
     private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
 
-        this.osService = spy(new OsService(okosynkConfiguration, batchRepository, mockedOppgaveGateway, mockedOppgaveBehandlingGateway));
+        this.osService = spy(new OsService(okosynkConfiguration, batchRepository));
         final Batch<OsMelding> batch = (Batch<OsMelding>)osService.createAndConfigureBatch(this.okosynkConfiguration);
         batch.setMeldingLinjeReader(new MeldingLinjeFileReaderMock(MOCK_OS_LINJE));
         when(osService.createAndConfigureBatch(this.okosynkConfiguration)).thenReturn((Batch)batch);

@@ -14,10 +14,6 @@ import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgave.OppgaveConsumerGatewayFactory;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.OppgaveBehandlingConsumerGatewayFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -26,11 +22,6 @@ public abstract class AbstractBatchService {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractBatchService.class);
 
-    @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveConsumerGateway oppgaveGateway;
-
-    @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway;
 
     @Getter(AccessLevel.PROTECTED)
     private final AbstractService service;
@@ -45,13 +36,8 @@ public abstract class AbstractBatchService {
         final IOkosynkConfiguration okosynkConfiguration,
         final Constants.BATCH_TYPE  batchType) {
 
-        final OppgaveConsumerGatewayFactory oppgaveConsumerGatewayFactory =
-            new OppgaveConsumerGatewayFactory(okosynkConfiguration);
-        final IOppgaveConsumerGateway oppgaveGateway = oppgaveConsumerGatewayFactory.create(batchType);
-        final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway =
-            new OppgaveBehandlingConsumerGatewayFactory(okosynkConfiguration).create(batchType);
         final AbstractService service =
-            createService(okosynkConfiguration, oppgaveGateway, oppgaveBehandlingGateway);
+            createService(okosynkConfiguration);
 
         this.oppgaveGateway           = oppgaveGateway;
         this.oppgaveBehandlingGateway = oppgaveBehandlingGateway;
@@ -68,16 +54,12 @@ public abstract class AbstractBatchService {
         final BatchRepository batchRepository = new BatchRepository();
 
         final AbstractService service =
-            createService(okosynkConfiguration, oppgaveGateway, oppgaveBehandlingGateway, batchRepository);
+            createService(okosynkConfiguration, batchRepository);
 
         return service;
     }
 
-    protected abstract AbstractService createService(
-        final IOkosynkConfiguration             okosynkConfiguration,
-        final IOppgaveConsumerGateway           oppgaveV3Service,
-        final IOppgaveBehandlingConsumerGateway oppgavebehandlingV3Service,
-        final BatchRepository                   batchRepository);
+    protected abstract AbstractService createService(final IOkosynkConfiguration okosynkConfiguration, final BatchRepository batchRepository);
 
     public BatchStatus startBatchSynchronously() {
 

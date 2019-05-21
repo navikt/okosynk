@@ -15,7 +15,7 @@ public class ConsumerStatisticsTest {
         final ConsumerStatistics consumerStatistics2 = null;
 
         assertThrows(
-            IllegalArgumentException.class,
+            NullPointerException.class,
             () -> consumerStatistics1.add(consumerStatistics2)
         );
     }

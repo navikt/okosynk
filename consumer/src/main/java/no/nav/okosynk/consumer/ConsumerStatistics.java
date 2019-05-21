@@ -3,7 +3,7 @@ package no.nav.okosynk.consumer;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang3.Validate;
 
 @Builder(toBuilder = true)
 public class ConsumerStatistics {

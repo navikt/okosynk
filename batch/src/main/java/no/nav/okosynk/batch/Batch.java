@@ -1,22 +1,19 @@
 package no.nav.okosynk.batch;
 
-import static no.nav.metrics.MetricsFactory.createTimer;
-
 import java.util.List;
+
+import io.prometheus.client.Histogram;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import no.nav.metrics.Timer;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingReader;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.LinjeUnreadableException;
 import org.apache.commons.lang3.Validate;
@@ -62,8 +59,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         final IOkosynkConfiguration                okosynkConfiguration,
         final Constants.BATCH_TYPE                 batchType,
         final long                                 executionId,
-        final IOppgaveConsumerGateway              oppgaveGateway,
-        final IOppgaveBehandlingConsumerGateway    oppgaveBehandlingGateway,
         final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
         final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper
     ) {
@@ -75,7 +70,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         this.executionId                  = executionId;
         this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
         this.spesifikkMeldingReader       = spesifikkMeldingReader;
-        this.oppgaveSynkroniserer         = new OppgaveSynkroniserer(oppgaveGateway, oppgaveBehandlingGateway, this::getStatus);
+        this.oppgaveSynkroniserer         = new OppgaveSynkroniserer(this::getStatus);
         this.spesifikkMapper              = spesifikkMapper;
 
         this.setStatus(BatchStatus.READY);
@@ -83,8 +78,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
 
     @Override
     public void run() {
-        final Timer timer = createTimer(getBatchName());
-        timer.start();
+//        final Timer timer = createTimer(getBatchName());
+//        timer.start();
         MDC.put("batchnavn", getBatchName());
 
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
@@ -118,11 +113,11 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         } catch (Throwable e) {
             logger.error("Noe uventet har gått galt under kjøring av " + getBatchName() + ". ", e);
             setStatus(BatchStatus.FEIL);
-            timer.setFailed();
+//            timer.setFailed();
         } finally {
             MDC.remove("batchnavn");
-            timer.stop();
-            timer.report();
+//            timer.stop();
+//            timer.report();
         }
     }
 

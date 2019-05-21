@@ -12,8 +12,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
@@ -36,27 +34,17 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     private final BatchRepository batchRepository;
 
     @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveConsumerGateway oppgaveGateway;
-
-    @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway;
-
-    @Getter(AccessLevel.PROTECTED)
     private final AtomicLong nextExecutionId;
 
     protected AbstractService(
         final Constants.BATCH_TYPE              batchType,
         final IOkosynkConfiguration             okosynkConfiguration,
-        final BatchRepository                   batchRepository,
-        final IOppgaveConsumerGateway           oppgaveGateway,
-        final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway
+        final BatchRepository                   batchRepository
         ) {
 
         this.batchType                = batchType;
         this.okosynkConfiguration     = okosynkConfiguration;
         this.batchRepository          = batchRepository;
-        this.oppgaveGateway           = oppgaveGateway;
-        this.oppgaveBehandlingGateway = oppgaveBehandlingGateway;
         this.nextExecutionId          =
             new AtomicLong(this.getBatchType().getExecutionIdOffset() + System.currentTimeMillis());
     }
@@ -154,8 +142,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
                 okosynkConfiguration,
                 getBatchType(),
                 getNextExecutionId().getAndIncrement(),
-                this.getOppgaveGateway(),
-                this.getOppgaveBehandlingGateway(),
                 createMeldingReader(),
                 createMeldingMapper()
             );
