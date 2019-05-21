@@ -1,8 +1,5 @@
 package no.nav.okosynk.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -14,22 +11,36 @@ import java.util.stream.Collectors;
 public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMelding>
     implements Function<List<MELDINGSTYPE>, Optional<Oppgave>> {
 
-    @Getter(AccessLevel.PROTECTED)
     private static final String fagomradeKode = "OKO";
-
-    @Getter(AccessLevel.PROTECTED)
     private static final String prioritetKode = "LAV_OKO";
-
-    @Getter(AccessLevel.PROTECTED)
     private static final String linjeSeparator = System.getProperty("line.separator"); // Does not need to use IOkosynkConfiguration, because "line.separator" is part of the no.nav.okosynk.io.os/java ecosystem.
 
-    @Getter(AccessLevel.PUBLIC)
+    public static String getFagomradeKode() {
+        return fagomradeKode;
+    }
+
+    public static String getPrioritetKode() {
+        return prioritetKode;
+    }
+
+    public static String getLinjeSeparator() {
+        return linjeSeparator;
+    }
+
+    public static String getRecordSeparator() {
+        return recordSeparator;
+    }
+
+    public static String getForsteFeltSeparator() {
+        return forsteFeltSeparator;
+    }
+
+    public static String getFeltSeparator() {
+        return feltSeparator;
+    }
+
     private static final String recordSeparator = linjeSeparator + linjeSeparator;
-
-    @Getter(AccessLevel.PROTECTED)
     private static final String forsteFeltSeparator = ";;   ";
-
-    @Getter(AccessLevel.PROTECTED)
     private static final String feltSeparator = ";   ";
 
     private static final DateTimeFormatter NORSK_DATO_FORMAT_UTEN_KLOKKESLETT = DateTimeFormatter.ofPattern("dd.MM.yy");

@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.domain.AbstractMeldingBatchInputRecordBuilder;
 
 public class OsMeldingBatchInputRecordBuilder
@@ -22,7 +20,18 @@ public class OsMeldingBatchInputRecordBuilder
         ETTER_OPPGJOR(OsMeldingFormat.ETTEROPPGJOR_START, OsMeldingFormat.ETTEROPPGJOR_SLUTT)
         ;
 
-        @Getter(AccessLevel.PUBLIC)
+        public static int getRecordLength() {
+            return RECORD_LENGTH;
+        }
+
+        public int getStartPos() {
+            return startPos;
+        }
+
+        public int getEndPos() {
+            return endPos;
+        }
+
         private static final int RECORD_LENGTH =
             Arrays
                 .stream(SUB_FIELD_DEF.values())
@@ -31,10 +40,8 @@ public class OsMeldingBatchInputRecordBuilder
                 .getAsInt();
         ;
 
-        @Getter(AccessLevel.PUBLIC)
         private final int startPos;
 
-        @Getter(AccessLevel.PUBLIC)
         private final int endPos;
 
         private SUB_FIELD_DEF(final int startPos, final int endPos) {
@@ -93,7 +100,7 @@ public class OsMeldingBatchInputRecordBuilder
     public String build() {
 
         final int totalRecordLength =
-            Math.max(SUPER_FIELD_DEF.getUR_RECORD_LENGTH(), SUB_FIELD_DEF.getRECORD_LENGTH());
+            Math.max(SUPER_FIELD_DEF.getUrRecordLength(), SUB_FIELD_DEF.getRecordLength());
         final char[] pad = new char[totalRecordLength];
         Arrays.fill(pad, ' ');
         final StringBuffer stringBuffer = new StringBuffer(totalRecordLength);

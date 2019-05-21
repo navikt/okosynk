@@ -18,9 +18,9 @@ public class OsMeldingLinjeFtpReaderTest
         LoggerFactory.getLogger("EnteringTestHeader");
     // =========================================================================
     static {
-        setFTP_HOST_URL_KEY(Constants.BATCH_TYPE.OS.getFtpHostUrlKey());
-        setFTP_USER_KEY(Constants.BATCH_TYPE.OS.getFtpUserKey());
-        setFTP_PASSWORD_KEY(Constants.BATCH_TYPE.OS.getFtpPasswordKey());
+        setFtpHostUrlKey(Constants.BATCH_TYPE.OS.getFtpHostUrlKey());
+        setFtpUserKey(Constants.BATCH_TYPE.OS.getFtpUserKey());
+        setFtpPasswordKey(Constants.BATCH_TYPE.OS.getFtpPasswordKey());
     }
     // =========================================================================
     @Override

@@ -106,7 +106,7 @@ public class OppgaveSynkroniserer {
         final ConsumerStatistics consumerStatistics;
         if (batchErStoppet()) {
             logger.info("Batchen er stoppet, avslutter uten å ferdigstille oppgaver");
-            consumerStatistics = ConsumerStatistics.builder().build();
+            consumerStatistics = ConsumerStatistics.zero();
         } else {
             final String oppgaveType = brukerTilOppgaveType(okosynkConfiguration, bruker);
             final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects.equals(oppgave.oppgavetypeKode, oppgaveType);

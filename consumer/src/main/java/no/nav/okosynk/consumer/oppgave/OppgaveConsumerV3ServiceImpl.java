@@ -1,8 +1,5 @@
 //package no.nav.okosynk.consumer.oppgave;
 //
-//import lombok.AccessLevel;
-//import lombok.Getter;
-//
 //import java.util.Collection;
 //import java.util.stream.Collectors;
 //import no.nav.okosynk.config.IOkosynkConfiguration;

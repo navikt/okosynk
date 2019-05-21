@@ -5,9 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
@@ -22,20 +19,37 @@ public abstract class AbstractMeldingLinjeFileReader
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMeldingLinjeFileReader.class);
 
-    @Getter(AccessLevel.PROTECTED)
     private static final Charset defaultCharset = StandardCharsets.ISO_8859_1;
-
-    @Getter(AccessLevel.PROTECTED)
     private final IOkosynkConfiguration okosynkConfiguration;
-
-    @Getter(AccessLevel.PROTECTED)
     final Constants.BATCH_TYPE  batchType;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PUBLIC)
+    private static Charset getDefaultCharset() {
+        return defaultCharset;
+    }
+
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
+    public Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
+
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
     private Status status = Status.UNSET;
 
-    @Getter(AccessLevel.PROTECTED)
+    public String getFullyQualifiedInputFileName() {
+        return fullyQualifiedInputFileName;
+    }
+
     private final String fullyQualifiedInputFileName;
 
     protected AbstractMeldingLinjeFileReader(

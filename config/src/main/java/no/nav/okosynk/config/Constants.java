@@ -1,8 +1,5 @@
 package no.nav.okosynk.config;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-
 public class Constants {
 
     public enum BATCH_TYPE {
@@ -36,44 +33,71 @@ public class Constants {
                 , UR_MAPPING_RULES_PROPERTIES_FILENAME)
         ;
 
-        @Getter(AccessLevel.PUBLIC)
         private final String name;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String batchBrukerKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String batchBrukerDefaultValue;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String batchRunSynchronouslyTimerName;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String oppgaveType;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String ftpHostUrlKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String ftpUserKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String ftpPasswordKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String ftpConnectionTimeoutKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final int    ftpConnectionTimeoutDefaultValueInMs;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String ftpCharsetNameKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final long   executionIdOffset;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String mappingRulesPropertiesFileName;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getBatchBrukerKey() {
+            return batchBrukerKey;
+        }
+
+        public String getBatchBrukerDefaultValue() {
+            return batchBrukerDefaultValue;
+        }
+
+        public String getBatchRunSynchronouslyTimerName() {
+            return batchRunSynchronouslyTimerName;
+        }
+
+        public String getOppgaveType() {
+            return oppgaveType;
+        }
+
+        public String getFtpHostUrlKey() {
+            return ftpHostUrlKey;
+        }
+
+        public String getFtpUserKey() {
+            return ftpUserKey;
+        }
+
+        public String getFtpPasswordKey() {
+            return ftpPasswordKey;
+        }
+
+        public String getFtpConnectionTimeoutKey() {
+            return ftpConnectionTimeoutKey;
+        }
+
+        public int getFtpConnectionTimeoutDefaultValueInMs() {
+            return ftpConnectionTimeoutDefaultValueInMs;
+        }
+
+        public String getFtpCharsetNameKey() {
+            return ftpCharsetNameKey;
+        }
+
+        public long getExecutionIdOffset() {
+            return executionIdOffset;
+        }
+
+        public String getMappingRulesPropertiesFileName() {
+            return mappingRulesPropertiesFileName;
+        }
 
         BATCH_TYPE(
               final String name
@@ -163,31 +187,51 @@ public class Constants {
         )
         ;
 
-        @Getter(AccessLevel.PUBLIC)
         private final String name;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String mockKey;
-
-        @Getter(AccessLevel.PUBLIC)
         private final String endpointUrlKey;
-
-        @Getter(AccessLevel.PUBLIC)
         final String tjenestebeskrivelse;
-
-        @Getter(AccessLevel.PUBLIC)
         final int timeout;
-
-        @Getter(AccessLevel.PUBLIC)
         final String bulkSizeMaxForCreate;
-
-        @Getter(AccessLevel.PUBLIC)
         final String bulkSizeDefaultForCreate;
-
-        @Getter(AccessLevel.PUBLIC)
         final String bulkSizeMaxForUpdate;
 
-        @Getter(AccessLevel.PUBLIC)
+        public String getName() {
+            return name;
+        }
+
+        public String getMockKey() {
+            return mockKey;
+        }
+
+        public String getEndpointUrlKey() {
+            return endpointUrlKey;
+        }
+
+        public String getTjenestebeskrivelse() {
+            return tjenestebeskrivelse;
+        }
+
+        public int getTimeout() {
+            return timeout;
+        }
+
+        public String getBulkSizeMaxForCreate() {
+            return bulkSizeMaxForCreate;
+        }
+
+        public String getBulkSizeDefaultForCreate() {
+            return bulkSizeDefaultForCreate;
+        }
+
+        public String getBulkSizeMaxForUpdate() {
+            return bulkSizeMaxForUpdate;
+        }
+
+        public String getBulkSizeDefaultForUpdate() {
+            return bulkSizeDefaultForUpdate;
+        }
+
         final String bulkSizeDefaultForUpdate;
 
         private CONSUMER_TYPE(

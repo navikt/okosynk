@@ -30,8 +30,6 @@ public class UrBatchTest extends BatchTest<UrMelding> {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 BatchTest.getEksekveringsId(),
-                this.getMockedOppgaveGateway(),
-                this.getMockedOppgaveBehandlingGateway(),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper()
             )

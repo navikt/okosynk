@@ -2,8 +2,6 @@ package no.nav.okosynk.io;
 
 import java.net.URL;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
@@ -14,10 +12,15 @@ public class MeldingLinjeReaderWrapper
 
     private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeReaderWrapper.class);
 
-    @Getter(AccessLevel.PACKAGE)
-    private final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
+    public IMeldingLinjeFileReader getWrappedMeldingLinjeFileReader() {
+        return wrappedMeldingLinjeFileReader;
+    }
 
-    @Getter(AccessLevel.PROTECTED)
+    public Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
+
+    private final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
     final Constants.BATCH_TYPE batchType;
 
     // =========================================================================

@@ -14,8 +14,6 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -33,10 +31,6 @@ class UrServiceTest {
 
     private static String inputFilPath = "mypath";
 
-    private IOppgaveConsumerGateway mockedOppgaveGateway =
-        mock(IOppgaveConsumerGateway.class);
-    private IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway =
-        mock(IOppgaveBehandlingConsumerGateway.class);
 
     private BatchRepository batchRepository;
     private UrService urService;
@@ -52,9 +46,7 @@ class UrServiceTest {
         urService =
             new UrService(
                 okosynkConfiguration,
-                batchRepository,
-                mockedOppgaveGateway,
-                mockedOppgaveBehandlingGateway
+                batchRepository
             );
     }
 
@@ -138,7 +130,7 @@ class UrServiceTest {
 
     private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
 
-        this.urService = spy(new UrService(okosynkConfiguration, batchRepository, mockedOppgaveGateway, mockedOppgaveBehandlingGateway));
+        this.urService = spy(new UrService(okosynkConfiguration, batchRepository));
         final Batch<UrMelding> batch = (Batch<UrMelding>)urService.createAndConfigureBatch(this.okosynkConfiguration);
         batch.setMeldingLinjeReader(new MeldingLinjeFileReaderMock(MOCK_UR_LINJE));
         when(urService.createAndConfigureBatch(this.okosynkConfiguration)).thenReturn((Batch)batch);

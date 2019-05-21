@@ -13,13 +13,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
@@ -39,39 +34,64 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
     private static final long EKSEKVERINGS_ID = 0;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private Batch batch;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
+    public Batch getBatch() {
+        return batch;
+    }
+
+    public void setBatch(Batch batch) {
+        this.batch = batch;
+    }
+
+    public IMeldingReader<SPESIFIKKMELDINGTYPE> getMeldingReader() {
+        return meldingReader;
+    }
+
+    public void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
+        this.meldingReader = meldingReader;
+    }
+
+    public IMeldingMapper<SPESIFIKKMELDINGTYPE> getMeldingMapper() {
+        return meldingMapper;
+    }
+
+    public void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
+        this.meldingMapper = meldingMapper;
+    }
+
+    public String getFsInputFilePathKey() {
+        return fsInputFilePathKey;
+    }
+
+    public void setFsInputFilePathKey(String fsInputFilePathKey) {
+        this.fsInputFilePathKey = fsInputFilePathKey;
+    }
+
     private String fsInputFilePathKey;
 
-    @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveConsumerGateway mockedOppgaveGateway =
-        mock(IOppgaveConsumerGateway.class);
+    public IMeldingLinjeFileReader getMockedUspesifikkMeldingLinjeReader() {
+        return mockedUspesifikkMeldingLinjeReader;
+    }
 
-    @Getter(AccessLevel.PROTECTED)
-    private final IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway =
-        mock(IOppgaveBehandlingConsumerGateway.class);
-
-    @Getter(AccessLevel.PRIVATE)
     private final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
         mock(IMeldingLinjeFileReader.class);
 
-    @Getter(AccessLevel.PRIVATE)
+    public OppgaveSynkroniserer getOppgaveSynkroniserer() {
+        return oppgaveSynkroniserer;
+    }
+
     private final OppgaveSynkroniserer oppgaveSynkroniserer =
         mock(OppgaveSynkroniserer.class);
 
-    @Getter(AccessLevel.PROTECTED)
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
     // =========================================================================
     protected static long getEksekveringsId() {

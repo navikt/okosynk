@@ -6,8 +6,6 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.metrics.Timer;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
@@ -23,14 +21,21 @@ public abstract class AbstractBatchService {
     private static final Logger logger = LoggerFactory.getLogger(AbstractBatchService.class);
 
 
-    @Getter(AccessLevel.PROTECTED)
     private final AbstractService service;
-
-    @Getter(AccessLevel.PROTECTED)
     final IOkosynkConfiguration okosynkConfiguration;
-
-    @Getter(AccessLevel.PRIVATE)
     final Constants.BATCH_TYPE batchType;
+
+    private AbstractService getService() {
+        return service;
+    }
+
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
+    private Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
 
     public AbstractBatchService(
         final IOkosynkConfiguration okosynkConfiguration,
@@ -39,22 +44,15 @@ public abstract class AbstractBatchService {
         final AbstractService service =
             createService(okosynkConfiguration);
 
-        this.oppgaveGateway           = oppgaveGateway;
-        this.oppgaveBehandlingGateway = oppgaveBehandlingGateway;
         this.service                  = service;
         this.okosynkConfiguration     = okosynkConfiguration;
         this.batchType                = batchType;
     }
 
-    private AbstractService createService(
-        final IOkosynkConfiguration             okosynkConfiguration,
-        final IOppgaveConsumerGateway           oppgaveGateway,
-        final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway) {
-
+    private AbstractService createService(final IOkosynkConfiguration okosynkConfiguration) {
         final BatchRepository batchRepository = new BatchRepository();
 
-        final AbstractService service =
-            createService(okosynkConfiguration, batchRepository);
+        final AbstractService service = createService(okosynkConfiguration, batchRepository);
 
         return service;
     }

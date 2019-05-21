@@ -2,15 +2,17 @@ package no.nav.okosynk.batch;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.LinjeUnreadableException;
 
 public class MeldingLinjeFileReaderMock
     implements IMeldingLinjeFileReader {
 
-    @Getter(AccessLevel.PUBLIC)
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
     private final Status status = Status.UNSET;
 
     private String mockLinje;

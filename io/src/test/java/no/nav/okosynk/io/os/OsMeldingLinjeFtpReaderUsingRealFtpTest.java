@@ -18,7 +18,7 @@ public class OsMeldingLinjeFtpReaderUsingRealFtpTest
 
     static {
         MeldingLinjeFtpReaderTestUsingRealFtpOrSftp
-            .setFTP_TEST_SERVER_FTP_PROTOCOL(Constants.FTP_PROTOCOL.FTP);
+            .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.FTP);
     }
 
     @BeforeAll

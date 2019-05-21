@@ -1,8 +1,5 @@
 package no.nav.okosynk.cli;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.cli.os.OsBatchService;
 import no.nav.okosynk.cli.testcertificates.TestCertificates_Copy;
@@ -55,11 +52,20 @@ public class CliMain {
     private static final String CLI_UR_ONLY_LONG_KEY                              = "onlyUr";
     private static final String CLI_UR_ONLY_DESCRIPTION                           = "Only run ur batch";
 
-    @Getter(AccessLevel.PRIVATE)
+    private IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     private final IOkosynkConfiguration okosynkConfiguration;
 
-    @Setter(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
+    private IStartableAndStoppable getFtpServerTestStarter() {
+        return ftpServerTestStarter;
+    }
+
+    private void setFtpServerTestStarter(IStartableAndStoppable ftpServerTestStarter) {
+        this.ftpServerTestStarter = ftpServerTestStarter;
+    }
+
     private IStartableAndStoppable ftpServerTestStarter = null;
 
     public CliMain(final String applicationPropertiesFileName) {

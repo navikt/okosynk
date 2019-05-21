@@ -8,8 +8,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.domain.AbstractMelding;
@@ -24,16 +22,9 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
-    @Getter(AccessLevel.PROTECTED)
     private final Constants.BATCH_TYPE batchType;
-
-    @Getter(AccessLevel.PRIVATE)
     private final IOkosynkConfiguration okosynkConfiguration;
-
-    @Getter(AccessLevel.PROTECTED)
     private final BatchRepository batchRepository;
-
-    @Getter(AccessLevel.PROTECTED)
     private final AtomicLong nextExecutionId;
 
     protected AbstractService(
@@ -147,5 +138,21 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
             );
 
         return batch;
+    }
+
+    private Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
+
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
+    public BatchRepository getBatchRepository() {
+        return batchRepository;
+    }
+
+    private AtomicLong getNextExecutionId() {
+        return nextExecutionId;
     }
 }

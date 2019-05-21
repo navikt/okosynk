@@ -3,9 +3,6 @@ package no.nav.okosynk.batch;
 import java.util.List;
 
 import io.prometheus.client.Histogram;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -28,31 +25,14 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
 
     private static final int UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT = 25000;
 
-    @Getter(AccessLevel.PUBLIC)
-    private BatchStatus status;
-
-    @Getter(AccessLevel.PRIVATE)
     private final IOkosynkConfiguration okosynkConfiguration;
-
-    @Getter(AccessLevel.PRIVATE)
     final Constants.BATCH_TYPE batchType;
-
-    @Getter(AccessLevel.PUBLIC)
     private final long executionId;
-
-    @Getter(AccessLevel.PRIVATE)
+    private BatchStatus status;
     private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
 
-    @Setter(AccessLevel.PUBLIC)
-    @Getter(AccessLevel.PRIVATE)
     private IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
-
-    @Setter(AccessLevel.PUBLIC)
-    @Getter(AccessLevel.PRIVATE)
     private OppgaveSynkroniserer oppgaveSynkroniserer;
-
-    @Setter(AccessLevel.PUBLIC)
-    @Getter(AccessLevel.PRIVATE)
     private IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
 
     public Batch(
@@ -230,9 +210,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         return linjerMedUspesifikkeMeldinger;
     }
 
-    private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(
-        final List<String> linjerMedUspesifikkeMeldinger
-    ) {
+    private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(final List<String> linjerMedUspesifikkeMeldinger) {
         logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
 
         List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = null;
@@ -247,5 +225,50 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         logger.debug("About to normally leave Batch.opprettSpesifikkeMeldinger");
 
         return spesifikkeMeldinger;
+    }
+
+    public BatchStatus getStatus() {
+        return status;
+    }
+
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
+    private Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
+
+
+    public long getExecutionId() {
+        return executionId;
+    }
+
+    private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {
+        return uspesifikkMeldingLinjeReader;
+    }
+
+    private IMeldingReader<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingReader() {
+        return spesifikkMeldingReader;
+    }
+
+    public void setSpesifikkMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader) {
+        this.spesifikkMeldingReader = spesifikkMeldingReader;
+    }
+
+    private OppgaveSynkroniserer getOppgaveSynkroniserer() {
+        return oppgaveSynkroniserer;
+    }
+
+    public void setOppgaveSynkroniserer(OppgaveSynkroniserer oppgaveSynkroniserer) {
+        this.oppgaveSynkroniserer = oppgaveSynkroniserer;
+    }
+
+    private IMeldingMapper<SPESIFIKKMELDINGTYPE> getSpesifikkMapper() {
+        return spesifikkMapper;
+    }
+
+    public void setSpesifikkMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+        this.spesifikkMapper = spesifikkMapper;
     }
 }

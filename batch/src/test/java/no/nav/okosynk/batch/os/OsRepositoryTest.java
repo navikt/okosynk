@@ -1,15 +1,12 @@
 package no.nav.okosynk.batch.os;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import no.nav.okosynk.domain.os.OsMapper;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.os.OsMeldingReader;
@@ -26,8 +23,6 @@ class OsRepositoryTest {
     private static final long EKSEKVERINGS_ID = 0;
 
     private BatchRepository batchRepository;
-    private IOppgaveConsumerGateway mockedOppgaveGateway           = mock(IOppgaveConsumerGateway.class);
-    private IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway = mock(IOppgaveBehandlingConsumerGateway.class);
     private IOkosynkConfiguration okosynkConfiguration;
 
     @BeforeEach
@@ -50,8 +45,6 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
-                mockedOppgaveGateway,
-                mockedOppgaveBehandlingGateway,
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 
@@ -72,8 +65,6 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
-                mockedOppgaveGateway,
-                mockedOppgaveBehandlingGateway,
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 

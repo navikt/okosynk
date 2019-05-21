@@ -1,8 +1,5 @@
 package no.nav.okosynk.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -26,8 +23,10 @@ public abstract class AbstractMelding {
     public  final String    nyesteVentestatus;
     public  final String    brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
 
+    public MeldingParser getParser() {
+        return parser;
+    }
 
-    @Getter(AccessLevel.PROTECTED)
     private final MeldingParser parser;
 
     protected AbstractMelding(final String melding, final MeldingParser parser) {

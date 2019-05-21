@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.net.ftp.FTPClient;
@@ -20,7 +18,10 @@ public class MeldingLinjeFtpReader
     private static class FtpResourceContainer
         extends AbstractMeldingLinjeFtpOrSftpReader.AbstractFtpOrSftpResourceContainer {
 
-        @Getter(AccessLevel.PRIVATE)
+        public FTPClient getFtpClient() {
+            return ftpClient;
+        }
+
         private final FTPClient ftpClient;
 
         private FtpResourceContainer(final FTPClient ftpClient) {
@@ -76,7 +77,10 @@ public class MeldingLinjeFtpReader
 
     private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeFtpReader.class);
 
-    @Getter(AccessLevel.PRIVATE)
+    private FTPClient getFtpClient() {
+        return ftpClient;
+    }
+
     private final FTPClient ftpClient;
 
     public MeldingLinjeFtpReader(

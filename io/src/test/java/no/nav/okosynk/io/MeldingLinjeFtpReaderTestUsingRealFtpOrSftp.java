@@ -7,9 +7,6 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -34,36 +31,72 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     public static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL = "testfilForMeldingsleser.txt";
     // =========================================================================
 
-    @Getter(AccessLevel.PROTECTED)
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     private IOkosynkConfiguration okosynkConfiguration;
 
     // =========================================================================
 
+    public static void setFtpHostUriKey(String ftpHostUriKey) {
+        FTP_HOST_URI_KEY = ftpHostUriKey;
+    }
+
     // Set by subclass:
-    @Setter(AccessLevel.PROTECTED)
     protected static String FTP_HOST_URI_KEY;
 
-    @Setter(AccessLevel.PROTECTED)
+    public static void setFtpHostPortKey(String ftpHostPortKey) {
+        FTP_HOST_PORT_KEY = ftpHostPortKey;
+    }
+
     protected static String FTP_HOST_PORT_KEY;
 
-    @Setter(AccessLevel.PROTECTED)
+    public static void setFtpUserKey(String ftpUserKey) {
+        FTP_USER_KEY = ftpUserKey;
+    }
+
     protected static String FTP_USER_KEY;
 
-    @Setter(AccessLevel.PROTECTED)
+    public static void setFtpPasswordKey(String ftpPasswordKey) {
+        FTP_PASSWORD_KEY = ftpPasswordKey;
+    }
+
     protected static String FTP_PASSWORD_KEY;
+
+    public static String getFtpInputFilePath() {
+        return FTP_INPUT_FILE_PATH;
+    }
+
+    public static void setFtpInputFilePath(String ftpInputFilePath) {
+        FTP_INPUT_FILE_PATH = ftpInputFilePath;
+    }
+
     // ---------------------------------------------------------------------
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PROTECTED)
     protected static String FTP_INPUT_FILE_PATH;
 
-    @Getter(AccessLevel.PRIVATE)
+    public static String getFtpInputFileName() {
+        return FTP_INPUT_FILE_NAME;
+    }
+
     protected static final String FTP_INPUT_FILE_NAME = MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
+
+    public static void setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL ftpTestServerFtpProtocol) {
+        FTP_TEST_SERVER_FTP_PROTOCOL = ftpTestServerFtpProtocol;
+    }
+
     // =========================================================================
-    @Setter(AccessLevel.PROTECTED)
     protected static Constants.FTP_PROTOCOL FTP_TEST_SERVER_FTP_PROTOCOL;
+
+    public static AbstractTestFtpServer getFtpTestServer() {
+        return ftpTestServer;
+    }
+
+    public static void setFtpTestServer(AbstractTestFtpServer ftpTestServer) {
+        MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.ftpTestServer = ftpTestServer;
+    }
+
     // =========================================================================
-    @Setter(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
     private static AbstractTestFtpServer ftpTestServer;
     // =========================================================================
     @AfterAll
@@ -123,7 +156,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
             final String ftpFilePath =
                 new File(fullyQualifiedInputOperatingSystemFileName).getParent().substring(homeDir.length());
-            setFTP_INPUT_FILE_PATH(ftpFilePath);
+            setFtpInputFilePath(ftpFilePath);
         }
         // ===
         // =====================================================================
@@ -138,8 +171,8 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
             + AbstractTestFtpServer.FTP_TEST_SERVER_PORT
             + "/"
             + new File(
-                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFTP_INPUT_FILE_PATH(),
-                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFTP_INPUT_FILE_NAME()
+                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFilePath(),
+                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFileName()
               ).getPath().replace('\\', '/')
             ;
         final String ftpUserKey     = FTP_USER_KEY;
@@ -245,7 +278,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         enteringTestHeaderLogger.debug(null);
 
-        setFTP_INPUT_FILE_PATH(FTP_INPUT_FILE_PATH + "_NOT");
+        setFtpInputFilePath(FTP_INPUT_FILE_PATH + "_NOT");
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader =
             createAWorkingFtpServerAndAnInstanceOfMeldingLinjeFtpOrSftpFileReader();

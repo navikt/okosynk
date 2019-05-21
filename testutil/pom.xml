@@ -16,17 +16,10 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.sshd</groupId>
             <artifactId>sshd-core</artifactId>
             <version>1.7.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.apache.ftpserver</groupId>

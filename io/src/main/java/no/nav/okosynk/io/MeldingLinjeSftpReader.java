@@ -10,9 +10,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
@@ -24,15 +21,30 @@ public class MeldingLinjeSftpReader
     private static class SftpResourceContainer
         extends AbstractMeldingLinjeFtpOrSftpReader.AbstractFtpOrSftpResourceContainer {
 
-        @Getter(AccessLevel.PRIVATE)
         private final JSch jSch;
 
-        @Setter(AccessLevel.PRIVATE)
-        @Getter(AccessLevel.PRIVATE)
+        public JSch getjSch() {
+            return jSch;
+        }
+
+        public Session getSftpSession() {
+            return sftpSession;
+        }
+
+        public void setSftpSession(Session sftpSession) {
+            this.sftpSession = sftpSession;
+        }
+
         private Session sftpSession;
 
-        @Setter(AccessLevel.PRIVATE)
-        @Getter(AccessLevel.PRIVATE)
+        public ChannelSftp getSftpChannel() {
+            return sftpChannel;
+        }
+
+        public void setSftpChannel(ChannelSftp sftpChannel) {
+            this.sftpChannel = sftpChannel;
+        }
+
         private ChannelSftp sftpChannel;
 
         private SftpResourceContainer(final JSch jSch) {
@@ -58,8 +70,11 @@ public class MeldingLinjeSftpReader
 
     private static final String JSCH_CHANNEL_TYPE_SFTP = "sftp";
 
-    @Getter(AccessLevel.PRIVATE)
     private final JSch jSch;
+
+    public JSch getjSch() {
+        return jSch;
+    }
 
     public MeldingLinjeSftpReader(
         final IOkosynkConfiguration okosynkConfiguration,
@@ -95,7 +110,7 @@ public class MeldingLinjeSftpReader
 
     @Override
     protected AbstractMeldingLinjeFileReader.IResourceContainer createResourceContainer() {
-        return new MeldingLinjeSftpReader.SftpResourceContainer(getJSch());
+        return new MeldingLinjeSftpReader.SftpResourceContainer(getjSch());
     }
 
     private void establishSftpResources(
@@ -108,7 +123,7 @@ public class MeldingLinjeSftpReader
             final String  sftpHostServerName = this.getFtpHostServerName(okosynkConfiguration);
             final int     sftpPort           = this.getFtpHostPort(okosynkConfiguration);
             final Session sftpSession =
-                sftpResourceContainer.getJSch().getSession(sftpUser, sftpHostServerName, sftpPort);
+                sftpResourceContainer.getjSch().getSession(sftpUser, sftpHostServerName, sftpPort);
             sftpResourceContainer.setSftpSession(sftpSession);
         } catch (JSchException e) {
             final String msg =

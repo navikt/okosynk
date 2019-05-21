@@ -3,9 +3,6 @@ package no.nav.okosynk.domain;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,11 +11,20 @@ public abstract class AbstractMeldingReader<SPESIFIKKMELDINGTYPE extends Abstrac
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMeldingReader.class);
 
-    @Getter(AccessLevel.PRIVATE)
+    public IMeldingCreator<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingCreator() {
+        return spesifikkMeldingCreator;
+    }
+
     private final IMeldingCreator<SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator;
 
-    @Setter(AccessLevel.PRIVATE)
-    @Getter(AccessLevel.PRIVATE)
+    public int getLinjeNummer() {
+        return linjeNummer;
+    }
+
+    public void setLinjeNummer(int linjeNummer) {
+        this.linjeNummer = linjeNummer;
+    }
+
     private int linjeNummer;
 
     protected AbstractMeldingReader(

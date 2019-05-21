@@ -6,8 +6,6 @@ import no.nav.okosynk.batch.ur.UrService;
 import no.nav.okosynk.cli.AbstractBatchService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +21,9 @@ public class UrBatchService
     @Override
     protected AbstractService createService(
         final IOkosynkConfiguration             okosynkConfiguration,
-        final IOppgaveConsumerGateway           oppgaveGateway,
-        final IOppgaveBehandlingConsumerGateway oppgaveBehandlingGateway,
         final BatchRepository                   batchRepository) {
 
-        final AbstractService service =
-            new UrService(okosynkConfiguration, batchRepository, oppgaveGateway, oppgaveBehandlingGateway);
+        final AbstractService service = new UrService(okosynkConfiguration, batchRepository);
 
         return service;
     }

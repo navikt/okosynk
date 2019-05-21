@@ -1,8 +1,6 @@
 package no.nav.okosynk.io;
 
 import java.util.function.Supplier;
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.io.os.OsMeldingLinjeReaderWrapperTest;
@@ -16,7 +14,10 @@ public abstract class MeldingLinjeReaderWrapperTest {
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
-    @Getter(AccessLevel.PROTECTED)
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     private final IOkosynkConfiguration okosynkConfiguration =
         new FakeOkosynkConfiguration();
 

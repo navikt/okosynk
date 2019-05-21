@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -38,20 +35,42 @@ public abstract class MeldingLinjeFtpReaderTest
         LoggerFactory.getLogger("EnteringTestHeader");
     // =========================================================================
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private static String FTP_HOST_URL_KEY;
-
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private static String FTP_USER_KEY;
-
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
     private static String FTP_PASSWORD_KEY;
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PRIVATE)
+    public static String getFtpHostUrlKey() {
+        return FTP_HOST_URL_KEY;
+    }
+
+    public static void setFtpHostUrlKey(String ftpHostUrlKey) {
+        FTP_HOST_URL_KEY = ftpHostUrlKey;
+    }
+
+    public static String getFtpUserKey() {
+        return FTP_USER_KEY;
+    }
+
+    public static void setFtpUserKey(String ftpUserKey) {
+        FTP_USER_KEY = ftpUserKey;
+    }
+
+    public static String getFtpPasswordKey() {
+        return FTP_PASSWORD_KEY;
+    }
+
+    public static void setFtpPasswordKey(String ftpPasswordKey) {
+        FTP_PASSWORD_KEY = ftpPasswordKey;
+    }
+
+    public static String getFtpInputFilePath() {
+        return FTP_INPUT_FILE_PATH;
+    }
+
+    public static void setFtpInputFilePath(String ftpInputFilePath) {
+        FTP_INPUT_FILE_PATH = ftpInputFilePath;
+    }
+
     private static  String FTP_INPUT_FILE_PATH;
 
     private IOkosynkConfiguration okosynkConfiguration;

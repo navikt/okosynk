@@ -334,8 +334,8 @@ class UrMeldingTest extends AbstractMeldingTest {
 
         final int totalRecordLength =
             Math.max(
-                AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUR_RECORD_LENGTH(),
-                OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRECORD_LENGTH()
+                AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUrRecordLength(),
+                OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRecordLength()
             );
 
         final UrMelding melding =

@@ -1,7 +1,5 @@
 package no.nav.okosynk.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.domain.os.OsMeldingFormat;
 import no.nav.okosynk.domain.ur.UrMeldingFormat;
 
@@ -23,19 +21,35 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
         TOTALT_NETTO_BELOP(OsMeldingFormat.TOTALT_NETTO_BELOP_START, OsMeldingFormat.TOTALT_NETTO_BELOP_SLUTT, UrMeldingFormat.TOTALT_NETTO_BELOP_KOLONNE_START, UrMeldingFormat.TOTALT_NETTO_BELOP_KOLONNE_SLUTT),
         ;
 
-        @Getter(AccessLevel.PUBLIC)
+        public int getStartPosInOs() {
+            return startPosInOs;
+        }
+
+        public int getEndPosInOs() {
+            return endPosInOs;
+        }
+
+        public int getStartPosInUr() {
+            return startPosInUr;
+        }
+
+        public int getEndPosInUr() {
+            return endPosInUr;
+        }
+
+        public static int getOsRecordLength() {
+            return OS_RECORD_LENGTH;
+        }
+
+        public static int getUrRecordLength() {
+            return UR_RECORD_LENGTH;
+        }
+
         private final int startPosInOs;
-
-        @Getter(AccessLevel.PUBLIC)
         private final int endPosInOs;
-
-        @Getter(AccessLevel.PUBLIC)
         private final int startPosInUr;
-
-        @Getter(AccessLevel.PUBLIC)
         private final int endPosInUr;
 
-        @Getter(AccessLevel.PUBLIC)
         private static final int OS_RECORD_LENGTH =
             Arrays
                 .stream(SUPER_FIELD_DEF.values())
@@ -43,7 +57,6 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
                 .max()
                 .getAsInt();
 
-        @Getter(AccessLevel.PUBLIC)
         private static final int UR_RECORD_LENGTH =
             Arrays
                 .stream(SUPER_FIELD_DEF.values())

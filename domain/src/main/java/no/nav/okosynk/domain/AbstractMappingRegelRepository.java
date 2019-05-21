@@ -1,7 +1,5 @@
 package no.nav.okosynk.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +12,10 @@ public abstract class AbstractMappingRegelRepository<MELDINGSTYPE extends Abstra
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMappingRegelRepository.class);
 
-    @Getter(AccessLevel.PROTECTED)
+    public Properties getMappingRulesProperties() {
+        return mappingRulesProperties;
+    }
+
     private final Properties mappingRulesProperties = new Properties();
 
     private static final char NOKKEL_SKILLETEGN = ',';

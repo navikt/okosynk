@@ -1,9 +1,6 @@
 package no.nav.okosynk.io;
 
 import java.util.function.Function;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import org.junit.jupiter.api.Assertions;
@@ -22,12 +19,21 @@ abstract class AbstractMeldingLinjeFileReaderTest {
         MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
     // =========================================================================
 
-    @Getter(AccessLevel.PROTECTED)
+    public IOkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     private final IOkosynkConfiguration okosynkConfiguration =
         new FakeOkosynkConfiguration();
 
-    @Setter(AccessLevel.PROTECTED)
-    @Getter(AccessLevel.PROTECTED)
+    public static String getInputFileName() {
+        return INPUT_FILE_NAME;
+    }
+
+    public static void setInputFileName(String inputFileName) {
+        INPUT_FILE_NAME = inputFileName;
+    }
+
     private static String INPUT_FILE_NAME;
 
     // =========================================================================
