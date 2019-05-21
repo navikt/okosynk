@@ -11,6 +11,7 @@ import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.ur.UrMapper;
@@ -47,6 +48,7 @@ public class UrBatchBlackBoxTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper());
         batch.setMeldingLinjeReader(meldingReaderMock);

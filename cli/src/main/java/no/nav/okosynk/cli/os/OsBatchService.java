@@ -6,6 +6,7 @@ import no.nav.okosynk.batch.os.OsService;
 import no.nav.okosynk.cli.AbstractBatchService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +20,10 @@ public class OsBatchService
     }
 
     @Override
-    protected AbstractService createService(
-        final IOkosynkConfiguration             okosynkConfiguration,
-        final BatchRepository                   batchRepository) {
+    protected AbstractService createService(final IOkosynkConfiguration okosynkConfiguration,
+                                            final BatchRepository batchRepository,
+                                            final OppgaveRestClient oppgaveRestClient) {
 
-        final AbstractService service = new OsService(okosynkConfiguration, batchRepository);
-
-        return service;
+        return new OsService(okosynkConfiguration, batchRepository, oppgaveRestClient);
     }
 }

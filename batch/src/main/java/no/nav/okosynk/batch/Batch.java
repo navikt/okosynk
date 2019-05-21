@@ -6,6 +6,7 @@ import io.prometheus.client.Histogram;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingReader;
@@ -18,8 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
-    implements Runnable {
+public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
 
@@ -35,13 +35,13 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
     private OppgaveSynkroniserer oppgaveSynkroniserer;
     private IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
 
-    public Batch(
-        final IOkosynkConfiguration                okosynkConfiguration,
-        final Constants.BATCH_TYPE                 batchType,
-        final long                                 executionId,
-        final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
-        final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper
-    ) {
+    public Batch(final IOkosynkConfiguration okosynkConfiguration,
+                 final Constants.BATCH_TYPE batchType,
+                 final long executionId,
+                 final OppgaveRestClient oppgaveRestClient,
+                 final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
+                 final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+
         // Assume failure, set to ready by the descendant if successful:
         this.setStatus(BatchStatus.FEIL);
 
@@ -50,7 +50,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding>
         this.executionId                  = executionId;
         this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
         this.spesifikkMeldingReader       = spesifikkMeldingReader;
-        this.oppgaveSynkroniserer         = new OppgaveSynkroniserer(this::getStatus);
+        this.oppgaveSynkroniserer         = new OppgaveSynkroniserer(this::getStatus, oppgaveRestClient);
         this.spesifikkMapper              = spesifikkMapper;
 
         this.setStatus(BatchStatus.READY);

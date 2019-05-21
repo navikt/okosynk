@@ -274,11 +274,7 @@ public class CliMain {
         }
     }
 
-    private BatchStatus runBatches(
-        final boolean shouldOnlyRunOs,
-        final boolean shouldOnlyRunUr
-    ) {
-
+    private BatchStatus runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         logSelectedProperties(okosynkConfiguration, logger);
 
@@ -303,8 +299,7 @@ public class CliMain {
             urBatchStatus = runUr(okosynkConfiguration);
         }
 
-        final BatchStatus batchStatus =
-            (
+        return (
                 (
                     BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL.equals(osBatchStatus)
                     ||
@@ -322,8 +317,6 @@ public class CliMain {
             :
             BatchStatus.FEIL
             ;
-
-        return batchStatus;
     }
 
     private BatchStatus runOs(final IOkosynkConfiguration okosynkConfiguration) {

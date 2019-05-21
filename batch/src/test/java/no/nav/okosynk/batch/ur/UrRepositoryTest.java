@@ -8,6 +8,7 @@ import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
@@ -45,6 +46,7 @@ class UrRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper());
 
@@ -65,6 +67,7 @@ class UrRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper());
 

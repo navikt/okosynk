@@ -37,24 +37,6 @@
             <artifactId>okosynk-testutil</artifactId>
         </dependency>
 
-        <!-- NAV-avhengigheter -->
-        <dependency>
-            <groupId>no.nav.dialogarena</groupId>
-            <artifactId>oidc-security</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav.dialogarena</groupId>
-            <artifactId>oidc-security</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>no.nav</groupId>
-            <artifactId>metrics</artifactId>
-        </dependency>
-
         <!-- Eksterne avhengigheter -->
         <dependency>
             <groupId>commons-io</groupId>

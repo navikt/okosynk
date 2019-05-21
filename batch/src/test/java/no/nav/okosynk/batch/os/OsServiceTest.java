@@ -11,6 +11,7 @@ import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.MeldingLinjeFileReaderMock;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
@@ -48,11 +49,7 @@ class OsServiceTest {
 
         batchRepository = new BatchRepository();
         batchRepository.cleanTestRepository();
-        osService =
-            new OsService(
-                okosynkConfiguration,
-                batchRepository
-            );
+        osService = new OsService(okosynkConfiguration, batchRepository, new OppgaveRestClient(this.okosynkConfiguration));
     }
 
     @Test
@@ -132,7 +129,7 @@ class OsServiceTest {
 
     private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
 
-        this.osService = spy(new OsService(okosynkConfiguration, batchRepository));
+        this.osService = spy(new OsService(okosynkConfiguration, batchRepository, new OppgaveRestClient(okosynkConfiguration)));
         final Batch<OsMelding> batch = (Batch<OsMelding>)osService.createAndConfigureBatch(this.okosynkConfiguration);
         batch.setMeldingLinjeReader(new MeldingLinjeFileReaderMock(MOCK_OS_LINJE));
         when(osService.createAndConfigureBatch(this.okosynkConfiguration)).thenReturn((Batch)batch);

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.batch.BatchTest;
 import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.os.OsMapper;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
@@ -25,6 +26,7 @@ public class OsBatchTest extends BatchTest<OsMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
                 BatchTest.getEksekveringsId(),
+                new OppgaveRestClient(getOkosynkConfiguration()),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper()
             )

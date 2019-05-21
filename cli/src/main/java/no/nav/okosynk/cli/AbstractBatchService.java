@@ -1,25 +1,22 @@
 package no.nav.okosynk.cli;
 
-import static no.nav.metrics.MetricsFactory.createTimer;
-
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
-import no.nav.metrics.Timer;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
+import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public abstract class AbstractBatchService {
-
     private static final Logger logger = LoggerFactory.getLogger(AbstractBatchService.class);
-
 
     private final AbstractService service;
     final IOkosynkConfiguration okosynkConfiguration;
@@ -37,27 +34,24 @@ public abstract class AbstractBatchService {
         return batchType;
     }
 
-    public AbstractBatchService(
-        final IOkosynkConfiguration okosynkConfiguration,
-        final Constants.BATCH_TYPE  batchType) {
+    public AbstractBatchService(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE  batchType) {
 
-        final AbstractService service =
-            createService(okosynkConfiguration);
+        final AbstractService service = createService(okosynkConfiguration, new OppgaveRestClient(okosynkConfiguration));
 
-        this.service                  = service;
-        this.okosynkConfiguration     = okosynkConfiguration;
-        this.batchType                = batchType;
+        this.service = service;
+        this.okosynkConfiguration = okosynkConfiguration;
+        this.batchType = batchType;
     }
 
-    private AbstractService createService(final IOkosynkConfiguration okosynkConfiguration) {
+    private AbstractService createService(final IOkosynkConfiguration okosynkConfiguration, OppgaveRestClient oppgaveRestClient) {
         final BatchRepository batchRepository = new BatchRepository();
 
-        final AbstractService service = createService(okosynkConfiguration, batchRepository);
-
-        return service;
+        return createService(okosynkConfiguration, batchRepository, oppgaveRestClient);
     }
 
-    protected abstract AbstractService createService(final IOkosynkConfiguration okosynkConfiguration, final BatchRepository batchRepository);
+    protected abstract AbstractService createService(final IOkosynkConfiguration okosynkConfiguration,
+                                                     final BatchRepository batchRepository,
+                                                     final OppgaveRestClient oppgaveRestClient);
 
     public BatchStatus startBatchSynchronously() {
 
@@ -74,8 +68,8 @@ public abstract class AbstractBatchService {
         // END - prometheus
         // =====================================================================
 
-        final Timer timer = createTimer(getStartBatchSynchronouslyTimerNavn());
-        timer.start();
+//        final Timer timer = createTimer(getStartBatchSynchronouslyTimerNavn());
+//        timer.start();
         MDC.put("batchnavn", getBatchNavn());
 
         final BatchStatus batchStatus;
@@ -96,12 +90,12 @@ public abstract class AbstractBatchService {
             // END - prometheus
             // =====================================================================
         } catch (final Exception e) {
-            timer.setFailed();
+//            timer.setFailed();
             throw e;
         } finally {
             MDC.remove(getBatchNavn());
-            timer.stop();
-            timer.report();
+//            timer.stop();
+//            timer.report();
 
             // =====================================================================
             // BEGIN - prometheus:

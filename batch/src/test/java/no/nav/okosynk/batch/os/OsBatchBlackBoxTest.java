@@ -11,6 +11,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.os.OsMapper;
@@ -49,6 +50,7 @@ public class OsBatchBlackBoxTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
         batch.setMeldingLinjeReader(meldingReaderMock);

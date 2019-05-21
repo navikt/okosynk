@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,16 +28,17 @@ public class OppgaveSynkroniserer {
 
     private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkroniserer.class);
 
-    private Supplier<BatchStatus>                   batchStatusSupplier;
+    private final OppgaveRestClient oppgaveRestClient;
+    private Supplier<BatchStatus> batchStatusSupplier;
 
-    public OppgaveSynkroniserer(final Supplier<BatchStatus> batchStatusSupplier) {
-        this.batchStatusSupplier= batchStatusSupplier;
+    public OppgaveSynkroniserer(final Supplier<BatchStatus> batchStatusSupplier, final OppgaveRestClient oppgaveRestClient) {
+        this.batchStatusSupplier = batchStatusSupplier;
+        this.oppgaveRestClient = oppgaveRestClient;
     }
 
-    public void synkroniser(
-        final IOkosynkConfiguration okosynkConfiguration,
-        final Collection<Oppgave>   alleOppgaverLestFraBatchen_parm,
-        final String                bruker) {
+    public void synkroniser(final IOkosynkConfiguration okosynkConfiguration,
+                            final Collection<Oppgave> alleOppgaverLestFraBatchen_parm,
+                            final String bruker) {
 
         logger.info("Bruker {} forsøker å synkronisere {} oppgaver lest fra batch input.", bruker, alleOppgaverLestFraBatchen_parm.size());
 

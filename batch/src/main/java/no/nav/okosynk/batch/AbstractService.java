@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
@@ -24,20 +25,20 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     private final Constants.BATCH_TYPE batchType;
     private final IOkosynkConfiguration okosynkConfiguration;
+    private final OppgaveRestClient oppgaveRestClient;
     private final BatchRepository batchRepository;
     private final AtomicLong nextExecutionId;
 
-    protected AbstractService(
-        final Constants.BATCH_TYPE              batchType,
-        final IOkosynkConfiguration             okosynkConfiguration,
-        final BatchRepository                   batchRepository
-        ) {
+    protected AbstractService(final Constants.BATCH_TYPE batchType,
+                              final IOkosynkConfiguration okosynkConfiguration,
+                              final BatchRepository batchRepository,
+                              final OppgaveRestClient oppgaveRestClient) {
 
-        this.batchType                = batchType;
-        this.okosynkConfiguration     = okosynkConfiguration;
-        this.batchRepository          = batchRepository;
-        this.nextExecutionId          =
-            new AtomicLong(this.getBatchType().getExecutionIdOffset() + System.currentTimeMillis());
+        this.batchType = batchType;
+        this.okosynkConfiguration = okosynkConfiguration;
+        this.batchRepository = batchRepository;
+        this.oppgaveRestClient = oppgaveRestClient;
+        this.nextExecutionId = new AtomicLong(this.getBatchType().getExecutionIdOffset() + System.currentTimeMillis());
     }
 
     public BatchStatus startBatchSynchronously() {
@@ -133,6 +134,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
                 okosynkConfiguration,
                 getBatchType(),
                 getNextExecutionId().getAndIncrement(),
+                this.getOppgaveRestClient(),
                 createMeldingReader(),
                 createMeldingMapper()
             );
@@ -154,5 +156,9 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     private AtomicLong getNextExecutionId() {
         return nextExecutionId;
+    }
+
+    public OppgaveRestClient getOppgaveRestClient() {
+        return oppgaveRestClient;
     }
 }

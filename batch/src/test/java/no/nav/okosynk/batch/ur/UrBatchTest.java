@@ -7,6 +7,7 @@ import no.nav.okosynk.batch.BatchTest;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
@@ -30,6 +31,7 @@ public class UrBatchTest extends BatchTest<UrMelding> {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 BatchTest.getEksekveringsId(),
+                new OppgaveRestClient(okosynkConfiguration),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper()
             )

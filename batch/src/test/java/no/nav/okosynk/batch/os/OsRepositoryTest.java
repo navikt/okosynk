@@ -7,6 +7,7 @@ import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.os.OsMapper;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.os.OsMeldingReader;
@@ -45,6 +46,7 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 
@@ -65,6 +67,7 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
+                new OppgaveRestClient(okosynkConfiguration),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 

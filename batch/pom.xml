@@ -35,12 +35,6 @@
             <artifactId>okosynk-io</artifactId>
         </dependency>
 
-        <!-- NAV-avhengigheter -->
-        <dependency>
-            <groupId>no.nav</groupId>
-            <artifactId>metrics</artifactId>
-        </dependency>
-
         <!-- Eksterne avhengigheter -->
         <dependency>
             <groupId>org.apache.commons</groupId>
