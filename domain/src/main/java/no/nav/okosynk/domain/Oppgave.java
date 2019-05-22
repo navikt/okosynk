@@ -253,7 +253,6 @@ public class Oppgave {
                 .append("fagomradeKode              : ").append(fagomradeKode).append(LOG_FIELD_SEPARATOR)
                 .append("underkategoriKode          : ").append(underkategoriKode).append(LOG_FIELD_SEPARATOR)
                 .append("prioritetKode              : ").append(prioritetKode).append(LOG_FIELD_SEPARATOR)
-                .append("beskrivelse                : ").append(beskrivelse).append(LOG_FIELD_SEPARATOR)
                 .append("aktivFra                   : ").append(aktivFra).append(LOG_FIELD_SEPARATOR)
                 .append("aktivTil                   : ").append(aktivTil).append(LOG_FIELD_SEPARATOR)
                 .append("ansvarligEnhetId           : ").append(ansvarligEnhetId).append(LOG_FIELD_SEPARATOR)
