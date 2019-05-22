@@ -46,7 +46,7 @@ class UrRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
-                new OppgaveRestClient(okosynkConfiguration),
+                new OppgaveRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper());
 
@@ -67,7 +67,7 @@ class UrRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
-                new OppgaveRestClient(okosynkConfiguration),
+                new OppgaveRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper());
 

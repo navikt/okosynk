@@ -36,7 +36,7 @@ public abstract class AbstractBatchService {
 
     public AbstractBatchService(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE  batchType) {
 
-        final AbstractService service = createService(okosynkConfiguration, new OppgaveRestClient(okosynkConfiguration));
+        final AbstractService service = createService(okosynkConfiguration, new OppgaveRestClient(okosynkConfiguration, batchType));
 
         this.service = service;
         this.okosynkConfiguration = okosynkConfiguration;

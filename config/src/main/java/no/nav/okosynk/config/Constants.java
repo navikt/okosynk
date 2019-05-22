@@ -16,7 +16,8 @@ public class Constants {
                 , OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS
                 , OS_FTP_CHARSET_NAME_KEY
                 , OS_EXECUTION_ID_OFFSET
-                , OS_MAPPING_RULES_PROPERTIES_FILENAME)
+                , OS_MAPPING_RULES_PROPERTIES_FILENAME
+                , OS_BATCH_BRUKER_PASSWORD_KEY)
         , UR(
                   UR_BATCH_NAVN
                 , UR_BATCH_BRUKER_KEY
@@ -30,7 +31,8 @@ public class Constants {
                 , UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS
                 , UR_FTP_CHARSET_NAME_KEY
                 , UR_EXECUTION_ID_OFFSET
-                , UR_MAPPING_RULES_PROPERTIES_FILENAME)
+                , UR_MAPPING_RULES_PROPERTIES_FILENAME
+                , UR_BATCH_BRUKER_PASSWORD_KEY)
         ;
 
         private final String name;
@@ -46,6 +48,12 @@ public class Constants {
         private final String ftpCharsetNameKey;
         private final long   executionIdOffset;
         private final String mappingRulesPropertiesFileName;
+
+        public String getBatchBrukerPasswordKey() {
+            return batchBrukerPasswordKey;
+        }
+
+        private final String batchBrukerPasswordKey;
 
         public String getName() {
             return name;
@@ -113,6 +121,7 @@ public class Constants {
             , final String ftpCharsetNameKey
             , final long   executionIdOffset
             , final String mappingRulesPropertiesFileName
+            , final String batchBrukerPasswordKey
         ) {
             this.name                                 = name;
             this.batchBrukerKey                       = batchBrukerKey;
@@ -127,11 +136,13 @@ public class Constants {
             this.ftpCharsetNameKey                    = ftpCharsetNameKey;
             this.executionIdOffset                    = executionIdOffset;
             this.mappingRulesPropertiesFileName       = mappingRulesPropertiesFileName;
+            this.batchBrukerPasswordKey               = batchBrukerPasswordKey;
         }
     }
     // =========================================================================
     private static final String OS_BATCH_NAVN                                 = "bokosynk001";
     private static final String OS_BATCH_BRUKER_KEY                           = "SRVBOKOSYNK001_USERNAME";
+    private static final String OS_BATCH_BRUKER_PASSWORD_KEY                  = "SRVBOKOSYNK001_PASSWORD";
     private static final String OS_BATCH_BRUKER_DEFAULT_VALUE                 = "srvbokosynk001";
     private static final String OS_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME         = "OsBatchRestControllerStartBatchSynchronously";
     private static final String OS_OPPGAVE_TYPE                               = "OKO_OS";
@@ -146,6 +157,7 @@ public class Constants {
     // -------------------------------------------------------------------------
     private static final String UR_BATCH_NAVN                                 = "bokosynk002";
     private static final String UR_BATCH_BRUKER_KEY                           = "SRVBOKOSYNK002_USERNAME";
+    private static final String UR_BATCH_BRUKER_PASSWORD_KEY                  = "SRVBOKOSYNK002_PASSWORD";
     private static final String UR_BATCH_BRUKER_DEFAULT_VALUE                 = "srvbokosynk002";
     private static final String UR_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME         = "UrBatchRestControllerStartBatchSynchronously";
     private static final String UR_OPPGAVE_TYPE                               = "OKO_UR";

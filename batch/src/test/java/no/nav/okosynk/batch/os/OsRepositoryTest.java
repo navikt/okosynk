@@ -46,7 +46,7 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
-                new OppgaveRestClient(okosynkConfiguration),
+                new OppgaveRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 
@@ -67,7 +67,7 @@ class OsRepositoryTest {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
-                new OppgaveRestClient(okosynkConfiguration),
+                new OppgaveRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper());
 

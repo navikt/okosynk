@@ -26,7 +26,7 @@ public class OsBatchTest extends BatchTest<OsMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
                 BatchTest.getEksekveringsId(),
-                new OppgaveRestClient(getOkosynkConfiguration()),
+                new OppgaveRestClient(getOkosynkConfiguration(), Constants.BATCH_TYPE.OS),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper()
             )

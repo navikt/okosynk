@@ -31,7 +31,7 @@ public class UrBatchTest extends BatchTest<UrMelding> {
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 BatchTest.getEksekveringsId(),
-                new OppgaveRestClient(okosynkConfiguration),
+                new OppgaveRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper()
             )

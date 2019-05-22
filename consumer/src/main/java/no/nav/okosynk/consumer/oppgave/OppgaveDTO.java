@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Map;
 
@@ -11,7 +13,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class OppgaveDTO {
 
-    private Integer id;
+    private String id;
     private String aktoerId;
     private String orgnr;
     private String tema;
@@ -21,20 +23,20 @@ public class OppgaveDTO {
     private String behandlingstema;
     private String oppgavetype;
     private String behandlingstype;
-    private Date aktivDato;
-    private Date fristFerdigstillelse;
+    private LocalDate aktivDato;
+    private LocalDate fristFerdigstillelse;
     private String prioritet;
     private String tildeltEnhetsnr;
     private String endretAvEnhetsnr;
     private String opprettetAvEnhetsnr;
     private String tilordnetRessurs;
-    private Integer mappeId;
+    private String mappeId;
     private OppgaveStatus status;
     private String opprettetAv;
     private String endretAv;
-    private Date opprettetTidspunkt;
-    private Date endretTidspunkt;
-    private Date ferdigstiltTidspunkt;
+    private LocalDateTime opprettetTidspunkt;
+    private LocalDateTime endretTidspunkt;
+    private LocalDateTime ferdigstiltTidspunkt;
     private String beskrivelse;
     private Integer versjon;
     private String journalpostkilde;
@@ -45,11 +47,11 @@ public class OppgaveDTO {
 
     public OppgaveDTO() {}
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -181,19 +183,19 @@ public class OppgaveDTO {
         this.behandlingstype = behandlingstype;
     }
 
-    public Date getAktivDato() {
+    public LocalDate getAktivDato() {
         return aktivDato;
     }
 
-    public void setAktivDato(Date aktivDato) {
+    public void setAktivDato(LocalDate aktivDato) {
         this.aktivDato = aktivDato;
     }
 
-    public Date getFristFerdigstillelse() {
+    public LocalDate getFristFerdigstillelse() {
         return fristFerdigstillelse;
     }
 
-    public void setFristFerdigstillelse(Date fristFerdigstillelse) {
+    public void setFristFerdigstillelse(LocalDate fristFerdigstillelse) {
         this.fristFerdigstillelse = fristFerdigstillelse;
     }
 
@@ -221,11 +223,11 @@ public class OppgaveDTO {
         this.tilordnetRessurs = tilordnetRessurs;
     }
 
-    public Integer getMappeId() {
+    public String getMappeId() {
         return mappeId;
     }
 
-    public void setMappeId(Integer mappeId) {
+    public void setMappeId(String mappeId) {
         this.mappeId = mappeId;
     }
 
@@ -245,11 +247,11 @@ public class OppgaveDTO {
         this.opprettetAv = opprettetAv;
     }
 
-    public Date getOpprettetTidspunkt() {
+    public LocalDateTime getOpprettetTidspunkt() {
         return opprettetTidspunkt;
     }
 
-    public void setOpprettetTidspunkt(Date opprettetTidspunkt) {
+    public void setOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
         this.opprettetTidspunkt = opprettetTidspunkt;
     }
 
@@ -269,19 +271,19 @@ public class OppgaveDTO {
         this.endretAv = endretAv;
     }
 
-    public Date getEndretTidspunkt() {
+    public LocalDateTime getEndretTidspunkt() {
         return endretTidspunkt;
     }
 
-    public void setEndretTidspunkt(Date endretTidspunkt) {
+    public void setEndretTidspunkt(LocalDateTime endretTidspunkt) {
         this.endretTidspunkt = endretTidspunkt;
     }
 
-    public Date getFerdigstiltTidspunkt() {
+    public LocalDateTime getFerdigstiltTidspunkt() {
         return ferdigstiltTidspunkt;
     }
 
-    public void setFerdigstiltTidspunkt(Date ferdigstiltTidspunkt) {
+    public void setFerdigstiltTidspunkt(LocalDateTime ferdigstiltTidspunkt) {
         this.ferdigstiltTidspunkt = ferdigstiltTidspunkt;
     }
 

@@ -67,7 +67,7 @@ public class ConsumerStatistics {
 
 
 
-    static final class Builder {
+    public static final class Builder {
         private int antallOppgaverSomErHentetFraDatabasen;
         private int antallOppgaverSomMedSikkerhetErOpprettet;
         private int antallOppgaverSomKanVaereOpprettet;
@@ -87,7 +87,7 @@ public class ConsumerStatistics {
             return new ConsumerStatistics(this);
         }
 
-        Builder antallOppgaverSomErHentetFraDatabasen(final int verdi) {
+        public Builder antallOppgaverSomErHentetFraDatabasen(final int verdi) {
             this.antallOppgaverSomErHentetFraDatabasen = verdi;
             return this;
         }

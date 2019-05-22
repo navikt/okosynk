@@ -55,6 +55,7 @@
         <mockito.version>1.10.19</mockito.version>
         <jacoco.version>0.8.0</jacoco.version>
         <maven.jacoco.plugin.version>${jacoco.version}</maven.jacoco.plugin.version>
+        <junit.platform.version>1.4.2</junit.platform.version>
 
     </properties>
 
@@ -339,10 +340,24 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit.platform.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

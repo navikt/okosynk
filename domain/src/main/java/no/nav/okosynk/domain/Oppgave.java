@@ -1,10 +1,12 @@
 package no.nav.okosynk.domain;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Oppgave {
 
@@ -16,6 +18,8 @@ public class Oppgave {
     public final String brukertypeKode;
     public final String oppgavetypeKode;
     public final String fagomradeKode;
+    public final String behandlingstema;
+    public final String behandlingstype;
     public final String underkategoriKode;
     public final String prioritetKode;
     public final String beskrivelse;
@@ -35,6 +39,8 @@ public class Oppgave {
         this.brukertypeKode = oppgaveBuilder.brukertypeKode;
         this.oppgavetypeKode = oppgaveBuilder.oppgavetypeKode;
         this.fagomradeKode = oppgaveBuilder.fagomradeKode;
+        this.behandlingstema = oppgaveBuilder.behandlingstema;
+        this.behandlingstype = oppgaveBuilder.behandlingstype;
         this.underkategoriKode = oppgaveBuilder.underkategoriKode;
         this.prioritetKode = oppgaveBuilder.prioritetKode;
         this.beskrivelse = oppgaveBuilder.beskrivelse;
@@ -55,6 +61,8 @@ public class Oppgave {
         private String brukertypeKode;
         private String oppgavetypeKode;
         private String fagomradeKode;
+        private String behandlingstema;
+        private String behandlingstype;
         private String underkategoriKode;
         private String prioritetKode;
         private String beskrivelse;
@@ -90,6 +98,16 @@ public class Oppgave {
 
         public OppgaveBuilder withFagomradeKode(String fagomradeKode) {
             this.fagomradeKode = fagomradeKode;
+            return this;
+        }
+
+        public OppgaveBuilder withBehandlingstema(String behandlingstema) {
+            this.behandlingstema = behandlingstema;
+            return this;
+        }
+
+        public OppgaveBuilder withBehandlingstype(String behandlingstype) {
+            this.behandlingstype = behandlingstype;
             return this;
         }
 
@@ -159,7 +177,8 @@ public class Oppgave {
             this.brukertypeKode = oppgave.brukertypeKode;
             this.oppgavetypeKode = oppgave.oppgavetypeKode;
             this.fagomradeKode = oppgave.fagomradeKode;
-            this.underkategoriKode = oppgave.underkategoriKode;
+            this.behandlingstema = oppgave.behandlingstema;
+            this.behandlingstype = oppgave.behandlingstype;
             this.prioritetKode = oppgave.prioritetKode;
             this.beskrivelse = oppgave.beskrivelse;
             this.aktivFra = oppgave.aktivFra;
@@ -181,7 +200,7 @@ public class Oppgave {
             if (brukerId == null) {
                 warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
             }
-            if (underkategoriKode == null) {
+            if (behandlingstema == null && behandlingstype == null) {
                 warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
             }
             if (ansvarligEnhetId == null) {
@@ -205,40 +224,16 @@ public class Oppgave {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Oppgave oppgave = (Oppgave) o;
-
-        if (!brukerId.equals(oppgave.brukerId)) return false;
-        if (!underkategoriKode.equals(oppgave.underkategoriKode)) return false;
-        return ansvarligEnhetId.equals(oppgave.ansvarligEnhetId);
+        return Objects.equals(brukerId, oppgave.brukerId) &&
+                Objects.equals(behandlingstema, oppgave.behandlingstema) &&
+                Objects.equals(behandlingstype, oppgave.behandlingstype) &&
+                Objects.equals(ansvarligEnhetId, oppgave.ansvarligEnhetId);
     }
 
     @Override
     public int hashCode() {
-
-        String warnStr = "";
-        int result = 0;
-        if (brukerId == null) {
-            warnStr += "Oppgave.brukerId is null" + LOG_PARAGRAPH_SEPARATOR;
-        } else {
-            result += 23 * 1 * brukerId.hashCode();
-        }
-        if (underkategoriKode == null) {
-            warnStr += "Oppgave.underkategoriKode is null" + LOG_PARAGRAPH_SEPARATOR;
-        } else {
-            result = 29 * 1000 * result + underkategoriKode.hashCode();
-        }
-        if (ansvarligEnhetId == null) {
-            warnStr += "Oppgave.ansvarligEnhetId is null" + LOG_PARAGRAPH_SEPARATOR;
-        } else {
-            result = 31 * 1000000 * result + ansvarligEnhetId.hashCode();
-        }
-        if (!warnStr.isEmpty()) {
-            warnStr += "Oppgave: " + LOG_FIELD_SEPARATOR + toString();
-            logger.warn(warnStr);
-        }
-
-        return result;
+        return Objects.hash(brukerId, behandlingstema, behandlingstype, ansvarligEnhetId);
     }
 
     @Override
@@ -251,7 +246,8 @@ public class Oppgave {
                 .append("brukertypeKode             : ").append(brukertypeKode).append(LOG_FIELD_SEPARATOR)
                 .append("oppgavetypeKode            : ").append(oppgavetypeKode).append(LOG_FIELD_SEPARATOR)
                 .append("fagomradeKode              : ").append(fagomradeKode).append(LOG_FIELD_SEPARATOR)
-                .append("underkategoriKode          : ").append(underkategoriKode).append(LOG_FIELD_SEPARATOR)
+                .append("behandlingstema            : ").append(behandlingstema).append(LOG_FIELD_SEPARATOR)
+                .append("behandlingstype            : ").append(behandlingstype).append(LOG_FIELD_SEPARATOR)
                 .append("prioritetKode              : ").append(prioritetKode).append(LOG_FIELD_SEPARATOR)
                 .append("aktivFra                   : ").append(aktivFra).append(LOG_FIELD_SEPARATOR)
                 .append("aktivTil                   : ").append(aktivTil).append(LOG_FIELD_SEPARATOR)

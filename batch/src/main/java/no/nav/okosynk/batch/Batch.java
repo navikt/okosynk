@@ -179,10 +179,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
         logger.debug("Entering Batch.hentBatchOppgaver...");
 
-        final List<String> linjerMedUspesifikkeMeldinger =
-            hentLinjerMedUspesifikkeMeldinger();
-        final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger =
-            opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
+        final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
+        final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
         final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
 
         logger.debug("About to normally leave Batch.hentBatchOppgaver");
