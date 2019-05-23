@@ -6,18 +6,20 @@ import java.util.Objects;
 
 public class MappingRegel {
 
-    public final String underkategoriKode;
+    public final String behandlingstema;
+    public final String behandlingstype;
     public final String ansvarligEnhetId;
 
-    public MappingRegel(String underkategoriKode, String ansvarligEnhetId) {
+    public MappingRegel(String behandlingstema, String behandlingstype, String ansvarligEnhetId) {
 
-        this.underkategoriKode = underkategoriKode;
+        this.behandlingstema = behandlingstema;
+        this.behandlingstype = behandlingstype;
         this.ansvarligEnhetId = ansvarligEnhetId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.underkategoriKode, this.ansvarligEnhetId);
+        return Objects.hash(this.behandlingstema, this.behandlingstype, this.ansvarligEnhetId);
     }
 
     @Override
@@ -33,10 +35,8 @@ public class MappingRegel {
 
         final MappingRegel otherAsMappingRegel = (MappingRegel)other;
 
-        return
-                this.underkategoriKode.equals(otherAsMappingRegel.underkategoriKode)
-                &&
-                this.ansvarligEnhetId.equals(otherAsMappingRegel.ansvarligEnhetId)
-            ;
+        return Objects.equals(behandlingstema, otherAsMappingRegel.behandlingstema) &&
+                Objects.equals(behandlingstype, otherAsMappingRegel.behandlingstype) &&
+                Objects.equals(ansvarligEnhetId, otherAsMappingRegel.ansvarligEnhetId);
     }
 }

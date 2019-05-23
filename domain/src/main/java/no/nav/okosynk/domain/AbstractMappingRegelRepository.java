@@ -19,8 +19,9 @@ public abstract class AbstractMappingRegelRepository<MELDINGSTYPE extends Abstra
     private final Properties mappingRulesProperties = new Properties();
 
     private static final char NOKKEL_SKILLETEGN = ',';
-    private static final int UNDERKATEGORI_INDEKS = 0;
-    private static final int ANSVARLIG_ENHET_ID_INDEKS = 1;
+    private static final int BEHANDLINGSTEMA_INDEKS = 0;
+    private static final int BEHANDLINGSTYPE_INDEKS = 1;
+    private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
 
     private final Constants.BATCH_TYPE batchType;
 
@@ -40,11 +41,12 @@ public abstract class AbstractMappingRegelRepository<MELDINGSTYPE extends Abstra
 
         final String mappingRegelKey = createMappingRegelKey(melding);
 
-        final Optional<String> underkategoriKode = finnVerdiPaIndeks(mappingRegelKey, UNDERKATEGORI_INDEKS);
+        final Optional<String> behandlingstema = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTEMA_INDEKS);
+        final Optional<String> behandlingstype = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTYPE_INDEKS);
         final Optional<String> ansvarligEnhetId = finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
 
-        if (underkategoriKode.isPresent() && ansvarligEnhetId.isPresent()) {
-            return Optional.of(new MappingRegel(underkategoriKode.get(), ansvarligEnhetId.get()));
+        if (behandlingstema.isPresent()  && behandlingstype.isPresent() && ansvarligEnhetId.isPresent()) {
+            return Optional.of(new MappingRegel(behandlingstema.get(), behandlingstype.get(), ansvarligEnhetId.get()));
         } else {
             return Optional.empty();
         }

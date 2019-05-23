@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 
 class OsMapperTest {
 
-    private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String OS_MELDING_SOM_GJELDER_TSS = "80000437552017087784 2009-04-012009-06-24RETUK231B3502009-03-012009-03-31000000005000æ 4819         PEN     80000437552            ";
     private static final String OS_MELDING_SOM_IKKE_HAR_MAPPING = "10108000398029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF10108000398            ";
@@ -53,7 +52,8 @@ class OsMapperTest {
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
-        assertEquals("ENS_FORS_OKO", oppgaver.get(0).underkategoriKode);
+        assertEquals("ab0272", oppgaver.get(0).behandlingstema);
+        assertEquals("", oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
     }
 

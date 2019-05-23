@@ -12,7 +12,7 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     implements Function<List<MELDINGSTYPE>, Optional<Oppgave>> {
 
     private static final String fagomradeKode = "OKO";
-    private static final String prioritetKode = "LAV_OKO";
+    private static final String prioritetKode = "LAV";
     private static final String linjeSeparator = System.getProperty("line.separator"); // Does not need to use IOkosynkConfiguration, because "line.separator" is part of the no.nav.okosynk.io.os/java ecosystem.
 
     public static String getFagomradeKode() {
@@ -73,7 +73,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                 .withBrukertypeKode(melding.utledGjelderIdType())
                                 .withOppgavetypeKode(oppgaveTypeKode())
                                 .withFagomradeKode(getFagomradeKode())
-                                .withUnderkategoriKode(mappingRegel.underkategoriKode)
+                                .withBehandlingstema(mappingRegel.behandlingstema)
+                                .withBehandlingstype(mappingRegel.behandlingstype)
                                 .withPrioritetKode(getPrioritetKode())
                                 .withBeskrivelse(lagSamletBeskrivelse(meldinger))
                                 .withAktivFra(aktivFra)

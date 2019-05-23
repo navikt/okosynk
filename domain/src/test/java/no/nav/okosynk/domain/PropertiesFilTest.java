@@ -1,7 +1,7 @@
 package no.nav.okosynk.domain;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,9 +124,10 @@ class PropertiesFilTest {
     private void sjekkOmKodeEllerEnhetErBlank(String oppdragsInformasjon, String underkategoriInformasjon) {
         String oppdragsKode = oppdragsInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[0];
         String behandlendeEnhet = oppdragsInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[1];
-        String underkategoriKode = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[0];
-        String ansvarligEnhet = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[1];
-        if (StringUtils.isBlank(oppdragsKode) || StringUtils.isBlank(behandlendeEnhet) || StringUtils.isBlank(underkategoriKode) || StringUtils.isBlank(ansvarligEnhet)) {
+        String behandlingstema = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[0];
+        String behandlingstype = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[1];
+        String ansvarligEnhet = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[2];
+        if (StringUtils.isBlank(oppdragsKode) || StringUtils.isBlank(behandlendeEnhet) || StringUtils.isBlank(ansvarligEnhet) || StringUtils.isAllBlank(behandlingstema, behandlingstype)) {
             fail(String.format("Mangler verdier for ett eller flere felter i '.", propertiesFilnavn));
         }
     }

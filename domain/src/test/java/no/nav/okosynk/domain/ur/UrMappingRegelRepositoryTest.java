@@ -40,7 +40,8 @@ class UrMappingRegelRepositoryTest {
 
         assertTrue(mapping.isPresent(), "Mapping mangler");
         assertAll("Mapping skal ha riktige verdier",
-                () -> assertEquals("UTPOST", mapping.get().underkategoriKode),
+                () -> assertEquals("", mapping.get().behandlingstema),
+                () -> assertEquals("ae0204", mapping.get().behandlingstype),
                 () -> assertEquals("4151", mapping.get().ansvarligEnhetId)
         );
     }

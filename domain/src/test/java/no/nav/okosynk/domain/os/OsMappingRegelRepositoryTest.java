@@ -40,7 +40,8 @@ class OsMappingRegelRepositoryTest {
 
         assertTrue(osMappingRegel.isPresent(), "Mapping mangler");
         assertAll("Mapping skal ha riktige verdier",
-                () -> assertEquals("GS", osMappingRegel.get().underkategoriKode),
+                () -> assertEquals("ab0155", osMappingRegel.get().behandlingstema),
+                () -> assertEquals("", osMappingRegel.get().behandlingstype),
                 () -> assertEquals("4151", osMappingRegel.get().ansvarligEnhetId)
         );
     }

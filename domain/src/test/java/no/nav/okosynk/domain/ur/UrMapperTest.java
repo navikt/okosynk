@@ -56,7 +56,8 @@ class UrMapperTest {
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
-        assertEquals("ENS_FORS_OKO", oppgaver.get(0).underkategoriKode);
+        assertEquals("ab0272", oppgaver.get(0).behandlingstema);
+        assertEquals("", oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
     }
 

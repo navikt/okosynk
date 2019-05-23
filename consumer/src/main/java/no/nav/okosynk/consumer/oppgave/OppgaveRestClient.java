@@ -50,7 +50,7 @@ public class OppgaveRestClient {
         this.httpClient = HttpClients.createDefault();
     }
 
-    public FinnOppgaveResponse finnOppgaver(String opprettetAv, int limit, int offset) {
+    private FinnOppgaveResponse finnOppgaver(String opprettetAv, int limit, int offset) {
         URI uri;
         try {
             uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"))
@@ -97,7 +97,7 @@ public class OppgaveRestClient {
 
 
 
-        while(finnOppgaveResponse.getOppgaver().size() > 0) {
+        while(!finnOppgaveResponse.getOppgaver().isEmpty()) {
             finnOppgaveResponse = this.finnOppgaver(opprettetAv, limit, offset);
             oppgaver.addAll(finnOppgaveResponse.getOppgaver()
                             .stream()
