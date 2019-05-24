@@ -1,14 +1,19 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import no.nav.okosynk.domain.Oppgave;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.*;
 import java.util.Map;
+import java.util.Objects;
 
+import static no.nav.okosynk.consumer.oppgave.OppgaveRestClient.erBostNr;
+import static no.nav.okosynk.domain.AbstractMelding.ORGANISASJON;
+import static no.nav.okosynk.domain.AbstractMelding.PERSON;
+import static no.nav.okosynk.domain.AbstractMelding.SAMHANDLER;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class OppgaveDTO {
@@ -45,7 +50,8 @@ public class OppgaveDTO {
     private String samhandlernr;
     Map<String, String> metadata;
 
-    public OppgaveDTO() {}
+    public OppgaveDTO() {
+    }
 
     public String getId() {
         return id;
@@ -187,16 +193,16 @@ public class OppgaveDTO {
         return aktivDato;
     }
 
-    public void setAktivDato(LocalDate aktivDato) {
-        this.aktivDato = aktivDato;
+    public void setAktivDato(String aktivDato) {
+        this.aktivDato = LocalDate.parse(aktivDato);
     }
 
     public LocalDate getFristFerdigstillelse() {
         return fristFerdigstillelse;
     }
 
-    public void setFristFerdigstillelse(LocalDate fristFerdigstillelse) {
-        this.fristFerdigstillelse = fristFerdigstillelse;
+    public void setFristFerdigstillelse(String fristFerdigstillelse) {
+        this.fristFerdigstillelse = LocalDate.parse(fristFerdigstillelse);
     }
 
     public String getPrioritet() {
@@ -251,8 +257,8 @@ public class OppgaveDTO {
         return opprettetTidspunkt;
     }
 
-    public void setOpprettetTidspunkt(LocalDateTime opprettetTidspunkt) {
-        this.opprettetTidspunkt = opprettetTidspunkt;
+    public void setOpprettetTidspunkt(String opprettetTidspunkt) {
+        this.opprettetTidspunkt = ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
     }
 
     public Integer getVersjon() {
@@ -275,16 +281,16 @@ public class OppgaveDTO {
         return endretTidspunkt;
     }
 
-    public void setEndretTidspunkt(LocalDateTime endretTidspunkt) {
-        this.endretTidspunkt = endretTidspunkt;
+    public void setEndretTidspunkt(String endretTidspunkt) {
+        this.endretTidspunkt = ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
     }
 
     public LocalDateTime getFerdigstiltTidspunkt() {
         return ferdigstiltTidspunkt;
     }
 
-    public void setFerdigstiltTidspunkt(LocalDateTime ferdigstiltTidspunkt) {
-        this.ferdigstiltTidspunkt = ferdigstiltTidspunkt;
+    public void setFerdigstiltTidspunkt(String ferdigstiltTidspunkt) {
+        this.ferdigstiltTidspunkt = ZonedDateTime.parse(ferdigstiltTidspunkt).toLocalDateTime();
     }
 
     public Map<String, String> getMetadata() {

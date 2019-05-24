@@ -12,9 +12,9 @@ public abstract class AbstractMelding {
 
     private static final char   TSS_PREFIX_2               = '9';
     private static final int    ORGANISASJONSNUMMER_LENGDE = 9;
-    private static final String ORGANISASJON               = "ORGANISASJON";
-    private static final String PERSON                     = "PERSON";
-    private static final String SAMHANDLER                 = "SAMHANDLER";
+    public static final String ORGANISASJON               = "ORGANISASJON";
+    public static final String PERSON                     = "PERSON";
+    public static final String SAMHANDLER                 = "SAMHANDLER";
 
     public  final String    behandlendeEnhet;
     public  final double    totaltNettoBelop;

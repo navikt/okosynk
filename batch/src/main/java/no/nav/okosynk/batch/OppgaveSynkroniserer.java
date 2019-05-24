@@ -45,7 +45,8 @@ public class OppgaveSynkroniserer {
         final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>(alleOppgaverLestFraBatchen_parm);
 
         final Set<Oppgave> oppgaverLestFraDatabasen   = new HashSet<>();
-        final ConsumerStatistics consumerStatistics_finn = ConsumerStatistics.zero(); //oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
+        //final ConsumerStatistics consumerStatistics_finn = oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
+        final ConsumerStatistics consumerStatistics_finn = oppgaveRestClient.finnOppgaver(bruker, oppgaverLestFraDatabasen);
 
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
         final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres = finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
@@ -123,7 +124,8 @@ public class OppgaveSynkroniserer {
                 consumerStatistics = ConsumerStatistics.zero();
             } else {
                 logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker, oppgaverSomSkalFerdigstilles.size());
-                consumerStatistics = ConsumerStatistics.zero();//oppgaveBehandlingGateway.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
+                //consumerStatistics = oppgaveBehandlingGateway.patchOppgaver(oppgaverSomSkalFerdigstilles);
+                consumerStatistics = this.oppgaveRestClient.patchOppgaver(oppgaverSomSkalFerdigstilles, true);
                 logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker, oppgaverSomSkalFerdigstilles.size());
             }
         }
@@ -178,7 +180,8 @@ public class OppgaveSynkroniserer {
             consumerStatistics = ConsumerStatistics.zero();
         } else {
             logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
-            consumerStatistics = ConsumerStatistics.zero(); //oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
+            //onsumerStatistics = oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
+            consumerStatistics = this.oppgaveRestClient.opprettOppgaver(oppgaver);
             logger.info("Bruker {} har opprettet {} oppgaver", bruker, oppgaver.size());
         }
 

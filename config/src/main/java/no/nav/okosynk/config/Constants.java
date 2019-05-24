@@ -48,12 +48,11 @@ public class Constants {
         private final String ftpCharsetNameKey;
         private final long   executionIdOffset;
         private final String mappingRulesPropertiesFileName;
+        private final String batchBrukerPasswordKey;
 
         public String getBatchBrukerPasswordKey() {
             return batchBrukerPasswordKey;
         }
-
-        private final String batchBrukerPasswordKey;
 
         public String getName() {
             return name;

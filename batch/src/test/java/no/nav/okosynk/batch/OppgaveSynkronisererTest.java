@@ -118,7 +118,7 @@
 //    }
 //
 //    @Test
-//    @DisplayName("Hvis batchen er stoppet når synkroniser-metoden startes skal det ikke gjøres tjenestekall for ferdigstillOppgaver, opprettOppgaver eller oppdaterOppgaver")
+//    @DisplayName("Hvis batchen er stoppet når synkroniser-metoden startes skal det ikke gjøres tjenestekall for patchOppgaver, opprettOppgaver eller oppdaterOppgaver")
 //    void synkroniserSkalIkkeKalleOppgavebehandlingHvisBatchErStoppet() {
 //
 //        enteringTestHeaderLogger.debug(null);
@@ -131,7 +131,7 @@
 //                lagOppgaveliste(OPPGAVEID, BRUKERID),
 //                BATCHBRUKER);
 //
-//        verify(mockedOppgaveBehandlingGateway, times(0)).ferdigstillOppgaver(       anyCollection());
+//        verify(mockedOppgaveBehandlingGateway, times(0)).patchOppgaver(       anyCollection());
 //        verify(mockedOppgaveBehandlingGateway, times(0)).opprettOppgaver    (any(), anyCollection());
 //        verify(mockedOppgaveBehandlingGateway, times(0)).oppdaterOppgaver   (any(), anyCollection());
 //    }
@@ -163,7 +163,7 @@
 //    }
 //
 //    @Test
-//    @DisplayName("kall ferdigstillOppgaver, oppdaterOppgaver og opprettOppgaver i synkroniser(), rekkefølgen er ikke viktig")
+//    @DisplayName("kall patchOppgaver, oppdaterOppgaver og opprettOppgaver i synkroniser(), rekkefølgen er ikke viktig")
 //    void kallAlleOppgaveOperasjonerISynkroniser() {
 //
 //        enteringTestHeaderLogger.debug(null);
@@ -176,7 +176,7 @@
 //                lagOppgaveliste(OPPGAVEID, BRUKERID),
 //                BATCHBRUKER);
 //
-//        verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).ferdigstillOppgaver(any(), anySet(), anyString());
+//        verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).patchOppgaver(any(), anySet(), anyString());
 //        verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).oppdaterOppgaver(any(), anySet(), anyString());
 //        verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).opprettOppgaver(any(), anySet(), anyString());
 //    }
@@ -302,7 +302,7 @@
 //    }
 //
 //    @Test
-//    @DisplayName("ikke ferdigstillOppgaver oppgaver som har endret oppgavetype")
+//    @DisplayName("ikke patchOppgaver oppgaver som har endret oppgavetype")
 //    void ikkeFerdigstillOppgaverMedEndretOppgaveType(){
 //
 //        enteringTestHeaderLogger.debug(null);
@@ -321,17 +321,17 @@
 //                        Collections.singleton(oppgaveMedEndretOppgaveType));
 //
 //        this.oppgaveSynkronisererWithInjectedMocks
-//            .ferdigstillOppgaver(
+//            .patchOppgaver(
 //                this.okosynkConfiguration,
 //                oppgaverSomSkalFerdigstilles,
 //                "srvbokosynk002");
 //
 //        final ArgumentCaptor<Collection<Oppgave>> captor = ArgumentCaptor.forClass((Class) List.class);
-//        verify(mockedOppgaveBehandlingGateway, times(0)).ferdigstillOppgaver(anyCollection());
+//        verify(mockedOppgaveBehandlingGateway, times(0)).patchOppgaver(anyCollection());
 //    }
 //
 //    @Test
-//    @DisplayName("ferdigstillOppgaver oppgave som har uendret oppgavetype")
+//    @DisplayName("patchOppgaver oppgave som har uendret oppgavetype")
 //    void ferdigstillOppgaveMedUendretOppgaveType(){
 //
 //        enteringTestHeaderLogger.debug(null);
@@ -345,13 +345,13 @@
 //                    Collections.singleton(oppgave));
 //
 //        this.oppgaveSynkronisererWithInjectedMocks
-//            .ferdigstillOppgaver(
+//            .patchOppgaver(
 //                this.okosynkConfiguration,
 //                oppgaverSomSkalFerdigstilles,
 //                "srvbokosynk001");
 //
 //        final ArgumentCaptor<Collection<Oppgave>> captor = ArgumentCaptor.forClass((Class) List.class);
-//        verify(this.mockedOppgaveBehandlingGateway, times(1)).ferdigstillOppgaver(anyCollection());
+//        verify(this.mockedOppgaveBehandlingGateway, times(1)).patchOppgaver(anyCollection());
 //    }
 //
 //    // =========================================================================

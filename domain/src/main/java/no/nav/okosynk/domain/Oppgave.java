@@ -20,7 +20,6 @@ public class Oppgave {
     public final String fagomradeKode;
     public final String behandlingstema;
     public final String behandlingstype;
-    public final String underkategoriKode;
     public final String prioritetKode;
     public final String beskrivelse;
     public final LocalDate aktivFra;
@@ -41,7 +40,6 @@ public class Oppgave {
         this.fagomradeKode = oppgaveBuilder.fagomradeKode;
         this.behandlingstema = oppgaveBuilder.behandlingstema;
         this.behandlingstype = oppgaveBuilder.behandlingstype;
-        this.underkategoriKode = oppgaveBuilder.underkategoriKode;
         this.prioritetKode = oppgaveBuilder.prioritetKode;
         this.beskrivelse = oppgaveBuilder.beskrivelse;
         this.aktivFra = oppgaveBuilder.aktivFra;
@@ -63,7 +61,6 @@ public class Oppgave {
         private String fagomradeKode;
         private String behandlingstema;
         private String behandlingstype;
-        private String underkategoriKode;
         private String prioritetKode;
         private String beskrivelse;
         private LocalDate aktivFra;
@@ -108,11 +105,6 @@ public class Oppgave {
 
         public OppgaveBuilder withBehandlingstype(String behandlingstype) {
             this.behandlingstype = behandlingstype;
-            return this;
-        }
-
-        public OppgaveBuilder withUnderkategoriKode(String underkategoriKode) {
-            this.underkategoriKode = underkategoriKode;
             return this;
         }
 
@@ -198,10 +190,10 @@ public class Oppgave {
             String warnStr = "";
 
             if (brukerId == null) {
-                warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
+                //warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
             }
             if (behandlingstema == null && behandlingstype == null) {
-                warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
+                //warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
             }
             if (ansvarligEnhetId == null) {
                 warnStr += "An oppgave is about to be built with ansvarligEnhetId null" + LOG_PARAGRAPH_SEPARATOR;

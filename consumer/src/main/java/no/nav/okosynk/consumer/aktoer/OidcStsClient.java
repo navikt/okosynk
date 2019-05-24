@@ -1,8 +1,10 @@
-package no.nav.okosynk.consumer;
+package no.nav.okosynk.consumer.aktoer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.STSOidcResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -30,13 +32,12 @@ public class OidcStsClient {
     private final CloseableHttpClient httpClient;
     private final URI endpointURI;
     private final UsernamePasswordCredentials credentials;
+    private final String batchBruker;
     private String oidcToken;
 
-    public OidcStsClient(IOkosynkConfiguration okosynkConfiguration) {
-        this.credentials = new UsernamePasswordCredentials(
-                okosynkConfiguration.getRequiredString("SRVOPPGAVE_USERNAME"),
-                okosynkConfiguration.getRequiredString("SRVOPPGAVE_PASSWORD")
-        );
+    public OidcStsClient(IOkosynkConfiguration okosynkConfiguration, Constants.BATCH_TYPE batchType) {
+        this.batchBruker = okosynkConfiguration.getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+        this.credentials = new UsernamePasswordCredentials(this.batchBruker, okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
 
         try {
             this.endpointURI = new URIBuilder(okosynkConfiguration.getRequiredString("REST_STS_URL"))
@@ -53,7 +54,7 @@ public class OidcStsClient {
 
     public String getOidcToken() {
         if (isExpired(oidcToken)) {
-            log.info("OIDC Token for srvokosynk expired, getting a new one from the STS");
+            log.info("OIDC Token for {} expired, getting a new one from the STS", this.batchBruker);
             oidcToken = getTokenFromSTS();
         }
 
@@ -82,6 +83,7 @@ public class OidcStsClient {
     }
 
     private String getTokenFromSTS() {
+        log.info("henter OIDC Token for {}.", this.batchBruker);
         HttpGet request = new HttpGet(this.endpointURI);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
 

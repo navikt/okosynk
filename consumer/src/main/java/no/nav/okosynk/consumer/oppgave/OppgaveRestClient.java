@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.*;
-import no.nav.okosynk.consumer.util.ListeOppdeler;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
-import org.apache.commons.lang3.Validate;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -22,17 +21,22 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.stream.Collectors.toList;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
+import static no.nav.okosynk.domain.AbstractMelding.ORGANISASJON;
+import static no.nav.okosynk.domain.AbstractMelding.PERSON;
+import static no.nav.okosynk.domain.AbstractMelding.SAMHANDLER;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 public class OppgaveRestClient {
-    private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
+    private static final Logger log = LoggerFactory.getLogger(OppgaveRestClient.class);
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
 
     private final IOkosynkConfiguration okosynkConfiguration;
@@ -95,8 +99,6 @@ public class OppgaveRestClient {
         FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(opprettetAv, limit, offset);
         log.info("Starter inkrementelt søk i oppgaver mot Oppgave API. Fant totalt {} oppgaver", finnOppgaveResponse.getAntallTreffTotalt());
 
-
-
         while(!finnOppgaveResponse.getOppgaver().isEmpty()) {
             finnOppgaveResponse = this.finnOppgaver(opprettetAv, limit, offset);
             oppgaver.addAll(finnOppgaveResponse.getOppgaver()
@@ -104,7 +106,8 @@ public class OppgaveRestClient {
                             .map(this::tilOppgave)
                             .collect(Collectors.toList()));
 
-            log.info("Hentet {}/{} oppgaver fra Oppgave.", oppgaver.size(), finnOppgaveResponse.getAntallTreffTotalt());
+            log.info("Hentet {}/{} unike oppgaver fra Oppgave. Offset -> {}", oppgaver.size(), finnOppgaveResponse.getAntallTreffTotalt(), offset);
+            offset += limit;
         }
 
 
@@ -115,6 +118,7 @@ public class OppgaveRestClient {
     }
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
+        Collection<OppgaveDTO> oppgaveDTOs = oversettOppgaver(oppgaver);
 
         return null;
     }
@@ -128,10 +132,26 @@ public class OppgaveRestClient {
     }
 
     private Oppgave tilOppgave(OppgaveDTO oppgaveDTO) {
+//        String brukerTypeKode = null;
+//        String brukerId = null;
+//        if (isNotBlank(oppgaveDTO.getAktoerId())) {
+//            brukerTypeKode = PERSON;
+//            brukerId = this.aktoerRestClient.hentFnrForAktoerId();
+//        } else if (isNotBlank(oppgaveDTO.getBnr())) {
+//            brukerTypeKode = PERSON;
+//            brukerId = oppgaveDTO.getBnr();
+//        } else if (isNotBlank(oppgaveDTO.getOrgnr())) {
+//            brukerTypeKode = ORGANISASJON;
+//            brukerId = oppgaveDTO.getOrgnr();
+//        } else if (isNotBlank(oppgaveDTO.getSamhandlernr())) {
+//            brukerTypeKode = SAMHANDLER;
+//            brukerId = oppgaveDTO.getSamhandlernr();
+//        }
+
         return new Oppgave.OppgaveBuilder()
                 .withOppgaveId(oppgaveDTO.getId())
-//                .withBrukerId(oppgaveDTO.getGjelder() != null ? oppgaveDTO.getGjelder().getBrukerId() : null)
-//                .withBrukertypeKode(oppgaveDTO.getGjelder() != null ? oppgaveDTO.getGjelder().getBrukertypeKode() : null)
+//                .withBrukerId(brukerId)
+//                .withBrukertypeKode(brukerTypeKode)
                 .withOppgavetypeKode(oppgaveDTO.getOppgavetype())
                 .withFagomradeKode(oppgaveDTO.getTema())
                 .withBehandlingstema(oppgaveDTO.getBehandlingstema())
@@ -147,6 +167,47 @@ public class OppgaveRestClient {
                 .withMappeId(oppgaveDTO.getMappeId())
                 .withAnsvarligSaksbehandlerIdent(oppgaveDTO.getTilordnetRessurs())
                 .build();
+    }
+
+    private Set<OppgaveDTO> oversettOppgaver(Collection<Oppgave> oppgaver) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Set<OppgaveDTO> oppgaveDTOs = new HashSet<>();
+
+        oppgaver.forEach(oppgave -> {
+            OppgaveDTO oppgaveDTO = new OppgaveDTO();
+
+            if (Objects.equals(oppgave.brukertypeKode, SAMHANDLER)) {
+                oppgaveDTO.setSamhandlernr(oppgave.brukerId);
+            } else if (Objects.equals(oppgave.brukertypeKode, ORGANISASJON)) {
+                oppgaveDTO.setOrgnr(oppgave.brukerId);
+            } else if (isNotBlank(oppgave.brukerId) && erBostNr(oppgave.brukerId)) {
+                oppgaveDTO.setBnr(oppgave.brukerId);
+            } else if (isNotBlank(oppgave.brukerId)) {
+//                oppgaveDTO.setAktoerId(this.aktoerRestClient.hentAktoerIdForFnr(oppgave.brukerId));
+            }
+            oppgaveDTO.setOppgavetype(oppgave.oppgavetypeKode);
+            oppgaveDTO.setTema(oppgave.fagomradeKode);
+            oppgaveDTO.setBehandlingstema(oppgave.behandlingstema);
+            oppgaveDTO.setBehandlingstype(oppgave.behandlingstype);
+            oppgaveDTO.setPrioritet(oppgave.prioritetKode);
+            oppgaveDTO.setBeskrivelse(oppgave.beskrivelse);
+            oppgaveDTO.setAktivDato(oppgave.aktivFra.format(formatter));
+            oppgaveDTO.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
+            oppgaveDTO.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
+
+            oppgaveDTOs.add(oppgaveDTO);
+        });
+
+        return oppgaveDTOs;
+    }
+
+    private String hentAktoerIdForFnr() {
+        return null;
+    }
+
+    public static boolean erBostNr(String aktorNr) {
+        int month = Integer.valueOf(substring(aktorNr, 2, 4));
+        return (month >= 21 && month <=32);
     }
 
 }
