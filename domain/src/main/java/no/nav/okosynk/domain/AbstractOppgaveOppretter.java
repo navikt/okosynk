@@ -4,9 +4,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static no.nav.okosynk.domain.AbstractMelding.*;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substring;
 
 public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMelding>
     implements Function<List<MELDINGSTYPE>, Optional<Oppgave>> {
@@ -63,27 +68,45 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                 (final MELDINGSTYPE melding) -> {
 
                     final LocalDate aktivFra = LocalDate.now();
-                    final Optional<MappingRegel> kanskjeMappingRegel =
-                        this.mappingRegelRepository.finnRegel(melding);
+                    final Optional<MappingRegel> mappingRegel = this.mappingRegelRepository.finnRegel(melding);
 
-                    return kanskjeMappingRegel
-                        .map(mappingRegel ->
-                            new Oppgave.OppgaveBuilder()
-                                .withBrukerId(melding.gjelderId)
-                                .withBrukertypeKode(melding.utledGjelderIdType())
+                    Oppgave.OppgaveBuilder builder = new Oppgave.OppgaveBuilder();
+
+                    if (mappingRegel.isPresent()) {
+                        String gjelderId = melding.gjelderId;
+
+                        if (isNotBlank(gjelderId)) {
+                            String type = melding.utledGjelderIdType();
+                            if (Objects.equals(type, PERSON)) {
+                                if (erBostNr(gjelderId)) {
+                                    builder.withBnr(gjelderId);
+                                } else {
+                                    builder.withAktoerId("");
+                                }
+                            } else if (Objects.equals(type, SAMHANDLER)) {
+                                builder.withSamhandlernr(gjelderId);
+                            } else if (Objects.equals(type, ORGANISASJON)) {
+                                builder.withOrgnr(gjelderId);
+                            }
+                        }
+
+                        return builder
                                 .withOppgavetypeKode(oppgaveTypeKode())
                                 .withFagomradeKode(getFagomradeKode())
-                                .withBehandlingstema(mappingRegel.behandlingstema)
-                                .withBehandlingstype(mappingRegel.behandlingstype)
+                                .withBehandlingstema(mappingRegel.get().behandlingstema)
+                                .withBehandlingstype(mappingRegel.get().behandlingstype)
                                 .withPrioritetKode(getPrioritetKode())
                                 .withBeskrivelse(lagSamletBeskrivelse(meldinger))
                                 .withAktivFra(aktivFra)
                                 .withAktivTil(aktivFra.plusDays(antallDagerFrist()))
-                                .withAnsvarligEnhetId(mappingRegel.ansvarligEnhetId)
+                                .withAnsvarligEnhetId(mappingRegel.get().ansvarligEnhetId)
                                 .withLest(false)
                                 .withAntallMeldinger(meldinger.size())
-                                .build())
-                        .orElse(null);
+                                .build();
+
+                    } else {
+                        return null;
+                    }
                 });
     }
 
@@ -105,4 +128,9 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     protected abstract String lagBeskrivelse(final MELDINGSTYPE melding);
 
     protected abstract Comparator<MELDINGSTYPE> getMeldingComparator();
+
+    private boolean erBostNr(String aktorNr) {
+        int month = Integer.valueOf(substring(aktorNr, 2, 4));
+        return (month >= 21 && month <=32);
+    }
 }

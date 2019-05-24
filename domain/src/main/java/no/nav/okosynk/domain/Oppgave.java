@@ -1,6 +1,5 @@
 package no.nav.okosynk.domain;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +13,10 @@ public class Oppgave {
     private static final String LOG_PARAGRAPH_SEPARATOR = ". - ";
 
     public final String oppgaveId;
-    public final String brukerId;
-    public final String brukertypeKode;
+    public final String aktoerId;
+    public final String samhandlernr;
+    public final String orgnr;
+    public final String bnr;
     public final String oppgavetypeKode;
     public final String fagomradeKode;
     public final String behandlingstema;
@@ -34,8 +35,10 @@ public class Oppgave {
 
     public Oppgave(OppgaveBuilder oppgaveBuilder) {
         this.oppgaveId = oppgaveBuilder.oppgaveId;
-        this.brukerId = oppgaveBuilder.brukerId;
-        this.brukertypeKode = oppgaveBuilder.brukertypeKode;
+        this.aktoerId = oppgaveBuilder.aktoerId;
+        this.samhandlernr = oppgaveBuilder.samhandlernr;
+        this.orgnr = oppgaveBuilder.orgnr;
+        this.bnr = oppgaveBuilder.bnr;
         this.oppgavetypeKode = oppgaveBuilder.oppgavetypeKode;
         this.fagomradeKode = oppgaveBuilder.fagomradeKode;
         this.behandlingstema = oppgaveBuilder.behandlingstema;
@@ -55,8 +58,10 @@ public class Oppgave {
 
     public static class OppgaveBuilder {
         private String oppgaveId;
-        private String brukerId;
-        private String brukertypeKode;
+        private String aktoerId;
+        private String samhandlernr;
+        private String orgnr;
+        private String bnr;
         private String oppgavetypeKode;
         private String fagomradeKode;
         private String behandlingstema;
@@ -78,13 +83,23 @@ public class Oppgave {
             return this;
         }
 
-        public OppgaveBuilder withBrukerId(String brukerId) {
-            this.brukerId = brukerId;
+        public OppgaveBuilder withAktoerId(String aktoerId) {
+            this.aktoerId = aktoerId;
             return this;
         }
 
-        public OppgaveBuilder withBrukertypeKode(String brukertypeKode) {
-            this.brukertypeKode = brukertypeKode;
+        public OppgaveBuilder withSamhandlernr(String samhandlernr) {
+            this.samhandlernr = samhandlernr;
+            return this;
+        }
+
+        public OppgaveBuilder withOrgnr(String orgnr) {
+            this.orgnr = orgnr;
+            return this;
+        }
+
+        public OppgaveBuilder withBnr(String bnr) {
+            this.bnr = bnr;
             return this;
         }
 
@@ -165,8 +180,10 @@ public class Oppgave {
 
         public OppgaveBuilder withSameValuesAs(Oppgave oppgave) {
             this.oppgaveId = oppgave.oppgaveId;
-            this.brukerId = oppgave.brukerId;
-            this.brukertypeKode = oppgave.brukertypeKode;
+            this.aktoerId = oppgave.aktoerId;
+            this.samhandlernr = oppgave.samhandlernr;
+            this.orgnr = oppgave.orgnr;
+            this.bnr = oppgave.bnr;
             this.oppgavetypeKode = oppgave.oppgavetypeKode;
             this.fagomradeKode = oppgave.fagomradeKode;
             this.behandlingstema = oppgave.behandlingstema;
@@ -189,12 +206,12 @@ public class Oppgave {
 
             String warnStr = "";
 
-            if (brukerId == null) {
-                //warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
-            }
-            if (behandlingstema == null && behandlingstype == null) {
-                //warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
-            }
+//            if (brukerId == null) {
+//                warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
+//            }
+//            if (behandlingstema == null && behandlingstype == null) {
+//                warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
+//            }
             if (ansvarligEnhetId == null) {
                 warnStr += "An oppgave is about to be built with ansvarligEnhetId null" + LOG_PARAGRAPH_SEPARATOR;
             }
@@ -217,7 +234,10 @@ public class Oppgave {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Oppgave oppgave = (Oppgave) o;
-        return Objects.equals(brukerId, oppgave.brukerId) &&
+        return Objects.equals(aktoerId, oppgave.aktoerId) &&
+                Objects.equals(samhandlernr, oppgave.samhandlernr) &&
+                Objects.equals(orgnr, oppgave.orgnr) &&
+                Objects.equals(bnr, oppgave.bnr) &&
                 Objects.equals(behandlingstema, oppgave.behandlingstema) &&
                 Objects.equals(behandlingstype, oppgave.behandlingstype) &&
                 Objects.equals(ansvarligEnhetId, oppgave.ansvarligEnhetId);
@@ -225,7 +245,7 @@ public class Oppgave {
 
     @Override
     public int hashCode() {
-        return Objects.hash(brukerId, behandlingstema, behandlingstype, ansvarligEnhetId);
+        return Objects.hash(aktoerId, samhandlernr, orgnr, bnr, behandlingstema, behandlingstype, ansvarligEnhetId);
     }
 
     @Override
@@ -234,8 +254,10 @@ public class Oppgave {
         final StringBuffer strBuff =
             new StringBuffer()
                 .append("oppgaveId                  : ").append(oppgaveId).append(LOG_FIELD_SEPARATOR)
-                .append("brukerId                   : ").append(brukerId).append(LOG_FIELD_SEPARATOR)
-                .append("brukertypeKode             : ").append(brukertypeKode).append(LOG_FIELD_SEPARATOR)
+                .append("aktoerId                   : ").append(aktoerId).append(LOG_FIELD_SEPARATOR)
+                .append("samhandlernr               : ").append(samhandlernr).append(LOG_FIELD_SEPARATOR)
+                .append("orgnr                      : ").append(orgnr).append(LOG_FIELD_SEPARATOR)
+                .append("bnr                        : ").append(bnr).append(LOG_FIELD_SEPARATOR)
                 .append("oppgavetypeKode            : ").append(oppgavetypeKode).append(LOG_FIELD_SEPARATOR)
                 .append("fagomradeKode              : ").append(fagomradeKode).append(LOG_FIELD_SEPARATOR)
                 .append("behandlingstema            : ").append(behandlingstema).append(LOG_FIELD_SEPARATOR)

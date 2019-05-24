@@ -181,7 +181,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
         final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
         final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
-        final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
+        final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger, this.okosynkConfiguration);
 
         logger.debug("About to normally leave Batch.hentBatchOppgaver");
 

@@ -132,26 +132,13 @@ public class OppgaveRestClient {
     }
 
     private Oppgave tilOppgave(OppgaveDTO oppgaveDTO) {
-//        String brukerTypeKode = null;
-//        String brukerId = null;
-//        if (isNotBlank(oppgaveDTO.getAktoerId())) {
-//            brukerTypeKode = PERSON;
-//            brukerId = this.aktoerRestClient.hentFnrForAktoerId();
-//        } else if (isNotBlank(oppgaveDTO.getBnr())) {
-//            brukerTypeKode = PERSON;
-//            brukerId = oppgaveDTO.getBnr();
-//        } else if (isNotBlank(oppgaveDTO.getOrgnr())) {
-//            brukerTypeKode = ORGANISASJON;
-//            brukerId = oppgaveDTO.getOrgnr();
-//        } else if (isNotBlank(oppgaveDTO.getSamhandlernr())) {
-//            brukerTypeKode = SAMHANDLER;
-//            brukerId = oppgaveDTO.getSamhandlernr();
-//        }
 
         return new Oppgave.OppgaveBuilder()
                 .withOppgaveId(oppgaveDTO.getId())
-//                .withBrukerId(brukerId)
-//                .withBrukertypeKode(brukerTypeKode)
+                .withAktoerId(oppgaveDTO.getAktoerId())
+                .withSamhandlernr(oppgaveDTO.getSamhandlernr())
+                .withOrgnr(oppgaveDTO.getOrgnr())
+                .withBnr(oppgaveDTO.getBnr())
                 .withOppgavetypeKode(oppgaveDTO.getOppgavetype())
                 .withFagomradeKode(oppgaveDTO.getTema())
                 .withBehandlingstema(oppgaveDTO.getBehandlingstema())
@@ -176,15 +163,10 @@ public class OppgaveRestClient {
         oppgaver.forEach(oppgave -> {
             OppgaveDTO oppgaveDTO = new OppgaveDTO();
 
-            if (Objects.equals(oppgave.brukertypeKode, SAMHANDLER)) {
-                oppgaveDTO.setSamhandlernr(oppgave.brukerId);
-            } else if (Objects.equals(oppgave.brukertypeKode, ORGANISASJON)) {
-                oppgaveDTO.setOrgnr(oppgave.brukerId);
-            } else if (isNotBlank(oppgave.brukerId) && erBostNr(oppgave.brukerId)) {
-                oppgaveDTO.setBnr(oppgave.brukerId);
-            } else if (isNotBlank(oppgave.brukerId)) {
-//                oppgaveDTO.setAktoerId(this.aktoerRestClient.hentAktoerIdForFnr(oppgave.brukerId));
-            }
+            oppgaveDTO.setAktoerId(oppgave.aktoerId);
+            oppgaveDTO.setSamhandlernr(oppgave.samhandlernr);
+            oppgaveDTO.setOrgnr(oppgave.orgnr);
+            oppgaveDTO.setBnr(oppgave.bnr);
             oppgaveDTO.setOppgavetype(oppgave.oppgavetypeKode);
             oppgaveDTO.setTema(oppgave.fagomradeKode);
             oppgaveDTO.setBehandlingstema(oppgave.behandlingstema);
@@ -199,15 +181,6 @@ public class OppgaveRestClient {
         });
 
         return oppgaveDTOs;
-    }
-
-    private String hentAktoerIdForFnr() {
-        return null;
-    }
-
-    public static boolean erBostNr(String aktorNr) {
-        int month = Integer.valueOf(substring(aktorNr, 2, 4));
-        return (month >= 21 && month <=32);
     }
 
 }

@@ -142,7 +142,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return batch;
     }
 
-    private Constants.BATCH_TYPE getBatchType() {
+    protected Constants.BATCH_TYPE getBatchType() {
         return batchType;
     }
 
@@ -158,7 +158,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return nextExecutionId;
     }
 
-    public OppgaveRestClient getOppgaveRestClient() {
+    private OppgaveRestClient getOppgaveRestClient() {
         return oppgaveRestClient;
     }
 }

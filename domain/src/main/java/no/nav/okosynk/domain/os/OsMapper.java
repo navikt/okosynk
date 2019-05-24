@@ -14,12 +14,12 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
 
     private static final Logger logger = LoggerFactory.getLogger(OsMapper.class);
 
-    private OsOppgaveOppretter       osOppgaveOppretter;
+    private OsOppgaveOppretter osOppgaveOppretter;
     private OsMappingRegelRepository osMappingRegelRepository;
 
     public OsMapper() {
         osMappingRegelRepository = new OsMappingRegelRepository();
-        osOppgaveOppretter       = new OsOppgaveOppretter(osMappingRegelRepository);
+        osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository);
     }
 
     @Override
