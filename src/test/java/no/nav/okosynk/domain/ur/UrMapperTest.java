@@ -4,14 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,17 +34,18 @@ class UrMapperTest {
     private static final String ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL = "05073512345PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
     private static final String MELDING_ORGANISASJON_MED_MAPPING_REGEL = "00800000000ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8020UTPOST UR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282";
     private static final String UR_MELDING_EFOG =
-        "02029513245PERSON      2019-02-14T21:13:5525          00000000080610æ8020EFOG   UR2302019-02-12600767010Stoppet utbetaling                                02029530095";
+        "02029512345PERSON      2019-02-14T21:13:5525          00000000080610æ8020EFOG   UR2302019-02-12600767010Stoppet utbetaling                                02029530095";
 
     private UrMapper urMapper;
     private UrMelding urMeldingSomSkalBliTilOppgave;
     private UrMelding annenUrMeldingSomSkalBliTilOppgave;
     private UrMelding urMeldingUtenMappingRegel;
     private UrMelding urMeldingEFOG;
+    private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
 
     @BeforeEach
     void setUp() {
-        urMapper = new UrMapper(new AktoerRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.OS));
+        urMapper = new UrMapper(aktoerRestClient);
         urMeldingSomSkalBliTilOppgave = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         annenUrMeldingSomSkalBliTilOppgave = new UrMelding(ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         urMeldingUtenMappingRegel = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);
@@ -50,9 +55,10 @@ class UrMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med oppdragsKode \"EFOG\" som skal bli til oppgave.")
     void lagUrOppgaveMedOppdragsKodeEFOG() {
-
+        Mockito.reset(aktoerRestClient);
         enteringTestHeaderLogger.debug(null);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("02029512345")).thenReturn(AktoerRespons.ok("123"));
         final List<Oppgave> oppgaver =
             urMapper
                 .lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
@@ -62,32 +68,40 @@ class UrMapperTest {
         assertEquals("ab0272", oppgaver.get(0).behandlingstema);
         assertEquals("", oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
+        assertEquals(oppgaver.get(0).aktoerId, "123");
     }
 
     @Test
     @DisplayName("lagOppgaver returnerer to oppgaver hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void lagUrOppgaverFraUrMeldingListeReturnererToOppgaver() {
-
+        Mockito.reset(aktoerRestClient);
         enteringTestHeaderLogger.debug(null);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(aktoerRestClient.hentGjeldendeAktoerId("05073512345")).thenReturn(AktoerRespons.ok("1234"));
         List<Oppgave> oppgaver = urMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
         assertNotNull(oppgaver);
         assertEquals(2, oppgaver.size());
+        assertEquals(oppgaver.get(0).aktoerId, "1234");
+        assertEquals(oppgaver.get(1).aktoerId, "123");
     }
 
     @Test
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
     void lagUrOppgaverFraUrMeldingListeReturnererEnOppgave() {
-
+        Mockito.reset(aktoerRestClient);
         enteringTestHeaderLogger.debug(null);
+
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
 
         List<Oppgave> oppgaver = urMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
+        assertEquals(oppgaver.get(0).aktoerId, "123");
     }
 
 

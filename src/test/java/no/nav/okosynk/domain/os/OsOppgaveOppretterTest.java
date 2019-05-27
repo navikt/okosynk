@@ -1,9 +1,15 @@
 package no.nav.okosynk.domain.os;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.*;
 
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.consumer.aktoer.AktoerRespons;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.os.OsMappingRegelRepository;
 import no.nav.okosynk.domain.os.OsMelding;
@@ -19,15 +25,16 @@ class OsOppgaveOppretterTest {
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
-    private final OsOppgaveOppretter osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository());
+    private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private final OsOppgaveOppretter osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), aktoerRestClient);
 
     private static final OsMelding OS_MELDING_1 = new OsMelding("10108000398022828640 2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    10108000398            ");
-    private static final OsMelding OS_MELDING_2 = new OsMelding("06025800174029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         INNT    06025800174            ");
+    private static final OsMelding OS_MELDING_2 = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         INNT    06025812345            ");
 
-    private static final OsMelding OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new OsMelding("06025800174029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF06025800174            ");
+    private static final OsMelding OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF06025812345            ");
 
     private static final String OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "RETU;   1230kr;   beregningsdato/id:04.07.09/022828640;   periode:01.05.09-31.07.09;   feilkonto: ;   statusdato:26.09.09;   ;   UtbTil:10108000398;   K231B350";
-    private static final String OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "AVVE;   7277kr;   beregningsdato/id:06.11.09/029568753;   periode:01.11.09-30.11.09;   feilkonto: ;   statusdato:30.11.09;   ;   UtbTil:06025800174;   X123456";
+    private static final String OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "AVVE;   7277kr;   beregningsdato/id:06.11.09/029568753;   periode:01.11.09-30.11.09;   feilkonto: ;   statusdato:30.11.09;   ;   UtbTil:06025812345;   X123456";
 
     @Test
     void lagBeskrivelseLagerForventetBeskrivelse() {
@@ -58,9 +65,10 @@ class OsOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         Oppgave oppgave = osOppgaveOppretter.apply(Collections.singletonList(OS_MELDING_1)).get();
         assertAll(
-                () -> assertEquals("10108000398", oppgave.aktoerId),
+                () -> assertEquals("123", oppgave.aktoerId),
                 () -> assertEquals("OKO_OS", oppgave.oppgavetypeKode),
                 () -> assertEquals("OKO", oppgave.fagomradeKode),
                 () -> assertEquals("", oppgave.behandlingstema),
@@ -85,6 +93,7 @@ class OsOppgaveOppretterTest {
                 .append(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE)
                 .toString();
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         assertEquals(forventetSamletBeskrivelse, osOppgaveOppretter.apply(Arrays.asList(OS_MELDING_1, OS_MELDING_2)).get().beskrivelse);
         assertEquals(forventetSamletBeskrivelse, osOppgaveOppretter.apply(Arrays.asList(OS_MELDING_2, OS_MELDING_1)).get().beskrivelse);
     }
@@ -97,6 +106,7 @@ class OsOppgaveOppretterTest {
         final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
         final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = osOppgaveOppretter.apply(Arrays.asList(OS_MELDING_2, OS_MELDING_1)).get();
 
         assertAll(
@@ -114,6 +124,7 @@ class OsOppgaveOppretterTest {
         final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
         final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = osOppgaveOppretter.apply(Arrays.asList(OS_MELDING_1, OS_MELDING_2)).get();
 
         assertAll(
@@ -148,6 +159,7 @@ class OsOppgaveOppretterTest {
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019400æ 8020         BA      10108000398            ");
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
@@ -161,6 +173,7 @@ class OsOppgaveOppretterTest {
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019401æ 8020         BA      10108000398            ");
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));

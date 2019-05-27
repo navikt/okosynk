@@ -1,6 +1,8 @@
 package no.nav.okosynk.domain.os;
 
 import java.util.Comparator;
+
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.AbstractOppgaveOppretter;
 
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
@@ -15,8 +17,8 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
         return meldingComparator;
     }
 
-    public OsOppgaveOppretter(final OsMappingRegelRepository mappingRegelRepository) {
-        super(mappingRegelRepository);
+    public OsOppgaveOppretter(final OsMappingRegelRepository mappingRegelRepository, AktoerRestClient aktoerRestClient) {
+        super(mappingRegelRepository, aktoerRestClient);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package no.nav.okosynk.batch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -46,7 +47,7 @@ class OsRepositoryTest {
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(new AktoerRestClient(this.okosynkConfiguration, Constants.BATCH_TYPE.OS)));
+                new OsMapper(mock(AktoerRestClient.class)));
 
         batchRepository.leggTil(osBatch);
 
@@ -66,7 +67,7 @@ class OsRepositoryTest {
                 Constants.BATCH_TYPE.OS,
                 EKSEKVERINGS_ID,
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(new AktoerRestClient(this.okosynkConfiguration, Constants.BATCH_TYPE.OS)));
+                new OsMapper(mock(AktoerRestClient.class)));
 
         batchRepository.leggTil(osBatch);
 

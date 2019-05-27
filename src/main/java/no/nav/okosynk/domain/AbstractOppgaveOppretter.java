@@ -1,5 +1,10 @@
 package no.nav.okosynk.domain;
 
+import no.nav.okosynk.consumer.aktoer.AktoerRespons;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
@@ -15,7 +20,7 @@ import static org.apache.commons.lang3.StringUtils.substring;
 
 public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMelding>
     implements Function<List<MELDINGSTYPE>, Optional<Oppgave>> {
-
+    private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
     private static final String fagomradeKode = "OKO";
     private static final String prioritetKode = "LAV";
     private static final String linjeSeparator = System.getProperty("line.separator"); // Does not need to use IOkosynkConfiguration, because "line.separator" is part of the no.nav.okosynk.io.os/java ecosystem.
@@ -51,9 +56,11 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     private static final DateTimeFormatter NORSK_DATO_FORMAT_UTEN_KLOKKESLETT = DateTimeFormatter.ofPattern("dd.MM.yy");
 
     private final AbstractMappingRegelRepository mappingRegelRepository;
+    private final AktoerRestClient aktoerRestClient;
 
-    protected AbstractOppgaveOppretter(final AbstractMappingRegelRepository mappingRegelRepository) {
+    protected AbstractOppgaveOppretter(final AbstractMappingRegelRepository mappingRegelRepository, AktoerRestClient aktoerRestClient) {
         this.mappingRegelRepository = mappingRegelRepository;
+        this.aktoerRestClient = aktoerRestClient;
     }
 
     @Override
@@ -81,7 +88,18 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                 if (erBostNr(gjelderId)) {
                                     builder.withBnr(gjelderId);
                                 } else {
-                                    builder.withAktoerId("");
+                                    try {
+                                        AktoerRespons aktoerRespons = this.aktoerRestClient.hentGjeldendeAktoerId(gjelderId);
+                                        if (isNotBlank(aktoerRespons.getFeilmelding())) {
+                                            log.warn("Fikk feilmelding fra aktoerregisteret ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}", aktoerRespons.getFeilmelding());
+                                            return null;
+                                        } else {
+                                            builder.withAktoerId(aktoerRespons.getAktoerId());
+                                        }
+                                    } catch (Exception e) {
+                                        log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
+                                        return null;
+                                    }
                                 }
                             } else if (Objects.equals(type, SAMHANDLER)) {
                                 builder.withSamhandlernr(gjelderId);

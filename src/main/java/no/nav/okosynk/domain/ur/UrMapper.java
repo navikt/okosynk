@@ -21,7 +21,7 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
 
     public UrMapper(AktoerRestClient aktoerRestClient) {
         urMappingRegelRepository = new UrMappingRegelRepository();
-        urOppgaveOppretter       = new UrOppgaveOppretter(urMappingRegelRepository);
+        urOppgaveOppretter       = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient);
     }
 
     @Override

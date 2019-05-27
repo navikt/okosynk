@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.Oppgave;
@@ -21,7 +23,7 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
 
     public OsMapper(AktoerRestClient aktoerRestClient) {
         osMappingRegelRepository = new OsMappingRegelRepository();
-        osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository);
+        osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerRestClient);
     }
 
     @Override

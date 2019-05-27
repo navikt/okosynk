@@ -46,7 +46,7 @@ class UrRepositoryTest {
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR)));
+                new UrMapper(mock(AktoerRestClient.class)));
 
         batchRepository.leggTil(urBatch);
 
@@ -66,7 +66,7 @@ class UrRepositoryTest {
                 Constants.BATCH_TYPE.UR,
                 EKSEKVERINGS_ID,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR)));
+                new UrMapper(mock(AktoerRestClient.class)));
 
         batchRepository.leggTil(urBatch);
 

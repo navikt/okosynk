@@ -1,9 +1,15 @@
 package no.nav.okosynk.domain.ur;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.*;
 
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.consumer.aktoer.AktoerRespons;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.ur.UrMappingRegelRepository;
 import no.nav.okosynk.domain.ur.UrMelding;
@@ -19,8 +25,8 @@ class UrOppgaveOppretterTest {
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
-
-    private final UrOppgaveOppretter urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository());
+    private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private final UrOppgaveOppretter urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), aktoerRestClient);
 
     private static final UrMelding UR_MELDING_1 = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
     private static final UrMelding UR_MELDING_2 = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8020INNT   UR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
@@ -58,9 +64,10 @@ class UrOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         Oppgave oppgave = urOppgaveOppretter.apply(Collections.singletonList(UR_MELDING_1)).get();
         assertAll(
-                () -> assertEquals("10108000398", oppgave.aktoerId),
+                () -> assertEquals("123", oppgave.aktoerId),
                 () -> assertEquals("OKO_UR", oppgave.oppgavetypeKode),
                 () -> assertEquals("OKO", oppgave.fagomradeKode),
                 () -> assertEquals("", oppgave.behandlingstema),
@@ -144,6 +151,7 @@ class UrOppgaveOppretterTest {
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
@@ -157,6 +165,7 @@ class UrOppgaveOppretterTest {
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019401æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
+        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));

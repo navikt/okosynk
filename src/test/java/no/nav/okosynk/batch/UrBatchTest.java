@@ -31,7 +31,7 @@ public class UrBatchTest extends BatchTest<UrMelding> {
                 Constants.BATCH_TYPE.UR,
                 getEksekveringsId(),
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR))
+                new UrMapper(mock(AktoerRestClient.class))
             )
         );
         this.commonPostSetUp();

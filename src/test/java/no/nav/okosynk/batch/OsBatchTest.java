@@ -11,6 +11,7 @@ import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.os.OsMeldingReader;
 import no.nav.okosynk.io.LinjeUnreadableException;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mock;
 
 public class OsBatchTest extends BatchTest<OsMelding> {
 
@@ -19,6 +20,7 @@ public class OsBatchTest extends BatchTest<OsMelding> {
     void setUp() throws MeldingUnreadableException, LinjeUnreadableException {
         this.setMeldingReader(mock(OsMeldingReader.class));
         this.setMeldingMapper(mock(OsMapper.class));
+
         //this.setInputFilePath();
         this.setBatch(
             new Batch<OsMelding>(
@@ -26,7 +28,7 @@ public class OsBatchTest extends BatchTest<OsMelding> {
                 Constants.BATCH_TYPE.OS,
                 getEksekveringsId(),
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(new AktoerRestClient(this.getOkosynkConfiguration(), Constants.BATCH_TYPE.OS))
+                new OsMapper(mock(AktoerRestClient.class))
             )
         );
         this.commonPostSetUp();

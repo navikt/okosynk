@@ -18,6 +18,7 @@ import java.util.*;
 
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -40,7 +41,7 @@ public class AktoerRestClient {
         log.info("Aktoerregister REST client bygd opp for {}", this.consumerId);
     }
 
-    public String hentAktoerIdForFnr(String fnr) {
+    public AktoerRespons hentGjeldendeAktoerId(String fnr) {
         URI uri;
         try {
              uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("AKTOERREGISTER_API_URL"))
@@ -62,62 +63,39 @@ public class AktoerRestClient {
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HTTP_OK) {
-                JsonNode jsonNode = new ObjectMapper().readTree(response.getEntity().getContent());
-                log.info(jsonNode.asText());
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
+                JsonNode aktoerResponse = jsonNode.get(fnr);
+                AktoerIdent aktoerIdent = objectMapper.treeToValue(aktoerResponse, AktoerIdent.class);
+
+                if (isNotBlank(aktoerIdent.getFeilmelding())) {
+                    return AktoerRespons.feil(String.format("Mottok feilmelding fra aktoerregisteret: %s", aktoerIdent.getFeilmelding()));
+                } else {
+                    List<AktoerIdentEntry> identer = aktoerIdent.getIdenter();
+                    if (identer != null && !identer.isEmpty()) {
+                        if (identer.size() == 1) {
+                            AktoerIdentEntry entry = identer.get(0);
+                            if (!entry.isGjeldende()) {
+                                return AktoerRespons.feil("Spurte etter kun gjeldene identer men mottok gyldig respons hvor ident ikke er satt til gyldig");
+                            } else {
+                                return AktoerRespons.ok(entry.getIdent());
+                            }
+                        } else {
+                            return AktoerRespons.feil(String.format("Forventet kun en aktoerId i respnsen men fikk: %s", identer.size()));
+                        }
+                    } else {
+                        return AktoerRespons.feil("Fant ingen identer i responsen fra aktoerregisteret som, responsen innholdt ingen feilmeldinger.");
+                    }
+                }
             } else if (statusLine.getStatusCode() == HTTP_NOT_FOUND) {
-                throw new IllegalStateException("AktoerId '%s' finnes ikke i aktoerregisteret");
+                return AktoerRespons.feil("Fant ikke forespurt FNR i aktoerregisteret");
             } else {
-                throw new IllegalStateException(String.format("Feil ved kall mot Aktoerregister - %s %s", statusLine.getStatusCode(), statusLine.getReasonPhrase()));
+                return AktoerRespons.feil(String.format("Feil ved kall mot Aktoerregister - %s %s", statusLine.getStatusCode(), statusLine.getReasonPhrase()));
             }
         } catch (IOException e) {
             throw new IllegalStateException("Feil ved kall mot Aktoerregister API", e);
         }
-
-        return fnr;
     }
-
-//    private Valideringsresultat determineValidity(CloseableHttpResponse response) {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//
-//        try {
-//            JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
-//
-//            JsonNode aktoerResponse = jsonNode.get(0);
-//            AktoerIdent aktoerIdent = objectMapper.treeToValue(aktoerResponse, AktoerIdent.class);
-//
-//            if (isNotBlank(aktoerIdent.getFeilmelding())) {
-//                return Valideringsresultat.invalid(String.format("Feilmelding mottatt i svar fra Aktoerregisteret for aktoerId '%s' - %s", aktoerId, aktoerIdent.getFeilmelding()));
-//            }
-//
-//            List<AktoerIdentEntry> identer = aktoerIdent.getIdenter();
-//            if (identer != null && !identer.isEmpty()) {
-//                if (identer.size() == 1) {
-//                    AktoerIdentEntry entry = identer.get(0);
-//                    if (!entry.isGjeldende()) {
-//                        return Valideringsresultat.invalid("AktoerId funnet men er ikke gyldig");
-//                    } else {
-//                        return Valideringsresultat.valid();
-//                    }
-//                } else {
-//                    for (AktoerIdentEntry entry : identer) {
-//                        if (entry.isGjeldende()) {
-//                            if (Objects.equals(entry.getIdent(), aktoerId)) {
-//                                return Valideringsresultat.valid();
-//                            } else {
-//                                return Valideringsresultat.invalid(String.format("Fant en annen gjeldende aktoerId: '%s'", entry.getIdent()));
-//                            }
-//                        }
-//
-//                    }
-//
-//                }
-//            }
-//
-//            return Valideringsresultat.invalid("Fikk svar fra Aktoerregisteret men responsen var tom");
-//        } catch (IOException e) {
-//            throw new ExternalApiException("Klarte ikke lese respons fra Aktoerregisteret", e);
-//        }
-//    }
 
     private String getOidcToken() {
         return this.oidcStsClient.getOidcToken();
