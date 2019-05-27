@@ -1,20 +1,19 @@
 package no.nav.okosynk.consumer.oppgave;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.*;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -22,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.format.DateTimeFormatter;
@@ -31,8 +31,6 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substring;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -92,8 +90,6 @@ public class OppgaveRestClient {
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
-
-
     }
 
     public ConsumerStatistics finnOppgaver(String opprettetAv, Set<Oppgave> oppgaver ) {
@@ -121,9 +117,50 @@ public class OppgaveRestClient {
     }
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
-        Collection<OppgaveDTO> oppgaveDTOs = oversettOppgaver(oppgaver);
+        List<OppgaveDTO> oppgaveDTOs = oppgaver.stream()
+                .map(this::oversettOppgave)
+                .collect(Collectors.toList());
 
-        return null;
+        HttpPost request = new HttpPost(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
+        request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
+        request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
+        request.addHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType());
+        try {
+            request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
+        } catch (AuthenticationException e) {
+            throw new IllegalStateException(e);
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<OppgaveDTO> opprettedeOppgaver = new ArrayList<>();
+        List<OppgaveDTO> oppgaverSomIkkeErOpprettet = new ArrayList<>();
+        oppgaveDTOs.forEach(dto -> {
+            try {
+                request.setEntity(new StringEntity(objectMapper.writeValueAsString(dto)));
+            } catch (UnsupportedEncodingException | JsonProcessingException e) {
+                throw new IllegalStateException("Klarte ikke serialisere oppgave i forkant av POST mot Oppgave", e);
+            }
+
+            try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+                StatusLine statusLine = response.getStatusLine();
+                if (statusLine.getStatusCode() >= 400) {
+                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+                    log.error("Feil oppsto under oppretting av oppgave: {}, Errorresponse: {}", dto, errorResponse);
+                    oppgaverSomIkkeErOpprettet.add(dto);
+                }
+
+                opprettedeOppgaver.add(new ObjectMapper().readValue(response.getEntity().getContent(), OppgaveDTO.class));
+            } catch (IOException e) {
+                throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
+            }
+
+        });
+
+        return ConsumerStatistics
+                .builder()
+                .antallOppgaverSomMedSikkerhetErOpprettet(opprettedeOppgaver.size())
+                .antallOppgaverSomMedSikkerhetIkkeErOpprettet(oppgaverSomIkkeErOpprettet.size())
+                .build();
     }
 
     public ConsumerStatistics patchOppgaver(Set<Oppgave> oppgaver, boolean ferdigstill) {
@@ -131,14 +168,7 @@ public class OppgaveRestClient {
             return ConsumerStatistics.zero();
         }
 
-        URI uri;
-        try {
-            uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL")).build();
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Klarte ikke bygge opp oppgave URI", e);
-        }
-
-        HttpPatch request = new HttpPatch(uri);
+        HttpPatch request = new HttpPatch(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
         request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         request.addHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType());
@@ -157,7 +187,6 @@ public class OppgaveRestClient {
             e.printStackTrace();
         }
 
-
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= 400) {
@@ -168,11 +197,22 @@ public class OppgaveRestClient {
 
             PatchOppgaverResponse patchOppgaverResponse = new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
 
+            ConsumerStatistics.Builder builder = ConsumerStatistics.builder();
+            if (ferdigstill) {
+                return builder
+                        .antallOppgaverSomMedSikkerhetErFerdigstilt(patchOppgaverResponse.getSuksess())
+                        .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(patchOppgaverResponse.getFeilet())
+                        .build();
+            } else {
+                return builder
+                        .antallOppgaverSomMedSikkerhetErOppdatert(patchOppgaverResponse.getSuksess())
+                        .antallOppgaverSomMedSikkerhetIkkeErOppdatert(patchOppgaverResponse.getFeilet())
+                        .build();
+            }
+
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
-
-        return ConsumerStatistics.zero();
     }
 
     private ObjectNode createPatchrequest(Set<Oppgave> oppgaver, boolean ferdigstill) {
@@ -189,6 +229,7 @@ public class OppgaveRestClient {
             node.put("beskrivelse", o.beskrivelse);
             patchJsonOppgaver.add(node);
         });
+
         return patchJson;
     }
 
@@ -197,7 +238,6 @@ public class OppgaveRestClient {
     }
 
     private Oppgave tilOppgave(OppgaveDTO oppgaveDTO) {
-
         return new Oppgave.OppgaveBuilder()
                 .withOppgaveId(oppgaveDTO.getId())
                 .withAktoerId(oppgaveDTO.getAktoerId())
@@ -221,13 +261,10 @@ public class OppgaveRestClient {
                 .build();
     }
 
-    private Set<OppgaveDTO> oversettOppgaver(Collection<Oppgave> oppgaver) {
+    private OppgaveDTO oversettOppgave(Oppgave oppgave) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Set<OppgaveDTO> oppgaveDTOs = new HashSet<>();
 
-        oppgaver.forEach(oppgave -> {
             OppgaveDTO oppgaveDTO = new OppgaveDTO();
-
             oppgaveDTO.setAktoerId(oppgave.aktoerId);
             oppgaveDTO.setSamhandlernr(oppgave.samhandlernr);
             oppgaveDTO.setOrgnr(oppgave.orgnr);
@@ -242,10 +279,7 @@ public class OppgaveRestClient {
             oppgaveDTO.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
             oppgaveDTO.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
 
-            oppgaveDTOs.add(oppgaveDTO);
-        });
-
-        return oppgaveDTOs;
+        return oppgaveDTO;
     }
 
 }

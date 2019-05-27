@@ -6,6 +6,7 @@ public class ConsumerStatistics {
     private int antallOppgaverSomErHentetFraDatabasen;
     private int antallOppgaverSomMedSikkerhetErOpprettet;
     private int antallOppgaverSomKanVaereOpprettet;
+    private int antallOppgaverSomMedSikkerhetIkkeErOpprettet;
     private int antallOppgaverSomMedSikkerhetErOppdatert;
     private int antallOppgaverSomMedSikkerhetIkkeErOppdatert;
     private int antallOppgaverSomKanVaereOppdatert;
@@ -18,6 +19,7 @@ public class ConsumerStatistics {
         this.antallOppgaverSomErHentetFraDatabasen = builder.antallOppgaverSomErHentetFraDatabasen;
         this.antallOppgaverSomMedSikkerhetErOpprettet = builder.antallOppgaverSomMedSikkerhetErOpprettet;
         this.antallOppgaverSomKanVaereOpprettet = builder.antallOppgaverSomKanVaereOpprettet;
+        this.antallOppgaverSomMedSikkerhetIkkeErOpprettet = builder.antallOppgaverSomMedSikkerhetIkkeErOpprettet;
         this.antallOppgaverSomMedSikkerhetErOppdatert = builder.antallOppgaverSomMedSikkerhetErOppdatert;
         this.antallOppgaverSomMedSikkerhetIkkeErOppdatert = builder.antallOppgaverSomMedSikkerhetIkkeErOppdatert;
         this.antallOppgaverSomKanVaereOppdatert = builder.antallOppgaverSomKanVaereOppdatert;
@@ -55,6 +57,7 @@ public class ConsumerStatistics {
             .antallOppgaverSomKanVaereFerdigstilt(other.antallOppgaverSomKanVaereFerdigstilt + this.antallOppgaverSomKanVaereFerdigstilt)
             .antallOppgaverSomKanVaereOppdatert(other.antallOppgaverSomKanVaereOppdatert + this.antallOppgaverSomKanVaereOppdatert)
             .antallOppgaverSomKanVaereOpprettet(other.antallOppgaverSomKanVaereOpprettet + this.antallOppgaverSomKanVaereOpprettet)
+            .antallOppgaverSomMedSikkerhetIkkeErOpprettet(other.antallOppgaverSomMedSikkerhetIkkeErOpprettet + this.antallOppgaverSomMedSikkerhetIkkeErOpprettet)
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(other.antallOppgaverSomMedSikkerhetIkkeErFerdigstilt + this.antallOppgaverSomMedSikkerhetIkkeErFerdigstilt)
             .antallOppgaverSomMedSikkerhetIkkeErOppdatert(other.antallOppgaverSomMedSikkerhetIkkeErOppdatert + this.antallOppgaverSomMedSikkerhetIkkeErOppdatert)
             .numberOfExceptionReceivedDuringRun(other.numberOfExceptionReceivedDuringRun + this.numberOfExceptionReceivedDuringRun)
@@ -71,6 +74,7 @@ public class ConsumerStatistics {
         private int antallOppgaverSomErHentetFraDatabasen;
         private int antallOppgaverSomMedSikkerhetErOpprettet;
         private int antallOppgaverSomKanVaereOpprettet;
+        private int antallOppgaverSomMedSikkerhetIkkeErOpprettet;
         private int antallOppgaverSomMedSikkerhetErOppdatert;
         private int antallOppgaverSomMedSikkerhetIkkeErOppdatert;
         private int antallOppgaverSomKanVaereOppdatert;
@@ -91,19 +95,23 @@ public class ConsumerStatistics {
             this.antallOppgaverSomErHentetFraDatabasen = verdi;
             return this;
         }
-        Builder antallOppgaverSomMedSikkerhetErOpprettet(final int verdi) {
+        public Builder antallOppgaverSomMedSikkerhetErOpprettet(final int verdi) {
             this.antallOppgaverSomMedSikkerhetErOpprettet = verdi;
+            return this;
+        }
+        public Builder antallOppgaverSomMedSikkerhetIkkeErOpprettet(final int verdi) {
+            this.antallOppgaverSomMedSikkerhetIkkeErOpprettet = verdi;
             return this;
         }
         Builder antallOppgaverSomKanVaereOpprettet(final int verdi) {
             this.antallOppgaverSomKanVaereOpprettet = verdi;
             return this;
         }
-        Builder antallOppgaverSomMedSikkerhetErOppdatert(final int verdi) {
+        public Builder antallOppgaverSomMedSikkerhetErOppdatert(final int verdi) {
             this.antallOppgaverSomMedSikkerhetErOppdatert = verdi;
             return this;
         }
-        Builder antallOppgaverSomMedSikkerhetIkkeErOppdatert(final int verdi) {
+        public Builder antallOppgaverSomMedSikkerhetIkkeErOppdatert(final int verdi) {
             this.antallOppgaverSomMedSikkerhetIkkeErOppdatert = verdi;
             return this;
         }
@@ -111,11 +119,11 @@ public class ConsumerStatistics {
             this.antallOppgaverSomKanVaereOppdatert = verdi;
             return this;
         }
-        Builder antallOppgaverSomMedSikkerhetErFerdigstilt(final int verdi) {
+        public Builder antallOppgaverSomMedSikkerhetErFerdigstilt(final int verdi) {
             this.antallOppgaverSomMedSikkerhetErFerdigstilt = verdi;
             return this;
         }
-        Builder antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(final int verdi) {
+        public Builder antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(final int verdi) {
             this.antallOppgaverSomMedSikkerhetIkkeErFerdigstilt = verdi;
             return this;
         }

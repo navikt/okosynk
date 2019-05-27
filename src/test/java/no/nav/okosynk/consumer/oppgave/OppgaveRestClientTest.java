@@ -6,6 +6,6 @@ class OppgaveRestClientTest {
 
     @Test
     void bla() {
-
+        //Wiremock
     }
 }
