@@ -159,7 +159,8 @@ public class OppgaveSynkroniserer {
         } else {
             logger.info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
             Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream().map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
-            consumerStatistics = ConsumerStatistics.zero(); //oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
+//            consumerStatistics = oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
+            consumerStatistics = this.oppgaveRestClient.patchOppgaver(oppdaterteOppgaver, false);
             logger.info("Bruker {} har oppdatert {} oppgaver", bruker, oppgaveOppdateringer.size());
         }
 
@@ -180,7 +181,7 @@ public class OppgaveSynkroniserer {
             consumerStatistics = ConsumerStatistics.zero();
         } else {
             logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
-            //onsumerStatistics = oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
+            //consumerStatistics = oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
             consumerStatistics = this.oppgaveRestClient.opprettOppgaver(oppgaver);
             logger.info("Bruker {} har opprettet {} oppgaver", bruker, oppgaver.size());
         }
