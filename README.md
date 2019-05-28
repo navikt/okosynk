@@ -18,7 +18,7 @@ som oppført i docker-compose.yml.
 0. Pakk ut `domain/src/test/resources/os.input.valid.per.2018-05-04.zip` i samme directory. Hvorvidt navnet på fila da er korrekt, avhenger av no.nav.okosynk.OkosynkDomainConstants.OS_FS_INPUT_FILE_NAME i domain-modulen, evt. filnavnet som implisitt er angitt i `osFtpBaseUrl.url`-property'en hvis man skal teste FTP.
 0. Pakk ut `domain/src/test/resources/ur.input.valid.per.2018-05-04.zip` i samme directory. Hvorvidt navnet på fila da er korrekt, avhenger av no.nav.okosynk.OkosynkDomainConstants.UR_FS_INPUT_FILE_NAME i domain-modulen, evt. filnavnet som implisitt er angitt i `urFtpBaseUrl.url`-property'en hvis man skal teste FTP.
 0. Start Jetty-serveren som er definert i `no.nav.okosynk.TestStarter` under `okosynk/web/src/test/java`. (Dette gjøres vel enklest fra IDE'en.) (Kjøres via port 2712)
-0. Start en batch-jobb ved å kjøre følgende kommando fra kommandolinja: `curl -X POST -u srvokosynk:byttmeg -i localhost:2712/okosynk/tjenester/os/batch/launch`. Verdien til `byttmeg` finnes i Fasit. Verdi pr. 2018-05-04: `VIx3ZYEzBemO6m5` i t4. `os` kan selvsagt byttes ut med `ur`.
+0. Start en batch-jobb ved å kjøre følgende kommando fra kommandolinja: `curl -X POST -u srvokosynk:byttmeg -i localhost:2712/okosynk/tjenester/os/batch/launch`. Verdien til `byttmeg` finnes i Fasit. Verdi pr. 2018-05-04:  i t4. `os` kan selvsagt byttes ut med `ur`.
 
 0. Resultatet kan kontrolleres...
     1. ... ved å se på loggene. Se særlig etter strengen `STATISTIKK`. Loggen konfigureres i `okosynk/web/src/test/resources/logback-test.xml`.
