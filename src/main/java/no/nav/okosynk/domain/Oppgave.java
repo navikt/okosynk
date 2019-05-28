@@ -212,9 +212,9 @@ public class Oppgave {
 //            if (behandlingstema == null && behandlingstype == null) {
 //                warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
 //            }
-            if (ansvarligEnhetId == null) {
-                warnStr += "An oppgave is about to be built with ansvarligEnhetId null" + LOG_PARAGRAPH_SEPARATOR;
-            }
+//            if (ansvarligEnhetId == null) {
+//                warnStr += "An oppgave is about to be built with ansvarligEnhetId null" + LOG_PARAGRAPH_SEPARATOR;
+//            }
 
             final Oppgave oppgave = new Oppgave(this);
 
