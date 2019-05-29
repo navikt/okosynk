@@ -44,7 +44,7 @@ public class AktoerRestClient {
     public AktoerRespons hentGjeldendeAktoerId(String fnr) {
         URI uri;
         try {
-             uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("AKTOERREGISTER_API_URL"))
+             uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("AKTOERREGISTER_URL"))
                     .addParameter("identgruppe", "AktoerId")
                     .build();
         } catch (URISyntaxException e) {
