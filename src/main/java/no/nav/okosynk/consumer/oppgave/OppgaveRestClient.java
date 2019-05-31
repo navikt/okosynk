@@ -179,10 +179,8 @@ public class OppgaveRestClient {
         }
 
         ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
-
         try {
-            String jsonString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(patchJson);
-            log.info(jsonString);
+            String jsonString = new ObjectMapper().writeValueAsString(patchJson);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
