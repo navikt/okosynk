@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Optional.ofNullable;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -254,7 +255,7 @@ public class OppgaveRestClient {
                 .withAnsvarligEnhetId(oppgaveDTO.getTildeltEnhetsnr())
                 .withLest(oppgaveDTO.getStatus() != OPPRETTET)
                 .withVersjon(oppgaveDTO.getVersjon())
-                .withSistEndret(oppgaveDTO.getEndretTidspunkt())
+                .withSistEndret(ofNullable(oppgaveDTO.getEndretTidspunkt()).orElse(oppgaveDTO.getOpprettetTidspunkt()))
                 .withMappeId(oppgaveDTO.getMappeId())
                 .withAnsvarligSaksbehandlerIdent(oppgaveDTO.getTilordnetRessurs())
                 .build();
