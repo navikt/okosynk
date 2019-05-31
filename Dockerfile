@@ -12,10 +12,10 @@ FROM navikt/java:8
 
 WORKDIR /app
 
-COPY cli/runInsideDocker.sh /app/run.sh
+COPY /runInsideDocker.sh /app/run.sh
 RUN sed -i -e 's/\r$//' /app/run.sh
 
-COPY --from=builder cli/target/okosynk.jar /app/app.jar
+COPY --from=builder /target/okosynk.jar /app/app.jar
 
 
 ENTRYPOINT ["/dumb-init"]

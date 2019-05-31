@@ -47,12 +47,11 @@ public class OppgaveRestClient {
     public OppgaveRestClient(IOkosynkConfiguration okosynkConfiguration, Constants.BATCH_TYPE batchType) {
         this.okosynkConfiguration = okosynkConfiguration;
 
-        this.credentials = new UsernamePasswordCredentials(
-                okosynkConfiguration.getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue()),
-                okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey())
-        );
+        String bruker = okosynkConfiguration.getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+        this.credentials = new UsernamePasswordCredentials(bruker, okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
 
         this.httpClient = HttpClients.createDefault();
+        log.info("OppgaveRestClient konfigurert for {} og bruker {}", batchType, bruker);
     }
 
     private FinnOppgaveResponse finnOppgaver(String opprettetAv, int limit, int offset) {
