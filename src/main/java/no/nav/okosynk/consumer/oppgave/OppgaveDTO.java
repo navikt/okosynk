@@ -1,18 +1,14 @@
 package no.nav.okosynk.consumer.oppgave;
 
-import no.nav.okosynk.domain.Oppgave;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.time.*;
 import java.util.Map;
-import java.util.Objects;
 
-import static no.nav.okosynk.domain.AbstractMelding.ORGANISASJON;
-import static no.nav.okosynk.domain.AbstractMelding.PERSON;
-import static no.nav.okosynk.domain.AbstractMelding.SAMHANDLER;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class OppgaveDTO {
@@ -27,8 +23,8 @@ public class OppgaveDTO {
     private String behandlingstema;
     private String oppgavetype;
     private String behandlingstype;
-    private LocalDate aktivDato;
-    private LocalDate fristFerdigstillelse;
+    private String aktivDato;
+    private String fristFerdigstillelse;
     private String prioritet;
     private String tildeltEnhetsnr;
     private String endretAvEnhetsnr;
@@ -52,6 +48,8 @@ public class OppgaveDTO {
     public OppgaveDTO() {
     }
 
+    @JsonIgnore
+    @JsonProperty("id")
     public String getId() {
         return id;
     }
@@ -60,6 +58,8 @@ public class OppgaveDTO {
         this.id = id;
     }
 
+    @JsonIgnore
+    @JsonProperty("endretAvEnhetsnr")
     public String getEndretAvEnhetsnr() {
         return endretAvEnhetsnr;
     }
@@ -188,20 +188,20 @@ public class OppgaveDTO {
         this.behandlingstype = behandlingstype;
     }
 
-    public LocalDate getAktivDato() {
+    public String getAktivDato() {
         return aktivDato;
     }
 
     public void setAktivDato(String aktivDato) {
-        this.aktivDato = LocalDate.parse(aktivDato);
+        this.aktivDato = aktivDato;
     }
 
-    public LocalDate getFristFerdigstillelse() {
+    public String getFristFerdigstillelse() {
         return fristFerdigstillelse;
     }
 
     public void setFristFerdigstillelse(String fristFerdigstillelse) {
-        this.fristFerdigstillelse = LocalDate.parse(fristFerdigstillelse);
+        this.fristFerdigstillelse = fristFerdigstillelse;
     }
 
     public String getPrioritet() {
@@ -236,6 +236,8 @@ public class OppgaveDTO {
         this.mappeId = mappeId;
     }
 
+    @JsonIgnore
+    @JsonProperty("status")
     public OppgaveStatus getStatus() {
         return status;
     }
@@ -244,6 +246,8 @@ public class OppgaveDTO {
         this.status = status;
     }
 
+    @JsonIgnore
+    @JsonProperty("opprettetAv")
     public String getOpprettetAv() {
         return opprettetAv;
     }
@@ -252,6 +256,8 @@ public class OppgaveDTO {
         this.opprettetAv = opprettetAv;
     }
 
+    @JsonIgnore
+    @JsonProperty("opprettetTidspunkt")
     public LocalDateTime getOpprettetTidspunkt() {
         return opprettetTidspunkt;
     }
@@ -260,6 +266,8 @@ public class OppgaveDTO {
         this.opprettetTidspunkt = ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
     }
 
+    @JsonIgnore
+    @JsonProperty("versjon")
     public Integer getVersjon() {
         return versjon;
     }
@@ -268,6 +276,8 @@ public class OppgaveDTO {
         this.versjon = versjon;
     }
 
+    @JsonIgnore
+    @JsonProperty("endretAv")
     public String getEndretAv() {
         return endretAv;
     }
@@ -276,6 +286,8 @@ public class OppgaveDTO {
         this.endretAv = endretAv;
     }
 
+    @JsonIgnore
+    @JsonProperty("endretTidspunkt")
     public LocalDateTime getEndretTidspunkt() {
         return endretTidspunkt;
     }
@@ -284,6 +296,8 @@ public class OppgaveDTO {
         this.endretTidspunkt = ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
     }
 
+    @JsonIgnore
+    @JsonProperty("ferdigstiltTidspunkt")
     public LocalDateTime getFerdigstiltTidspunkt() {
         return ferdigstiltTidspunkt;
     }

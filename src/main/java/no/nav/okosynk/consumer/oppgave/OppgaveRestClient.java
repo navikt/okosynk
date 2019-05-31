@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.ofNullable;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -108,7 +110,6 @@ public class OppgaveRestClient {
             log.info("Hentet {}/{} unike oppgaver fra Oppgave. Offset -> {}", oppgaver.size(), finnOppgaveResponse.getAntallTreffTotalt(), offset);
             offset += limit;
         }
-
 
         return ConsumerStatistics
                         .builder()
@@ -249,8 +250,8 @@ public class OppgaveRestClient {
                 .withBehandlingstype(oppgaveDTO.getBehandlingstype())
                 .withPrioritetKode(oppgaveDTO.getPrioritet())
                 .withBeskrivelse(oppgaveDTO.getBeskrivelse())
-                .withAktivFra(oppgaveDTO.getAktivDato())
-                .withAktivTil(oppgaveDTO.getFristFerdigstillelse())
+                .withAktivFra(isNotBlank(oppgaveDTO.getAktivDato()) ? LocalDate.parse(oppgaveDTO.getAktivDato()) : null)
+                .withAktivTil(isNotBlank(oppgaveDTO.getFristFerdigstillelse()) ? LocalDate.parse(oppgaveDTO.getFristFerdigstillelse()) : null)
                 .withAnsvarligEnhetId(oppgaveDTO.getTildeltEnhetsnr())
                 .withLest(oppgaveDTO.getStatus() != OPPRETTET)
                 .withVersjon(oppgaveDTO.getVersjon())
