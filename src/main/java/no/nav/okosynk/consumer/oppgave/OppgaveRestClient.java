@@ -178,11 +178,12 @@ public class OppgaveRestClient {
             throw new IllegalStateException(e);
         }
 
-        ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
         try {
+            ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            request.setEntity(new StringEntity(jsonString));
+        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
         }
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
