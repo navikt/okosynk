@@ -111,8 +111,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                         return builder
                                 .withOppgavetypeKode(oppgaveTypeKode())
                                 .withFagomradeKode(getFagomradeKode())
-                                .withBehandlingstema(mappingRegel.get().behandlingstema)
-                                .withBehandlingstype(mappingRegel.get().behandlingstype)
+                                .withBehandlingstema(isNotBlank(mappingRegel.get().behandlingstema) ? mappingRegel.get().behandlingstema : null)
+                                .withBehandlingstype(isNotBlank(mappingRegel.get().behandlingstype) ? mappingRegel.get().behandlingstype : null)
                                 .withPrioritetKode(getPrioritetKode())
                                 .withBeskrivelse(lagSamletBeskrivelse(meldinger))
                                 .withAktivFra(aktivFra)
