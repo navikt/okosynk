@@ -56,6 +56,7 @@ public class OppgaveSynkroniserer {
         final ConsumerStatistics consumerStatistics_oppdater = oppdaterOppgaver(okosynkConfiguration, oppgaverSomSkalOppdateres, bruker);
         final ConsumerStatistics consumerStatistics_opprett = opprettOppgaver(okosynkConfiguration, oppgaverSomSkalOpprettes, bruker);
 
+        //Skriv om dette
         final ConsumerStatistics consumerStatistics_accumulated =
             ConsumerStatistics.addAll(
                 consumerStatistics_finn,
@@ -126,7 +127,7 @@ public class OppgaveSynkroniserer {
                 logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker, oppgaverSomSkalFerdigstilles.size());
                 //consumerStatistics = oppgaveBehandlingGateway.patchOppgaver(oppgaverSomSkalFerdigstilles);
                 consumerStatistics = this.oppgaveRestClient.patchOppgaver(oppgaverSomSkalFerdigstilles, true);
-                logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker, oppgaverSomSkalFerdigstilles.size());
+                logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker, consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
             }
         }
 
@@ -161,7 +162,7 @@ public class OppgaveSynkroniserer {
             Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream().map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
 //            consumerStatistics = oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
             consumerStatistics = this.oppgaveRestClient.patchOppgaver(oppdaterteOppgaver, false);
-            logger.info("Bruker {} har oppdatert {} oppgaver", bruker, oppgaveOppdateringer.size());
+            logger.info("Bruker {} har oppdatert {} oppgaver", bruker, consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
         }
 
         return consumerStatistics;
@@ -183,7 +184,7 @@ public class OppgaveSynkroniserer {
             logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
             //consumerStatistics = oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
             consumerStatistics = this.oppgaveRestClient.opprettOppgaver(oppgaver);
-            logger.info("Bruker {} har opprettet {} oppgaver", bruker, oppgaver.size());
+            logger.info("Bruker {} har opprettet {} oppgaver", bruker, consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
         }
 
         return consumerStatistics;

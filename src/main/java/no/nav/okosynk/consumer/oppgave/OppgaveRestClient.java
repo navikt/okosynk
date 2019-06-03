@@ -33,6 +33,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.ofNullable;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
+import static no.nav.okosynk.consumer.util.ListeOppdeler.delOppListe;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -168,6 +169,8 @@ public class OppgaveRestClient {
         if (oppgaver == null || oppgaver.isEmpty()) {
             return ConsumerStatistics.zero();
         }
+
+        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1000);
 
         HttpPatch request = new HttpPatch(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
         request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
