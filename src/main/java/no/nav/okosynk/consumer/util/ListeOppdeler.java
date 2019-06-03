@@ -1,14 +1,12 @@
 package no.nav.okosynk.consumer.util;
 
-import no.nav.okosynk.domain.Oppgave;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListeOppdeler {
 
-    public static List<List<Oppgave>> delOppListe(List<Oppgave> liste, int sublisteStorrelse) {
-        final List<List<Oppgave>> subLister = new ArrayList<>();
+    public static <T> List<List<T>> delOppListe(List<T> liste, int sublisteStorrelse) {
+        final List<List<T>> subLister = new ArrayList<>();
 
         int startIndex = 0;
         int stoppIndex = sublisteStorrelse < liste.size() ? sublisteStorrelse : liste.size();

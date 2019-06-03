@@ -1,6 +1,9 @@
 package no.nav.okosynk.consumer;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class ConsumerStatistics {
     private int antallOppgaverSomErHentetFraDatabasen;
@@ -138,10 +141,20 @@ public class ConsumerStatistics {
 
     }
 
-//    @Override
-//    public String toString() {
-//        return this.toBuilder().toString();
-//    }
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
+                .append("antallOppgaverSomErHentetFraDatabasen", antallOppgaverSomErHentetFraDatabasen)
+                .append("antallOppgaverSomMedSikkerhetErOpprettet", antallOppgaverSomMedSikkerhetErOpprettet)
+                .append("antallOppgaverSomKanVaereOpprettet", antallOppgaverSomKanVaereOpprettet)
+                .append("antallOppgaverSomMedSikkerhetErOppdatert", antallOppgaverSomMedSikkerhetErOppdatert)
+                .append("antallOppgaverSomMedSikkerhetIkkeErOppdatert", antallOppgaverSomMedSikkerhetIkkeErOppdatert)
+                .append("antallOppgaverSomKanVaereOppdatert", antallOppgaverSomKanVaereOppdatert)
+                .append("antallOppgaverSomMedSikkerhetErFerdigstilt", antallOppgaverSomMedSikkerhetErFerdigstilt)
+                .append("antallOppgaverSomMedSikkerhetIkkeErFerdigstilt", antallOppgaverSomMedSikkerhetIkkeErFerdigstilt)
+                .append("antallOppgaverSomKanVaereFerdigstilt", antallOppgaverSomKanVaereFerdigstilt)
+                .toString();
+    }
 
     @Override
     public boolean equals(final Object other) {

@@ -170,8 +170,6 @@ public class OppgaveRestClient {
             return ConsumerStatistics.zero();
         }
 
-        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1000);
-
         HttpPatch request = new HttpPatch(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
         request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
@@ -182,6 +180,15 @@ public class OppgaveRestClient {
             throw new IllegalStateException(e);
         }
 
+        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1000);
+
+        ConsumerStatistics consumerStatistics = ConsumerStatistics.zero();
+        oppgaverLister.forEach(oppgaveListe -> consumerStatistics.add(patchOppgaver(oppgaveListe, ferdigstill, request)));
+
+        return consumerStatistics;
+    }
+
+    private ConsumerStatistics patchOppgaver(List<Oppgave> oppgaver, boolean ferdigstill, HttpPatch request) {
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
@@ -212,13 +219,12 @@ public class OppgaveRestClient {
                         .antallOppgaverSomMedSikkerhetIkkeErOppdatert(patchOppgaverResponse.getFeilet())
                         .build();
             }
-
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
     }
 
-    private ObjectNode createPatchrequest(Set<Oppgave> oppgaver, boolean ferdigstill) {
+    private ObjectNode createPatchrequest(List<Oppgave> oppgaver, boolean ferdigstill) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode patchJson = mapper.createObjectNode();
         patchJson.put("endretAvEnhetsnr", ENHET_ID_FOR_ANDRE_EKSTERNE);
