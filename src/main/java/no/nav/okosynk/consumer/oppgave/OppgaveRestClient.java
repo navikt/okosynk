@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -182,13 +183,35 @@ public class OppgaveRestClient {
 
         final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1000);
 
-        ConsumerStatistics consumerStatistics = ConsumerStatistics.zero();
-        oppgaverLister.forEach(oppgaveListe -> consumerStatistics.add(patchOppgaver(oppgaveListe, ferdigstill, request)));
+        List<PatchOppgaverResponse> responses  =
+                oppgaverLister.stream()
+                .map(list -> patchOppgaver(list, ferdigstill, request))
+                .collect(Collectors.toList());
 
-        return consumerStatistics;
+        int suksess = summerAntallFraResponse(responses, PatchOppgaverResponse::getSuksess);
+        int feilet = summerAntallFraResponse(responses, PatchOppgaverResponse::getFeilet);
+
+        if (ferdigstill) {
+            return ConsumerStatistics.builder()
+                    .antallOppgaverSomMedSikkerhetErFerdigstilt(suksess)
+                    .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(feilet)
+                    .build();
+        } else {
+            return ConsumerStatistics.builder()
+                    .antallOppgaverSomMedSikkerhetErOppdatert(suksess)
+                    .antallOppgaverSomMedSikkerhetIkkeErOppdatert(feilet)
+                    .build();
+        }
     }
 
-    private ConsumerStatistics patchOppgaver(List<Oppgave> oppgaver, boolean ferdigstill, HttpPatch request) {
+    private int summerAntallFraResponse(List<PatchOppgaverResponse> responses, ToIntFunction<PatchOppgaverResponse> function) {
+        return responses.stream()
+                .mapToInt(function)
+                .reduce(Integer::sum)
+                .orElse(0);
+    }
+
+    private PatchOppgaverResponse patchOppgaver(List<Oppgave> oppgaver, boolean ferdigstill, HttpPatch request) {
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
@@ -205,20 +228,7 @@ public class OppgaveRestClient {
                 throw illegalArgumentFrom(errorResponse);
             }
 
-            PatchOppgaverResponse patchOppgaverResponse = new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
-
-            ConsumerStatistics.Builder builder = ConsumerStatistics.builder();
-            if (ferdigstill) {
-                return builder
-                        .antallOppgaverSomMedSikkerhetErFerdigstilt(patchOppgaverResponse.getSuksess())
-                        .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(patchOppgaverResponse.getFeilet())
-                        .build();
-            } else {
-                return builder
-                        .antallOppgaverSomMedSikkerhetErOppdatert(patchOppgaverResponse.getSuksess())
-                        .antallOppgaverSomMedSikkerhetIkkeErOppdatert(patchOppgaverResponse.getFeilet())
-                        .build();
-            }
+            return new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }

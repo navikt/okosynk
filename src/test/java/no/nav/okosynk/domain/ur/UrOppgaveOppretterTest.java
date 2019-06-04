@@ -70,7 +70,7 @@ class UrOppgaveOppretterTest {
                 () -> assertEquals("123", oppgave.aktoerId),
                 () -> assertEquals("OKO_UR", oppgave.oppgavetypeKode),
                 () -> assertEquals("OKO", oppgave.fagomradeKode),
-                () -> assertEquals("", oppgave.behandlingstema),
+                () -> assertNull(null, oppgave.behandlingstema),
                 () -> assertEquals("ae0218", oppgave.behandlingstype),
                 () -> assertEquals("LAV", oppgave.prioritetKode),
                 () -> assertEquals(UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;"), oppgave.beskrivelse),

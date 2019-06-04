@@ -59,7 +59,7 @@ class OsMapperTest {
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
         assertEquals("ab0272", oppgaver.get(0).behandlingstema);
-        assertEquals("", oppgaver.get(0).behandlingstype);
+        assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
         assertEquals(oppgaver.get(0).aktoerId, "123");
     }

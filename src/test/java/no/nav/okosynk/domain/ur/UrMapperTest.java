@@ -1,9 +1,6 @@
 package no.nav.okosynk.domain.ur;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,7 +63,7 @@ class UrMapperTest {
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
         assertEquals("ab0272", oppgaver.get(0).behandlingstema);
-        assertEquals("", oppgaver.get(0).behandlingstype);
+        assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
         assertEquals(oppgaver.get(0).aktoerId, "123");
     }

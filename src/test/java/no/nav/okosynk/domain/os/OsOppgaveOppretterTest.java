@@ -71,7 +71,7 @@ class OsOppgaveOppretterTest {
                 () -> assertEquals("123", oppgave.aktoerId),
                 () -> assertEquals("OKO_OS", oppgave.oppgavetypeKode),
                 () -> assertEquals("OKO", oppgave.fagomradeKode),
-                () -> assertEquals("", oppgave.behandlingstema),
+                () -> assertNull( oppgave.behandlingstema),
                 () -> assertEquals("ae0218", oppgave.behandlingstype),
                 () -> assertEquals("LAV", oppgave.prioritetKode),
                 () -> assertEquals(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("RETU;", "RETU;;"), oppgave.beskrivelse),
