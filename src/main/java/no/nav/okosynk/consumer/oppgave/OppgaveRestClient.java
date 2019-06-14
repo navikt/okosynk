@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -85,9 +86,13 @@ public class OppgaveRestClient {
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= 400) {
-                ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-                log.error("Feil oppsto under henting av oppgaver: {}", errorResponse);
-                throw illegalArgumentFrom(errorResponse);
+                try {
+                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+                    log.error("Feil oppsto under henting av oppgaver: {}", errorResponse);
+                    throw illegalArgumentFrom(errorResponse);
+                } catch (JsonParseException jpe) {
+                    parseRawError(response);
+                }
             }
 
             return new ObjectMapper().readValue(response.getEntity().getContent(), FinnOppgaveResponse.class);
@@ -181,9 +186,9 @@ public class OppgaveRestClient {
             throw new IllegalStateException(e);
         }
 
-        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1000);
+        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 2);
 
-        List<PatchOppgaverResponse> responses  =
+        List<PatchOppgaverResponse> responses =
                 oppgaverLister.stream()
                 .map(list -> patchOppgaver(list, ferdigstill, request))
                 .collect(Collectors.toList());
@@ -223,15 +228,25 @@ public class OppgaveRestClient {
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= 400) {
-                ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-                log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
-                throw illegalArgumentFrom(errorResponse);
+                try {
+                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
+                    throw illegalArgumentFrom(errorResponse);
+                } catch (JsonParseException jpe) {
+                    parseRawError(response);
+                }
             }
 
             return new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
+    }
+
+    private PatchOppgaverResponse parseRawError(CloseableHttpResponse response) throws IOException {
+        String responseBody = new ObjectMapper().readValue(response.getEntity().getContent(), String.class);
+        log.error("Feilet under parsing av oppgave error response: {}", responseBody);
+        throw new IllegalStateException("Feilet under parsing av oppgave error response");
     }
 
     private ObjectNode createPatchrequest(List<Oppgave> oppgaver, boolean ferdigstill) {
