@@ -6,7 +6,7 @@ FROM maven:3.5.3-jdk-8 as builder
 
 ADD . .
 
-RUN mvn clean install --settings maven-settings.xml
+RUN mvn clean install
 
 FROM navikt/java:8
 
