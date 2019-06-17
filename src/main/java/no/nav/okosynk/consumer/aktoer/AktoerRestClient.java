@@ -46,6 +46,7 @@ public class AktoerRestClient {
         try {
              uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("AKTOERREGISTER_URL"))
                     .addParameter("identgruppe", "AktoerId")
+                     .addParameter("gjeldende", "true")
                     .build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Failed while building aktoerregister endpoint URI", e);
