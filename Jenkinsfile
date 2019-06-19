@@ -37,5 +37,27 @@ pipeline {
 
              }
          }
+
+         stage('Update yaml file') {
+             steps {
+                 script {
+                     def yaml = "${params.yamlFile}"
+                     echo "klar for å lese yamlfile $yaml"
+                     def yamlFile = readFile(yaml).replaceAll("@@version@@", "${env.APPLICATION_VERSION}")
+                     writeFile file: yaml, text: yamlFile
+                 }
+             }
+         }
+
+         stage('Deploy to preprod') {
+             when {
+                 expression { params.yamlFile != 'app-prod.yaml' }
+             }
+             steps {
+                 script {
+                     echo "Deployer til preprod"
+                 }
+             }
+         }
     }
 }
