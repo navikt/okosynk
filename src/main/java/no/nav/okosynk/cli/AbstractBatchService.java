@@ -54,18 +54,13 @@ public abstract class AbstractBatchService {
 
     public BatchStatus startBatchSynchronously() {
 
-        // =====================================================================
-        // BEGIN - prometheus:
-        //
+
         final CollectorRegistry registry = new CollectorRegistry();
         final Gauge duration = Gauge.build()
-            .name("my_batch_job_duration_seconds")
-            .help("Duration of my batch job in seconds.")
+            .name("okosynk_job_duration_seconds")
+            .help("Duration of okosynk batch job in seconds.")
             .register(registry);
         final Gauge.Timer durationTimer = duration.startTimer();
-        //
-        // END - prometheus
-        // =====================================================================
 
 //        final Timer timer = createTimer(getStartBatchSynchronouslyTimerNavn());
 //        timer.start();
@@ -77,38 +72,22 @@ public abstract class AbstractBatchService {
             final AbstractService service  = getService();
             batchStatus = service.startBatchSynchronously();
 
-            // =====================================================================
-            // BEGIN - prometheus:
-            //
             final Gauge lastSuccess = Gauge.build()
-                .name("my_batch_job_last_success_unixtime")
-                .help("Last time my batch job succeeded, in unixtime.")
+                .name("okosynk_batch_job_last_success_unixtime")
+                .help("Last time okosynk batch job succeeded, in unixtime.")
                 .register(registry);
             lastSuccess.setToCurrentTime();
-            //
-            // END - prometheus
-            // =====================================================================
-        } catch (final Exception e) {
-//            timer.setFailed();
-            throw e;
         } finally {
             MDC.remove(getBatchNavn());
-//            timer.stop();
-//            timer.report();
 
-            // =====================================================================
-            // BEGIN - prometheus:
-            //
             durationTimer.setDuration();
-            final PushGateway pushGateway = new PushGateway("127.0.0.1:9091");
+            String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
+            logger.info("Pusher metrikker til {}", pushGateway);
             try {
-                pushGateway.pushAdd(registry, "my_batch_job");
+                new PushGateway(pushGateway).pushAdd(registry, "okosynk_batch_job");
             } catch (IOException e) {
-                // TODO: Now: OK. Because this is only some template code. But: Change when time comes.
+                logger.error("Klarte ikke pushe metrikker", e);
             }
-            //
-            // END - prometheus
-            // =====================================================================
         }
 
         return batchStatus;
