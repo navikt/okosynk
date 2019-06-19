@@ -1,0 +1,100 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: okosynk
+  namespace: okosynk
+spec:
+  schedule: "0 4 * * *" # Every morning at 04:00 UTC
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          volumes:
+            - name: okosynk
+              secret:
+                secretName: okosynk
+          restartPolicy: Never
+          containers:
+            - name: okosynk
+              image: repo.adeo.no:5443/okosynk:@@version@@
+              env:
+                - name: OKOSYNK_SHOULD_RUN_DRY
+                  value: "false"
+                - name: NAV_TRUSTSTORE_KEYSTOREALIAS
+                  value: na
+                - name: NAV_TRUSTSTORE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: nav_truststore_password
+                - name: NAV_TRUSTSTORE_PATH
+                  value: "/var/run/secrets/naisd.io/nav_truststore_path"
+                - name: SRVOKOSYNK_KEYSTOREALIAS
+                  value: app-key
+                - name: SRVOKOSYNK_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: srvokosynk_password
+                - name: SRVOKOSYNK_KEYSTORE
+                  value: /var/run/secrets/naisd.io/srvokosynk_keystore
+                - name: VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL
+                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgavebehandlingV3
+                  value: https://service-gw-q3.preprod.local
+                - name: VIRKSOMHET_OPPGAVE_V3_ENDPOINTURL
+                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgaveV3
+                  value: https://service-gw-q3.preprod.local
+                - name: SERVICEGATEWAY_URL
+                  value: https://service-gw-q3.preprod.local/
+                - name: OPPGAVE_URL
+                  value: https://oppgave.nais.preprod.local/api/v1/oppgaver
+                - name: AKTOERREGISTER_URL
+                  value: https://app-q1.adeo.no/aktoerregister/api/v1/identer
+                - name: REST_STS_URL
+                  value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
+                - name: PUSH_GATEWAY_ADDRESS
+                  value: nais-prometheus-prometheus-pushgateway.nais:9091
+                - name: SRVBOKOSYNK_USERNAME
+                  value: srvbokosynk
+                - name: SRVBOKOSYNK_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: srvbokosynk_password
+                - name: SRVBOKOSYNK001_USERNAME
+                  value: srvbokosynk001
+                - name: SRVBOKOSYNK001_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: srvbokosynk001_password
+                - name: SRVBOKOSYNK002_USERNAME
+                  value: srvbokosynk002
+                - name: SRVBOKOSYNK002_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: srvbokosynk002_password
+                - name: OSFTPBASEURL_URL
+                  value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/os.input
+                - name: OSFTPCREDENTIALS_USERNAME
+                  value: srvokosynksftp
+                - name: OSFTPCREDENTIALS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: osftpcredentials_password
+                - name: URFTPBASEURL_URL
+                  value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
+                - name: URFTPCREDENTIALS_USERNAME
+                  value: srvokosynksftp
+                - name: URFTPCREDENTIALS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: urftpcredentials_password
+                - name: SECURITYTOKENSERVICE_URL
+                  value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
+              volumeMounts:
+                - name: okosynk
+                  mountPath: "/var/run/secrets/naisd.io/"
