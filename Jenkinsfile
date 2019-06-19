@@ -29,7 +29,6 @@ pipeline {
             steps {
                 script {
                     echo "Done!"
-                    echo ${env.APPLICATION_VERSION}
                 }
 
             }
