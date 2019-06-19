@@ -55,7 +55,7 @@ pipeline {
              }
              steps {
                  script {
-                     echo "Deployer til preprod"
+                     sh "kubectl --context preprod-fss apply -f ${params.yamlFile}"
                  }
              }
          }
