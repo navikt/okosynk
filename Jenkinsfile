@@ -17,6 +17,7 @@ pipeline {
     }
 
     stages {
+
         stage('Maven Build') {
             steps {
                 script {
@@ -26,13 +27,15 @@ pipeline {
         }
 
         stage('Build and push docker image') {
-            steps {
-                script {
-                    echo "Done!"
-                }
+             steps {
+                 script {
+                     echo "name -> ${env.APPLICATION_NAME}"
+                     echo "version -> ${env.APPLICATION_VERSION}"
+                     sh "docker build -t repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION} --pull ."
+                     sh "docker push repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION}"
+                 }
 
-            }
-        }
-
+             }
+         }
     }
 }
