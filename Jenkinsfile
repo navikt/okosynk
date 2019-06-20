@@ -55,7 +55,9 @@ pipeline {
              }
              steps {
                  script {
-                     sh "kubectl --context preprod-fss apply -f ${params.yamlFile}"
+                 echo "Not applying yaml file because of missing vault iAc setup: Printing image so this can be done manually."
+                 echo "repo.adeo.no:5443/${env.APPLICATION_NAME}:${env.APPLICATION_VERSION}"
+                     //sh "kubectl --context preprod-fss apply -f ${params.yamlFile}"
                  }
              }
          }
