@@ -144,8 +144,8 @@ public class OppgaveRestClient {
         List<OppgaveDTO> oppgaverSomIkkeErOpprettet = new ArrayList<>();
         oppgaveDTOs.forEach(dto -> {
             try {
-                request.setEntity(new StringEntity(objectMapper.writeValueAsString(dto)));
-            } catch (UnsupportedEncodingException | JsonProcessingException e) {
+                request.setEntity(new StringEntity(objectMapper.writeValueAsString(dto), "UTF-8"));
+            } catch (JsonProcessingException e) {
                 throw new IllegalStateException("Klarte ikke serialisere oppgave i forkant av POST mot Oppgave", e);
             }
 
@@ -228,8 +228,8 @@ public class OppgaveRestClient {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
             log.info("Forsøker å patche oppgaver: {}", jsonString);
-            request.setEntity(new StringEntity(jsonString));
-        } catch (JsonProcessingException | UnsupportedEncodingException e) {
+            request.setEntity(new StringEntity(jsonString, "UTF-8"));
+        } catch (JsonProcessingException e) {
             throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
         }
 
