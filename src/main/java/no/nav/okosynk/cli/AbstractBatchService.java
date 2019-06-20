@@ -4,6 +4,9 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.batch.BatchStatus;
@@ -53,8 +56,6 @@ public abstract class AbstractBatchService {
                                                      final BatchRepository batchRepository);
 
     public BatchStatus startBatchSynchronously() {
-
-
         final CollectorRegistry registry = new CollectorRegistry();
         final Gauge duration = Gauge.build()
             .name("okosynk_job_duration_seconds")
@@ -84,7 +85,7 @@ public abstract class AbstractBatchService {
             String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
             logger.info("Pusher metrikker til {}", pushGateway);
             try {
-                new PushGateway(pushGateway).pushAdd(registry, "okosynk_batch_job");
+                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", "okosynk"));
             } catch (IOException e) {
                 logger.error("Klarte ikke pushe metrikker", e);
             }
