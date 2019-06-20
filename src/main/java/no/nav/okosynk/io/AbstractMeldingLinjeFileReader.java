@@ -101,7 +101,8 @@ public abstract class AbstractMeldingLinjeFileReader
     protected abstract IResourceContainer createResourceContainer();
 
     protected String getCharsetName(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getString(getBatchType().getFtpCharsetNameKey(), "ISO8859_1");
+        return "UTF-8";
+//        return okosynkConfiguration.getString(getBatchType().getFtpCharsetNameKey(), "ISO8859_1");
     }
 
     protected String getDefaultCharsetName() {
