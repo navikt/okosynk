@@ -132,7 +132,7 @@ public class OppgaveRestClient {
         HttpPost request = new HttpPost(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
         request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
-        request.addHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType());
+        request.addHeader(CONTENT_TYPE,  "application/json; charset=ISO-8859-1");
         try {
             request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
         } catch (AuthenticationException e) {
@@ -183,7 +183,7 @@ public class OppgaveRestClient {
         HttpPatch request = new HttpPatch(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
         request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
-        request.addHeader(CONTENT_TYPE, APPLICATION_JSON.getMimeType());
+        request.addHeader(CONTENT_TYPE,  "application/json; charset=ISO-8859-1");
         try {
             request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
         } catch (AuthenticationException e) {
