@@ -114,9 +114,11 @@ public class OppgaveRestClient {
                             .map(this::tilOppgave)
                             .collect(Collectors.toList()));
 
-            log.info("Hentet {}/{} unike oppgaver fra Oppgave. Offset -> {}", oppgaver.size(), finnOppgaveResponse.getAntallTreffTotalt(), offset);
+
             offset += limit;
         }
+
+        log.info("Hentet {} unike oppgaver fra Oppgave", oppgaver.size());
 
         return ConsumerStatistics
                         .builder()
@@ -190,15 +192,13 @@ public class OppgaveRestClient {
             throw new IllegalStateException(e);
         }
 
-        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1);
+        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 500);
 
         log.info("Starter patching av oppgaver, sublistestørrelse: {}, antall sublister {}, antall oppgaver totalt: {}", 500, oppgaverLister.size(), oppgaver.size());
         List<PatchOppgaverResponse> responses =
                 oppgaverLister.stream()
                 .map(list -> patchOppgaver(list, ferdigstill, request))
                 .collect(Collectors.toList());
-
-        log.info("Ferdig med patching av oppgave");
 
         int suksess = summerAntallFraResponse(responses, PatchOppgaverResponse::getSuksess);
         int feilet = summerAntallFraResponse(responses, PatchOppgaverResponse::getFeilet);
@@ -227,7 +227,6 @@ public class OppgaveRestClient {
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
-            log.info("Forsøker å patche oppgaver: {}", jsonString);
             request.setEntity(new StringEntity(jsonString, "UTF-8"));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
