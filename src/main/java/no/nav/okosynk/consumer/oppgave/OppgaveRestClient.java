@@ -231,6 +231,7 @@ public class OppgaveRestClient {
         }
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
+            log.info("Patch request {}", request);
             String responseBody = new ObjectMapper().readValue(response.getEntity().getContent(), String.class);
             log.info(responseBody);
             throw new IllegalStateException(responseBody);
