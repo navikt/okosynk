@@ -220,7 +220,6 @@ public class OppgaveRestClient {
     }
 
     private PatchOppgaverResponse patchOppgaver(List<Oppgave> oppgaver, boolean ferdigstill, HttpPatch request) {
-        log.info("Starter med patching av subliste");
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
@@ -231,22 +230,18 @@ public class OppgaveRestClient {
         }
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
-            log.info("Patch request {}", request);
-            String responseBody = new ObjectMapper().readValue(response.getEntity().getContent(), String.class);
-            log.info(responseBody);
-            throw new IllegalStateException(responseBody);
-//            StatusLine statusLine = response.getStatusLine();
-//            if (statusLine.getStatusCode() >= 400) {
-//                try {
-//                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-//                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
-//                    throw illegalArgumentFrom(errorResponse);
-//                } catch (JsonParseException jpe) {
-//                    //parseRawError(response);
-//                }
-//            }
-//
-//            return new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
+            StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() >= 400) {
+                try {
+                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
+                    throw illegalArgumentFrom(errorResponse);
+                } catch (JsonParseException jpe) {
+                    parseRawError(response);
+                }
+            }
+
+            return new ObjectMapper().readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }

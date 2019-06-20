@@ -10,7 +10,7 @@ public class PatchOppgaverResponse {
     private Integer feilet;
     private Integer suksess;
     private Integer totalt;
-    private Map<Integer, List<Long>> data;
+    private Map<String, List<Long>> data;
 
     public PatchOppgaverResponse() {
         //JAX-RS
@@ -40,11 +40,11 @@ public class PatchOppgaverResponse {
         this.totalt = totalt;
     }
 
-    public Map<Integer, List<Long>> getData() {
+    public Map<String, List<Long>> getData() {
         return data;
     }
 
-    public void setData(Map<Integer, List<Long>> data) {
+    public void setData(Map<String, List<Long>> data) {
         this.data = data;
     }
 
