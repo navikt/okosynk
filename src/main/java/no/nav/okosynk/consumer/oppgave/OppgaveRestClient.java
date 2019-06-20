@@ -152,12 +152,16 @@ public class OppgaveRestClient {
             try (CloseableHttpResponse response = this.httpClient.execute(request)) {
                 StatusLine statusLine = response.getStatusLine();
                 if (statusLine.getStatusCode() >= 400) {
-                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    log.error("Feil oppsto under oppretting av oppgave: {}, Errorresponse: {}", dto, errorResponse);
-                    oppgaverSomIkkeErOpprettet.add(dto);
+                    try {
+                        ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+                        log.error("Feil oppsto under oppretting av oppgave: {}, Errorresponse: {}", dto, errorResponse);
+                        oppgaverSomIkkeErOpprettet.add(dto);
+                    } catch (JsonParseException jpe) {
+                        parseRawError(response);
+                    }
+                } else {
+                    opprettedeOppgaver.add(new ObjectMapper().readValue(response.getEntity().getContent(), OppgaveDTO.class));
                 }
-
-                opprettedeOppgaver.add(new ObjectMapper().readValue(response.getEntity().getContent(), OppgaveDTO.class));
             } catch (IOException e) {
                 throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
             }
