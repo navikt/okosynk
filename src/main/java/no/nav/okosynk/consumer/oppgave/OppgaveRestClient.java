@@ -188,10 +188,13 @@ public class OppgaveRestClient {
 
         final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 500);
 
+        log.info("Starter patching av oppgaver, sublistestørrelse: {}, antall sublister {}, antall oppgaver totalt: {}", 500, oppgaverLister.size(), oppgaver.size());
         List<PatchOppgaverResponse> responses =
                 oppgaverLister.stream()
                 .map(list -> patchOppgaver(list, ferdigstill, request))
                 .collect(Collectors.toList());
+
+        log.info("Ferdig med patching av oppgave");
 
         int suksess = summerAntallFraResponse(responses, PatchOppgaverResponse::getSuksess);
         int feilet = summerAntallFraResponse(responses, PatchOppgaverResponse::getFeilet);
@@ -217,6 +220,7 @@ public class OppgaveRestClient {
     }
 
     private PatchOppgaverResponse patchOppgaver(List<Oppgave> oppgaver, boolean ferdigstill, HttpPatch request) {
+        log.info("Starter med patching av subliste");
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
@@ -228,7 +232,7 @@ public class OppgaveRestClient {
 
         try (CloseableHttpResponse response = this.httpClient.execute(request)) {
             String responseBody = new ObjectMapper().readValue(response.getEntity().getContent(), String.class);
-            log.error(responseBody);
+            log.info(responseBody);
             throw new IllegalStateException(responseBody);
 //            StatusLine statusLine = response.getStatusLine();
 //            if (statusLine.getStatusCode() >= 400) {
