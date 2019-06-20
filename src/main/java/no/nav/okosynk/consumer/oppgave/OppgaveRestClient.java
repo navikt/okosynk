@@ -220,6 +220,7 @@ public class OppgaveRestClient {
         try {
             ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
             String jsonString = new ObjectMapper().writeValueAsString(patchJson);
+            log.info("Forsøker å patche oppgaver: {}", jsonString);
             request.setEntity(new StringEntity(jsonString));
         } catch (JsonProcessingException | UnsupportedEncodingException e) {
             throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
