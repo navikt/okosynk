@@ -5,15 +5,12 @@ import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
-import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -63,14 +60,11 @@ public abstract class AbstractBatchService {
             .register(registry);
         final Gauge.Timer durationTimer = duration.startTimer();
 
-//        final Timer timer = createTimer(getStartBatchSynchronouslyTimerNavn());
-//        timer.start();
         MDC.put("batchnavn", getBatchNavn());
-
         final BatchStatus batchStatus;
         try {
             logger.info("Mottatt kall til " + this.getClass().getSimpleName() + ".startBatchSynchronously");
-            final AbstractService service  = getService();
+            final AbstractService service = getService();
             batchStatus = service.startBatchSynchronously();
 
             final Gauge lastSuccess = Gauge.build()
@@ -79,16 +73,16 @@ public abstract class AbstractBatchService {
                 .register(registry);
             lastSuccess.setToCurrentTime();
         } finally {
-            MDC.remove(getBatchNavn());
-
             durationTimer.setDuration();
             String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
             logger.info("Pusher metrikker til {}", pushGateway);
             try {
-                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", "okosynk"));
+                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchNavn()));
             } catch (IOException e) {
                 logger.error("Klarte ikke pushe metrikker", e);
             }
+
+            MDC.remove(getBatchNavn());
         }
 
         return batchStatus;
