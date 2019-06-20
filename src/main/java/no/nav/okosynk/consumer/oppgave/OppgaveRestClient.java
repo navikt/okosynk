@@ -190,7 +190,7 @@ public class OppgaveRestClient {
             throw new IllegalStateException(e);
         }
 
-        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 500);
+        final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 1);
 
         log.info("Starter patching av oppgaver, sublistestørrelse: {}, antall sublister {}, antall oppgaver totalt: {}", 500, oppgaverLister.size(), oppgaver.size());
         List<PatchOppgaverResponse> responses =
