@@ -229,9 +229,10 @@ public class OppgaveRestClient {
             StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= 400) {
                 try {
-                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
-                    throw illegalArgumentFrom(errorResponse);
+//                    ErrorResponse errorResponse = new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
+//                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
+//                    throw illegalArgumentFrom(errorResponse);
+                    parseRawError(response);
                 } catch (JsonParseException jpe) {
                     parseRawError(response);
                 }
