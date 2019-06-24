@@ -44,7 +44,7 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 public class OppgaveRestClient {
     private static final Logger log = LoggerFactory.getLogger(OppgaveRestClient.class);
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
-    private static final int ENHET_ID_FOR_ANDRE_EKSTERNE = 9999;
+    private static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
 
     private final IOkosynkConfiguration okosynkConfiguration;
     private final CloseableHttpClient httpClient;
@@ -319,6 +319,7 @@ public class OppgaveRestClient {
             oppgaveDTO.setAktivDato(oppgave.aktivFra.format(formatter));
             oppgaveDTO.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
             oppgaveDTO.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
+            oppgaveDTO.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
 
         return oppgaveDTO;
     }
