@@ -17,6 +17,13 @@ spec:
           containers:
             - name: okosynk
               image: repo.adeo.no:5443/okosynk:@@version@@
+              resources:
+                limits:
+                  cpu: 250m
+                  memory: 1Gi
+                requests:
+                  cpu: 250m
+                  memory: 1Gi
               env:
                 - name: OKOSYNK_SHOULD_RUN_DRY
                   value: "false"
@@ -52,6 +59,8 @@ spec:
                   value: https://app.adeo.no/aktoerregister/api/v1/identer
                 - name: REST_STS_URL
                   value: https://security-token-service.nais.adeo.no/rest/v1/sts/token
+                - name: PUSH_GATEWAY_ADDRESS
+                  value: nais-prometheus-prometheus-pushgateway.nais:9091
                 - name: SRVBOKOSYNK_USERNAME
                   value: srvbokosynk
                 - name: SRVBOKOSYNK_PASSWORD
