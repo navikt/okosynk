@@ -56,38 +56,13 @@ public abstract class AbstractBatchService {
                                                      final BatchRepository batchRepository);
 
     public BatchStatus startBatchSynchronously() {
-        final CollectorRegistry registry = new CollectorRegistry();
-        final Gauge duration = Gauge.build()
-            .name("okosynk_job_duration_seconds")
-            .help("Duration of okosynk batch job in seconds.")
-            .register(registry);
-        final Gauge.Timer durationTimer = duration.startTimer();
-
         MDC.put("batchnavn", getBatchNavn());
         final BatchStatus batchStatus;
         try {
             logger.info("Mottatt kall til " + this.getClass().getSimpleName() + ".startBatchSynchronously");
             final AbstractService service = getService();
             batchStatus = service.startBatchSynchronously();
-
-            //Kun oppdater last success metrikk om batchen er FULLFORT_UTEN_UVENTEDE_FEIL.
-            if (Objects.equals(batchStatus, FULLFORT_UTEN_UVENTEDE_FEIL)) {
-                final Gauge lastSuccess = Gauge.build()
-                        .name("okosynk_batch_job_last_success_unixtime")
-                        .help("Last time okosynk batch job succeeded, in unixtime.")
-                        .register(registry);
-                lastSuccess.setToCurrentTime();
-            }
         } finally {
-            durationTimer.setDuration();
-            String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
-            logger.info("Pusher metrikker til {}", pushGateway);
-            try {
-                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchNavn()));
-            } catch (IOException e) {
-                logger.error("Klarte ikke pushe metrikker", e);
-            }
-
             MDC.remove(getBatchNavn());
         }
 

@@ -1,8 +1,12 @@
 package no.nav.okosynk.batch;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
-import io.prometheus.client.Histogram;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.exporter.PushGateway;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -57,11 +61,33 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
     @Override
     public void run() {
-//        final Timer timer = createTimer(getBatchName());
-//        timer.start();
         MDC.put("batchnavn", getBatchName());
 
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+
+        final CollectorRegistry registry = new CollectorRegistry();
+
+        final Gauge oppgaverOpprettet = Gauge.build()
+                .name("okosynk_job_oppgaver_opprettet")
+                .help("Antall oppgaver opprettet")
+                .register(registry);
+
+        final Gauge oppgaverOppdatert = Gauge.build()
+                .name("okosynk_job_oppgaver_oppdatert")
+                .help("Antall oppgaver oppdatert")
+                .register(registry);
+
+        final Gauge oppgaverFerdigstilt = Gauge.build()
+                .name("okosynk_job_oppgaver_ferdigstilt")
+                .help("Antall oppgaver ferdigstilt")
+                .register(registry);
+
+        final Gauge duration = Gauge.build()
+                .name("okosynk_job_duration_seconds")
+                .help("Duration of okosynk batch job in seconds.")
+                .register(registry);
+
+        final Gauge.Timer durationTimer = duration.startTimer();
 
         setStatus(BatchStatus.STARTET);
         logger.info("Batch " + getBatchName() + " har startet.");
@@ -81,22 +107,42 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
                 throw new RuntimeException(msg);
             }
 
-            //final ConsumerStatistics consumerStatistics =
+            final ConsumerStatistics consumerStatistics =
                 getOppgaveSynkroniserer()
                     .synkroniser(
                         okosynkConfiguration,
                         alleOppgaverLestFraBatchen,
                         getBatchUser(okosynkConfiguration));
-            //fullfor(consumerStatistics);
-            fullfor();
+
+            BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
+            setStatus(status);
+            logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
+
+            oppgaverOpprettet.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
+            oppgaverOppdatert.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
+            oppgaverFerdigstilt.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
+
+            final Gauge lastSuccess = Gauge.build()
+                    .name("okosynk_batch_job_last_success_unixtime")
+                    .help("Last time okosynk batch job succeeded, in unixtime.")
+                    .register(registry);
+            lastSuccess.setToCurrentTime();
         } catch (Throwable e) {
             logger.error("Noe uventet har gått galt under kjøring av " + getBatchName() + ". ", e);
             setStatus(BatchStatus.FEIL);
-//            timer.setFailed();
+            oppgaverOpprettet.set(0);
+            oppgaverOppdatert.set(0);
+            oppgaverFerdigstilt.set(0);
         } finally {
+            durationTimer.setDuration();
+            String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
+            logger.info("Pusher metrikker til {}", pushGateway);
+            try {
+                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchName()));
+            } catch (IOException e) {
+                logger.error("Klarte ikke pushe metrikker", e);
+            }
             MDC.remove("batchnavn");
-//            timer.stop();
-//            timer.report();
         }
     }
 
@@ -142,21 +188,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
         setStatus(BatchStatus.STOPPET);
     }
 
-    // private void fullfor(final ConsumerStatistics consumerStatistics) {
-    private void fullfor() {
-
-        final BatchStatus batchStatus = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
-            /*
-            (consumerStatistics.getNumberOfExceptionReceivedDuringRun() > 0)
-                ?
-                BatchStatus.FULLFORT_MED_UVENTEDE_FEIL
-                :
-                BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL
-                ;
-                */
-        setStatus(batchStatus);
-        logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + batchStatus);
-    }
 
     private void handterLinjeUnreadableException(LinjeUnreadableException e) {
 

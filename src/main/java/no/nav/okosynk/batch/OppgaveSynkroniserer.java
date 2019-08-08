@@ -36,7 +36,7 @@ public class OppgaveSynkroniserer {
         this.oppgaveRestClient = oppgaveRestClient;
     }
 
-    public void synkroniser(final IOkosynkConfiguration okosynkConfiguration,
+    public ConsumerStatistics synkroniser(final IOkosynkConfiguration okosynkConfiguration,
                             final Collection<Oppgave> alleOppgaverLestFraBatchen_parm,
                             final String bruker) {
 
@@ -56,7 +56,7 @@ public class OppgaveSynkroniserer {
         final ConsumerStatistics consumerStatistics_oppdater = oppdaterOppgaver(okosynkConfiguration, oppgaverSomSkalOppdateres, bruker);
         final ConsumerStatistics consumerStatistics_opprett = opprettOppgaver(okosynkConfiguration, oppgaverSomSkalOpprettes, bruker);
 
-        //Skriv om dette
+        //Kan skrives om til å basere seg på patch resultatene
         final ConsumerStatistics consumerStatistics_accumulated =
             ConsumerStatistics.addAll(
                 consumerStatistics_finn,
@@ -67,7 +67,7 @@ public class OppgaveSynkroniserer {
         loggAntallMeldingerMedOppgave(oppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes);
         loggAccumulatedConsumerStatistics(consumerStatistics_accumulated);
 
-        // return consumerStatistics_accumulated;
+        return consumerStatistics_accumulated;
     }
 
     private void loggAntallMeldingerMedOppgave(
