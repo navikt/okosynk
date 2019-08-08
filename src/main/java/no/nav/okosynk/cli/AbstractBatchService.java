@@ -5,6 +5,7 @@ import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Objects;
 
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
@@ -14,6 +15,8 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import static no.nav.okosynk.batch.BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
 
 public abstract class AbstractBatchService {
     private static final Logger logger = LoggerFactory.getLogger(AbstractBatchService.class);
@@ -67,11 +70,14 @@ public abstract class AbstractBatchService {
             final AbstractService service = getService();
             batchStatus = service.startBatchSynchronously();
 
-            final Gauge lastSuccess = Gauge.build()
-                .name("okosynk_batch_job_last_success_unixtime")
-                .help("Last time okosynk batch job succeeded, in unixtime.")
-                .register(registry);
-            lastSuccess.setToCurrentTime();
+            //Kun oppdater last success metrikk om batchen er FULLFORT_UTEN_UVENTEDE_FEIL.
+            if (Objects.equals(batchStatus, FULLFORT_UTEN_UVENTEDE_FEIL)) {
+                final Gauge lastSuccess = Gauge.build()
+                        .name("okosynk_batch_job_last_success_unixtime")
+                        .help("Last time okosynk batch job succeeded, in unixtime.")
+                        .register(registry);
+                lastSuccess.setToCurrentTime();
+            }
         } finally {
             durationTimer.setDuration();
             String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
