@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
@@ -136,12 +138,18 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
         } finally {
             durationTimer.setDuration();
             String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
-            logger.info("Pusher metrikker til {}", pushGateway);
-            try {
-                new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchName()));
-            } catch (IOException e) {
-                logger.error("Klarte ikke pushe metrikker", e);
+
+            if (isNotBlank(pushGateway)) {
+                logger.info("Pusher metrikker til {}", pushGateway);
+                try {
+                    new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchName()));
+                } catch (IOException e) {
+                    logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
+                }
+            } else {
+                logger.warn("Konfigurasjonsnøkkel PUSH_GATEWAY_ADDRESS mangler, får ikke pushet metrikker");
             }
+
             MDC.remove("batchnavn");
         }
     }

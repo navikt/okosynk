@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
@@ -136,6 +137,9 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     void runSetterStatusTilFullfortNarBatchErFerdig() throws MeldingUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
+
+        when(oppgaveSynkroniserer.synkroniser(any(), anyCollection(), anyString()))
+                .thenReturn(ConsumerStatistics.zero());
 
         getBatch().run();
 
