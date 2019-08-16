@@ -31,3 +31,4 @@ local.secret.db.access.txt
 APP_LOG_HOME_IS_UNDEFINED
 keystore.jks
 local.secret.db.access.txt
+/.java-version
