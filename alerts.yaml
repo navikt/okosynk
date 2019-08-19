@@ -8,21 +8,21 @@ spec:
   receivers: # receivers for all alerts below
     slack:
       channel: '#oh-prod-varsling'
-      prependText: 'Okosynk batch har ikke opprettet noen nye oppgaver | '
+      prependText: 'Okosynk batch har ikke oppdatert noen oppgaver'
   alerts:
-    - alert: okosynk (OS) ingen nye oppgaver
-      expr: 'okosynk_job_oppgaver_opprettet{cronjob="bokosynk001",job="kubernetes-pods"} == 0'
+    - alert: okosynk (OS) ingen oppgaver oppdatert
+      expr: 'okosynk_job_oppgaver_oppdatert{cronjob="bokosynk001",job="kubernetes-pods"} == 0'
       for: 5m
-      action: Se logger
-      description: Okosynk (OS) batch job har ikke opprettet noen nye oppgaver
+      action: Se status på batch i kibana
+      description: Okosynk (OS) batch job har ikke oppdatert noen oppgaver
       documentation: okosynk
       sla: N/A
       severity: warning
-    - alert: okosynk (UR) ingen nye oppgaver
-      expr: 'okosynk_job_oppgaver_opprettet{cronjob="bokosynk002",job="kubernetes-pods"} == 0'
+    - alert: okosynk (UR) ingen oppgaver oppdatert
+      expr: 'okosynk_job_oppgaver_oppdatert{cronjob="bokosynk002",job="kubernetes-pods"} == 0'
       for: 5m
-      action: Se logger
-      description: Okosynk (UR) batch job har ikke opprettet noen nye oppgaver
+      action: Se status på batch i kibana
+      description: Okosynk (UR) batch job har ikke oppdatert noen oppgaver
       documentation: okosynk
       sla: N/A
       severity: warning
