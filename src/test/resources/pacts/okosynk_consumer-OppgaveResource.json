@@ -1,0 +1,210 @@
+{
+  "provider": {
+    "name": "OppgaveResource"
+  },
+  "consumer": {
+    "name": "okosynk_consumer"
+  },
+  "interactions": [
+    {
+      "description": "Søker etter oppgaver OS",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/oppgaver",
+        "headers": {
+          "Authorization": "Basic srvbokosynk001",
+          "Accept": "application/json",
+          "X-Correlation-ID": "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb"
+        },
+        "query": {
+          "opprettetAv": [
+            "srvbokosynk001"
+          ],
+          "tema": [
+            "OKO"
+          ],
+          "statuskategori": [
+            "AAPEN"
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset\u003dUTF-8"
+        },
+        "body": {
+          "antallTreffTotalt": 3,
+          "oppgaver": [
+            {}
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.oppgaver": {
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 0
+                }
+              ],
+              "combine": "AND"
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset\u003d[\\w\\-]+)?"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "OS_oppgaver_er_opprettet"
+        }
+      ]
+    },
+    {
+      "description": "Oppretter oppgave",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/oppgaver",
+        "headers": {
+          "Authorization": "Basic srvbokosynk001",
+          "Accept": "application/json",
+          "X-Correlation-ID": "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb"
+        },
+        "body": {
+          "tildeltEnhetsnr": "4408",
+          "opprettetAvEnhetsnr": "9999",
+          "aktoerId": "1831212532188",
+          "beskrivelse": "Okosynk beskrivelse",
+          "tema": "OKO",
+          "oppgavetype": "OKO_UR",
+          "aktivDato": "2019-08-08",
+          "fristFerdigstillelse": "2019-08-10",
+          "prioritet": "LAV"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json; charset\u003dUTF-8"
+        },
+        "body": {
+          "id": 1234567890
+        },
+        "matchingRules": {
+          "body": {
+            "$.id": {
+              "matchers": [
+                {
+                  "match": "type"
+                }
+              ],
+              "combine": "AND"
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset\u003d[\\w\\-]+)?"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        },
+        "generators": {
+          "body": {
+            "$.id": {
+              "type": "RandomInt",
+              "min": 0,
+              "max": 2147483647
+            }
+          }
+        }
+      }
+    },
+    {
+      "description": "Søker etter oppgaver UR",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/oppgaver",
+        "headers": {
+          "Authorization": "Basic srvbokosynk001",
+          "Accept": "application/json",
+          "X-Correlation-ID": "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb"
+        },
+        "query": {
+          "opprettetAv": [
+            "srvbokosynk002"
+          ],
+          "tema": [
+            "OKO"
+          ],
+          "statuskategori": [
+            "AAPEN"
+          ]
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json; charset\u003dUTF-8"
+        },
+        "body": {
+          "antallTreffTotalt": 4,
+          "oppgaver": [
+            {}
+          ]
+        },
+        "matchingRules": {
+          "body": {
+            "$.oppgaver": {
+              "matchers": [
+                {
+                  "match": "type",
+                  "min": 0
+                }
+              ],
+              "combine": "AND"
+            }
+          },
+          "header": {
+            "Content-Type": {
+              "matchers": [
+                {
+                  "match": "regex",
+                  "regex": "application/json(;\\s?charset\u003d[\\w\\-]+)?"
+                }
+              ],
+              "combine": "AND"
+            }
+          }
+        }
+      },
+      "providerStates": [
+        {
+          "name": "UR_oppgaver_er_opprettet"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    },
+    "pact-jvm": {
+      "version": "4.0.0-beta.5"
+    }
+  }
+}

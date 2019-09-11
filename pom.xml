@@ -47,6 +47,7 @@
         <jacoco.version>0.8.0</jacoco.version>
         <maven.jacoco.plugin.version>${jacoco.version}</maven.jacoco.plugin.version>
         <junit.platform.version>1.4.2</junit.platform.version>
+        <pact.version>4.0.0-beta.5</pact.version>
 
     </properties>
 
@@ -286,6 +287,12 @@
         </dependency>
 
         <!-- Testing -->
+        <dependency>
+            <groupId>au.com.dius</groupId>
+            <artifactId>pact-jvm-consumer-junit5</artifactId>
+            <version>${pact.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
