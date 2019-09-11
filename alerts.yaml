@@ -8,21 +8,15 @@ spec:
   receivers: # receivers for all alerts below
     slack:
       channel: '#oh-prod-varsling'
-      prependText: 'Okosynk batch har ikke oppdatert noen oppgaver'
+      prependText: 'Okosynk batch ser ut til å ha feilet'
+    email:
+      to: 'jorgen.markussen@nav.no'
   alerts:
-    - alert: okosynk (OS) ingen oppgaver oppdatert
-      expr: 'okosynk_job_oppgaver_oppdatert{cronjob="bokosynk001",job="kubernetes-pods"} == 0'
+    - alert: Okosynk batch status failed
+      expr: 'sum(rate(kube_job_status_failed{namespace="okosynk"}[24h])) > 0'
       for: 5m
       action: Se status på batch i kibana
-      description: Okosynk (OS) batch job har ikke oppdatert noen oppgaver
+      description: Okosynk (OS) batch job ser ut til å ha feilet under kjøring
       documentation: okosynk
       sla: N/A
-      severity: warning
-    - alert: okosynk (UR) ingen oppgaver oppdatert
-      expr: 'okosynk_job_oppgaver_oppdatert{cronjob="bokosynk002",job="kubernetes-pods"} == 0'
-      for: 5m
-      action: Se status på batch i kibana
-      description: Okosynk (UR) batch job har ikke oppdatert noen oppgaver
-      documentation: okosynk
-      sla: N/A
-      severity: warning
+      severity: critical
