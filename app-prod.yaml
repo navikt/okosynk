@@ -4,7 +4,7 @@ metadata:
   name: okosynk
   namespace: okosynk
 spec:
-  schedule: "0 4 * * *" # Every morning at 04:00 UTC
+  schedule: "0 5 * * *" # Every morning at 04:00 UTC
   jobTemplate:
     spec:
       template:
@@ -19,10 +19,10 @@ spec:
               image: repo.adeo.no:5443/okosynk:@@version@@
               resources:
                 limits:
-                  cpu: 250m
+                  cpu: 500m
                   memory: 1Gi
                 requests:
-                  cpu: 250m
+                  cpu: 500m
                   memory: 1Gi
               env:
                 - name: OKOSYNK_SHOULD_RUN_DRY
