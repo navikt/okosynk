@@ -6,7 +6,6 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
-import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
@@ -14,7 +13,7 @@ import no.nav.okosynk.domain.ur.UrMeldingReader;
 import no.nav.okosynk.io.LinjeUnreadableException;
 import org.junit.jupiter.api.BeforeEach;
 
-public class UrBatchTest extends BatchTest<UrMelding> {
+class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
     // =========================================================================
     @BeforeEach
@@ -26,7 +25,7 @@ public class UrBatchTest extends BatchTest<UrMelding> {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
         this.setBatch(
-            new Batch<UrMelding>(
+            new Batch<>(
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
                 getEksekveringsId(),

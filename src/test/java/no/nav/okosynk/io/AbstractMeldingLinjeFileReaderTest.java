@@ -16,7 +16,7 @@ abstract class AbstractMeldingLinjeFileReaderTest {
         LoggerFactory.getLogger("EnteringTestHeader");
     // =========================================================================
     protected static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL =
-        MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
+        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
     // =========================================================================
 
     public IOkosynkConfiguration getOkosynkConfiguration() {
@@ -39,7 +39,7 @@ abstract class AbstractMeldingLinjeFileReaderTest {
     // =========================================================================
     @Test
     @DisplayName("Tests that fullyQualifiedInputFileName is not null when creating an instance of IMeldingLinjeFileReader")
-    public void testUspesifikkMeldingLinjeFtpReaderFullyQualifiedInputFileNameIsNull() {
+    void testUspesifikkMeldingLinjeFtpReaderFullyQualifiedInputFileNameIsNull() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -51,7 +51,7 @@ abstract class AbstractMeldingLinjeFileReaderTest {
 
     @Test
     @DisplayName("Status set to not ok if fullyQualifiedInputFileName is empty")
-    public void statusSetToFeilIfFullyQualifiedInputFileNameIsEmpty() {
+    void statusSetToFeilIfFullyQualifiedInputFileNameIsEmpty() {
 
         enteringTestHeaderLogger.debug(null);
 

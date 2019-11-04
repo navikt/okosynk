@@ -4,14 +4,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.io.MeldingLinjeFtpReader;
-import no.nav.okosynk.io.MeldingLinjeFtpReaderTest;
+import no.nav.okosynk.io.AbstractMeldingLinjeFtpReaderTest;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OsMeldingLinjeFtpReaderTest
-    extends MeldingLinjeFtpReaderTest {
+    extends AbstractMeldingLinjeFtpReaderTest {
 
     // =========================================================================
     private static final Logger enteringTestHeaderLogger =

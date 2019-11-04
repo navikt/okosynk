@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
+public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
@@ -53,7 +53,7 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return meldingReader;
     }
 
-    public void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
+    void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
         this.meldingReader = meldingReader;
     }
 
@@ -61,7 +61,7 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return meldingMapper;
     }
 
-    public void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
+    void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
         this.meldingMapper = meldingMapper;
     }
 
@@ -93,14 +93,14 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return okosynkConfiguration;
     }
 
-    final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
     // =========================================================================
-    protected static long getEksekveringsId() {
+    static long getEksekveringsId() {
         return EKSEKVERINGS_ID;
     }
     // =========================================================================
 
-    protected void commonPostSetUp() throws LinjeUnreadableException, MeldingUnreadableException {
+    void commonPostSetUp() throws LinjeUnreadableException, MeldingUnreadableException {
 
         getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
         getBatch().setSpesifikkMeldingReader(meldingReader);
@@ -134,7 +134,7 @@ public abstract class BatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
     @Test
     @DisplayName("Når batchen har kjørt ferdig skal den ha status FULLFØRT")
-    void runSetterStatusTilFullfortNarBatchErFerdig() throws MeldingUnreadableException {
+    void runSetterStatusTilFullfortNarBatchErFerdig() {
 
         enteringTestHeaderLogger.debug(null);
 
