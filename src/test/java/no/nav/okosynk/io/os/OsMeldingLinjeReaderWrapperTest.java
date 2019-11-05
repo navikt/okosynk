@@ -4,10 +4,10 @@ import java.util.function.Supplier;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.io.MeldingLinjeReaderWrapper;
-import no.nav.okosynk.io.MeldingLinjeReaderWrapperTest;
+import no.nav.okosynk.io.AbstractMeldingLinjeReaderWrapperTest;
 
 public class OsMeldingLinjeReaderWrapperTest
-    extends MeldingLinjeReaderWrapperTest {
+    extends AbstractMeldingLinjeReaderWrapperTest {
 
     @Override
     protected Supplier<MeldingLinjeReaderWrapper> getCreator() {

@@ -1,10 +1,10 @@
 package no.nav.okosynk.io.ur;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.io.MeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
+import no.nav.okosynk.io.AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
 
 abstract class AbstractUrMeldingLinjeFtpReaderTestUsingRealFtpOrSftp
-    extends MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
+    extends AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     static {
         setFtpHostUriKey(Constants.BATCH_TYPE.UR.getFtpHostUrlKey());

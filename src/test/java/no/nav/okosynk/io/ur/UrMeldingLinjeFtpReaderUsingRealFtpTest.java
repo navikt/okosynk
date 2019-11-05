@@ -3,7 +3,7 @@ package no.nav.okosynk.io.ur;
 import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.io.MeldingLinjeFtpReader;
-import no.nav.okosynk.io.MeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
+import no.nav.okosynk.io.AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -17,7 +17,7 @@ public class UrMeldingLinjeFtpReaderUsingRealFtpTest
     extends AbstractUrMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     static {
-        MeldingLinjeFtpReaderTestUsingRealFtpOrSftp
+        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp
             .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.FTP);
     }
 

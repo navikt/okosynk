@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MeldingLinjeReaderWrapperTest {
+public abstract class AbstractMeldingLinjeReaderWrapperTest {
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
@@ -22,7 +22,7 @@ public abstract class MeldingLinjeReaderWrapperTest {
         new FakeOkosynkConfiguration();
 
     @Test
-    public void testSuccessfulCreationUsingFtp() {
+    void testSuccessfulCreationUsingFtp() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -67,7 +67,7 @@ public abstract class MeldingLinjeReaderWrapperTest {
     }
 
     @Test
-    public void testSuccessfulCreationUsingSftp() {
+    void testSuccessfulCreationUsingSftp() {
 
         enteringTestHeaderLogger.debug(null);
 

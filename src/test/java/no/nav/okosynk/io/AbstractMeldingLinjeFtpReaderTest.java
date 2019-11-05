@@ -25,12 +25,12 @@ import org.slf4j.LoggerFactory;
 /**
  * Common tests for OS/UR FTP tests.
  */
-public abstract class MeldingLinjeFtpReaderTest
+public abstract class AbstractMeldingLinjeFtpReaderTest
     extends AbstractMeldingLinjeFileReaderTest {
 
     // =========================================================================
     private static final Logger logger =
-        LoggerFactory.getLogger(MeldingLinjeFtpReaderTest.class);
+        LoggerFactory.getLogger(AbstractMeldingLinjeFtpReaderTest.class);
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
     // =========================================================================
@@ -43,7 +43,7 @@ public abstract class MeldingLinjeFtpReaderTest
         return FTP_HOST_URL_KEY;
     }
 
-    public static void setFtpHostUrlKey(String ftpHostUrlKey) {
+    protected static void setFtpHostUrlKey(String ftpHostUrlKey) {
         FTP_HOST_URL_KEY = ftpHostUrlKey;
     }
 
@@ -51,7 +51,7 @@ public abstract class MeldingLinjeFtpReaderTest
         return FTP_USER_KEY;
     }
 
-    public static void setFtpUserKey(String ftpUserKey) {
+    protected static void setFtpUserKey(String ftpUserKey) {
         FTP_USER_KEY = ftpUserKey;
     }
 
@@ -59,7 +59,7 @@ public abstract class MeldingLinjeFtpReaderTest
         return FTP_PASSWORD_KEY;
     }
 
-    public static void setFtpPasswordKey(String ftpPasswordKey) {
+    protected static void setFtpPasswordKey(String ftpPasswordKey) {
         FTP_PASSWORD_KEY = ftpPasswordKey;
     }
 
@@ -75,14 +75,14 @@ public abstract class MeldingLinjeFtpReaderTest
 
     private IOkosynkConfiguration okosynkConfiguration;
     // =========================================================================
-    protected static final String syntacticallyAcceptableFtpHostUri                  = "ftp://012.123.234.345:32000";
-    protected static final String syntacticallyAcceptableFtpUser                     = "somePlaceholderUser";
-    protected static final String syntacticallyAcceptableFtpPassword                 = "somePlaceholderPassword";
-    protected static final String syntacticallyAcceptableFullyQualifiedInputFileName = "/a/somePlaceholderFullyQualifiedInputFileName.txt";
+    private static final String syntacticallyAcceptableFtpHostUri                  = "ftp://012.123.234.345:32000";
+    private static final String syntacticallyAcceptableFtpUser                     = "somePlaceholderUser";
+    private static final String syntacticallyAcceptableFtpPassword                 = "somePlaceholderPassword";
+    private static final String syntacticallyAcceptableFullyQualifiedInputFileName = "/a/somePlaceholderFullyQualifiedInputFileName.txt";
     // =========================================================================
 
     @BeforeEach
-    public void setNecessarySystemProperties() {
+    void setNecessarySystemProperties() {
 
         this.okosynkConfiguration = new FakeOkosynkConfiguration();
 
@@ -99,7 +99,7 @@ public abstract class MeldingLinjeFtpReaderTest
         2) Something is probably wrong with the usage of constants by the business classes
     */
     @Test
-    public void testGetFtpProtocol() throws LinjeUnreadableException {
+    void testGetFtpProtocol() throws LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -193,7 +193,7 @@ public abstract class MeldingLinjeFtpReaderTest
     }
 
     @Test
-    public void testGetFtpHostServerName() throws LinjeUnreadableException {
+    void testGetFtpHostServerName() throws LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -247,10 +247,9 @@ public abstract class MeldingLinjeFtpReaderTest
 
             final Class<? extends Exception> expectedExceptionClass = testDatum.getValue2();
 
-            final URI uri;
             try {
                 logger.debug("ftpHostUrl: " + ftpHostUrl);
-                uri = new URI(ftpHostUrl);
+                new URI(ftpHostUrl);
             } catch (Throwable e) {
                 final String msg = "ftpHostUrl: " + ftpHostUrl;
                 logger.debug(msg, e);
@@ -280,7 +279,7 @@ public abstract class MeldingLinjeFtpReaderTest
     }
 
     @Test
-    public void testGetFtpHostPort() throws LinjeUnreadableException {
+    void testGetFtpHostPort() throws LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -334,10 +333,9 @@ public abstract class MeldingLinjeFtpReaderTest
 
             final Class<? extends Exception> expectedExceptionClass = testDatum.getValue2();
 
-            final URI uri;
             try {
                 logger.debug("ftpHostUrl: " + ftpHostUrl);
-                uri = new URI(ftpHostUrl);
+                new URI(ftpHostUrl);
             } catch (Throwable e) {
                 final String msg = "ftpHostUrl: " + ftpHostUrl;
                 logger.debug(msg, e);
@@ -369,7 +367,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that all necessary system properties are set to successfully create an instance of OsMeldingLinjeFtpReader")
-    public void testSystemProperties() {
+    void testSystemProperties() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -441,7 +439,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when trying to connect")
-    public void testExceptionUponConnect() throws IOException {
+    void testExceptionUponConnect() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -452,12 +450,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when connect implies a bad return code")
-    public void testBadReplyUponConnect() throws IOException {
+    void testBadReplyUponConnect() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -468,12 +466,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when login throws an exception")
-    public void testExceptionUponLogin() throws IOException {
+    void testExceptionUponLogin() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -485,12 +483,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when login returns unsuccessfully")
-    public void testUnsuccessfulLogin() throws IOException {
+    void testUnsuccessfulLogin() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -502,12 +500,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when the returned InputStream is null")
-    public void testInputStreamIsNull_FileDoesNotExist() throws IOException {
+    void testInputStreamIsNull_FileDoesNotExist() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -520,12 +518,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that a correct exception is thrown when acquiring an InputStream implies an exception")
-    public void testExceptionWhenAcquiringTheInputStream() throws IOException {
+    void testExceptionWhenAcquiringTheInputStream() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -538,12 +536,12 @@ public abstract class MeldingLinjeFtpReaderTest
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
             getBiCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName, mockedFTPClient);
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> uspesifikkMeldingLinjeFtpReader.read());
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeFtpReader::read);
     }
 
     @Test
     @DisplayName("Tests that that an exception is NOT thrown when completePendingCommand() throws upon cleanup.")
-    public void testNoExceptionWhenCompletePendingCommandThrows() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenCompletePendingCommandThrows() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -554,8 +552,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenThrow(IOException.class);
@@ -570,7 +568,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when completePendingCommand() returns an error.")
-    public void testNoExceptionWhenCompletePendingReturnsAnError() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenCompletePendingReturnsAnError() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -581,8 +579,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenReturn(false);
@@ -597,7 +595,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when closing the input stream throws.")
-    public void testNoExceptionWhenClosingTheInputStreamThrows() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenClosingTheInputStreamThrows() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -608,8 +606,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
         Mockito.doThrow(IOException.class).when(mockedInputStream).close();
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
@@ -625,7 +623,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when logging out from the ftp client throws.")
-    public void testNoExceptionWhenLoggingOutFromFtpClientThrows() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenLoggingOutFromFtpClientThrows() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -636,8 +634,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenReturn(true);
@@ -653,7 +651,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when logging out from the ftp client is unsuccessful.")
-    public void testNoExceptionWhenLoggingOutFromFtpClientReturnsNoSuccess() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenLoggingOutFromFtpClientReturnsNoSuccess() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -664,8 +662,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenReturn(true);
@@ -681,7 +679,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when disconnecting the ftp client throws.")
-    public void testNoExceptionWhenDisconnectingFtpClientThrows() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenDisconnectingFtpClientThrows() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -692,8 +690,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenReturn(true);
@@ -711,7 +709,7 @@ public abstract class MeldingLinjeFtpReaderTest
 
     @Test
     @DisplayName("Tests that an exception is NOT thrown when disconnecting an unconnected ftp client.")
-    public void testNoExceptionWhenDisconnectingUnconnectedFtpClient() throws IOException, LinjeUnreadableException {
+    void testNoExceptionWhenDisconnectingUnconnectedFtpClient() throws IOException, LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -722,8 +720,8 @@ public abstract class MeldingLinjeFtpReaderTest
 
         final InputStream mockedInputStream = Mockito.mock(InputStream.class);
         Mockito.when(mockedInputStream.read()).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any())).thenReturn(-1);
-        Mockito.when(mockedInputStream.read(Matchers.<byte[]>any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
+        Mockito.when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt())).thenReturn(-1);
 
         Mockito.when(mockedFTPClient.retrieveFileStream(Matchers.anyString())).thenReturn(mockedInputStream);
         Mockito.when(mockedFTPClient.completePendingCommand()).thenReturn(true);

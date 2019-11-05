@@ -17,18 +17,17 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
+public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.class);
+        LoggerFactory.getLogger(AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.class);
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
-    public static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL = "testfilForMeldingsleser.txt";
+    static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL = "testfilForMeldingsleser.txt";
     // =========================================================================
 
     public IOkosynkConfiguration getOkosynkConfiguration() {
@@ -39,61 +38,61 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     // =========================================================================
 
-    public static void setFtpHostUriKey(String ftpHostUriKey) {
+    protected static void setFtpHostUriKey(String ftpHostUriKey) {
         FTP_HOST_URI_KEY = ftpHostUriKey;
     }
 
     // Set by subclass:
-    protected static String FTP_HOST_URI_KEY;
+    private static String FTP_HOST_URI_KEY;
 
     public static void setFtpHostPortKey(String ftpHostPortKey) {
         FTP_HOST_PORT_KEY = ftpHostPortKey;
     }
 
-    protected static String FTP_HOST_PORT_KEY;
+    private static String FTP_HOST_PORT_KEY;
 
-    public static void setFtpUserKey(String ftpUserKey) {
+    protected static void setFtpUserKey(String ftpUserKey) {
         FTP_USER_KEY = ftpUserKey;
     }
 
-    protected static String FTP_USER_KEY;
+    private static String FTP_USER_KEY;
 
-    public static void setFtpPasswordKey(String ftpPasswordKey) {
+    protected static void setFtpPasswordKey(String ftpPasswordKey) {
         FTP_PASSWORD_KEY = ftpPasswordKey;
     }
 
-    protected static String FTP_PASSWORD_KEY;
+    private static String FTP_PASSWORD_KEY;
 
-    public static String getFtpInputFilePath() {
+    private static String getFtpInputFilePath() {
         return FTP_INPUT_FILE_PATH;
     }
 
-    public static void setFtpInputFilePath(String ftpInputFilePath) {
+    private static void setFtpInputFilePath(String ftpInputFilePath) {
         FTP_INPUT_FILE_PATH = ftpInputFilePath;
     }
 
     // ---------------------------------------------------------------------
-    protected static String FTP_INPUT_FILE_PATH;
+    private static String FTP_INPUT_FILE_PATH;
 
-    public static String getFtpInputFileName() {
+    private static String getFtpInputFileName() {
         return FTP_INPUT_FILE_NAME;
     }
 
-    protected static final String FTP_INPUT_FILE_NAME = MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
+    private static final String FTP_INPUT_FILE_NAME = AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
 
     public static void setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL ftpTestServerFtpProtocol) {
         FTP_TEST_SERVER_FTP_PROTOCOL = ftpTestServerFtpProtocol;
     }
 
     // =========================================================================
-    protected static Constants.FTP_PROTOCOL FTP_TEST_SERVER_FTP_PROTOCOL;
+    private static Constants.FTP_PROTOCOL FTP_TEST_SERVER_FTP_PROTOCOL;
 
-    public static AbstractTestFtpServer getFtpTestServer() {
+    private static AbstractTestFtpServer getFtpTestServer() {
         return ftpTestServer;
     }
 
-    public static void setFtpTestServer(AbstractTestFtpServer ftpTestServer) {
-        MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.ftpTestServer = ftpTestServer;
+    private static void setFtpTestServer(AbstractTestFtpServer ftpTestServer) {
+        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.ftpTestServer = ftpTestServer;
     }
 
     // =========================================================================
@@ -127,7 +126,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     }
 
     @BeforeEach
-    public void setup() throws URISyntaxException, IOException {
+    public void setup() throws IOException {
 
         this.okosynkConfiguration = new FakeOkosynkConfiguration();
 
@@ -135,7 +134,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         createAWorkingMeldingLinjeFtpOrSftpFileReader();
     }
 
-    public void setWorkingSystemProperties(final IOkosynkConfiguration okosynkConfiguration) throws IOException {
+    private void setWorkingSystemProperties(final IOkosynkConfiguration okosynkConfiguration) {
 
         // =====================================================================
         // === Used by the creator of OsMeldingLinjeFtpReader and UrMeldingLinjeFtpReader:
@@ -171,8 +170,8 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
             + AbstractTestFtpServer.FTP_TEST_SERVER_PORT
             + "/"
             + new File(
-                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFilePath(),
-                  MeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFileName()
+                  AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFilePath(),
+                  AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFileName()
               ).getPath().replace('\\', '/')
             ;
         final String ftpUserKey     = FTP_USER_KEY;
@@ -195,7 +194,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     //@Test
     // TODO: Reintroduce this test
     @DisplayName("Tets that reading an existing file using FTP is successful.")
-    public void testSuccessfulReadingOfExistingFile() throws LinjeUnreadableException, IOException {
+    public void testSuccessfulReadingOfExistingFile() throws LinjeUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -211,7 +210,7 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     //@Test
     // TODO: Reintroduce this test
-    public void testSftpHostUriNotValid() throws LinjeUnreadableException, IOException {
+    public void testSftpHostUriNotValid() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -227,12 +226,12 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> { uspesifikkMeldingLinjeReader.read(); } );
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
     }
 
     //@Test
     // TODO: Reintroduce this test
-    public void testFtpUserNotValid() throws LinjeUnreadableException, IOException {
+    public void testFtpUserNotValid() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -248,12 +247,12 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> { uspesifikkMeldingLinjeReader.read(); });
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
     }
 
     //@Test
     // TODO: Reintroduce this test
-    public void testSftpPasswordNotValid() throws LinjeUnreadableException, IOException {
+    public void testSftpPasswordNotValid() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -269,12 +268,12 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> { uspesifikkMeldingLinjeReader.read(); });
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
     }
 
     //@Test
     // TODO: Reintroduce this test
-    public void testFileNotExisting() throws LinjeUnreadableException, IOException {
+    public void testFileNotExisting() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -285,17 +284,17 @@ public abstract class MeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, () -> { uspesifikkMeldingLinjeReader.read(); });
+        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
     }
 
-    private void createAWorkingMeldingLinjeFtpOrSftpFileReader() throws URISyntaxException, IOException {
+    private void createAWorkingMeldingLinjeFtpOrSftpFileReader() throws IOException {
 
         final File path = new File(FTP_INPUT_FILE_PATH, FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL);
 
         this.uspesifikkMeldingLinjeFileReader = getCreator().apply(path.getCanonicalPath());
     }
 
-    protected IMeldingLinjeFileReader createAWorkingFtpServerAndAnInstanceOfMeldingLinjeFtpOrSftpFileReader() throws IOException {
+    private IMeldingLinjeFileReader createAWorkingFtpServerAndAnInstanceOfMeldingLinjeFtpOrSftpFileReader() {
 
         // Create a working FTP server and an instance of OsMeldingLinjeFtpReader:
         final String ftpFilePath = FTP_INPUT_FILE_PATH;
