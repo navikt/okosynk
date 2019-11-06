@@ -13,6 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 class OsBatchTest extends AbstractBatchTest<OsMelding> {
 
+    OsBatchTest() {
+        super(Constants.BATCH_TYPE.OS);
+    }
+
     // =========================================================================
     @BeforeEach
     void setUp() throws MeldingUnreadableException, LinjeUnreadableException {

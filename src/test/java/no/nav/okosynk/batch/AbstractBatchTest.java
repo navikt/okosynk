@@ -13,6 +13,8 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -30,229 +32,240 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
-    private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+  private static final Logger enteringTestHeaderLogger =
+      LoggerFactory.getLogger("EnteringTestHeader");
 
-    private static final long EKSEKVERINGS_ID = 0;
+  private static final long EKSEKVERINGS_ID = 0;
 
-    private Batch batch;
+  private Batch batch;
 
-    private IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader;
+  private IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader;
 
-    private IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper;
+  private IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper;
 
-    public Batch getBatch() {
-        return batch;
-    }
+  public Batch getBatch() {
+    return batch;
+  }
 
-    public void setBatch(Batch batch) {
-        this.batch = batch;
-    }
+  public void setBatch(Batch batch) {
+    this.batch = batch;
+  }
 
-    public IMeldingReader<SPESIFIKKMELDINGTYPE> getMeldingReader() {
-        return meldingReader;
-    }
+  public IMeldingReader<SPESIFIKKMELDINGTYPE> getMeldingReader() {
+    return meldingReader;
+  }
 
-    void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
-        this.meldingReader = meldingReader;
-    }
+  void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
+    this.meldingReader = meldingReader;
+  }
 
-    public IMeldingMapper<SPESIFIKKMELDINGTYPE> getMeldingMapper() {
-        return meldingMapper;
-    }
+  public IMeldingMapper<SPESIFIKKMELDINGTYPE> getMeldingMapper() {
+    return meldingMapper;
+  }
 
-    void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
-        this.meldingMapper = meldingMapper;
-    }
+  void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
+    this.meldingMapper = meldingMapper;
+  }
 
-    public String getFsInputFilePathKey() {
-        return fsInputFilePathKey;
-    }
+  public String getFsInputFilePathKey() {
+    return fsInputFilePathKey;
+  }
 
-    public void setFsInputFilePathKey(String fsInputFilePathKey) {
-        this.fsInputFilePathKey = fsInputFilePathKey;
-    }
+  public void setFsInputFilePathKey(String fsInputFilePathKey) {
+    this.fsInputFilePathKey = fsInputFilePathKey;
+  }
 
-    private String fsInputFilePathKey;
+  private String fsInputFilePathKey;
 
-    public IMeldingLinjeFileReader getMockedUspesifikkMeldingLinjeReader() {
-        return mockedUspesifikkMeldingLinjeReader;
-    }
+  private final Constants.BATCH_TYPE batchType;
 
-    private final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
-        mock(IMeldingLinjeFileReader.class);
+  protected AbstractBatchTest(final Constants.BATCH_TYPE batchType) {
+    this.batchType = batchType;
+  }
 
-    public OppgaveSynkroniserer getOppgaveSynkroniserer() {
-        return oppgaveSynkroniserer;
-    }
+  public IMeldingLinjeFileReader getMockedUspesifikkMeldingLinjeReader() {
+    return mockedUspesifikkMeldingLinjeReader;
+  }
 
-    private final OppgaveSynkroniserer oppgaveSynkroniserer =
-        mock(OppgaveSynkroniserer.class);
+  private final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
+      mock(IMeldingLinjeFileReader.class);
 
-    public IOkosynkConfiguration getOkosynkConfiguration() {
-        return okosynkConfiguration;
-    }
+  public OppgaveSynkroniserer getOppgaveSynkroniserer() {
+    return oppgaveSynkroniserer;
+  }
 
-    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-    // =========================================================================
-    static long getEksekveringsId() {
-        return EKSEKVERINGS_ID;
-    }
-    // =========================================================================
+  private final OppgaveSynkroniserer oppgaveSynkroniserer =
+      mock(OppgaveSynkroniserer.class);
 
-    void commonPostSetUp() throws LinjeUnreadableException, MeldingUnreadableException {
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
+  }
 
-        getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
-        getBatch().setSpesifikkMeldingReader(meldingReader);
-        getBatch().setSpesifikkMapper(meldingMapper);
-        getBatch().setOppgaveSynkroniserer(oppgaveSynkroniserer);
+  private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
-        when(mockedUspesifikkMeldingLinjeReader.read())
-            .thenReturn(emptyList());
-        when(meldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
-            .thenReturn(new ArrayList<>());
-        when(meldingMapper.lagOppgaver(anyList()))
-            .thenReturn(new ArrayList());
-    }
+  // =========================================================================
+  static long getEksekveringsId() {
+    return EKSEKVERINGS_ID;
+  }
+  // =========================================================================
 
-    // =========================================================================
+  void commonPostSetUp() throws LinjeUnreadableException, MeldingUnreadableException {
 
-    @Test
-    @DisplayName("Kaster IllegalStateException hvis filområde ikke er satt som system property")
-    void batchStatusSetToFeilIfUspesifikkMeldingLinjeFileReaderIsNotOk() {
+    getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
+    getBatch().setSpesifikkMeldingReader(meldingReader);
+    getBatch().setSpesifikkMapper(meldingMapper);
+    getBatch().setOppgaveSynkroniserer(oppgaveSynkroniserer);
 
-        enteringTestHeaderLogger.debug(null);
+    when(mockedUspesifikkMeldingLinjeReader.read())
+        .thenReturn(emptyList());
+    when(meldingReader
+        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
+        .thenReturn(new ArrayList<>());
+    when(meldingMapper.lagOppgaver(anyList()))
+        .thenReturn(new ArrayList());
+  }
 
-        getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
-        when(
-            mockedUspesifikkMeldingLinjeReader.getStatus()
-        )
+  // =========================================================================
+
+  @Test
+  @DisplayName("Kaster IllegalStateException hvis filområde ikke er satt som system property")
+  void batchStatusSetToFeilIfUspesifikkMeldingLinjeFileReaderIsNotOk() {
+
+    enteringTestHeaderLogger.debug(null);
+
+    getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
+    when(
+        mockedUspesifikkMeldingLinjeReader.getStatus()
+    )
         .thenReturn(IMeldingLinjeFileReader.Status.ERROR);
 
-        Assertions.assertEquals(BatchStatus.FEIL, getBatch().getStatus());
-    }
+    Assertions.assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+  }
 
-    @Test
-    @DisplayName("Når batchen har kjørt ferdig skal den ha status FULLFØRT")
-    void runSetterStatusTilFullfortNarBatchErFerdig() {
+  @Test
+  @DisplayName("Når batchen har kjørt ferdig skal den ha status FULLFØRT")
+  void runSetterStatusTilFullfortNarBatchErFerdig() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        when(oppgaveSynkroniserer.synkroniser(any(), anyCollection(), anyString()))
-                .thenReturn(ConsumerStatistics.zero());
+    when(oppgaveSynkroniserer.synkroniser(any(), anyCollection(), anyString()))
+        .thenReturn(ConsumerStatistics.zero(this.batchType));
 
-        getBatch().run();
+    getBatch().run();
 
-        assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, getBatch().getStatus());
-    }
+    assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, getBatch().getStatus());
+  }
 
-    @Test
-    void runLeserFraFil() throws LinjeUnreadableException {
+  @Test
+  void runLeserFraFil() throws LinjeUnreadableException {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().run();
+    getBatch().run();
 
-        verify(mockedUspesifikkMeldingLinjeReader).read();
-    }
+    verify(mockedUspesifikkMeldingLinjeReader).read();
+  }
 
-    @Test
-    void runOppretterUrMeldingerFraFil() throws MeldingUnreadableException {
+  @Test
+  void runOppretterUrMeldingerFraFil() throws MeldingUnreadableException {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().run();
+    getBatch().run();
 
-        verify(meldingReader).opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
-    }
+    verify(meldingReader)
+        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
+  }
 
-    @Test
-    void statusSettesTilFeilHvisLesingFraFilFeiler() throws LinjeUnreadableException {
+  @Test
+  void statusSettesTilFeilHvisLesingFraFilFeiler() throws LinjeUnreadableException {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        when(mockedUspesifikkMeldingLinjeReader.read())
-            .thenThrow(new LinjeUnreadableException(new IOException("Noe gikk skeis")));
+    when(mockedUspesifikkMeldingLinjeReader.read())
+        .thenThrow(new LinjeUnreadableException(new IOException("Noe gikk skeis")));
 
-        getBatch().run();
+    getBatch().run();
 
-        assertEquals(BatchStatus.FEIL, getBatch().getStatus());
-    }
+    assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+  }
 
-    @Test
-    void runOppretterMeldingerFraFil() throws MeldingUnreadableException {
+  @Test
+  void runOppretterMeldingerFraFil() throws MeldingUnreadableException {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().run();
+    getBatch().run();
 
-        verify(meldingReader).opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
-    }
+    verify(meldingReader)
+        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
+  }
 
-    @Test
-    void statusSettesTilFeilHvisOpprettingAvMeldingFeiler() throws MeldingUnreadableException {
+  @Test
+  void statusSettesTilFeilHvisOpprettingAvMeldingFeiler() throws MeldingUnreadableException {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        when(meldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
-            .thenThrow(new MeldingUnreadableException(new IOException("Noe gikk skeis")));
+    when(meldingReader
+        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
+        .thenThrow(new MeldingUnreadableException(new IOException("Noe gikk skeis")));
 
-        getBatch().run();
+    getBatch().run();
 
-        assertEquals(BatchStatus.FEIL, getBatch().getStatus());
-    }
+    assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+  }
 
-    @Test
-    void runOppretterLokaleOppgaverFraMeldinger() {
+  @Test
+  void runOppretterLokaleOppgaverFraMeldinger() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().run();
+    getBatch().run();
 
-        verify(meldingMapper).lagOppgaver(anyList());
-    }
+    verify(meldingMapper).lagOppgaver(anyList());
+  }
 
-    @Test
-    void runSynkronisererOppgaverMotGsak() {
+  @Test
+  void runSynkronisererOppgaverMotGsak() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().run();
+    getBatch().run();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+    final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
-        verify(oppgaveSynkroniserer).synkroniser(any(), anyCollection(), anyString());
-    }
+    verify(oppgaveSynkroniserer).synkroniser(any(), anyCollection(), anyString());
+  }
 
-    @Test
-    void stoppSetterStatusTilStoppet() {
+  @Test
+  void stoppSetterStatusTilStoppet() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().stopp();
+    getBatch().stopp();
 
-        assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
-    }
+    assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
+  }
 
-    @Test
-    void setStatusOverskriverIkkeStatusDersomBatchErStoppet() {
+  @Test
+  void setStatusOverskriverIkkeStatusDersomBatchErStoppet() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        getBatch().stopp();
-        getBatch().setStatus(BatchStatus.FEIL);
+    getBatch().stopp();
+    getBatch().setStatus(BatchStatus.FEIL);
 
-        assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
-    }
+    assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
+  }
 
-    @Test
-    @DisplayName("Assert that a null pointer exception is thrown when trying to inject null for uspesifikkMeldingLinjeReader")
-    void setUspesifikkMeldingLinjeReaderToNull() {
+  @Test
+  @DisplayName("Assert that a null pointer exception is thrown when trying to inject null for uspesifikkMeldingLinjeReader")
+  void setUspesifikkMeldingLinjeReaderToNull() {
 
-        enteringTestHeaderLogger.debug(null);
+    enteringTestHeaderLogger.debug(null);
 
-        assertThrows(NullPointerException.class, () -> {
-            getBatch().setMeldingLinjeReader(null);
-        });
-    }
+    assertThrows(NullPointerException.class, () -> {
+      getBatch().setMeldingLinjeReader(null);
+    });
+  }
 }

@@ -15,6 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 
 class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
+    UrBatchTest() {
+        super(Constants.BATCH_TYPE.UR);
+    }
+
     // =========================================================================
     @BeforeEach
     void setUp() throws MeldingUnreadableException, LinjeUnreadableException {

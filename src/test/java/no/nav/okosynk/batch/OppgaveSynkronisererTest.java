@@ -1,4 +1,4 @@
-//package no.nav.okosynk.batch;
+package no.nav.okosynk.batch;
 //
 //import static org.junit.jupiter.api.Assertions.assertEquals;
 //import static org.mockito.Matchers.anyCollection;
@@ -27,7 +27,7 @@
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //
-//class OppgaveSynkronisererTest {
+class OppgaveSynkronisererTest {
 //
 //    private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
 //
@@ -400,4 +400,4 @@
 //
 //        return new Oppgave(oppgaveBuilder);
 //    }
-//}
+}

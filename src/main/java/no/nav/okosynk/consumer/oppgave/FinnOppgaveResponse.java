@@ -5,16 +5,16 @@ import java.util.List;
 public class FinnOppgaveResponse {
 
     private int antallTreffTotalt;
-    private List<OppgaveDTO> oppgaver;
+    private List<OppgaveDto> oppgaver;
 
     public FinnOppgaveResponse() {
     }
 
-    public List<OppgaveDTO> getOppgaver() {
+    public List<OppgaveDto> getOppgaver() {
         return oppgaver;
     }
 
-    public void setOppgaver(List<OppgaveDTO> oppgaver) {
+    public void setOppgaver(List<OppgaveDto> oppgaver) {
         this.oppgaver = oppgaver;
     }
 
