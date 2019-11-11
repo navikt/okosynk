@@ -1,96 +1,107 @@
 package no.nav.okosynk.batch;
 //
 //import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockito.Matchers.anyCollection;
-//import static org.mockito.Matchers.anyString;
+
+import static org.mockito.Matchers.anySet;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyCollection;
+import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.*;
 //
-//import java.time.LocalDate;
-//import java.time.LocalDateTime;
-//import java.util.Collection;
-//import java.util.Collections;
-//import java.util.HashSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 //import java.util.List;
-//import java.util.Set;
-//
-//import no.nav.okosynk.config.FakeOkosynkConfiguration;
-//import no.nav.okosynk.config.IOkosynkConfiguration;
-//import no.nav.okosynk.consumer.ConsumerStatistics;
+import java.util.Set;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.ConsumerStatistics;
 //import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
 //import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
 //import no.nav.okosynk.domain.Oppgave;
-//import org.junit.jupiter.api.BeforeEach;
+import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
+import no.nav.okosynk.domain.Oppgave;
+import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.DisplayName;
 //import org.junit.jupiter.api.Test;
 //import org.mockito.ArgumentCaptor;
 //import org.mockito.Mockito;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //
 class OppgaveSynkronisererTest {
-//
-//    private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
-//
-//    private static final Logger enteringTestHeaderLogger =
-//        LoggerFactory.getLogger("EnteringTestHeader");
-//
-//    private static final String                BATCHBRUKER              = "srvokosynk";
-//    private static final String                OPPGAVEID_GSAK           = "185587300";
-//    private static final String                OPPGAVEID                = "185587998";
-//    private static final String                BRUKERID_GSAK            = "10108000398";
-//    private static final String                BRUKERID                 = "06025800174";
-//    public  static final String                EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
-//    private static final IOkosynkConfiguration okosynkConfiguration     = new FakeOkosynkConfiguration();
-//
-//    private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
-//    private BatchStatus batchStatus;
-//
-//    @BeforeEach
-//    void setUp() {
-//
-//        logger.debug("About to create a new OppgaveSynkroniserer instance equipped with the mocked versions of IOppgaveConsumerGateway and IOppgaveBehandlingConsumerGateway...");
-//
-//        this.oppgaveSynkronisererWithInjectedMocks =
-//            new OppgaveSynkroniserer(
-//                this::getBatchStatus);
-//
-//        this.batchStatus = BatchStatus.STARTET;
-//
-//        final Set<Oppgave> oppgaveListe =
-//            lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
-//        when(
-//            this
-//                .mockedOppgaveGateway
-//                .finnOppgaver(anyString(), anyCollection())
-//        )
-//        .thenReturn(
-//            // TODO: As of now, just a placeholder:
-//            ConsumerStatistics.zero()
-//        )
+
+  private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
+  private static final Logger enteringTestHeaderLogger =
+      LoggerFactory.getLogger("EnteringTestHeader");
+
+  private static final Constants.BATCH_TYPE BATCH_TYPE =
+      Constants.BATCH_TYPE.OS;
+  private static final String OPPGAVEID_GSAK = "185587300";
+  private static final String OPPGAVEID = "185587998";
+  private static final String BRUKERID_GSAK = "10108000398";
+  private static final String BRUKERID = "06025800174";
+  public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
+  private static final IOkosynkConfiguration okosynkConfiguration =
+      new FakeOkosynkConfiguration();
+
+  private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
+  private OppgaveRestClient mockedOppgaveRestClient;
+  private BatchStatus batchStatus;
+
+  @BeforeEach
+  void setUp() {
+
+    logger.debug("About to create a new OppgaveSynkroniserer instance equipped with the mocked versions of OppgaveRestClient...");
+
+    mockedOppgaveRestClient = mock(OppgaveRestClient.class);
+
+      this.oppgaveSynkronisererWithInjectedMocks =
+            new OppgaveSynkroniserer(this::getBatchStatus, mockedOppgaveRestClient);
+
+        this.batchStatus = BatchStatus.STARTET;
+
+        final Set<Oppgave> oppgaveListe =
+            lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
+        when(
+            this
+                .mockedOppgaveRestClient
+                .finnOppgaver(anyString(), anySet())
+        )
+        .thenReturn(
+            // TODO: As of now, just a placeholder:
+            ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
+        )
+        /*
+        TODO: Quasi code for what is wanted as mock.
+        .thenSetTheSeconParameterTo(
+            oppgaveListe
+        )
+         */
+        ;
+
+        when(
+            this
+                .mockedOppgaveRestClient
+                .opprettOppgaver(anyCollection())
+        )
+            .thenReturn(
+                // TODO: As of now, just a placeholder:
+                ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
+            )
 //        /*
 //        TODO: Quasi code for what is wanted as mock.
 //        .thenSetTheSeconParameterTo(
 //            oppgaveListe
 //        )
 //         */
-//        ;
-//
-//        when(
-//            this
-//                .mockedOppgaveBehandlingGateway
-//                .opprettOppgaver(any(IOkosynkConfiguration.class), anyCollection())
-//        )
-//            .thenReturn(
-//                // TODO: As of now, just a placeholder:
-//                ConsumerStatistics.zero()
-//            )
-//        /*
-//        TODO: Quasi code for what is wanted as mock.
-//        .thenSetTheSeconParameterTo(
-//            oppgaveListe
-//        )
-//         */
-//        ;
+        ;
 //
 //        // =====================================================================
 //
@@ -98,25 +109,26 @@ class OppgaveSynkronisererTest {
 //        this.okosynkConfiguration.clearSystemProperty("urbatch.bruker");
 //
 //        // =====================================================================
-//    }
-//
-//    // =========================================================================
-//
-//    @Test
-//    void synkroniser_skal_hente_oppgaver_fra_oppgave_applikasjonen() {
-//
-//        enteringTestHeaderLogger.debug(null);
-//
-//        this.oppgaveSynkronisererWithInjectedMocks
-//            .synkroniser(
-//                this.okosynkConfiguration,
-//                lagOppgaveliste(OPPGAVEID, BRUKERID),
-//                BATCHBRUKER);
-//
-//        final Collection<Oppgave> funneOppgaver = new HashSet<>();
-//        verify(this.mockedOppgaveGateway).finnOppgaver(BATCHBRUKER, funneOppgaver);
-//    }
-//
+  }
+
+  // =========================================================================
+
+  @Test
+  void synkroniser_skal_hente_oppgaver_fra_oppgave_applikasjonen() {
+
+    enteringTestHeaderLogger.debug(null);
+
+    final String batchBruker = getBatchBruker(this.okosynkConfiguration);
+    this.oppgaveSynkronisererWithInjectedMocks
+        .synkroniser(
+            this.okosynkConfiguration,
+            lagOppgaveliste(OPPGAVEID, BRUKERID),
+            batchBruker);
+
+    final Set<Oppgave> funneOppgaver = new HashSet<>();
+    verify(this.mockedOppgaveRestClient).finnOppgaver(batchBruker, funneOppgaver);
+  }
+
 //    @Test
 //    @DisplayName("Hvis batchen er stoppet når synkroniser-metoden startes skal det ikke gjøres tjenestekall for patchOppgaver, opprettOppgaver eller oppdaterOppgaver")
 //    void synkroniserSkalIkkeKalleOppgavebehandlingHvisBatchErStoppet() {
@@ -353,20 +365,20 @@ class OppgaveSynkronisererTest {
 //        final ArgumentCaptor<Collection<Oppgave>> captor = ArgumentCaptor.forClass((Class) List.class);
 //        verify(this.mockedOppgaveBehandlingGateway, times(1)).patchOppgaver(anyCollection());
 //    }
-//
-//    // =========================================================================
-//
-//    BatchStatus getBatchStatus() {
-//        return this.batchStatus;
-//    }
-//
-//    private Set<Oppgave> lagOppgaveliste(String oppgaveId, String brukerId) {
-//        Set<Oppgave> oppgaveliste = new HashSet<>();
-//        oppgaveliste.add(lagOppgave(oppgaveId, brukerId));
-//
-//        return oppgaveliste;
-//    }
-//
+
+  // =========================================================================
+
+  BatchStatus getBatchStatus() {
+    return this.batchStatus;
+  }
+
+  private Set<Oppgave> lagOppgaveliste(String oppgaveId, String brukerId) {
+    Set<Oppgave> oppgaveliste = new HashSet<>();
+    oppgaveliste.add(lagOppgave(oppgaveId, brukerId));
+
+    return oppgaveliste;
+  }
+
 //    private Set<OppgaveSynkroniserer.OppgaveOppdatering> lagOppgaveOppdatering(
 //        final Oppgave oppgaveLestFraBatch,
 //        final Oppgave oppgaveLestFraDatabasen) {
@@ -376,28 +388,41 @@ class OppgaveSynkronisererTest {
 //
 //        return oppgaveOppdateringsListe;
 //    }
-//
-//    private Oppgave lagOppgave(String oppgaveId, String brukerId) {
-//        return lagOppgave(oppgaveId, brukerId, "STATUS;;oppsummer meldinger slått sammen til en oppgave");
-//    }
-//
-//    private Oppgave lagOppgave(String oppgaveId, String brukerId, String beskrivelse) {
-//        Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder()
-//                .withOppgaveId(oppgaveId)
-//                .withBrukerId(brukerId)
-//                .withBrukertypeKode("PERSON")
-//                .withOppgavetypeKode("OKO_OS")
-//                .withFagomradeKode("BA")
-//                .withUnderkategoriKode("BA")
-//                .withPrioritetKode("LAV_OKO")
-//                .withBeskrivelse(beskrivelse)
-//                .withAnsvarligEnhetId("4151")
-//                .withLest(false)
-//                .withVersjon(1)
-//                .withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36))
-//                .withAktivFra(LocalDate.of(1997, 2, 2))
-//                .withAktivTil(LocalDate.of(1997, 2, 9));
-//
-//        return new Oppgave(oppgaveBuilder);
-//    }
+
+  private Oppgave lagOppgave(String oppgaveId, String brukerId) {
+    return lagOppgave(oppgaveId, brukerId,
+        "STATUS;;oppsummer meldinger slått sammen til en oppgave");
+  }
+
+  private Oppgave lagOppgave(String oppgaveId, String brukerId, String beskrivelse) {
+    Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder()
+        .withOppgaveId(oppgaveId)
+        //.withBrukerId(brukerId)
+        //.withBrukertypeKode("PERSON")
+        .withOppgavetypeKode("OKO_OS")
+        .withFagomradeKode("BA")
+        //.withUnderkategoriKode("BA")
+        .withPrioritetKode("LAV_OKO")
+        .withBeskrivelse(beskrivelse)
+        .withAnsvarligEnhetId("4151")
+        .withLest(false)
+        .withVersjon(1)
+        .withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36))
+        .withAktivFra(LocalDate.of(1997, 2, 2))
+        .withAktivTil(LocalDate.of(1997, 2, 9));
+
+    return new Oppgave(oppgaveBuilder);
+  }
+
+  private String getBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
+
+    final String batchBruker =
+        okosynkConfiguration
+            .getString(
+                BATCH_TYPE.getBatchBrukerKey(),
+                BATCH_TYPE.getBatchBrukerDefaultValue()
+            );
+
+    return batchBruker;
+  }
 }

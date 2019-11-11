@@ -28,7 +28,6 @@ import java.util.UUID;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.domain.Oppgave;
@@ -77,7 +76,10 @@ public class OppgaveRestClient {
     log.info("OppgaveRestClient konfigurert for {} og bruker {}", batchType, bruker);
   }
 
-  private FinnOppgaveResponse finnOppgaver(String opprettetAv, int limit, int offset) {
+  private FinnOppgaveResponse finnOppgaver(
+      final String opprettetAv,
+      final int limit,
+      final int offset) {
     URI uri;
     try {
       uri = new URIBuilder(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"))

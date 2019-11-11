@@ -32,10 +32,12 @@ public class OppgaveSynkroniserer {
   private final OppgaveRestClient oppgaveRestClient;
   private Supplier<BatchStatus> batchStatusSupplier;
 
-  public OppgaveSynkroniserer(final Supplier<BatchStatus> batchStatusSupplier,
-      final OppgaveRestClient oppgaveRestClient) {
+  public OppgaveSynkroniserer(
+      final Supplier<BatchStatus> batchStatusSupplier,
+      final OppgaveRestClient     oppgaveRestClient) {
+
     this.batchStatusSupplier = batchStatusSupplier;
-    this.oppgaveRestClient = oppgaveRestClient;
+    this.oppgaveRestClient   = oppgaveRestClient;
   }
 
   public ConsumerStatistics synkroniser(final IOkosynkConfiguration okosynkConfiguration,
