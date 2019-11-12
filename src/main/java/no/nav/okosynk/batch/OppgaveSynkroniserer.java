@@ -27,219 +27,21 @@ import org.slf4j.LoggerFactory;
  */
 public class OppgaveSynkroniserer {
 
-  private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkroniserer.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(OppgaveSynkroniserer.class);
 
-  private final OppgaveRestClient oppgaveRestClient;
-  private Supplier<BatchStatus> batchStatusSupplier;
+  private final IOkosynkConfiguration okosynkConfiguration;
+  private final OppgaveRestClient     oppgaveRestClient;
+  private final Supplier<BatchStatus> batchStatusSupplier;
 
   public OppgaveSynkroniserer(
+      final IOkosynkConfiguration okosynkConfiguration,
       final Supplier<BatchStatus> batchStatusSupplier,
       final OppgaveRestClient     oppgaveRestClient) {
 
-    this.batchStatusSupplier = batchStatusSupplier;
-    this.oppgaveRestClient   = oppgaveRestClient;
-  }
-
-  public ConsumerStatistics synkroniser(final IOkosynkConfiguration okosynkConfiguration,
-      final Collection<Oppgave> alleOppgaverLestFraBatchenFuncParm,
-      final String bruker) {
-
-    logger.info("Bruker {} forsøker å synkronisere {} oppgaver lest fra batch input.", bruker,
-        alleOppgaverLestFraBatchenFuncParm.size());
-
-    final Set<Oppgave> alleOppgaverLestFraBatchen =
-        new HashSet<>(alleOppgaverLestFraBatchenFuncParm);
-
-    final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
-    //final ConsumerStatistics consumerStatistics_finn =
-    //     oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
-    final ConsumerStatistics consumerStatistics_finn = oppgaveRestClient
-        .finnOppgaver(bruker, oppgaverLestFraDatabasen);
-
-    final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(
-        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-    final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres = finnOppgaverSomSkalOppdateres(
-        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-    final Set<Oppgave> oppgaverSomSkalOpprettes = finnOppgaverSomSkalOpprettes(
-        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-
-    final ConsumerStatistics consumerStatistics_ferdigstill = ferdigstillOppgaver(
-        okosynkConfiguration, oppgaverSomSkalFerdigstilles, bruker);
-    final ConsumerStatistics consumerStatistics_oppdater = oppdaterOppgaver(okosynkConfiguration,
-        oppgaverSomSkalOppdateres, bruker);
-    final ConsumerStatistics consumerStatistics_opprett = opprettOppgaver(okosynkConfiguration,
-        oppgaverSomSkalOpprettes, bruker);
-
-    //Kan skrives om til å basere seg på patch resultatene
-    final ConsumerStatistics consumerStatistics_accumulated =
-        ConsumerStatistics.addAll(
-            consumerStatistics_finn,
-            consumerStatistics_ferdigstill,
-            consumerStatistics_oppdater,
-            consumerStatistics_opprett);
-
-    loggAntallMeldingerMedOppgave(oppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes);
-    loggAccumulatedConsumerStatistics(consumerStatistics_accumulated);
-
-    return consumerStatistics_accumulated;
-  }
-
-  private void loggAntallMeldingerMedOppgave(
-      final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres,
-      final Set<Oppgave> oppgaverSomSkalOpprettes) {
-
-    final Integer antallMeldingerSomHarEnOppdaterOppgave = oppgaverSomSkalOppdateres.stream()
-        .map(oppgaveOppdatering -> oppgaveOppdatering.oppgaveLestFraBatchen.antallMeldinger)
-        .reduce((sum, i) -> sum + i)
-        .orElse(0);
-
-    final Integer antallMeldingerSomHarEnOpprettOppgave = oppgaverSomSkalOpprettes.stream()
-        .map(oppgave -> oppgave.antallMeldinger)
-        .reduce((sum, i) -> sum + i)
-        .orElse(0);
-
-    final int antallOppgaver = oppgaverSomSkalOppdateres.size() + oppgaverSomSkalOpprettes.size();
-    final int antallMeldinger =
-        antallMeldingerSomHarEnOppdaterOppgave + antallMeldingerSomHarEnOpprettOppgave;
-
-    logger.info(
-        "STATISTIKK: Etter synkronisering finnes det {} åpne oppgaver basert på {} meldinger.",
-        antallOppgaver,
-        antallMeldinger
-    );
-  }
-
-  private void loggAccumulatedConsumerStatistics(
-      final ConsumerStatistics accumulatedConsumerStatistics) {
-
-    logger.info(
-        "STATISTIKK: accumulatedConsumerStatistics etter synkronisering: {}",
-        accumulatedConsumerStatistics
-    );
-  }
-
-  ConsumerStatistics ferdigstillOppgaver(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final Set<Oppgave> oppgaver,
-      final String bruker) {
-
-    final String consumerStatisticsName =
-        getConsumerStatisticsName(okosynkConfiguration, bruker);
-
-    final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å ferdigstille oppgaver");
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else {
-      final String oppgaveType = brukerTilOppgaveType(okosynkConfiguration, bruker);
-      final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
-          .equals(oppgave.oppgavetypeKode, oppgaveType);
-      final Predicate<Oppgave> ikkeNyligEndret = oppgave -> oppgave.sistEndret
-          .isBefore(LocalDateTime.now().minusHours(8));
-      final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()
-          .filter(ikkeNyligEndret)
-          .filter(harUendretOppgaveType)
-          .collect(Collectors.toSet());
-
-      if (oppgaverSomSkalFerdigstilles.isEmpty()) {
-        logger.info(
-            "Bruker {} forsøker å ferdigstille oppgaver, men det er ingen oppgaver å ferdigstille.",
-            bruker);
-        consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-      } else {
-        logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker,
-            oppgaverSomSkalFerdigstilles.size());
-        //consumerStatistics = oppgaveBehandlingGateway.patchOppgaver(oppgaverSomSkalFerdigstilles);
-        consumerStatistics = this.oppgaveRestClient
-            .patchOppgaver(oppgaverSomSkalFerdigstilles, true);
-        logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker,
-            consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
-      }
-    }
-
-    return consumerStatistics;
-  }
-
-  private String getConsumerStatisticsName(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final String bruker) {
-
-    final String osBruker = this.hentOsBatchBruker(okosynkConfiguration);
-    final Constants.BATCH_TYPE batchType =
-        bruker.equals(osBruker) ? Constants.BATCH_TYPE.OS : Constants.BATCH_TYPE.UR;
-
-    return batchType.getConsumerStatisticsName();
-  }
-
-  /**
-   * TODO: This will fail the day we are using the same user for the two jobs!
-   */
-  private String brukerTilOppgaveType(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final String                bruker) {
-
-    final String osBruker = this.hentOsBatchBruker(okosynkConfiguration);
-    final Constants.BATCH_TYPE batchType =
-        bruker.equals(osBruker) ? Constants.BATCH_TYPE.OS : Constants.BATCH_TYPE.UR;
-
-    return batchType.getOppgaveType();
-  }
-
-  ConsumerStatistics oppdaterOppgaver(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final Set<OppgaveOppdatering> oppgaveOppdateringer,
-      final String bruker) {
-
-    final String consumerStatisticsName =
-        getConsumerStatisticsName(okosynkConfiguration, bruker);
-    final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å oppdatere oppgaver");
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else if (oppgaveOppdateringer.isEmpty()) {
-      logger.info("Bruker {} forsøker å oppdatere oppgaver, men det er ingen oppgaver å oppdatere.",
-          bruker);
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else {
-      logger
-          .info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
-      Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream()
-          .map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
-      // consumerStatistics =
-      //     oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
-      consumerStatistics = this.oppgaveRestClient.patchOppgaver(oppdaterteOppgaver, false);
-      logger.info("Bruker {} har oppdatert {} oppgaver", bruker,
-          consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
-    }
-
-    return consumerStatistics;
-  }
-
-  ConsumerStatistics opprettOppgaver(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final Set<Oppgave> oppgaver,
-      final String bruker) {
-
-    final String consumerStatisticsName =
-        getConsumerStatisticsName(okosynkConfiguration, bruker);
-    final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å opprette oppgaver");
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else if (oppgaver.isEmpty()) {
-      logger.info("Bruker {} forsøker å opprette oppgaver, men det er ingen oppgaver å opprette.",
-          bruker);
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else {
-      logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
-      //consumerStatistics =
-      //     oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
-      consumerStatistics = this.oppgaveRestClient.opprettOppgaver(oppgaver);
-      logger.info("Bruker {} har opprettet {} oppgaver", bruker,
-          consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
-    }
-
-    return consumerStatistics;
+    this.okosynkConfiguration = okosynkConfiguration;
+    this.batchStatusSupplier  = batchStatusSupplier;
+    this.oppgaveRestClient    = oppgaveRestClient;
   }
 
   static Set<Oppgave> finnOppgaverSomSkalOpprettes(
@@ -285,8 +87,212 @@ public class OppgaveSynkroniserer {
         .collect(Collectors.toSet());
   }
 
+  private static String getBatchBruker(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE  batchType) {
+
+    final String batchBruker =
+        okosynkConfiguration
+            .getString(
+                batchType.getBatchBrukerKey(),
+                batchType.getBatchBrukerDefaultValue()
+            );
+
+    return batchBruker;
+  }
+
+  public ConsumerStatistics synkroniser(
+      final Collection<Oppgave> alleOppgaverLestFraBatchenFuncParm
+  ) {
+
+    final String bruker =
+        getBatchBruker(this.okosynkConfiguration, getBatchType());
+
+    logger.info("Bruker {} forsøker å synkronisere {} oppgaver lest fra batch input.", bruker,
+        alleOppgaverLestFraBatchenFuncParm.size());
+
+    final Set<Oppgave> alleOppgaverLestFraBatchen =
+        new HashSet<>(alleOppgaverLestFraBatchenFuncParm);
+
+    final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+    //final ConsumerStatistics consumerStatistics_finn =
+    //     oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
+    final ConsumerStatistics consumerStatistics_finn =
+        getOppgaveRestClient()
+          .finnOppgaver(bruker, oppgaverLestFraDatabasen);
+
+    final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(
+        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+    final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres = finnOppgaverSomSkalOppdateres(
+        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+    final Set<Oppgave> oppgaverSomSkalOpprettes = finnOppgaverSomSkalOpprettes(
+        alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+
+    final ConsumerStatistics consumerStatistics_ferdigstill =
+        ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
+    final ConsumerStatistics consumerStatistics_oppdater =
+        oppdaterOppgaver(oppgaverSomSkalOppdateres);
+    final ConsumerStatistics consumerStatistics_opprett =
+        opprettOppgaver(oppgaverSomSkalOpprettes);
+
+    //Kan skrives om til å basere seg på patch resultatene
+    final ConsumerStatistics consumerStatistics_accumulated =
+        ConsumerStatistics.addAll(
+            consumerStatistics_finn,
+            consumerStatistics_ferdigstill,
+            consumerStatistics_oppdater,
+            consumerStatistics_opprett);
+
+    loggAntallMeldingerMedOppgave(oppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes);
+    loggAccumulatedConsumerStatistics(consumerStatistics_accumulated);
+
+    return consumerStatistics_accumulated;
+  }
+
+  ConsumerStatistics ferdigstillOppgaver(final Set<Oppgave> oppgaver) {
+
+    final String bruker = getBatchBruker(this.okosynkConfiguration, getBatchType());
+
+    final String consumerStatisticsName =
+        getBatchType().getConsumerStatisticsName();
+
+    final ConsumerStatistics consumerStatistics;
+    if (batchErStoppet()) {
+      logger.info("Batchen er stoppet, avslutter uten å ferdigstille oppgaver");
+      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+    } else {
+      final String oppgaveType = getBatchType().getOppgaveType();
+      final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
+          .equals(oppgave.oppgavetypeKode, oppgaveType);
+      final Predicate<Oppgave> ikkeNyligEndret = oppgave -> oppgave.sistEndret
+          .isBefore(LocalDateTime.now().minusHours(8));
+      final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()
+          .filter(ikkeNyligEndret)
+          .filter(harUendretOppgaveType)
+          .collect(Collectors.toSet());
+
+      if (oppgaverSomSkalFerdigstilles.isEmpty()) {
+        logger.info(
+            "Bruker {} forsøker å ferdigstille oppgaver, men det er ingen oppgaver å ferdigstille.",
+            bruker);
+        consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+      } else {
+        logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker,
+            oppgaverSomSkalFerdigstilles.size());
+        //consumerStatistics = oppgaveBehandlingGateway.patchOppgaver(oppgaverSomSkalFerdigstilles);
+        consumerStatistics = getOppgaveRestClient()
+            .patchOppgaver(oppgaverSomSkalFerdigstilles, true);
+        logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker,
+            consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
+      }
+    }
+
+    return consumerStatistics;
+  }
+
+  ConsumerStatistics oppdaterOppgaver(final Set<OppgaveOppdatering> oppgaveOppdateringer) {
+
+    final String bruker = getBatchBruker(this.okosynkConfiguration, getBatchType());
+
+    final String consumerStatisticsName =
+        getBatchType().getConsumerStatisticsName();
+
+    final ConsumerStatistics consumerStatistics;
+    if (batchErStoppet()) {
+      logger.info("Batchen er stoppet, avslutter uten å oppdatere oppgaver");
+      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+    } else if (oppgaveOppdateringer.isEmpty()) {
+      logger.info("Bruker {} forsøker å oppdatere oppgaver, men det er ingen oppgaver å oppdatere.",
+          bruker);
+      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+    } else {
+      logger
+          .info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
+      Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream()
+          .map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
+      // consumerStatistics =
+      //     oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
+      consumerStatistics = getOppgaveRestClient().patchOppgaver(oppdaterteOppgaver, false);
+      logger.info("Bruker {} har oppdatert {} oppgaver", bruker,
+          consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
+    }
+
+    return consumerStatistics;
+  }
+
+  ConsumerStatistics opprettOppgaver(final Set<Oppgave> oppgaver) {
+
+    final String bruker = getBatchBruker(this.okosynkConfiguration, getBatchType());
+
+    final String consumerStatisticsName =
+        getBatchType().getConsumerStatisticsName();
+
+    final ConsumerStatistics consumerStatistics;
+    if (batchErStoppet()) {
+      logger.info("Batchen er stoppet, avslutter uten å opprette oppgaver");
+      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+    } else if (oppgaver.isEmpty()) {
+      logger.info("Bruker {} forsøker å opprette oppgaver, men det er ingen oppgaver å opprette.",
+          bruker);
+      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
+    } else {
+      logger.info("Bruker {} forsøker å opprette {} oppgaver.", bruker, oppgaver.size());
+      //consumerStatistics =
+      //     oppgaveBehandlingGateway.opprettOppgaver(okosynkConfiguration, oppgaver);
+      consumerStatistics = getOppgaveRestClient().opprettOppgaver(oppgaver);
+      logger.info("Bruker {} har opprettet {} oppgaver", bruker,
+          consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
+    }
+
+    return consumerStatistics;
+  }
+
+  private void loggAntallMeldingerMedOppgave(
+      final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres,
+      final Set<Oppgave>            oppgaverSomSkalOpprettes) {
+
+    final Integer antallMeldingerSomHarEnOppdaterOppgave = oppgaverSomSkalOppdateres.stream()
+        .map(oppgaveOppdatering -> oppgaveOppdatering.oppgaveLestFraBatchen.antallMeldinger)
+        .reduce((sum, i) -> sum + i)
+        .orElse(0);
+
+    final Integer antallMeldingerSomHarEnOpprettOppgave = oppgaverSomSkalOpprettes.stream()
+        .map(oppgave -> oppgave.antallMeldinger)
+        .reduce((sum, i) -> sum + i)
+        .orElse(0);
+
+    final int antallOppgaver = oppgaverSomSkalOppdateres.size() + oppgaverSomSkalOpprettes.size();
+    final int antallMeldinger =
+        antallMeldingerSomHarEnOppdaterOppgave + antallMeldingerSomHarEnOpprettOppgave;
+
+    logger.info(
+        "STATISTIKK: Etter synkronisering finnes det {} åpne oppgaver basert på {} meldinger.",
+        antallOppgaver,
+        antallMeldinger
+    );
+  }
+
+  private void loggAccumulatedConsumerStatistics(
+      final ConsumerStatistics accumulatedConsumerStatistics) {
+
+    logger.info(
+        "STATISTIKK: accumulatedConsumerStatistics etter synkronisering: {}",
+        accumulatedConsumerStatistics
+    );
+  }
+
   private boolean batchErStoppet() {
     return BatchStatus.STOPPET.equals(batchStatusSupplier.get());
+  }
+
+  private OppgaveRestClient getOppgaveRestClient() {
+    final OppgaveRestClient  oppgaveRestClient = this.oppgaveRestClient;
+    return  oppgaveRestClient;
+  }
+
+  private Constants.BATCH_TYPE getBatchType() {
+    final Constants.BATCH_TYPE batchType = getOppgaveRestClient().getBatchType();
+    return  batchType;
   }
 
   static class OppgaveOppdatering {
@@ -298,7 +304,7 @@ public class OppgaveSynkroniserer {
         final Oppgave oppgaveLestFraBatchen,
         final Oppgave oppgaveLestFraDatabasen) {
 
-      this.oppgaveLestFraBatchen = oppgaveLestFraBatchen;
+      this.oppgaveLestFraBatchen   = oppgaveLestFraBatchen;
       this.oppgaveLestFraDatabasen = oppgaveLestFraDatabasen;
     }
 
@@ -314,22 +320,10 @@ public class OppgaveSynkroniserer {
       //Ta vare på ti tegn av oppgavebeskrivelsen
       // lagt til av brukere fra Pesys. De 10 tegnene brukes til koder
       // som sier hvorfor de ikke har lukket oppgaven enda.
-      String[] beskrivelseFelter = oppgaveLestFraDatabasen.beskrivelse.split(";");
-      String kode = beskrivelseFelter.length > 2 ? substring(beskrivelseFelter[1], 0, 10) : "";
+      final String[] beskrivelseFelter = oppgaveLestFraDatabasen.beskrivelse.split(";");
+      final String kode = beskrivelseFelter.length > 2 ? substring(beskrivelseFelter[1], 0, 10) : "";
 
       return oppgaveLestFraBatchen.beskrivelse.replaceFirst(";;", ";" + kode + ";");
     }
-  }
-
-  private static String hentOsBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
-
-    final String batchBruker =
-        okosynkConfiguration
-            .getString(
-                Constants.BATCH_TYPE.OS.getBatchBrukerKey(),
-                Constants.BATCH_TYPE.OS.getBatchBrukerDefaultValue()
-            );
-
-    return batchBruker;
   }
 }

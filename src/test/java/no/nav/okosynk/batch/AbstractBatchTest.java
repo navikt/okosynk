@@ -148,7 +148,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     enteringTestHeaderLogger.debug(null);
 
-    when(oppgaveSynkroniserer.synkroniser(any(), anyCollection(), anyString()))
+    when(oppgaveSynkroniserer.synkroniser(anyCollection()))
         .thenReturn(ConsumerStatistics.zero(this.batchType));
 
     getBatch().run();
@@ -234,7 +234,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
-    verify(oppgaveSynkroniserer).synkroniser(any(), anyCollection(), anyString());
+    verify(oppgaveSynkroniserer).synkroniser(anyCollection());
   }
 
   @Test

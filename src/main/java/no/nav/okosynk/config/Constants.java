@@ -4,34 +4,37 @@ public class Constants {
 
   public enum BATCH_TYPE {
     OS(
-        OS_BATCH_NAVN
-        , OS_BATCH_BRUKER_KEY
-        , OS_BATCH_BRUKER_DEFAULT_VALUE
-        , OS_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME
-        , OS_OPPGAVE_TYPE
-        , OS_FTP_HOST_URL_KEY
-        , OS_FTP_USER_KEY
-        , OS_FTP_PASSWORD_KEY
-        , OS_FTP_CONNECTION_TIMEOUT_KEY
-        , OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS
-        , OS_FTP_CHARSET_NAME_KEY
-        , OS_EXECUTION_ID_OFFSET
-        , OS_MAPPING_RULES_PROPERTIES_FILENAME
-        , OS_BATCH_BRUKER_PASSWORD_KEY), UR(
-        UR_BATCH_NAVN
-        , UR_BATCH_BRUKER_KEY
-        , UR_BATCH_BRUKER_DEFAULT_VALUE
-        , UR_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME
-        , UR_OPPGAVE_TYPE
-        , UR_FTP_HOST_URL_KEY
-        , UR_FTP_USER_KEY
-        , UR_FTP_PASSWORD_KEY
-        , UR_FTP_CONNECTION_TIMEOUT_KEY
-        , UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS
-        , UR_FTP_CHARSET_NAME_KEY
-        , UR_EXECUTION_ID_OFFSET
-        , UR_MAPPING_RULES_PROPERTIES_FILENAME
-        , UR_BATCH_BRUKER_PASSWORD_KEY);
+        OS_BATCH_NAVN,
+        OS_BATCH_BRUKER_KEY,
+        OS_BATCH_BRUKER_DEFAULT_VALUE,
+        OS_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME,
+        OS_OPPGAVE_TYPE,
+        OS_FTP_HOST_URL_KEY,
+        OS_FTP_USER_KEY,
+        OS_FTP_PASSWORD_KEY,
+        OS_FTP_CONNECTION_TIMEOUT_KEY,
+        OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS,
+        OS_FTP_CHARSET_NAME_KEY,
+        OS_EXECUTION_ID_OFFSET,
+        OS_MAPPING_RULES_PROPERTIES_FILENAME,
+        OS_BATCH_BRUKER_PASSWORD_KEY
+    ),
+    UR(
+        UR_BATCH_NAVN,
+        UR_BATCH_BRUKER_KEY,
+        UR_BATCH_BRUKER_DEFAULT_VALUE,
+        UR_BATCH_RUN_SYNCHRONOUSLY_TIMER_NAME,
+        UR_OPPGAVE_TYPE,
+        UR_FTP_HOST_URL_KEY,
+        UR_FTP_USER_KEY,
+        UR_FTP_PASSWORD_KEY,
+        UR_FTP_CONNECTION_TIMEOUT_KEY,
+        UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS,
+        UR_FTP_CHARSET_NAME_KEY,
+        UR_EXECUTION_ID_OFFSET,
+        UR_MAPPING_RULES_PROPERTIES_FILENAME,
+        UR_BATCH_BRUKER_PASSWORD_KEY
+    );
 
     private final String name;
     private final String batchBrukerKey;
@@ -109,20 +112,20 @@ public class Constants {
     }
 
     BATCH_TYPE(
-        final String name
-        , final String batchBrukerKey
-        , final String batchBrukerDefaultValue
-        , final String batchRunSynchronouslyTimerName
-        , final String oppgaveType
-        , final String ftpHostUrlKey
-        , final String ftpUserKey
-        , final String ftpPasswordKey
-        , final String ftpConnectionTimeoutKey
-        , final int ftpConnectionTimeoutDefaultValueInMs
-        , final String ftpCharsetNameKey
-        , final long executionIdOffset
-        , final String mappingRulesPropertiesFileName
-        , final String batchBrukerPasswordKey
+        final String name,
+        final String batchBrukerKey,
+        final String batchBrukerDefaultValue,
+        final String batchRunSynchronouslyTimerName,
+        final String oppgaveType,
+        final String ftpHostUrlKey,
+        final String ftpUserKey,
+        final String ftpPasswordKey,
+        final String ftpConnectionTimeoutKey,
+        final int ftpConnectionTimeoutDefaultValueInMs,
+        final String ftpCharsetNameKey,
+        final long executionIdOffset,
+        final String mappingRulesPropertiesFileName,
+        final String batchBrukerPasswordKey
     ) {
       this.name = name;
       this.batchBrukerKey = batchBrukerKey;
@@ -152,9 +155,9 @@ public class Constants {
   private static final String OS_FTP_USER_KEY = "OSFTPCREDENTIALS_USERNAME";
   private static final String OS_FTP_PASSWORD_KEY = "OSFTPCREDENTIALS_PASSWORD";
   private static final String OS_FTP_CONNECTION_TIMEOUT_KEY = "OS_FTP_CONNECT_TIMEOUT_IN_MS";
-  private static final int OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
+  private static final int    OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
   private static final String OS_FTP_CHARSET_NAME_KEY = "OS_FTP_CHARSET";
-  private static final long OS_EXECUTION_ID_OFFSET = 0L;
+  private static final long   OS_EXECUTION_ID_OFFSET = 0L;
   private static final String OS_MAPPING_RULES_PROPERTIES_FILENAME = "os_mapping_regler.properties";
   // -------------------------------------------------------------------------
   private static final String UR_BATCH_NAVN = "bokosynk002";
@@ -167,35 +170,35 @@ public class Constants {
   private static final String UR_FTP_USER_KEY = "URFTPCREDENTIALS_USERNAME";
   private static final String UR_FTP_PASSWORD_KEY = "URFTPCREDENTIALS_PASSWORD";
   private static final String UR_FTP_CONNECTION_TIMEOUT_KEY = "UR_FTP_CONNECT_TIMEOUT_IN_MS";
-  private static final int UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
+  private static final int    UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
   private static final String UR_FTP_CHARSET_NAME_KEY = "UR_FTP_CHARSET";
-  private static final long UR_EXECUTION_ID_OFFSET = Long.MAX_VALUE / 2;
+  private static final long   UR_EXECUTION_ID_OFFSET = Long.MAX_VALUE / 2;
   private static final String UR_MAPPING_RULES_PROPERTIES_FILENAME = "ur_mapping_regler.properties";
   // =========================================================================
   // =========================================================================
 
   public enum CONSUMER_TYPE {
     OPPGAVE(
-        OPPGAVE_NAME
-        , OPPGAVE_WITHMOCK_KEY
-        , VIRKSOMHET_OPPGAVE_V3_ENDPOINTURL_KEY
-        , OPPGAVE_TJENESTEBESKRIVELSE
-        , OPPGAVE_TIMEOUT
-        , null
-        , null
-        , null
-        , null
+        OPPGAVE_NAME,
+        OPPGAVE_WITHMOCK_KEY,
+        VIRKSOMHET_OPPGAVE_V3_ENDPOINTURL_KEY,
+        OPPGAVE_TJENESTEBESKRIVELSE,
+        OPPGAVE_TIMEOUT,
+        null,
+        null,
+        null,
+        null
 
     ), OPPGAVE_BEHANDLING(
-        OPPGAVE_BEHANDLING_NAME
-        , OPPGAVEBEHANDLING_WITHMOCK_KEY
-        , VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL_KEY
-        , OPPGAVE_BEHANDLING_TJENESTEBESKRIVELSE
-        , OPPGAVE_BEHANDLING_TIMEOUT
-        , OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_KEY
-        , OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE
-        , OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_KEY
-        , OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE
+        OPPGAVE_BEHANDLING_NAME,
+        OPPGAVEBEHANDLING_WITHMOCK_KEY,
+        VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL_KEY,
+        OPPGAVE_BEHANDLING_TJENESTEBESKRIVELSE,
+        OPPGAVE_BEHANDLING_TIMEOUT,
+        OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_KEY,
+        OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE,
+        OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_KEY,
+        OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE
     );
 
     private final String name;
@@ -280,7 +283,7 @@ public class Constants {
   private static final String OPPGAVEBEHANDLING_WITHMOCK_KEY = "OPPGAVEBEHANDLING_WITHMOCK";
   private static final String VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL_KEY = "VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL";
   private static final String OPPGAVE_BEHANDLING_TJENESTEBESKRIVELSE = "OppgavebehandlingV3";
-  private static final int OPPGAVE_BEHANDLING_TIMEOUT = 120000;
+  private static final int    OPPGAVE_BEHANDLING_TIMEOUT = 120000;
   private static final String OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_KEY = "OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL";
   private static final String OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE = "50";
   private static final String OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_KEY = "OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL";

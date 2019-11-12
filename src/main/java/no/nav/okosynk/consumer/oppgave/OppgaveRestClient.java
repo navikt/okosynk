@@ -76,6 +76,20 @@ public class OppgaveRestClient {
     log.info("OppgaveRestClient konfigurert for {} og bruker {}", batchType, bruker);
   }
 
+  private static String getBatchBruker(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE  batchType) {
+
+    final String batchBruker =
+        okosynkConfiguration
+            .getString(
+                batchType.getBatchBrukerKey(),
+                batchType.getBatchBrukerDefaultValue()
+            );
+
+    return batchBruker;
+  }
+
   private FinnOppgaveResponse finnOppgaver(
       final String opprettetAv,
       final int limit,
@@ -123,6 +137,7 @@ public class OppgaveRestClient {
   }
 
   public ConsumerStatistics finnOppgaver(String opprettetAv, Set<Oppgave> oppgaver) {
+
     int limit = 20;
     int offset = 0;
     FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(opprettetAv, limit, offset);
@@ -142,7 +157,7 @@ public class OppgaveRestClient {
     log.info("Hentet {} unike oppgaver fra Oppgave", oppgaver.size());
 
     return ConsumerStatistics
-        .builder(this.batchType)
+        .builder(getBatchType())
         .antallOppgaverSomErHentetFraDatabasen(oppgaver.size())
         .build();
   }
@@ -197,7 +212,7 @@ public class OppgaveRestClient {
     });
 
     return ConsumerStatistics
-        .builder(this.batchType)
+        .builder(getBatchType())
         .antallOppgaverSomMedSikkerhetErOpprettet(opprettedeOppgaver.size())
         .antallOppgaverSomMedSikkerhetIkkeErOpprettet(oppgaverSomIkkeErOpprettet.size())
         .build();
@@ -208,7 +223,7 @@ public class OppgaveRestClient {
       final boolean ferdigstill) {
 
     if (oppgaver == null || oppgaver.isEmpty()) {
-      return ConsumerStatistics.zero(this.batchType);
+      return ConsumerStatistics.zero(getBatchType());
     }
 
     HttpPatch request = new HttpPatch(this.okosynkConfiguration.getRequiredString("OPPGAVE_URL"));
@@ -237,13 +252,13 @@ public class OppgaveRestClient {
 
     if (ferdigstill) {
       return ConsumerStatistics
-          .builder(this.batchType)
+          .builder(getBatchType())
           .antallOppgaverSomMedSikkerhetErFerdigstilt(suksess)
           .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(feilet)
           .build();
     } else {
       return ConsumerStatistics
-          .builder(this.batchType)
+          .builder(getBatchType())
           .antallOppgaverSomMedSikkerhetErOppdatert(suksess)
           .antallOppgaverSomMedSikkerhetIkkeErOppdatert(feilet)
           .build();
@@ -370,5 +385,10 @@ public class OppgaveRestClient {
     oppgaveDto.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
 
     return oppgaveDto;
+  }
+
+  public Constants.BATCH_TYPE getBatchType() {
+    final Constants.BATCH_TYPE  batchType = this.batchType;
+    return  batchType;
   }
 }

@@ -27,284 +27,295 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(Batch.class);
+  private static final Logger logger = LoggerFactory.getLogger(Batch.class);
 
-    private static final int UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT = 25000;
+  private static final int UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT = 25000;
 
-    private final IOkosynkConfiguration okosynkConfiguration;
-    final Constants.BATCH_TYPE batchType;
-    private final long executionId;
-    private BatchStatus status;
-    private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
+  private final IOkosynkConfiguration okosynkConfiguration;
+  final Constants.BATCH_TYPE batchType;
+  private final long executionId;
+  private BatchStatus status;
+  private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
 
-    private IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
-    private OppgaveSynkroniserer oppgaveSynkroniserer;
-    private IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
+  private IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
+  private OppgaveSynkroniserer oppgaveSynkroniserer;
+  private IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
 
-    public Batch(final IOkosynkConfiguration okosynkConfiguration,
-                 final Constants.BATCH_TYPE batchType,
-                 final long executionId,
-                 final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
-                 final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+  public Batch(final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE batchType,
+      final long executionId,
+      final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
+      final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
-        // Assume failure, set to ready by the descendant if successful:
-        this.setStatus(BatchStatus.FEIL);
+    // Assume failure, set to ready by the descendant if successful:
+    this.setStatus(BatchStatus.FEIL);
 
-        this.okosynkConfiguration         = okosynkConfiguration;
-        this.batchType                    = batchType;
-        this.executionId                  = executionId;
-        this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
-        this.spesifikkMeldingReader       = spesifikkMeldingReader;
-        this.oppgaveSynkroniserer         = new OppgaveSynkroniserer(this::getStatus, new OppgaveRestClient(okosynkConfiguration, batchType));
-        this.spesifikkMapper              = spesifikkMapper;
+    this.okosynkConfiguration = okosynkConfiguration;
+    this.batchType = batchType;
+    this.executionId = executionId;
+    this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
+    this.spesifikkMeldingReader = spesifikkMeldingReader;
+    this.oppgaveSynkroniserer = new OppgaveSynkroniserer(
+        okosynkConfiguration,
+        this::getStatus,
+        new OppgaveRestClient(okosynkConfiguration, batchType));
+    this.spesifikkMapper = spesifikkMapper;
 
-        this.setStatus(BatchStatus.READY);
-    }
+    this.setStatus(BatchStatus.READY);
+  }
 
-    @Override
-    public void run() {
-        MDC.put("batchnavn", getBatchName());
+  @Override
+  public void run() {
+    MDC.put("batchnavn", getBatchName());
 
-        final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
 
-        final CollectorRegistry registry = new CollectorRegistry();
+    final CollectorRegistry registry = new CollectorRegistry();
 
-        final Gauge oppgaverOpprettet = Gauge.build()
-                .name("okosynk_job_oppgaver_opprettet")
-                .help("Antall oppgaver opprettet")
-                .register(registry);
+    final Gauge oppgaverOpprettet = Gauge.build()
+        .name("okosynk_job_oppgaver_opprettet")
+        .help("Antall oppgaver opprettet")
+        .register(registry);
 
-        final Gauge oppgaverOppdatert = Gauge.build()
-                .name("okosynk_job_oppgaver_oppdatert")
-                .help("Antall oppgaver oppdatert")
-                .register(registry);
+    final Gauge oppgaverOppdatert = Gauge.build()
+        .name("okosynk_job_oppgaver_oppdatert")
+        .help("Antall oppgaver oppdatert")
+        .register(registry);
 
-        final Gauge oppgaverFerdigstilt = Gauge.build()
-                .name("okosynk_job_oppgaver_ferdigstilt")
-                .help("Antall oppgaver ferdigstilt")
-                .register(registry);
+    final Gauge oppgaverFerdigstilt = Gauge.build()
+        .name("okosynk_job_oppgaver_ferdigstilt")
+        .help("Antall oppgaver ferdigstilt")
+        .register(registry);
 
-        final Gauge duration = Gauge.build()
-                .name("okosynk_job_duration_seconds")
-                .help("Duration of okosynk batch job in seconds.")
-                .register(registry);
+    final Gauge duration = Gauge.build()
+        .name("okosynk_job_duration_seconds")
+        .help("Duration of okosynk batch job in seconds.")
+        .register(registry);
 
-        final Gauge.Timer durationTimer = duration.startTimer();
+    final Gauge.Timer durationTimer = duration.startTimer();
 
-        setStatus(BatchStatus.STARTET);
-        logger.info("Batch " + getBatchName() + " har startet.");
+    setStatus(BatchStatus.STARTET);
+    logger.info("Batch " + getBatchName() + " har startet.");
+    try {
+
+      final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
+      final int actualnumberOfOppgaverRetrievedFromBatchInput = alleOppgaverLestFraBatchen.size();
+      if (actualnumberOfOppgaverRetrievedFromBatchInput
+          > UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT) {
+        final String msg =
+            String.format(
+                  "Batch input innedholder %d oppgaver. "
+                + "Det største antallet okosynk er satt til å akseptere er %d oppgaver. "
+                + "Okosynk avbrytes.",
+                actualnumberOfOppgaverRetrievedFromBatchInput,
+                UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT
+            );
+        throw new RuntimeException(msg);
+      }
+
+      final ConsumerStatistics consumerStatistics =
+          getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
+
+      BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
+      setStatus(status);
+      logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
+
+      oppgaverOpprettet.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
+      oppgaverOppdatert.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
+      oppgaverFerdigstilt.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
+
+      final Gauge lastSuccess = Gauge.build()
+          .name("okosynk_batch_job_last_success_unixtime")
+          .help("Last time okosynk batch job succeeded, in unixtime.")
+          .register(registry);
+      lastSuccess.setToCurrentTime();
+    } catch (Throwable e) {
+      logger.error("Noe uventet har gått galt under kjøring av " + getBatchName() + ". ", e);
+      setStatus(BatchStatus.FEIL);
+      oppgaverOpprettet.set(0);
+      oppgaverOppdatert.set(0);
+      oppgaverFerdigstilt.set(0);
+    } finally {
+      durationTimer.setDuration();
+      String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
+
+      if (isNotBlank(pushGateway)) {
+        logger.info("Pusher metrikker til {}", pushGateway);
         try {
-
-            final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
-            final int actualnumberOfOppgaverRetrievedFromBatchInput = alleOppgaverLestFraBatchen.size();
-            if (actualnumberOfOppgaverRetrievedFromBatchInput > UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT) {
-                final String msg =
-                    String.format(
-                        "Batch input innedholder %d oppgaver. " +
-                        "Det største antallet okosynk er satt til å akseptere er %d oppgaver. " +
-                        "Okosynk avbrytes.",
-                        actualnumberOfOppgaverRetrievedFromBatchInput,
-                        UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT
-                    );
-                throw new RuntimeException(msg);
-            }
-
-            final ConsumerStatistics consumerStatistics =
-                getOppgaveSynkroniserer()
-                    .synkroniser(
-                        okosynkConfiguration,
-                        alleOppgaverLestFraBatchen,
-                        getBatchUser(okosynkConfiguration));
-
-            BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
-            setStatus(status);
-            logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
-
-            oppgaverOpprettet.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
-            oppgaverOppdatert.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
-            oppgaverFerdigstilt.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
-
-            final Gauge lastSuccess = Gauge.build()
-                    .name("okosynk_batch_job_last_success_unixtime")
-                    .help("Last time okosynk batch job succeeded, in unixtime.")
-                    .register(registry);
-            lastSuccess.setToCurrentTime();
-        } catch (Throwable e) {
-            logger.error("Noe uventet har gått galt under kjøring av " + getBatchName() + ". ", e);
-            setStatus(BatchStatus.FEIL);
-            oppgaverOpprettet.set(0);
-            oppgaverOppdatert.set(0);
-            oppgaverFerdigstilt.set(0);
-        } finally {
-            durationTimer.setDuration();
-            String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
-
-            if (isNotBlank(pushGateway)) {
-                logger.info("Pusher metrikker til {}", pushGateway);
-                try {
-                    new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods", Collections.singletonMap("cronjob", getBatchName()));
-                } catch (IOException e) {
-                    logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
-                }
-            } else {
-                logger.warn("Konfigurasjonsnøkkel PUSH_GATEWAY_ADDRESS mangler, får ikke pushet metrikker");
-            }
-
-            MDC.remove("batchnavn");
+          new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods",
+              Collections.singletonMap("cronjob", getBatchName()));
+        } catch (IOException e) {
+          logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
         }
+      } else {
+        logger.warn("Konfigurasjonsnøkkel PUSH_GATEWAY_ADDRESS mangler, får ikke pushet metrikker");
+      }
+
+      MDC.remove("batchnavn");
     }
+  }
 
-    public void setMeldingLinjeReader(final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader ) {
+  /**
+   * TODO: OBS! Is it possible to set a reader that conflicts with the batch type?
+   * @param uspesifikkMeldingLinjeReader
+   */
+  public void setMeldingLinjeReader(final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader) {
 
-        Validate.notNull(
-            uspesifikkMeldingLinjeReader,
-            "The parameter IMeldingLinjeFileReader supplied is null");
+    Validate.notNull(
+        uspesifikkMeldingLinjeReader,
+        "The parameter IMeldingLinjeFileReader supplied is null");
 
-        this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
-        setStatus(
-            (!IMeldingLinjeFileReader.Status.OK.equals(this.uspesifikkMeldingLinjeReader.getStatus()))
+    this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
+    setStatus(
+        (!IMeldingLinjeFileReader.Status.OK.equals(this.uspesifikkMeldingLinjeReader.getStatus()))
             ?
             BatchStatus.FEIL
             :
-            BatchStatus.READY
-        );
+                BatchStatus.READY
+    );
+  }
+
+  public synchronized void setStatus(final BatchStatus status) {
+    if (this.status != BatchStatus.STOPPET) {
+      this.status = status;
+    }
+  }
+
+  public String getBatchName() {
+    return getBatchType().getName();
+  }
+
+  private String getBatchUser(final IOkosynkConfiguration okosynkConfiguration) {
+
+    final String batchBruker =
+        okosynkConfiguration
+            .getString(
+                getBatchType().getBatchBrukerKey(),
+                getBatchType().getBatchBrukerDefaultValue()
+            );
+
+    return batchBruker;
+  }
+
+  public void stopp() {
+    setStatus(BatchStatus.STOPPET);
+  }
+
+
+  private void handterLinjeUnreadableException(LinjeUnreadableException e) {
+
+    logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
+        e);
+    setStatus(BatchStatus.FEIL);
+
+    throw new BatchExecutionException(e);
+  }
+
+  private void handterMeldingUnreadableException(final MeldingUnreadableException e) {
+
+    logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
+        e);
+    setStatus(BatchStatus.FEIL);
+
+    throw new BatchExecutionException(e);
+  }
+
+  private List<Oppgave> hentBatchOppgaver() {
+
+    logger.debug("Entering Batch.hentBatchOppgaver...");
+
+    final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
+    final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = opprettSpesifikkeMeldinger(
+        linjerMedUspesifikkeMeldinger);
+    final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
+
+    logger.debug("About to normally leave Batch.hentBatchOppgaver");
+
+    return batchOppgaver;
+  }
+
+  private List<String> hentLinjerMedUspesifikkeMeldinger() {
+
+    logger.debug("Entering Batch.hentLinjerMedUspesifikkeMeldinger...");
+
+    List<String> linjerMedUspesifikkeMeldinger = null;
+    try {
+      linjerMedUspesifikkeMeldinger = getUspesifikkMeldingLinjeReader().read();
+      logger.info(
+          "STATISTIKK: {} meldinger ble lest inn. Batch name: {}",
+          linjerMedUspesifikkeMeldinger.size(),
+          getBatchName());
+    } catch (LinjeUnreadableException e) {
+      handterLinjeUnreadableException(e);
     }
 
-    public synchronized void setStatus(final BatchStatus status) {
-        if (this.status != BatchStatus.STOPPET) {
-            this.status = status;
-        }
+    logger.debug("About to normally leave Batch.hentLinjerMedUspesifikkeMeldinger");
+
+    return linjerMedUspesifikkeMeldinger;
+  }
+
+  private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(
+      final List<String> linjerMedUspesifikkeMeldinger) {
+    logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
+
+    List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = null;
+    try {
+      spesifikkeMeldinger =
+          getSpesifikkMeldingReader()
+              .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
+                  linjerMedUspesifikkeMeldinger.stream());
+    } catch (MeldingUnreadableException e) {
+      handterMeldingUnreadableException(e);
     }
 
-    public String getBatchName() {
-        return getBatchType().getName();
-    }
+    logger.debug("About to normally leave Batch.opprettSpesifikkeMeldinger");
 
-    private String getBatchUser(final IOkosynkConfiguration okosynkConfiguration) {
+    return spesifikkeMeldinger;
+  }
 
-        final String batchBruker =
-            okosynkConfiguration
-                .getString(
-                    getBatchType().getBatchBrukerKey(),
-                    getBatchType().getBatchBrukerDefaultValue()
-                );
+  public BatchStatus getStatus() {
+    return status;
+  }
 
-        return batchBruker;
-    }
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
+  }
 
-    public void stopp() {
-        setStatus(BatchStatus.STOPPET);
-    }
+  private Constants.BATCH_TYPE getBatchType() {
+    return batchType;
+  }
 
 
-    private void handterLinjeUnreadableException(LinjeUnreadableException e) {
+  public long getExecutionId() {
+    return executionId;
+  }
 
-        logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.", e);
-        setStatus(BatchStatus.FEIL);
+  private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {
+    return uspesifikkMeldingLinjeReader;
+  }
 
-        throw new BatchExecutionException(e);
-    }
+  private IMeldingReader<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingReader() {
+    return spesifikkMeldingReader;
+  }
 
-    private void handterMeldingUnreadableException(final MeldingUnreadableException e) {
+  public void setSpesifikkMeldingReader(
+      IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader) {
+    this.spesifikkMeldingReader = spesifikkMeldingReader;
+  }
 
-        logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.", e);
-        setStatus(BatchStatus.FEIL);
+  private OppgaveSynkroniserer getOppgaveSynkroniserer() {
+    return oppgaveSynkroniserer;
+  }
 
-        throw new BatchExecutionException(e);
-    }
+  public void setOppgaveSynkroniserer(OppgaveSynkroniserer oppgaveSynkroniserer) {
+    this.oppgaveSynkroniserer = oppgaveSynkroniserer;
+  }
 
-    private List<Oppgave> hentBatchOppgaver() {
+  private IMeldingMapper<SPESIFIKKMELDINGTYPE> getSpesifikkMapper() {
+    return spesifikkMapper;
+  }
 
-        logger.debug("Entering Batch.hentBatchOppgaver...");
-
-        final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
-        final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
-        final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
-
-        logger.debug("About to normally leave Batch.hentBatchOppgaver");
-
-        return batchOppgaver;
-    }
-
-    private List<String> hentLinjerMedUspesifikkeMeldinger() {
-
-        logger.debug("Entering Batch.hentLinjerMedUspesifikkeMeldinger...");
-
-        List<String> linjerMedUspesifikkeMeldinger = null;
-        try {
-            linjerMedUspesifikkeMeldinger = getUspesifikkMeldingLinjeReader().read();
-            logger.info(
-                "STATISTIKK: {} meldinger ble lest inn. Batch name: {}",
-                linjerMedUspesifikkeMeldinger.size(),
-                getBatchName());
-        } catch (LinjeUnreadableException e) {
-            handterLinjeUnreadableException(e);
-        }
-
-        logger.debug("About to normally leave Batch.hentLinjerMedUspesifikkeMeldinger");
-
-        return linjerMedUspesifikkeMeldinger;
-    }
-
-    private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(final List<String> linjerMedUspesifikkeMeldinger) {
-        logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
-
-        List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = null;
-        try {
-            spesifikkeMeldinger =
-                getSpesifikkMeldingReader()
-                    .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(linjerMedUspesifikkeMeldinger.stream());
-        } catch (MeldingUnreadableException e) {
-            handterMeldingUnreadableException(e);
-        }
-
-        logger.debug("About to normally leave Batch.opprettSpesifikkeMeldinger");
-
-        return spesifikkeMeldinger;
-    }
-
-    public BatchStatus getStatus() {
-        return status;
-    }
-
-    public IOkosynkConfiguration getOkosynkConfiguration() {
-        return okosynkConfiguration;
-    }
-
-    private Constants.BATCH_TYPE getBatchType() {
-        return batchType;
-    }
-
-
-    public long getExecutionId() {
-        return executionId;
-    }
-
-    private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {
-        return uspesifikkMeldingLinjeReader;
-    }
-
-    private IMeldingReader<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingReader() {
-        return spesifikkMeldingReader;
-    }
-
-    public void setSpesifikkMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader) {
-        this.spesifikkMeldingReader = spesifikkMeldingReader;
-    }
-
-    private OppgaveSynkroniserer getOppgaveSynkroniserer() {
-        return oppgaveSynkroniserer;
-    }
-
-    public void setOppgaveSynkroniserer(OppgaveSynkroniserer oppgaveSynkroniserer) {
-        this.oppgaveSynkroniserer = oppgaveSynkroniserer;
-    }
-
-    private IMeldingMapper<SPESIFIKKMELDINGTYPE> getSpesifikkMapper() {
-        return spesifikkMapper;
-    }
-
-    public void setSpesifikkMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
-        this.spesifikkMapper = spesifikkMapper;
-    }
+  public void setSpesifikkMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+    this.spesifikkMapper = spesifikkMapper;
+  }
 }

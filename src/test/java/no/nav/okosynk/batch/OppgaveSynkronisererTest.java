@@ -2,15 +2,16 @@ package no.nav.okosynk.batch;
 //
 //import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyCollection;
 import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.*;
-//
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -37,17 +38,18 @@ import org.slf4j.LoggerFactory;
 //
 class OppgaveSynkronisererTest {
 
-  private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
+  private static final Logger logger =
+      LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
   private static final Logger enteringTestHeaderLogger =
       LoggerFactory.getLogger("EnteringTestHeader");
 
-  private static final Constants.BATCH_TYPE BATCH_TYPE =
-      Constants.BATCH_TYPE.OS;
+  public  static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
+  private static final Constants.BATCH_TYPE BATCH_TYPE = Constants.BATCH_TYPE.OS;
   private static final String OPPGAVEID_GSAK = "185587300";
   private static final String OPPGAVEID = "185587998";
   private static final String BRUKERID_GSAK = "10108000398";
   private static final String BRUKERID = "06025800174";
-  public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
+
   private static final IOkosynkConfiguration okosynkConfiguration =
       new FakeOkosynkConfiguration();
 
@@ -63,12 +65,16 @@ class OppgaveSynkronisererTest {
     mockedOppgaveRestClient = mock(OppgaveRestClient.class);
 
       this.oppgaveSynkronisererWithInjectedMocks =
-            new OppgaveSynkroniserer(this::getBatchStatus, mockedOppgaveRestClient);
+            new OppgaveSynkroniserer(
+                OppgaveSynkronisererTest.okosynkConfiguration,
+                this::getBatchStatus,
+                mockedOppgaveRestClient);
 
         this.batchStatus = BatchStatus.STARTET;
 
         final Set<Oppgave> oppgaveListe =
             lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
+
         when(
             this
                 .mockedOppgaveRestClient
@@ -102,6 +108,23 @@ class OppgaveSynkronisererTest {
 //        )
 //         */
         ;
+
+    when(
+        this
+            .mockedOppgaveRestClient
+            .getBatchType()
+    )
+        .thenReturn(
+            // TODO: As of now, just a placeholder:
+            OppgaveSynkronisererTest.BATCH_TYPE
+        )
+//        /*
+//        TODO: Quasi code for what is wanted as mock.
+//        .thenSetTheSeconParameterTo(
+//            oppgaveListe
+//        )
+//         */
+    ;
 //
 //        // =====================================================================
 //
@@ -114,40 +137,31 @@ class OppgaveSynkronisererTest {
   // =========================================================================
 
   @Test
-  void synkroniser_skal_hente_oppgaver_fra_oppgave_applikasjonen() {
+  void when_the_batch_is_started_when_synchronize_is_called_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() {
 
     enteringTestHeaderLogger.debug(null);
 
-    final String batchBruker = getBatchBruker(this.okosynkConfiguration);
+    final String batchBruker = getBatchBruker(OppgaveSynkronisererTest.okosynkConfiguration);
+    this.batchStatus = BatchStatus.STARTET;
     this.oppgaveSynkronisererWithInjectedMocks
-        .synkroniser(
-            this.okosynkConfiguration,
-            lagOppgaveliste(OPPGAVEID, BRUKERID),
-            batchBruker);
+        .synkroniser(lagOppgaveliste(OPPGAVEID, BRUKERID));
 
     final Set<Oppgave> funneOppgaver = new HashSet<>();
     verify(this.mockedOppgaveRestClient).finnOppgaver(batchBruker, funneOppgaver);
   }
 
-//    @Test
-//    @DisplayName("Hvis batchen er stoppet når synkroniser-metoden startes skal det ikke gjøres tjenestekall for patchOppgaver, opprettOppgaver eller oppdaterOppgaver")
-//    void synkroniserSkalIkkeKalleOppgavebehandlingHvisBatchErStoppet() {
-//
-//        enteringTestHeaderLogger.debug(null);
-//
-//        batchStatus = BatchStatus.STOPPET;
-//
-//        this.oppgaveSynkronisererWithInjectedMocks
-//            .synkroniser(
-//                this.okosynkConfiguration,
-//                lagOppgaveliste(OPPGAVEID, BRUKERID),
-//                BATCHBRUKER);
-//
-//        verify(mockedOppgaveBehandlingGateway, times(0)).patchOppgaver(       anyCollection());
-//        verify(mockedOppgaveBehandlingGateway, times(0)).opprettOppgaver    (any(), anyCollection());
-//        verify(mockedOppgaveBehandlingGateway, times(0)).oppdaterOppgaver   (any(), anyCollection());
-//    }
-//
+  @Test
+  void when_the_batch_is_stopped_when_synchronize_is_called_no_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() {
+
+    enteringTestHeaderLogger.debug(null);
+
+    this.batchStatus = BatchStatus.STOPPET;
+    this.oppgaveSynkronisererWithInjectedMocks
+        .synkroniser(lagOppgaveliste(OPPGAVEID, BRUKERID));
+    verify(this.mockedOppgaveRestClient, times(0)).patchOppgaver   (anySet(), anyBoolean());
+    verify(this.mockedOppgaveRestClient, times(0)).opprettOppgaver (anyCollection());
+  }
+
 //    @Test
 //    @DisplayName("Hvis batchen stoppes før oppretting av oppgaver starter skal det ikke gjøres tjenestekall for opprettOppgaver")
 //    void synkroniserSkalIkkeKalleOpprettHvisBatchStoppes() {
