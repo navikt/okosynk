@@ -106,7 +106,7 @@ public class OppgaveSynkroniserer {
   ) {
 
     final String bruker =
-        getBatchBruker(this.okosynkConfiguration, getBatchType());
+        OppgaveSynkroniserer.getBatchBruker(this.okosynkConfiguration, getBatchType());
 
     logger.info("Bruker {} forsøker å synkronisere {} oppgaver lest fra batch input.", bruker,
         alleOppgaverLestFraBatchenFuncParm.size());
@@ -119,7 +119,7 @@ public class OppgaveSynkroniserer {
     //     oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
     final ConsumerStatistics consumerStatistics_finn =
         getOppgaveRestClient()
-          .finnOppgaver(bruker, oppgaverLestFraDatabasen);
+          .finnOppgaver(oppgaverLestFraDatabasen);
 
     final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(
         alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);

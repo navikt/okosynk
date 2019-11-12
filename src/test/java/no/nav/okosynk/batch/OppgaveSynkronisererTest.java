@@ -64,60 +64,44 @@ class OppgaveSynkronisererTest {
 
     mockedOppgaveRestClient = mock(OppgaveRestClient.class);
 
-      this.oppgaveSynkronisererWithInjectedMocks =
-            new OppgaveSynkroniserer(
-                OppgaveSynkronisererTest.okosynkConfiguration,
-                this::getBatchStatus,
-                mockedOppgaveRestClient);
+    this.oppgaveSynkronisererWithInjectedMocks =
+        new OppgaveSynkroniserer(
+            OppgaveSynkronisererTest.okosynkConfiguration,
+            this::getBatchStatus,
+            mockedOppgaveRestClient);
 
-        this.batchStatus = BatchStatus.STARTET;
+    this.batchStatus = BatchStatus.STARTET;
 
-        final Set<Oppgave> oppgaveListe =
-            lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
+    final Set<Oppgave> oppgaveListe =
+        lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
 
-        when(
-            this
-                .mockedOppgaveRestClient
-                .finnOppgaver(anyString(), anySet())
-        )
+    when(this.mockedOppgaveRestClient.finnOppgaver(anySet()))
+      .thenReturn(
+          // TODO: As of now, just a placeholder:
+          ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
+      )
+    /*
+    TODO: Quasi code for what is wanted as mock.
+    .thenSetTheSeconParameterTo(
+        oppgaveListe
+    )
+    */
+    ;
+
+    when(this.mockedOppgaveRestClient.opprettOppgaver(anyCollection()))
         .thenReturn(
-            // TODO: As of now, just a placeholder:
             ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
         )
-        /*
-        TODO: Quasi code for what is wanted as mock.
-        .thenSetTheSeconParameterTo(
-            oppgaveListe
-        )
-         */
-        ;
+  //        /*
+  //        TODO: Quasi code for what is wanted as mock.
+  //        .thenSetTheSeconParameterTo(
+  //            oppgaveListe
+  //        )
+  //         */
+    ;
 
-        when(
-            this
-                .mockedOppgaveRestClient
-                .opprettOppgaver(anyCollection())
-        )
-            .thenReturn(
-                // TODO: As of now, just a placeholder:
-                ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
-            )
-//        /*
-//        TODO: Quasi code for what is wanted as mock.
-//        .thenSetTheSeconParameterTo(
-//            oppgaveListe
-//        )
-//         */
-        ;
-
-    when(
-        this
-            .mockedOppgaveRestClient
-            .getBatchType()
-    )
-        .thenReturn(
-            // TODO: As of now, just a placeholder:
-            OppgaveSynkronisererTest.BATCH_TYPE
-        )
+    when(this.mockedOppgaveRestClient.getBatchType())
+      .thenReturn(OppgaveSynkronisererTest.BATCH_TYPE)
 //        /*
 //        TODO: Quasi code for what is wanted as mock.
 //        .thenSetTheSeconParameterTo(
@@ -147,7 +131,7 @@ class OppgaveSynkronisererTest {
         .synkroniser(lagOppgaveliste(OPPGAVEID, BRUKERID));
 
     final Set<Oppgave> funneOppgaver = new HashSet<>();
-    verify(this.mockedOppgaveRestClient).finnOppgaver(batchBruker, funneOppgaver);
+    verify(this.mockedOppgaveRestClient).finnOppgaver(funneOppgaver);
   }
 
   @Test
