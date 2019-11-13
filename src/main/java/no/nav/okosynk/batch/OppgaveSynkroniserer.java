@@ -208,8 +208,11 @@ public class OppgaveSynkroniserer {
     } else {
       logger
           .info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
-      Set<Oppgave> oppdaterteOppgaver = oppgaveOppdateringer.stream()
-          .map(OppgaveOppdatering::oppdater).collect(Collectors.toSet());
+      final Set<Oppgave> oppdaterteOppgaver =
+          oppgaveOppdateringer
+              .stream()
+              .map(OppgaveOppdatering::oppdater)
+              .collect(Collectors.toSet());
       // consumerStatistics =
       //     oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
       consumerStatistics = getOppgaveRestClient().patchOppgaver(oppdaterteOppgaver, false);
@@ -320,8 +323,14 @@ public class OppgaveSynkroniserer {
       //Ta vare på ti tegn av oppgavebeskrivelsen
       // lagt til av brukere fra Pesys. De 10 tegnene brukes til koder
       // som sier hvorfor de ikke har lukket oppgaven enda.
-      final String[] beskrivelseFelter = oppgaveLestFraDatabasen.beskrivelse.split(";");
-      final String kode = beskrivelseFelter.length > 2 ? substring(beskrivelseFelter[1], 0, 10) : "";
+      final String[] beskrivelseFelter =
+          oppgaveLestFraDatabasen.beskrivelse.split(";");
+      final String kode =
+          beskrivelseFelter.length > 2
+          ?
+          substring(beskrivelseFelter[1], 0, 10)
+          :
+          "";
 
       return oppgaveLestFraBatchen.beskrivelse.replaceFirst(";;", ";" + kode + ";");
     }

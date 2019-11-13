@@ -146,6 +146,19 @@ public class OppgaveRestClient {
         .build();
   }
 
+  /**
+   * Update a collection of oppgaver by
+   * calling the Oppgave application's REST interface.
+   * @param oppgaver    The oppgaver to be updated.
+   * @param ferdigstill If <code>false</code>, the update changes
+   *                    a few selected fields (typically beskrivelse),
+   *                    but the oppgave status is kept as is. <BR/>
+   *                    If <code>true</code>, the update behaves
+   *                    as if it were <code>false</code>,
+   *                    but the oppgave status is set to ferdigstilt.
+   *
+   * @return The metrics of the update.
+   */
   public ConsumerStatistics patchOppgaver(
       final Set<Oppgave> oppgaver,
       final boolean      ferdigstill) {
@@ -159,12 +172,16 @@ public class OppgaveRestClient {
     request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
     request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
     try {
-      request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
+      request.addHeader(
+          new BasicScheme(UTF_8)
+              .authenticate(credentials, request, null)
+      );
     } catch (AuthenticationException e) {
       throw new IllegalStateException(e);
     }
 
-    final List<List<Oppgave>> oppgaverLister = delOppListe(new ArrayList<>(oppgaver), 500);
+    final List<List<Oppgave>> oppgaverLister =
+        delOppListe(new ArrayList<>(oppgaver), 500);
 
     log.info(
         "Starter patching av oppgaver, sublistestørrelse: "
