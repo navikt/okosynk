@@ -1,43 +1,31 @@
 package no.nav.okosynk.batch;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.*;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyCollection;
 import static org.mockito.Mockito.verify;
 
-import au.com.dius.pact.consumer.dsl.Matchers;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-//import java.util.List;
 import java.util.List;
 import java.util.Set;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
-//import no.nav.okosynk.consumer.oppgave.IOppgaveConsumerGateway;
-//import no.nav.okosynk.consumer.oppgavebehandling.IOppgaveBehandlingConsumerGateway;
-//import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-//import org.mockito.Mockito;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;

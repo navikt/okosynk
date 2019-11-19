@@ -26,7 +26,9 @@ public class FakeOkosynkConfiguration
     @Override
     public String getRequiredString(final String key) {
 
-        return System.getProperty(key);
+        final String value = System.getProperty(key);
+        assert (value != null) : "There is no system property set for the key " + key;
+        return value;
     }
 
     @Override
@@ -41,7 +43,7 @@ public class FakeOkosynkConfiguration
     }
 
     @Override
-    public String getString(String key) {
+    public String getString(final String key) {
 
         return System.getProperty(key);
     }

@@ -393,16 +393,15 @@ public abstract class AbstractMeldingLinjeFtpReaderTest
             final String sftpPassword = testDatum.getValue2();
             final Boolean shouldThrow = testDatum.getValue3();
 
-            logger.debug(
+            final String testDetails =
                 System.lineSeparator()
-                    + "About to test"                  + System.lineSeparator()
-                    + "============="                  + System.lineSeparator()
+                    + "Test details"                   + System.lineSeparator()
+                    + "=============="                 + System.lineSeparator()
                     + "sftpHostUri  : " + sftpHostUri  + System.lineSeparator()
                     + "sftpUser     : " + sftpUser     + System.lineSeparator()
                     + "sftpPassword : " + sftpPassword + System.lineSeparator()
                     + "shouldThrow  : " + shouldThrow  + System.lineSeparator()
-                    + System.lineSeparator()
-            );
+                    + System.lineSeparator();
 
             if (sftpHostUri == null) {
                 this.okosynkConfiguration.clearSystemProperty(FTP_HOST_URL_KEY);
@@ -424,7 +423,7 @@ public abstract class AbstractMeldingLinjeFtpReaderTest
                 Assertions.assertThrows(
                     IllegalArgumentException.class,
                     () -> getCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName),
-                    "Enough system properties not set. Creation of <OS/UR>MeldingLinjeFtpReader should have thrown."
+                    "Enough system properties not set. Creation of <OS/UR>MeldingLinjeFtpReader should have thrown." + System.lineSeparator() + testDetails
                 );
             } else {
                 try {

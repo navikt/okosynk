@@ -1,7 +1,18 @@
 package no.nav.okosynk.consumer.aktoer;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.Instant;
+
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.STSOidcResponse;
@@ -17,98 +28,96 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Instant;
+class OidcStsClient {
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+  private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
+  private final CloseableHttpClient httpClient;
+  private final URI endpointUri;
+  private final UsernamePasswordCredentials credentials;
+  private final String batchBruker;
+  private String oidcToken;
 
-public class OidcStsClient {
-    private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
-    private final CloseableHttpClient httpClient;
-    private final URI endpointURI;
-    private final UsernamePasswordCredentials credentials;
-    private final String batchBruker;
-    private String oidcToken;
+  OidcStsClient(IOkosynkConfiguration okosynkConfiguration, Constants.BATCH_TYPE batchType) {
+    this.batchBruker = okosynkConfiguration
+        .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+    this.credentials = new UsernamePasswordCredentials(this.batchBruker,
+        okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
 
-    public OidcStsClient(IOkosynkConfiguration okosynkConfiguration, Constants.BATCH_TYPE batchType) {
-        this.batchBruker = okosynkConfiguration.getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
-        this.credentials = new UsernamePasswordCredentials(this.batchBruker, okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
-
-        try {
-            this.endpointURI = new URIBuilder(okosynkConfiguration.getRequiredString("REST_STS_URL"))
-                    .addParameter("grant_type", "client_credentials")
-                    .addParameter("scope", "openid")
-                    .build();
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("Klarte ikke bygge opp URI for STS kall", e);
-        }
-
-        this.httpClient = HttpClients.createDefault();
-        this.oidcToken = getTokenFromSTS();
+    try {
+      this.endpointUri = new URIBuilder(okosynkConfiguration.getRequiredString("REST_STS_URL"))
+          .addParameter("grant_type", "client_credentials")
+          .addParameter("scope", "openid")
+          .build();
+    } catch (URISyntaxException e) {
+      throw new IllegalStateException("Klarte ikke bygge opp URI for STS kall", e);
     }
 
-    public String getOidcToken() {
-        if (isExpired(oidcToken)) {
-            log.info("OIDC Token for {} expired, getting a new one from the STS", this.batchBruker);
-            oidcToken = getTokenFromSTS();
-        }
+    this.httpClient = HttpClients.createDefault();
+    this.oidcToken = getTokenFromSts();
+  }
 
-        return oidcToken;
+  String getOidcToken() {
+    if (isExpired(oidcToken)) {
+      log.info("OIDC Token for {} expired, getting a new one from the STS", this.batchBruker);
+      oidcToken = getTokenFromSts();
     }
 
-    private boolean isExpired(String oidcToken) {
-        ObjectMapper mapper = new ObjectMapper();
+    return oidcToken;
+  }
 
-        try {
-            String tokenBody = new String(java.util.Base64.getDecoder().decode(substringBetween(oidcToken, ".")));
-            JsonNode node = mapper.readTree(tokenBody);
+  private boolean isExpired(String oidcToken) {
+    ObjectMapper mapper = new ObjectMapper();
 
-            Instant now = Instant.now();
-            Instant expiry = Instant.ofEpochSecond(node.get("exp").longValue()).minusSeconds(300);//5 min timeskew
+    try {
+      String tokenBody = new String(
+          java.util.Base64.getDecoder().decode(substringBetween(oidcToken, ".")));
+      JsonNode node = mapper.readTree(tokenBody);
 
-            if (now.isAfter(expiry)) {
-                log.info("OIDC token expired {} is after {}", now, expiry);
-                return true;
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException("Klarte ikke parse oidc token fra STS", e);
-        }
+      Instant now = Instant.now();
+      Instant expiry = Instant.ofEpochSecond(node.get("exp").longValue())
+          .minusSeconds(300);//5 min timeskew
 
-        return false;
+      if (now.isAfter(expiry)) {
+        log.info("OIDC token expired {} is after {}", now, expiry);
+        return true;
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Klarte ikke parse oidc token fra STS", e);
     }
 
-    private String getTokenFromSTS() {
-        log.info("henter OIDC Token for {}.", this.batchBruker);
-        HttpGet request = new HttpGet(this.endpointURI);
-        request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
+    return false;
+  }
 
-        try {
-            request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
-        } catch (AuthenticationException e) {
-            throw new IllegalStateException(e);
-        }
+  private String getTokenFromSts() {
+    log.info("henter OIDC Token for {}.", this.batchBruker);
+    HttpGet request = new HttpGet(this.endpointUri);
+    request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
 
-        try (CloseableHttpResponse response = httpClient.execute(request)) {
-            StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() != 200) {
-                throw new IllegalStateException(String.format("Feil oppsto under henting av token fra STS - %s", statusLine.getReasonPhrase()));
-            }
-
-            STSOidcResponse stsOidcResponse;
-            try {
-                stsOidcResponse = new ObjectMapper().readValue(response.getEntity().getContent(), STSOidcResponse.class);
-            } catch (IOException e) {
-                throw new IllegalStateException("Klarte ikke deserialisere respons fra STS", e);
-            }
-
-            return stsOidcResponse.getAccess_token();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+    try {
+      request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
+    } catch (AuthenticationException e) {
+      throw new IllegalStateException(e);
     }
+
+    try (CloseableHttpResponse response = httpClient.execute(request)) {
+      StatusLine statusLine = response.getStatusLine();
+      if (statusLine.getStatusCode() != 200) {
+        throw new IllegalStateException(String
+            .format("Feil oppsto under henting av token fra STS - %s",
+                statusLine.getReasonPhrase()));
+      }
+
+      STSOidcResponse stsOidcResponse;
+      try {
+        stsOidcResponse = new ObjectMapper()
+            .readValue(response.getEntity().getContent(), STSOidcResponse.class);
+      } catch (IOException e) {
+        throw new IllegalStateException("Klarte ikke deserialisere respons fra STS", e);
+      }
+
+      return stsOidcResponse.getAccess_token();
+    } catch (Exception e) {
+      throw new IllegalStateException(e);
+    }
+  }
 }

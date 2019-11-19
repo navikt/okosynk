@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
-
+import java.util.concurrent.atomic.AtomicLong;
 import no.nav.okosynk.config.*;
+import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.os.OsMelding;
@@ -18,7 +19,6 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Disabled
 class OsServiceTest {
 
     private static final Logger enteringTestHeaderLogger =
@@ -39,7 +39,7 @@ class OsServiceTest {
     private IOkosynkConfiguration okosynkConfiguration;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         this.okosynkConfiguration = new FakeOkosynkConfiguration();
 
@@ -49,79 +49,96 @@ class OsServiceTest {
     }
 
     @Test
-    public void opprettOsBatchLeggerBatchTilIRepository() throws MeldingUnreadableException {
+    public void when_a_batch_is_successfully_created_it_should_be_found_in_the_batch_repository() throws MeldingUnreadableException {
 
         enteringTestHeaderLogger.debug(null);
 
-        final Batch<? extends AbstractMelding> osBatch = osService.createAndConfigureBatch(this.okosynkConfiguration);
+        System.setProperty("REST_STS_URL", "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
+        System.setProperty("OSFTPBASEURL_URL", "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input");
+        System.setProperty("OSFTPCREDENTIALS_USERNAME", "someShitUserIdNotBeingUsedByNeitherThisOrThat");
+        System.setProperty("OSFTPCREDENTIALS_PASSWORD", "someShitPasswordNotBeingUsedByNeitherThisOrThat");
+
+        final OsService mockedOsService = mock(OsService.class);
+        when(mockedOsService.createAndConfigureBatch(any())).thenCallRealMethod();
+        when(mockedOsService.getNextExecutionId()).thenReturn(new AtomicLong());
+        when(mockedOsService.getBatchType()).thenReturn(BATCH_TYPE.OS);
+        when(mockedOsService.getBatchRepository()).thenReturn(new BatchRepository());
+
+        final Batch<? extends AbstractMelding> osBatch =
+            mockedOsService.createAndConfigureBatch(this.okosynkConfiguration);
 
         assertNotNull(osBatch);
-        assertTrue(batchRepository.hentBatch(osBatch.getExecutionId()).isPresent(), "Batchen finnes ikke i repositoryet");
+        assertTrue(
+            batchRepository
+                .hentBatch(osBatch.getExecutionId())
+                .isPresent(),
+            "Batchen finnes ikke i repositoryet"
+        );
     }
 
     @Test
-    public void stoppBatchReturnererFalseForIkkeEksisterendeBatch() {
+    void stoppBatchReturnererFalseForIkkeEksisterendeBatch() {
 
         enteringTestHeaderLogger.debug(null);
 
         assertFalse(osService.stoppBatch(), "En ikke-eksisterende batch har blitt stoppet");
     }
 
+//    @Test
+//    void batchStatusEtterKallTilStoppBatchErStoppet() throws MeldingUnreadableException {
+//
+//        enteringTestHeaderLogger.debug(null);
+//
+//        final Batch<? extends AbstractMelding> osBatch = osService.createAndConfigureBatch(this.okosynkConfiguration);
+//        osBatch.setStatus(BatchStatus.STARTET);
+//        osService.stoppBatch();
+//        BatchStatus batchStatus = osService.pollBatch(osBatch.getExecutionId()).get();
+//
+//        assertEquals(BatchStatus.STOPPET, batchStatus);
+//    }
+
     @Test
-    public void batchStatusEtterKallTilStoppBatchErStoppet() throws MeldingUnreadableException {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final Batch<? extends AbstractMelding> osBatch = osService.createAndConfigureBatch(this.okosynkConfiguration);
-        osBatch.setStatus(BatchStatus.STARTET);
-        osService.stoppBatch();
-        BatchStatus batchStatus = osService.pollBatch(osBatch.getExecutionId()).get();
-
-        assertEquals(BatchStatus.STOPPET, batchStatus);
-    }
-
-    @Test
-    public void batchSomIkkeHarStartetHarIkkeStatus() {
+    void batchSomIkkeHarStartetHarIkkeStatus() {
         assertFalse(osService.pollBatch(-1).isPresent(), "En batch som ikke har startet finnes i repositoryet");
     }
 
-    @Test
-    public void startAlleredeStartetBatchStopperOpprinneligBatch() throws MeldingUnreadableException {
+//    @Test
+//    void startAlleredeStartetBatchStopperOpprinneligBatch() throws MeldingUnreadableException {
+//
+//        enteringTestHeaderLogger.debug(null);
+//
+//        final long eksekveringsId = osService.startBatchAsynchronously();
+//
+//        osService.startBatchAsynchronously();
+//
+//        assertEquals(BatchStatus.STOPPET, osService.pollBatch(eksekveringsId).get());
+//    }
 
-        enteringTestHeaderLogger.debug(null);
+//    @Test
+//    void batchSomHarKjortHarStatusFullfort() throws InterruptedException, MeldingUnreadableException {
+//
+//        enteringTestHeaderLogger.debug(null);
+//
+//        setUpBatchFullfortMock(this.okosynkConfiguration);
+//        final long eksekveringsId = osService.startBatchAsynchronously();
+//
+//        sleep(250);
+//
+//        assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, osService.pollBatch(eksekveringsId).get());
+//    }
 
-        final long eksekveringsId = osService.startBatchAsynchronously();
-
-        osService.startBatchAsynchronously();
-
-        assertEquals(BatchStatus.STOPPET, osService.pollBatch(eksekveringsId).get());
-    }
-
-    @Test
-    public void batchSomHarKjortHarStatusFullfort() throws InterruptedException, MeldingUnreadableException {
-
-        enteringTestHeaderLogger.debug(null);
-
-        setUpBatchFullfortMock(this.okosynkConfiguration);
-        final long eksekveringsId = osService.startBatchAsynchronously();
-
-        sleep(250);
-
-        assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, osService.pollBatch(eksekveringsId).get());
-    }
-
-    @Test
-    public void pollBatchReturnererBatchStatusForEksekveringsIdSomErIBruk() throws MeldingUnreadableException {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final Batch<? extends AbstractMelding> osBatch = osService.createAndConfigureBatch(this.okosynkConfiguration);
-        osBatch.setStatus(BatchStatus.STARTET);
-
-        final Optional<BatchStatus> batchStatus = osService.pollBatch(osBatch.getExecutionId());
-
-        assertTrue(batchStatus.isPresent(), "PollBatch fant ikke batchstatus for batch med eksekveringsid som er i bruk");
-    }
+//    @Test
+//    void pollBatchReturnererBatchStatusForEksekveringsIdSomErIBruk() throws MeldingUnreadableException {
+//
+//        enteringTestHeaderLogger.debug(null);
+//
+//        final Batch<? extends AbstractMelding> osBatch = osService.createAndConfigureBatch(this.okosynkConfiguration);
+//        osBatch.setStatus(BatchStatus.STARTET);
+//
+//        final Optional<BatchStatus> batchStatus = osService.pollBatch(osBatch.getExecutionId());
+//
+//        assertTrue(batchStatus.isPresent(), "PollBatch fant ikke batchstatus for batch med eksekveringsid som er i bruk");
+//    }
 
     private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
 

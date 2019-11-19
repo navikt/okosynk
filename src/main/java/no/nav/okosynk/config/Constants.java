@@ -292,15 +292,15 @@ public class Constants {
   // ==========================================================================================================================
   public static final String OKOSYNK_SHOULD_RUN_DRY_KEY = "OKOSYNK_SHOULD_RUN_DRY";
   public static final boolean OKOSYNK_SHOULD_RUN_DRY_DEFAULT_VALUE = false;
-  public static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
-  public static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
+         static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
+         static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
   public static final String SHOULD_USE_SOAP_KEY = "SHOULD_USE_SOAP";
-  public static final String SRVBOKOSYNK_USERNAME_KEY = "SRVBOKOSYNK_USERNAME";
-  public static final String SRVBOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.username";
-  public static final String SRVBOKOSYNK_PASSWORD_KEY = "SRVBOKOSYNK_PASSWORD";
-  public static final String SYSTEM_USER_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.password";
-  public static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
-  public static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
+         static final String SRVBOKOSYNK_USERNAME_KEY = "SRVBOKOSYNK_USERNAME";
+         static final String SRVBOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.username";
+         static final String SRVBOKOSYNK_PASSWORD_KEY = "SRVBOKOSYNK_PASSWORD";
+         static final String SYSTEM_USER_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.password";
+         static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
+         static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
   public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
 
   public enum FTP_PROTOCOL {

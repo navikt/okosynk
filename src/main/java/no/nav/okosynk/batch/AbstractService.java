@@ -27,9 +27,10 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   private final BatchRepository batchRepository;
   private final AtomicLong nextExecutionId;
 
-  protected AbstractService(final Constants.BATCH_TYPE batchType,
+  protected AbstractService(
+      final Constants.BATCH_TYPE  batchType,
       final IOkosynkConfiguration okosynkConfiguration,
-      final BatchRepository batchRepository) {
+      final BatchRepository       batchRepository) {
 
     this.batchType = batchType;
     this.okosynkConfiguration = okosynkConfiguration;
@@ -156,7 +157,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return batchRepository;
   }
 
-  private AtomicLong getNextExecutionId() {
+  AtomicLong getNextExecutionId() {
     return nextExecutionId;
   }
 

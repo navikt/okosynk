@@ -1,6 +1,5 @@
 package no.nav.okosynk.io;
 
-import java.net.URL;
 import java.util.List;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
@@ -10,99 +9,106 @@ import org.slf4j.LoggerFactory;
 public class MeldingLinjeReaderWrapper
     implements IMeldingLinjeFileReader {
 
-    private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeReaderWrapper.class);
+  private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeReaderWrapper.class);
 
-    public IMeldingLinjeFileReader getWrappedMeldingLinjeFileReader() {
-        return wrappedMeldingLinjeFileReader;
+  IMeldingLinjeFileReader getWrappedMeldingLinjeFileReader() {
+    return wrappedMeldingLinjeFileReader;
+  }
+
+  public Constants.BATCH_TYPE getBatchType() {
+    return batchType;
+  }
+
+  private final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
+  private final Constants.BATCH_TYPE batchType;
+
+  // =========================================================================
+
+  private boolean shouldUseSftp(final IOkosynkConfiguration okosynkConfiguration) {
+    return AbstractMeldingLinjeFtpOrSftpReader.shouldUseSftp(
+        okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
+    );
+  }
+
+  private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
+      throws LinjeUnreadableException {
+    return AbstractMeldingLinjeFtpOrSftpReader.getFtpInputFilePath(
+        okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
+    );
+  }
+
+  // =========================================================================
+  public MeldingLinjeReaderWrapper(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE batchType) {
+
+    this.batchType = batchType;
+
+    final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
+    try {
+      wrappedMeldingLinjeFileReader = createMeldingLinjeReader(okosynkConfiguration);
+    } catch (LinjeUnreadableException e) {
+      throw new RuntimeException("Could not create wrappedMeldingLinjeFileReader", e);
     }
 
-    public Constants.BATCH_TYPE getBatchType() {
-        return batchType;
+    this.wrappedMeldingLinjeFileReader = wrappedMeldingLinjeFileReader;
+  }
+  // =========================================================================
+
+  @Override
+  public List<String> read() throws LinjeUnreadableException {
+    return getWrappedMeldingLinjeFileReader().read();
+  }
+
+  @Override
+  public Status getStatus() {
+    return getWrappedMeldingLinjeFileReader().getStatus();
+  }
+
+  // =========================================================================
+
+  private IMeldingLinjeFileReader createMeldingLinjeReader(
+      final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
+
+    final IMeldingLinjeFileReader meldingLinjeFileReader;
+
+    final String fullyQualifiedInputFileName = getFtpInputFilePath(okosynkConfiguration);
+
+    if (shouldUseSftp(okosynkConfiguration)) {
+      logger.info("Using SFTP for " + this.getClass().getSimpleName()
+          + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
+      meldingLinjeFileReader = createMeldingLinjeSftpReader(okosynkConfiguration,
+          fullyQualifiedInputFileName);
+    } else {
+      logger.info("Using FTP for " + this.getClass().getSimpleName()
+          + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
+      meldingLinjeFileReader = createMeldingLinjeFtpReader(okosynkConfiguration,
+          fullyQualifiedInputFileName);
     }
 
-    private final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
-    final Constants.BATCH_TYPE batchType;
+    return meldingLinjeFileReader;
+  }
 
-    // =========================================================================
+  private IMeldingLinjeFileReader createMeldingLinjeSftpReader(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final String fullyQualifiedInputFileName) {
 
-    private boolean shouldUseSftp(final IOkosynkConfiguration okosynkConfiguration) {
-        return AbstractMeldingLinjeFtpOrSftpReader.shouldUseSftp(
-                okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
-            );
-    }
+    return new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(),
+        fullyQualifiedInputFileName);
+  }
 
-    private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
-        return AbstractMeldingLinjeFtpOrSftpReader.getFtpInputFilePath(
-            okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
-        );
-    }
+  private IMeldingLinjeFileReader createMeldingLinjeFtpReader(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final String fullyQualifiedInputFileName) {
 
-    // =========================================================================
-    public MeldingLinjeReaderWrapper(
-          final IOkosynkConfiguration okosynkConfiguration
-        , final Constants.BATCH_TYPE  batchType) {
+    return new MeldingLinjeFtpReader(okosynkConfiguration, getBatchType(),
+        fullyQualifiedInputFileName);
+  }
 
-        this.batchType = batchType;
+  private String getFtpHostUrl(final IOkosynkConfiguration okosynkConfiguration) {
 
-        final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
-        try {
-            wrappedMeldingLinjeFileReader = createMeldingLinjeReader(okosynkConfiguration);
-        } catch (LinjeUnreadableException e) {
-            throw new RuntimeException("Could not create wrappedMeldingLinjeFileReader", e);
-        }
+    final String ftpHostUrl = okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey());
 
-        this.wrappedMeldingLinjeFileReader = wrappedMeldingLinjeFileReader;
-    }
-    // =========================================================================
-
-    @Override
-    public List<String> read() throws LinjeUnreadableException {
-        return getWrappedMeldingLinjeFileReader().read();
-    }
-
-    @Override
-    public Status getStatus() {
-        return getWrappedMeldingLinjeFileReader().getStatus();
-    }
-
-    // =========================================================================
-
-    private IMeldingLinjeFileReader createMeldingLinjeReader(
-        final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
-
-        final IMeldingLinjeFileReader meldingLinjeFileReader;
-
-        final String fullyQualifiedInputFileName = getFtpInputFilePath(okosynkConfiguration);
-
-        if (shouldUseSftp(okosynkConfiguration)) {
-            logger.info("Using SFTP for " + this.getClass().getSimpleName() + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
-            meldingLinjeFileReader = createMeldingLinjeSftpReader(okosynkConfiguration, fullyQualifiedInputFileName);
-        } else {
-            logger.info("Using FTP for " + this.getClass().getSimpleName() + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
-            meldingLinjeFileReader = createMeldingLinjeFtpReader(okosynkConfiguration, fullyQualifiedInputFileName);
-        }
-
-        return meldingLinjeFileReader;
-    }
-
-    private IMeldingLinjeFileReader createMeldingLinjeSftpReader(
-        final IOkosynkConfiguration okosynkConfiguration,
-        final String                fullyQualifiedInputFileName) {
-
-        return new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(), fullyQualifiedInputFileName);
-    }
-
-    private IMeldingLinjeFileReader createMeldingLinjeFtpReader (
-        final IOkosynkConfiguration okosynkConfiguration,
-        final String                fullyQualifiedInputFileName) {
-
-        return new MeldingLinjeFtpReader(okosynkConfiguration, getBatchType(), fullyQualifiedInputFileName);
-    }
-
-    private String  getFtpHostUrl(final IOkosynkConfiguration okosynkConfiguration) {
-
-        final String ftpHostUrl = okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey());
-
-        return ftpHostUrl;
-    }
+    return ftpHostUrl;
+  }
 }

@@ -31,6 +31,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.domain.Oppgave;
+import org.apache.http.HttpRequest;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -59,12 +60,13 @@ public class OppgaveRestClient {
 
   public OppgaveRestClient(
       final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType) {
+      final Constants.BATCH_TYPE  batchType) {
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
 
-    final String bruker = okosynkConfiguration
-        .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+    final String bruker =
+        okosynkConfiguration
+          .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
     this.credentials =
         new UsernamePasswordCredentials(
             bruker,
@@ -92,8 +94,9 @@ public class OppgaveRestClient {
 
   public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
 
-    final HttpPost request = new HttpPost(getOkosynkConfiguration().getRequiredString("OPPGAVE_URL"));
-    request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
+    final HttpPost request =
+        new HttpPost(getOkosynkConfiguration().getRequiredString("OPPGAVE_URL"));
+    addCorrelationIdToHttpRequest(request);
     request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
     request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
     try {
@@ -167,8 +170,9 @@ public class OppgaveRestClient {
       return ConsumerStatistics.zero(getBatchType());
     }
 
-    final HttpPatch request = new HttpPatch(getOkosynkConfiguration().getRequiredString("OPPGAVE_URL"));
-    request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
+    final HttpPatch request =
+        new HttpPatch(getOkosynkConfiguration().getRequiredString("OPPGAVE_URL"));
+    addCorrelationIdToHttpRequest(request);
     request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
     request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
     try {
@@ -222,7 +226,7 @@ public class OppgaveRestClient {
         OppgaveRestClient.getBatchBruker(getOkosynkConfiguration(), getBatchType());
 
     final int limit = 20;
-          int offset = 0;
+    int offset = 0;
     FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(opprettetAv, limit, offset);
     log.info("Starter inkrementelt søk i oppgaver mot Oppgave API. Fant totalt {} oppgaver",
         finnOppgaveResponse.getAntallTreffTotalt());
@@ -427,4 +431,7 @@ public class OppgaveRestClient {
     return this.okosynkConfiguration;
   }
 
+  private void addCorrelationIdToHttpRequest(final HttpRequest httpRequest) {
+    httpRequest.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
+  }
 }

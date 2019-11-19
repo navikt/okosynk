@@ -14,7 +14,7 @@ import no.nav.okosynk.domain.ur.UrMeldingReader;
 public class UrService extends AbstractService<UrMelding> {
 
     public UrService(final IOkosynkConfiguration okosynkConfiguration,
-                     final BatchRepository batchRepository) {
+                     final BatchRepository       batchRepository) {
 
         super(Constants.BATCH_TYPE.UR, okosynkConfiguration, batchRepository);
     }
