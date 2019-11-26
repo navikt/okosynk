@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -258,6 +259,7 @@ public class OppgaveDto {
 
   @JsonIgnore
   @JsonProperty("opprettetTidspunkt")
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getOpprettetTidspunkt() {
     return opprettetTidspunkt;
   }
@@ -288,6 +290,7 @@ public class OppgaveDto {
 
   @JsonIgnore
   @JsonProperty("endretTidspunkt")
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getEndretTidspunkt() {
     return endretTidspunkt;
   }
@@ -298,6 +301,7 @@ public class OppgaveDto {
 
   @JsonIgnore
   @JsonProperty("ferdigstiltTidspunkt")
+  @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getFerdigstiltTidspunkt() {
     return ferdigstiltTidspunkt;
   }

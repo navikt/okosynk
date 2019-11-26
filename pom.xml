@@ -29,7 +29,7 @@
     <commons-cli.version>1.4</commons-cli.version>
     <commons.beanutils.version>1.9.3</commons.beanutils.version>
     <httpclient.version>4.5.8</httpclient.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.10.1</jackson.version>
 
     <jsoup.version>1.11.2</jsoup.version>
     <slf4j.version>1.7.26</slf4j.version>
@@ -179,6 +179,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
       <version>${jackson.version}</version>
     </dependency>
 
