@@ -10,7 +10,7 @@ import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
-import no.nav.okosynk.io.LinjeUnreadableException;
+import no.nav.okosynk.io.OkosynkIoException;
 import org.junit.jupiter.api.BeforeEach;
 
 class UrBatchTest extends AbstractBatchTest<UrMelding> {
@@ -21,7 +21,14 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
     // =========================================================================
     @BeforeEach
-    void setUp() throws MeldingUnreadableException, LinjeUnreadableException {
+    void setUp() throws MeldingUnreadableException, OkosynkIoException {
+
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+            "2");
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+            "1000");
         this.setMeldingReader(mock(UrMeldingReader.class));
         this.setMeldingMapper(mock(UrMapper.class));
         //this.setInputFilePath();

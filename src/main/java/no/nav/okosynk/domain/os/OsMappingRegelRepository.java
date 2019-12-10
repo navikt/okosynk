@@ -6,15 +6,13 @@ import no.nav.okosynk.domain.AbstractMappingRegelRepository;
 public class OsMappingRegelRepository
     extends AbstractMappingRegelRepository<OsMelding> {
 
-    public OsMappingRegelRepository() {
-        super(Constants.BATCH_TYPE.OS);
-    }
+  OsMappingRegelRepository() {
+    super(Constants.BATCH_TYPE.OS);
+  }
 
-    @Override
-    protected String createMappingRegelKey(final OsMelding melding) {
+  @Override
+  protected String createMappingRegelKey(final OsMelding osMelding) {
 
-        final String mappingRegelKey = settSammenNokkel(melding.faggruppe, melding.behandlendeEnhet);
-
-        return mappingRegelKey;
-    }
+    return settSammenNokkel(osMelding.faggruppe, osMelding.behandlendeEnhet);
+  }
 }

@@ -1,137 +1,196 @@
 package no.nav.okosynk.io;
 
 import java.io.BufferedReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMeldingLinjeFileReader
     implements IMeldingLinjeFileReader {
 
-    protected interface IResourceContainer {
-        void free();
+  protected interface IResourceContainer {
+
+    void free();
+  }
+
+  private static final Logger logger =
+      LoggerFactory.getLogger(AbstractMeldingLinjeFileReader.class);
+
+  private final IOkosynkConfiguration okosynkConfiguration;
+  private final Constants.BATCH_TYPE batchType;
+  private final int retryWaitTimeInMilliseconds;
+  private final int maxNumberOfTries;
+  private Status status = Status.UNSET;
+  private final String fullyQualifiedInputFileName;
+
+  AbstractMeldingLinjeFileReader(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE batchType,
+      final String fullyQualifiedInputFileName) {
+
+    setStatus(Status.ERROR);
+
+    if (fullyQualifiedInputFileName == null) {
+      throw new NullPointerException("fullyQualifiedInputFileName er null");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractMeldingLinjeFileReader.class);
-
-    private static final Charset defaultCharset = StandardCharsets.ISO_8859_1;
-    private final IOkosynkConfiguration okosynkConfiguration;
-    final Constants.BATCH_TYPE  batchType;
-
-    private static Charset getDefaultCharset() {
-        return defaultCharset;
+    if (fullyQualifiedInputFileName.trim().isEmpty()) {
+      throw new IllegalArgumentException("fullyQualifiedInputFileName er tom eller blank");
     }
+    this.retryWaitTimeInMilliseconds =
+        AbstractMeldingLinjeFileReader.getRetryWaitTimeInMilliseconds(okosynkConfiguration);
+    this.maxNumberOfTries =
+        AbstractMeldingLinjeFileReader.getMaxNumberOfReadTries(okosynkConfiguration);
+    this.fullyQualifiedInputFileName = fullyQualifiedInputFileName;
+    this.okosynkConfiguration = okosynkConfiguration;
+    this.batchType = batchType;
 
-    public IOkosynkConfiguration getOkosynkConfiguration() {
-        return okosynkConfiguration;
-    }
+    setStatus(Status.OK);
+  }
 
-    public Constants.BATCH_TYPE getBatchType() {
-        return batchType;
-    }
+  private static int getRetryWaitTimeInMilliseconds(
+      final IOkosynkConfiguration okosynkConfiguration) {
+    return okosynkConfiguration
+        .getRequiredInt(Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY);
+  }
 
-    @Override
-    public Status getStatus() {
-        return status;
-    }
+  private static int getMaxNumberOfReadTries(final IOkosynkConfiguration okosynkConfiguration) {
+    return okosynkConfiguration.getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
+  }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
+  // =========================================================================
 
-    private Status status = Status.UNSET;
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
+  }
 
-    public String getFullyQualifiedInputFileName() {
-        return fullyQualifiedInputFileName;
-    }
+  public Constants.BATCH_TYPE getBatchType() {
+    return batchType;
+  }
 
-    private final String fullyQualifiedInputFileName;
+  @Override
+  public Status getStatus() {
+    return status;
+  }
 
-    protected AbstractMeldingLinjeFileReader(
-        final IOkosynkConfiguration okosynkConfiguration,
-        final Constants.BATCH_TYPE  batchType,
-        final String                fullyQualifiedInputFileName) {
+  @Override
+  final public List<String> read() throws OkosynkIoException {
 
-        setStatus(Status.ERROR);
-
-        if (fullyQualifiedInputFileName == null) {
-            throw new NullPointerException("fullyQualifiedInputFileName er null");
-        }
-
-        if (fullyQualifiedInputFileName.trim().isEmpty()) {
-            throw new IllegalArgumentException("fullyQualifiedInputFileName er tom eller blank");
-        }
-        this.fullyQualifiedInputFileName = fullyQualifiedInputFileName;
-
-        setStatus(Status.OK);
-
-        this.okosynkConfiguration = okosynkConfiguration;
-        this.batchType            = batchType;
-    }
-
-    // =========================================================================
-
-    @Override
-    public List<String> read() throws LinjeUnreadableException {
-
-        List<String> meldinger = null;
-        final IResourceContainer resourceContainer = createResourceContainer();
+    List<String> meldinger = null;
+    IResourceContainer resourceContainer = null;
+    try {
+      final int retryWaitTimeInMilliseconds  = getRetryWaitTimeInMilliseconds();
+      final int maxNumberOfTries             = getMaxNumberOfReadTries();
+      int       numberOfTriesDone            = 0;
+      boolean   shouldTryReadingTheInputFile = true;
+      while (shouldTryReadingTheInputFile) {
         try {
-            meldinger = lesMeldingerFraFil(resourceContainer);
-        } catch (LinjeUnreadableException e) {
-            handterThrowable(e);
-        } catch (Throwable e) {
-            handterThrowable(e);
-        } finally {
+          logger.debug(
+                "About to call lesMeldingerFraFil "
+              + "from the batch input file for the {}. time ...",
+              numberOfTriesDone + 1
+          );
+          if (resourceContainer != null) {
             resourceContainer.free();
+          }
+          resourceContainer = createResourceContainer();
+          meldinger = lesMeldingerFraFil(resourceContainer);
+          numberOfTriesDone++;
+          shouldTryReadingTheInputFile = false;
+        } catch (OkosynkIoException okosynkIoException) {
+          numberOfTriesDone++;
+          if (
+            ErrorCode.NOT_FOUND.equals(okosynkIoException.getErrorCode())
+            ||
+            ErrorCode.IO.equals(okosynkIoException.getErrorCode())
+          ) {
+            if (numberOfTriesDone < maxNumberOfTries) {
+              final String msg =
+                  System.lineSeparator()
+                + "I have tried reading the input file {}"
+                + " times, and I will not give up until I have tried {}"
+                + " times."
+                + System.lineSeparator()
+                + "I will try again in {}"
+                + " ms. Until then, I will take a nap."
+                + System.lineSeparator();
+              logger.warn(
+                  msg,
+                  numberOfTriesDone,
+                  maxNumberOfTries,
+                  retryWaitTimeInMilliseconds);
+              try {
+                logger.debug("Going to sleep, good night!");
+                Thread.sleep(retryWaitTimeInMilliseconds);
+                logger.debug("Good morning, I just woke up again!");
+              } catch (InterruptedException ex) {
+                logger.warn(
+                    "Ooooops, of unknown reasons, I was waked up before {} "
+                  + "ms had passed.",
+                  retryWaitTimeInMilliseconds);
+              }
+              logger.info("I will try re-reading...");
+            } else {
+              final String msg = "maxNumberOfTries: " + maxNumberOfTries + ", retryWaitTimeInMilliseconds: " + retryWaitTimeInMilliseconds;
+              throw new OkosynkIoException(OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, msg, okosynkIoException);
+            }
+          } else {
+            throw okosynkIoException;
+          }
         }
-
-        return meldinger;
+      }
+    } finally {
+      resourceContainer.free();
     }
 
-    protected abstract BufferedReader lagBufferedReader(
-        final IOkosynkConfiguration okosynkConfiguration,
-        final IResourceContainer    resources) throws Throwable;
+    return meldinger;
+  }
 
-    protected abstract IResourceContainer createResourceContainer();
+  public void setStatus(Status status) {
+    this.status = status;
+  }
 
-    protected String getCharsetName(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getString(getBatchType().getFtpCharsetNameKey(), "ISO8859_1");
+  public String getFullyQualifiedInputFileName() {
+    return fullyQualifiedInputFileName;
+  }
+
+  protected abstract BufferedReader lagBufferedReader(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final IResourceContainer resources) throws OkosynkIoException;
+
+  protected abstract IResourceContainer createResourceContainer();
+
+  String getCharsetName(final IOkosynkConfiguration okosynkConfiguration) {
+    return okosynkConfiguration.getString(getBatchType().getFtpCharsetNameKey(), "ISO8859_1");
+  }
+
+  int getMaxNumberOfReadTries() {
+    return this.maxNumberOfTries;
+  }
+
+  int getRetryWaitTimeInMilliseconds() {
+    return this.retryWaitTimeInMilliseconds;
+  }
+
+  private List<String> lesMeldingerFraFil(final IResourceContainer resourceContainer)
+      throws OkosynkIoException {
+
+    final BufferedReader bufferedReader =
+        lagBufferedReader(this.getOkosynkConfiguration(), resourceContainer);
+    final List<String> lines;
+    try {
+      lines = bufferedReader.lines().collect(Collectors.toList());
+    } catch (Throwable e) {
+      final String msg =
+          "Could not read lines from buffered reader. " + System.lineSeparator()
+              + this.toString();
+      throw new OkosynkIoException(ErrorCode.READ, msg, e);
     }
 
-    protected String getDefaultCharsetName() {
-        return AbstractMeldingLinjeFileReader.getDefaultCharset().name();
-    }
-
-    protected List<String> lesMeldingerFraFil(final IResourceContainer resourceContainer) throws Throwable {
-
-        final BufferedReader bufferedReader = lagBufferedReader(this.getOkosynkConfiguration(), resourceContainer);
-
-        final List<String> lines;
-        try {
-            lines = bufferedReader.lines().collect(Collectors.toList());
-        } catch (Throwable e) {
-            final String msg =
-                  "Could not read lines from buffered reader. " + System.lineSeparator()
-                + this.toString();
-            throw new LinjeUnreadableException(msg, e);
-        }
-
-        return lines;
-    }
-
-    private void handterThrowable(final Throwable e) throws LinjeUnreadableException {
-
-        logger.error(String.format(
-            "Det oppsto en feil under innlesning av meldinger fra filen %s.",
-            getFullyQualifiedInputFileName()), e
-        );
-
-        throw new LinjeUnreadableException(e);
-    }
+    return lines;
+  }
 }

@@ -3,7 +3,7 @@ package no.nav.okosynk.batch;
 import java.util.ArrayList;
 import java.util.List;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.LinjeUnreadableException;
+import no.nav.okosynk.io.OkosynkIoException;
 
 public class MeldingLinjeFileReaderMock
     implements IMeldingLinjeFileReader {
@@ -22,7 +22,7 @@ public class MeldingLinjeFileReaderMock
     }
 
     @Override
-    public List<String> read() throws LinjeUnreadableException {
+    public List<String> read() throws OkosynkIoException {
 
         List<String> fil = new ArrayList<>();
         fil.add(mockLinje);

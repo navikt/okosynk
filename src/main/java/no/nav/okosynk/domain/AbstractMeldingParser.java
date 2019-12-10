@@ -5,10 +5,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-public abstract class MeldingParser {
+public abstract class AbstractMeldingParser {
 
-    private static final DateTimeFormatter DATO_FORMAT_UTEN_KLOKKESLETT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter DATO_FORMAT_MED_KLOKKESLETT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    private static final DateTimeFormatter DATO_FORMAT_UTEN_KLOKKESLETT =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATO_FORMAT_MED_KLOKKESLETT =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public abstract String parseGjelderId(String melding);
 

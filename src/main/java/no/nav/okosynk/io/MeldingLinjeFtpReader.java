@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ public class MeldingLinjeFtpReader
   private static class FtpResourceContainer
       extends AbstractMeldingLinjeFtpOrSftpReader.AbstractFtpOrSftpResourceContainer {
 
-    public FTPClient getFtpClient() {
+    FTPClient getFtpClient() {
       return ftpClient;
     }
 
@@ -52,7 +53,9 @@ public class MeldingLinjeFtpReader
             final boolean success = getFtpClient().completePendingCommand();
             if (!success) {
               logger.warn(
-                  "Completing the pending command from the FTP client gave failure without an exception");
+                    "Completing the pending command "
+                  + "from the FTP client gave failure"
+                  + " without an exception");
             }
           } catch (Throwable e) {
             logger.warn("Exception when completing the pending command from the FTP client.", e);
@@ -107,7 +110,7 @@ public class MeldingLinjeFtpReader
   protected BufferedReader lagBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final AbstractMeldingLinjeFileReader.IResourceContainer resourceContainer)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     establishFtpResources(
         okosynkConfiguration,
@@ -127,12 +130,13 @@ public class MeldingLinjeFtpReader
   private void establishFtpResources(
       final IOkosynkConfiguration okosynkConfiguration,
       final MeldingLinjeFtpReader.FtpResourceContainer ftpResourceContainer)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     try {
       final String ftpHostServerName = this.getFtpHostServerName(okosynkConfiguration);
       final int ftpHostPort = this.getFtpHostPort(okosynkConfiguration);
-      ftpResourceContainer.getFtpClient()
+      ftpResourceContainer
+          .getFtpClient()
           .setConnectTimeout(this.getFtpConnectionTimeoutInMs(okosynkConfiguration));
       ftpResourceContainer.getFtpClient().connect(ftpHostServerName, ftpHostPort);
     } catch (IOException e) {
@@ -141,7 +145,7 @@ public class MeldingLinjeFtpReader
               + this.toString();
 
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.CONFIGURE_OR_INITIALIZE, msg, e);
     }
 
     final int reply = ftpResourceContainer.getFtpClient().getReplyCode();
@@ -157,51 +161,55 @@ public class MeldingLinjeFtpReader
       final String msg = msgStringBuffer.toString();
       logger.error(msg);
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg);
+      throw new OkosynkIoException(ErrorCode.IO, msg);
     }
 
+    final boolean loginOk;
     try {
-      final boolean loginOk =
+      loginOk =
           ftpResourceContainer.getFtpClient().login(this.getFtpUser(okosynkConfiguration),
               this.getFtpPassword(okosynkConfiguration));
-      if (!loginOk) {
-        setStatus(IMeldingLinjeFileReader.Status.ERROR);
-        throw new LinjeUnreadableException("Login returned an erroneous return code");
-      }
     } catch (IOException e) {
       final String msg =
           "Could not log in to the connected FTP server. " + System.lineSeparator()
               + this.toString();
 
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.AUTHENTICATION, msg, e);
+    }
+    if (!loginOk) {
+      setStatus(IMeldingLinjeFileReader.Status.ERROR);
+      throw new OkosynkIoException(ErrorCode.AUTHENTICATION, "Login returned an erroneous return code");
     }
   }
 
   private BufferedReader createBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final MeldingLinjeFtpReader.FtpResourceContainer ftpResourceContainer)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
+    final String fullyQualifiedInputFileName = this.getFullyQualifiedInputFileName();
+    final InputStream inputStream;
     try {
-      final String fullyQualifiedInputFileName = this.getFullyQualifiedInputFileName();
-      final InputStream inputStream =
-          ftpResourceContainer.getFtpClient().retrieveFileStream(fullyQualifiedInputFileName);
-      if (inputStream == null) {
-        final String msg =
-            "InputStream instance acquired from FtpClient is null, "
-                + "which most probably is caused by the file not existing." + System.lineSeparator()
-                + this.toString();
-        throw new LinjeUnreadableException(msg);
-      }
-      ftpResourceContainer.setInputStream(inputStream);
-
+      inputStream =
+          ftpResourceContainer
+              .getFtpClient()
+              .retrieveFileStream(fullyQualifiedInputFileName);
     } catch (IOException e) {
       final String msg =
           "Could not acquire an input stream. " + System.lineSeparator()
               + this.toString();
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.IO, msg, e);
     }
+    if (inputStream == null) {
+      final String msg =
+            "InputStream instance acquired from FtpClient is null, "
+          + "which most probably is caused by the file not existing."
+          + System.lineSeparator()
+          + this.toString();
+      throw new OkosynkIoException(ErrorCode.NOT_FOUND, msg);
+    }
+    ftpResourceContainer.setInputStream(inputStream);
 
     final InputStreamReader inputStreamReader;
     try {
@@ -210,7 +218,7 @@ public class MeldingLinjeFtpReader
       final String msg =
           "Could not acquire an InputStreamReaderfor the input stream. " + System.lineSeparator()
               + this.toString();
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.ENCODING, msg, e);
     }
 
     final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);

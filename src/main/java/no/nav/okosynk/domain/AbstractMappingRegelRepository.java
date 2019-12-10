@@ -1,99 +1,120 @@
 package no.nav.okosynk.domain;
 
-import no.nav.okosynk.config.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
+import no.nav.okosynk.config.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class AbstractMappingRegelRepository<MELDINGSTYPE extends AbstractMelding > {
+public abstract class AbstractMappingRegelRepository<MT extends AbstractMelding> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractMappingRegelRepository.class);
+  private static final Logger logger = LoggerFactory
+      .getLogger(AbstractMappingRegelRepository.class);
 
-    public Properties getMappingRulesProperties() {
-        return mappingRulesProperties;
+  private Properties getMappingRulesProperties() {
+    return mappingRulesProperties;
+  }
+
+  private final Properties mappingRulesProperties = new Properties();
+
+  private static final char NOKKEL_SKILLETEGN = ',';
+  private static final int BEHANDLINGSTEMA_INDEKS = 0;
+  private static final int BEHANDLINGSTYPE_INDEKS = 1;
+  private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
+
+  private final Constants.BATCH_TYPE batchType;
+
+  protected AbstractMappingRegelRepository(final Constants.BATCH_TYPE batchType) {
+
+    final String mappingRulesPropertiesFileName =
+        AbstractMappingRegelRepository.getMappingRulesPropertiesFileName(batchType);
+    try {
+      loadMappingRulesProperties(mappingRulesPropertiesFileName);
+    } catch (IOException e) {
+      handterIOException(e);
+    }
+    this.batchType = batchType;
+  }
+
+  private static String getMappingRulesPropertiesFileName(final Constants.BATCH_TYPE batchType) {
+    return batchType.getMappingRulesPropertiesFileName();
+  }
+
+  public Optional<MappingRegel> finnRegel(final MT melding) {
+
+    final String mappingRegelKey = createMappingRegelKey(melding);
+
+    final Optional<String> behandlingstema =
+        finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTEMA_INDEKS);
+    final Optional<String> behandlingstype =
+        finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTYPE_INDEKS);
+    final Optional<String> ansvarligEnhetId =
+        finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
+
+    final Optional<MappingRegel> optionalMappingRegel;
+    if (
+        behandlingstema.isPresent()
+        &&
+        behandlingstype.isPresent()
+        &&
+        ansvarligEnhetId.isPresent()) {
+
+      optionalMappingRegel =
+          Optional
+              .of(
+                new MappingRegel(
+                    behandlingstema.get(),
+                    behandlingstype.get(),
+                    ansvarligEnhetId.get()
+                )
+              );
+    } else {
+      optionalMappingRegel = Optional.empty();
     }
 
-    private final Properties mappingRulesProperties = new Properties();
+    return optionalMappingRegel;
+  }
 
-    private static final char NOKKEL_SKILLETEGN = ',';
-    private static final int BEHANDLINGSTEMA_INDEKS = 0;
-    private static final int BEHANDLINGSTYPE_INDEKS = 1;
-    private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
+  protected String settSammenNokkel(final String... nokkelFelter) {
+    return String.join(Character.toString(NOKKEL_SKILLETEGN), nokkelFelter);
+  }
 
-    private final Constants.BATCH_TYPE batchType;
+  protected abstract String createMappingRegelKey(final MT melding);
 
-    protected AbstractMappingRegelRepository(final Constants.BATCH_TYPE batchType) {
+  void loadMappingRulesProperties(final String mappingRulesPropertiesFileName)
+      throws IOException {
 
-        this.batchType = batchType;
-
-        final String mappingRulesPropertiesFileName = getMappingRulesPropertiesFileName();
-        try {
-            loadMappingRulesProperties(mappingRulesPropertiesFileName);
-        } catch (IOException e) {
-            handterIOException(e);
-        }
+    final InputStream inputStream =
+        this.getClass().getClassLoader().getResourceAsStream(mappingRulesPropertiesFileName);
+    if (inputStream == null) {
+      throw new IOException(
+          "Kunne ikke lese fra mappingRulesProperties filen " + mappingRulesPropertiesFileName);
     }
+    this.mappingRulesProperties.load(inputStream);
+  }
 
-    public Optional<MappingRegel> finnRegel(final MELDINGSTYPE melding) {
+  void handterIOException(IOException e) {
 
-        final String mappingRegelKey = createMappingRegelKey(melding);
+    logger.error(
+          "Problemer oppsto under innlesning av mappingRulesProperties filen {}. "
+        + "Applikasjonen er ute av stand til å håndtere batch som benytter seg av denne filen.",
+        getMappingRulesPropertiesFileName(this.batchType), e);
 
-        final Optional<String> behandlingstema = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTEMA_INDEKS);
-        final Optional<String> behandlingstype = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTYPE_INDEKS);
-        final Optional<String> ansvarligEnhetId = finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
+    throw new UleseligMappingfilException(e);
+  }
 
-        if (behandlingstema.isPresent()  && behandlingstype.isPresent() && ansvarligEnhetId.isPresent()) {
-            return Optional.of(new MappingRegel(behandlingstema.get(), behandlingstype.get(), ansvarligEnhetId.get()));
-        } else {
-            return Optional.empty();
-        }
-    }
+  private Optional<String> finnVerdiPaIndeks(final String sammensattNokkel, final int indeks) {
 
-    protected void loadMappingRulesProperties(final String mappingRulesPropertiesFileName) throws IOException {
+    final Optional<String> sammensatteVerdierOptional =
+        Optional.ofNullable(getMappingRulesProperties().getProperty(sammensattNokkel));
 
-        final InputStream inputStream =
-            this.getClass().getClassLoader().getResourceAsStream(mappingRulesPropertiesFileName);
-        if (inputStream == null) {
-            throw new IOException("Kunne ikke lese fra mappingRulesProperties filen " + mappingRulesPropertiesFileName);
-        }
-        mappingRulesProperties.load(inputStream);
-    }
-
-    protected String settSammenNokkel(final String... nokkelFelter) {
-
-        return String.join(Character.toString(NOKKEL_SKILLETEGN), nokkelFelter);
-    }
-
-    protected Optional<String> finnVerdiPaIndeks(final String sammensattNokkel, final int indeks) {
-
-        final Optional<String> sammensatteVerdierOptional =
-            Optional.ofNullable(getMappingRulesProperties().getProperty(sammensattNokkel));
-
-        return sammensatteVerdierOptional
-            .map(
-                (final String sammensatteVerdier)
-                ->
-                sammensatteVerdier.split(Character.toString(NOKKEL_SKILLETEGN))[indeks]);
-    }
-
-    protected abstract String createMappingRegelKey(final MELDINGSTYPE melding);
-
-    private void handterIOException(IOException e) {
-        logger.error(
-              "Problemer oppsto under innlesning av mappingRulesProperties filen {}. "
-            + "Applikasjonen er ute av stand til å håndtere batch som benytter seg av denne filen.",
-            getMappingRulesPropertiesFileName(), e);
-
-        throw new UleseligMappingfilException(e);
-    }
-
-    private String getMappingRulesPropertiesFileName() {
-
-        final String mappingRulesPropertiesFileName = this.batchType.getMappingRulesPropertiesFileName();
-
-        return mappingRulesPropertiesFileName;
-    }
+    return sammensatteVerdierOptional
+        .map(
+            (final String sammensatteVerdier)
+            ->
+            sammensatteVerdier.split(Character.toString(NOKKEL_SKILLETEGN))[indeks]
+        );
+  }
 }

@@ -14,43 +14,45 @@ import org.slf4j.LoggerFactory;
 
 public class UrMapper implements IMeldingMapper<UrMelding> {
 
-    private static final Logger logger = LoggerFactory.getLogger(UrMapper.class);
+  private static final Logger logger = LoggerFactory.getLogger(UrMapper.class);
 
-    private UrOppgaveOppretter       urOppgaveOppretter;
-    private UrMappingRegelRepository urMappingRegelRepository;
+  private UrOppgaveOppretter urOppgaveOppretter;
+  private UrMappingRegelRepository urMappingRegelRepository;
 
-    public UrMapper(AktoerRestClient aktoerRestClient) {
-        urMappingRegelRepository = new UrMappingRegelRepository();
-        urOppgaveOppretter       = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient);
-    }
+  public UrMapper(AktoerRestClient aktoerRestClient) {
+    urMappingRegelRepository = new UrMappingRegelRepository();
+    urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient);
+  }
 
-    @Override
-    public List<Oppgave> lagOppgaver(final List<UrMelding> meldinger) {
+  @Override
+  public List<Oppgave> lagOppgaver(final List<UrMelding> meldinger) {
 
-        return hentMeldingerSomSkalBliOppgaver(meldinger)
-                .stream()
-                .map(urOppgaveOppretter)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList());
-    }
+    return hentMeldingerSomSkalBliOppgaver(meldinger)
+        .stream()
+        .map(urOppgaveOppretter)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .collect(Collectors.toList());
+  }
 
-    Predicate<UrMelding> urMeldingSkalBliOppgave() {
-        return urMelding -> urMappingRegelRepository.finnRegel(urMelding).isPresent();
-    }
+  Predicate<UrMelding> urMeldingSkalBliOppgave() {
+    return urMelding -> urMappingRegelRepository.finnRegel(urMelding).isPresent();
+  }
 
-    Collection<List<UrMelding>> hentMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {
+  Collection<List<UrMelding>> hentMeldingerSomSkalBliOppgaver(
+      final List<UrMelding> ufiltrerteUrMeldinger) {
 
-        List<UrMelding> meldingerMedMappingRegel = ufiltrerteUrMeldinger.stream()
-                .filter(urMeldingSkalBliOppgave())
-                .collect(Collectors.toList());
+    List<UrMelding> meldingerMedMappingRegel = ufiltrerteUrMeldinger.stream()
+        .filter(urMeldingSkalBliOppgave())
+        .collect(Collectors.toList());
 
-        logger.info("STATISTIKK: Antall meldinger med duplikater er {}",
-                meldingerMedMappingRegel.size());
+    logger.info("STATISTIKK: Antall meldinger med duplikater er {}",
+        meldingerMedMappingRegel.size());
 
-        return meldingerMedMappingRegel.stream()
-                .distinct()
-                .collect(Collectors.groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList()))
-                .values();
-    }
+    return meldingerMedMappingRegel.stream()
+        .distinct()
+        .collect(Collectors
+            .groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList()))
+        .values();
+  }
 }

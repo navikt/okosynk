@@ -1,5 +1,7 @@
 package no.nav.okosynk.io;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -10,6 +12,7 @@ import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import no.nav.okosynk.testutil.AbstractTestFtpServer;
 import no.nav.okosynk.testutil.TestFtpServer;
 import no.nav.okosynk.testutil.TestSftpServer;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,9 +132,20 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     @BeforeEach
     public void setup() throws IOException {
 
-        this.okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration =
+            new FakeOkosynkConfiguration();
 
-        setWorkingSystemProperties(this.okosynkConfiguration);
+        setWorkingSystemProperties(okosynkConfiguration);
+
+        okosynkConfiguration.setSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+            "5");
+        okosynkConfiguration.setSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+            "1234");
+
+        this.okosynkConfiguration = okosynkConfiguration;
+
         createAWorkingMeldingLinjeFtpOrSftpFileReader();
     }
 
@@ -191,10 +206,9 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     private IMeldingLinjeFileReader uspesifikkMeldingLinjeFileReader;
 
-    //@Test
-    // TODO: Reintroduce this test
+    @Test
     @DisplayName("Tets that reading an existing file using FTP is successful.")
-    public void testSuccessfulReadingOfExistingFile() throws LinjeUnreadableException {
+    void when_connecting_with_ok_parameters_and_reading_an_existing_file_then_no_error_should_result() throws OkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -205,12 +219,11 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         final List<String> actualLines = uspesifikkMeldingLinjeReader.read();
 
-        Assertions.assertEquals(3, actualLines.size());
+        assertEquals(3, actualLines.size());
     }
 
-    //@Test
-    // TODO: Reintroduce this test
-    public void testSftpHostUriNotValid() {
+    @Test
+    void when_connecting_ftp_with_an_invalid_host_then_an_configuration_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -226,12 +239,13 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
+        final OkosynkIoException okosynkIoException =
+            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
+        assertEquals(ErrorCode.CONFIGURE_OR_INITIALIZE, okosynkIoException.getErrorCode());
     }
 
-    //@Test
-    // TODO: Reintroduce this test
-    public void testFtpUserNotValid() {
+    @Test
+    void when_connecting_ftp_with_an_invalid_userid_then_an_authentication_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -247,12 +261,13 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
+        final OkosynkIoException okosynkIoException =
+            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
+        assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
     }
 
-    //@Test
-    // TODO: Reintroduce this test
-    public void testSftpPasswordNotValid() {
+    @Test
+    void when_connecting_ftp_with_an_invalid_password_then_an_authentication_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -268,12 +283,13 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
+        final OkosynkIoException okosynkIoException =
+            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
+        assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
     }
 
-    //@Test
-    // TODO: Reintroduce this test
-    public void testFileNotExisting() {
+    @Test
+    void when_the_input_file_does_not_exist_then_an_adequate_exception_should_be_thrown_after_a_specified_number_of_retries() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -284,7 +300,11 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         logTestProperties();
 
-        Assertions.assertThrows(LinjeUnreadableException.class, uspesifikkMeldingLinjeReader::read);
+        final OkosynkIoException okosynkIoException =
+            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
+        assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
+        assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
+        assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
     }
 
     private void createAWorkingMeldingLinjeFtpOrSftpFileReader() throws IOException {

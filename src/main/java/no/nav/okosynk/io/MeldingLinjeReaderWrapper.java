@@ -31,7 +31,7 @@ public class MeldingLinjeReaderWrapper
   }
 
   private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
     return AbstractMeldingLinjeFtpOrSftpReader.getFtpInputFilePath(
         okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
     );
@@ -47,7 +47,7 @@ public class MeldingLinjeReaderWrapper
     final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
     try {
       wrappedMeldingLinjeFileReader = createMeldingLinjeReader(okosynkConfiguration);
-    } catch (LinjeUnreadableException e) {
+    } catch (OkosynkIoException e) {
       throw new RuntimeException("Could not create wrappedMeldingLinjeFileReader", e);
     }
 
@@ -56,7 +56,7 @@ public class MeldingLinjeReaderWrapper
   // =========================================================================
 
   @Override
-  public List<String> read() throws LinjeUnreadableException {
+  public List<String> read() throws OkosynkIoException {
     return getWrappedMeldingLinjeFileReader().read();
   }
 
@@ -68,7 +68,7 @@ public class MeldingLinjeReaderWrapper
   // =========================================================================
 
   private IMeldingLinjeFileReader createMeldingLinjeReader(
-      final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
+      final IOkosynkConfiguration okosynkConfiguration) throws OkosynkIoException {
 
     final IMeldingLinjeFileReader meldingLinjeFileReader;
 

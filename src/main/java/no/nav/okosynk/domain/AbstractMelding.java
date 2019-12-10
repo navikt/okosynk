@@ -23,13 +23,13 @@ public abstract class AbstractMelding {
     public  final String    nyesteVentestatus;
     public  final String    brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
 
-    public MeldingParser getParser() {
+    public AbstractMeldingParser getParser() {
         return parser;
     }
 
-    private final MeldingParser parser;
+    private final AbstractMeldingParser parser;
 
-    protected AbstractMelding(final String melding, final MeldingParser parser) {
+    protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
 
         this.parser = parser;
 

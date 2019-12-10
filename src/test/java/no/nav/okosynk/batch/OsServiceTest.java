@@ -45,6 +45,12 @@ class OsServiceTest {
 
         batchRepository = new BatchRepository();
         batchRepository.cleanTestRepository();
+        okosynkConfiguration.setSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+            "2");
+        okosynkConfiguration.setSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+            "1000");
         osService = new OsService(okosynkConfiguration, batchRepository);
     }
 

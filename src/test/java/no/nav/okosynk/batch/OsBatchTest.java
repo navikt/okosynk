@@ -8,7 +8,7 @@ import no.nav.okosynk.domain.os.OsMapper;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.os.OsMeldingReader;
-import no.nav.okosynk.io.LinjeUnreadableException;
+import no.nav.okosynk.io.OkosynkIoException;
 import org.junit.jupiter.api.BeforeEach;
 
 class OsBatchTest extends AbstractBatchTest<OsMelding> {
@@ -19,7 +19,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
 
     // =========================================================================
     @BeforeEach
-    void setUp() throws MeldingUnreadableException, LinjeUnreadableException {
+    void setUp() throws MeldingUnreadableException, OkosynkIoException {
         this.setMeldingReader(mock(OsMeldingReader.class));
         this.setMeldingMapper(mock(OsMapper.class));
 

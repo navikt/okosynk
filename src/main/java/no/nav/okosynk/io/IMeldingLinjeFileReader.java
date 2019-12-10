@@ -10,7 +10,7 @@ public interface IMeldingLinjeFileReader {
         OK
     }
 
-    List<String> read() throws LinjeUnreadableException;
+    List<String> read() throws OkosynkIoException;
 
     Status getStatus();
 }

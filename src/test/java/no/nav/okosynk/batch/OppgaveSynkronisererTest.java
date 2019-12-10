@@ -439,22 +439,24 @@ class OppgaveSynkronisererTest {
       final String brukerId,
       final String beskrivelse) {
 
-    final Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder()
-        .withOppgaveId(oppgaveId)
-        //.withBrukerId(brukerId)
-        //.withBrukertypeKode("PERSON")
-        .withOppgavetypeKode("OKO_OS")
-        .withFagomradeKode("BA")
-        //.withUnderkategoriKode("BA")
-        .withPrioritetKode("LAV_OKO")
-        .withBeskrivelse(beskrivelse)
-        .withAnsvarligEnhetId("4151")
-        .withLest(false)
-        .withVersjon(1)
-        .withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36))
-        .withAktivFra(LocalDate.of(1997, 2, 2))
-        .withAktivTil(LocalDate.of(1997, 2, 9));
+    final Oppgave oppgave =
+        new Oppgave.OppgaveBuilder()
+          .withOppgaveId(oppgaveId)
+          //.withBrukerId(brukerId)
+          //.withBrukertypeKode("PERSON")
+          .withOppgavetypeKode("OKO_OS")
+          .withFagomradeKode("BA")
+          //.withUnderkategoriKode("BA")
+          .withPrioritetKode("LAV_OKO")
+          .withBeskrivelse(beskrivelse)
+          .withAnsvarligEnhetId("4151")
+          .withLest(false)
+          .withVersjon(1)
+          .withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36))
+          .withAktivFra(LocalDate.of(1997, 2, 2))
+          .withAktivTil(LocalDate.of(1997, 2, 9))
+          .build();
 
-    return new Oppgave(oppgaveBuilder);
+    return oppgave;
   }
 }

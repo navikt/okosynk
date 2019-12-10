@@ -6,15 +6,13 @@ import no.nav.okosynk.domain.AbstractMappingRegelRepository;
 public class UrMappingRegelRepository
     extends AbstractMappingRegelRepository<UrMelding> {
 
-    public UrMappingRegelRepository() {
-        super(Constants.BATCH_TYPE.UR);
-    }
+  UrMappingRegelRepository() {
+    super(Constants.BATCH_TYPE.UR);
+  }
 
-    @Override
-    protected String createMappingRegelKey(final UrMelding melding) {
+  @Override
+  protected String createMappingRegelKey(final UrMelding urMelding) {
 
-        final String mappingRegelKey = settSammenNokkel(melding.oppdragsKode, melding.behandlendeEnhet);
-
-        return mappingRegelKey;
-    }
+    return settSammenNokkel(urMelding.oppdragsKode, urMelding.behandlendeEnhet);
+  }
 }

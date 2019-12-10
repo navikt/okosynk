@@ -7,6 +7,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,7 +119,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   private static Constants.FTP_PROTOCOL getFtpProtocol(final String ftpHostUrl)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     final Constants.FTP_PROTOCOL ftpHostProtocol;
     try {
@@ -134,7 +135,8 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
         ftpHostProtocol = Constants.FTP_PROTOCOL.valueOf(uri.getScheme().toUpperCase());
       }
     } catch (Throwable e) {
-      throw new LinjeUnreadableException(
+      throw new OkosynkIoException(
+          ErrorCode.CONFIGURE_OR_INITIALIZE,
           "Invalid ftpHostUrl found when trying to parse the protocol: " + ftpHostUrl, e);
     }
 
@@ -142,7 +144,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   private static String getFtpHostServerName(final String ftpHostUrl)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     String ftpHostServerName;
     try {
@@ -164,7 +166,8 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
       }
 
       if (ftpHostServerName.contains(":")) {
-        throw new LinjeUnreadableException(
+        throw new OkosynkIoException(
+            ErrorCode.CONFIGURE_OR_INITIALIZE,
             "Invalid ftpHostUrl: "
                 + ftpHostUrl
                 + ", parsed to give an invalid host containing a colon, "
@@ -173,14 +176,17 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
       }
 
     } catch (Throwable e) {
-      throw new LinjeUnreadableException(
-          "Invalid ftpHostUrl found when trying to parse the host name: " + ftpHostUrl, e);
+      throw new OkosynkIoException(
+          ErrorCode.CONFIGURE_OR_INITIALIZE,
+          "Invalid ftpHostUrl found when "
+              + "trying to parse the host name: "
+              + ftpHostUrl, e);
     }
 
     return ftpHostServerName;
   }
 
-  private static int getFtpHostPort(final String ftpHostUrl) throws LinjeUnreadableException {
+  private static int getFtpHostPort(final String ftpHostUrl) throws OkosynkIoException {
 
     final int ftpHostPort;
     try {
@@ -223,28 +229,31 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
         ftpHostPort = tempFtpHostPort;
       }
     } catch (Throwable e) {
-      throw new LinjeUnreadableException(
-          "Invalid ftpHostUrl found when trying to parse the port: " + ftpHostUrl, e);
+      throw new OkosynkIoException(
+          ErrorCode.CONFIGURE_OR_INITIALIZE,
+          "Invalid ftpHostUrl found when "
+              + "trying to parse the port: " + ftpHostUrl, e);
     }
 
     return ftpHostPort;
   }
 
   static String getFtpInputFilePath(final String ftpHostUrl)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
     try {
       final URI uri = checkFtpHostUrlAndProduceUri(ftpHostUrl);
       return uri.getPath();
     } catch (Throwable e) {
-      throw new LinjeUnreadableException(
-          "Invalid ftpHostUrl found when trying to parse the file path: " + ftpHostUrl, e);
+      throw new OkosynkIoException(
+          ErrorCode.CONFIGURE_OR_INITIALIZE,
+          "Invalid ftpHostUrl found "
+              + "when trying to parse the file path: " + ftpHostUrl, e);
     }
   }
 
   private static URI checkFtpHostUrlAndProduceUri(final String ftpHostUrl)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
-    String ftpHostServerName;
     final URI uri;
     try {
       if (ftpHostUrl == null) {
@@ -254,10 +263,12 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
       } else {
         uri = new URI(ftpHostUrl);
       }
-
     } catch (Throwable e) {
-      throw new LinjeUnreadableException(
-          "Invalid ftpHostUrl found when trying to parse the host name: " + ftpHostUrl, e);
+      throw new OkosynkIoException(
+          ErrorCode.CONFIGURE_OR_INITIALIZE,
+          "Invalid ftpHostUrl found when trying"
+              + " to parse the host name: "
+              + ftpHostUrl, e);
     }
 
     return uri;
@@ -268,7 +279,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
     Constants.FTP_PROTOCOL ftpProtocol;
     try {
       ftpProtocol = getFtpProtocol(ftpHostUrl);
-    } catch (LinjeUnreadableException e) {
+    } catch (OkosynkIoException e) {
       ftpProtocol = Constants.FTP_PROTOCOL_DEFAULT_VALUE;
     }
     final boolean shouldUseSftp = Constants.FTP_PROTOCOL.SFTP.equals(ftpProtocol);
@@ -277,7 +288,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   protected String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     final String ftpInputFilePath = getFtpInputFilePath(this.getFtpHostUrl(okosynkConfiguration));
     return ftpInputFilePath;
@@ -289,27 +300,40 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
 
     return
-        "ftpHostUrl              : "
-            + (this.getFtpHostUrl(okosynkConfiguration) == null
-            ?
-            "null"
-            :
-                this.getFtpHostUrl(okosynkConfiguration)) + System.lineSeparator()
-            + "user                     : "
-            + (this.getFtpUser(okosynkConfiguration) == null
-            ?
-            "null"
-            :
-                this.getFtpUser(okosynkConfiguration)) + System.lineSeparator()
-            + "fully qualified file name: "
-            + (this.getFullyQualifiedInputFileName() == null
-            ?
-            "null"
-            :
-                this.getFullyQualifiedInputFileName()) + System.lineSeparator();
+        "Linjereader properties:" + System.lineSeparator()
+            + "=======================" + System.lineSeparator()
+            + "ftpHostUrl                 : "
+            + (
+            this.getFtpHostUrl(okosynkConfiguration) == null
+                ?
+                "null"
+                :
+                    this.getFtpHostUrl(okosynkConfiguration)
+        ) + System.lineSeparator()
+            + "user                       : "
+            + (
+            this.getFtpUser(okosynkConfiguration) == null
+                ?
+                "null"
+                :
+                    this.getFtpUser(okosynkConfiguration)
+        ) + System.lineSeparator()
+            + "fully qualified file name  : "
+            + (
+            this.getFullyQualifiedInputFileName() == null
+                ?
+                "null"
+                :
+                    this.getFullyQualifiedInputFileName()
+        ) + System.lineSeparator()
+            + "retryWaitTimeInMilliseconds: "
+            + this.getRetryWaitTimeInMilliseconds() + System.lineSeparator()
+            + "maxNumberOfReadTries       : "
+            + this.getMaxNumberOfReadTries() + System.lineSeparator()
+        ;
   }
 
-  String getFtpConnectionTimeoutInMsKey() {
+  private String getFtpConnectionTimeoutInMsKey() {
     return getBatchType().getFtpConnectionTimeoutKey();
   }
 
@@ -326,7 +350,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   Constants.FTP_PROTOCOL getFtpProtocol(final IOkosynkConfiguration okosynkConfiguration)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
     final Constants.FTP_PROTOCOL ftpHostProtocol =
         getFtpProtocol(this.getFtpHostUrl(okosynkConfiguration));
@@ -335,7 +359,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   String getFtpHostServerName(
-      final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
+      final IOkosynkConfiguration okosynkConfiguration) throws OkosynkIoException {
 
     final String ftpHostServerName =
         getFtpHostServerName(this.getFtpHostUrl(okosynkConfiguration));
@@ -343,7 +367,7 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
   }
 
   int getFtpHostPort(
-      final IOkosynkConfiguration okosynkConfiguration) throws LinjeUnreadableException {
+      final IOkosynkConfiguration okosynkConfiguration) throws OkosynkIoException {
 
     final int ftpHostPort = getFtpHostPort(this.getFtpHostUrl(okosynkConfiguration));
     return ftpHostPort;
@@ -366,10 +390,10 @@ public abstract class AbstractMeldingLinjeFtpOrSftpReader
     return ftpConnectionTimeoutInMs;
   }
 
-  InputStreamReader createInputStreamReader(
+  protected InputStreamReader createInputStreamReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final AbstractMeldingLinjeFtpOrSftpReader
-                .AbstractFtpOrSftpResourceContainer resourceContainer)
+          .AbstractFtpOrSftpResourceContainer resourceContainer)
       throws UnsupportedEncodingException {
 
     final InputStreamReader inputStreamReader =

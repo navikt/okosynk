@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,30 +23,28 @@ public class MeldingLinjeSftpReader
       extends AbstractMeldingLinjeFtpOrSftpReader.AbstractFtpOrSftpResourceContainer {
 
     private final JSch jSch;
+    private Session sftpSession;
+    private ChannelSftp sftpChannel;
 
-    public JSch getjSch() {
+    JSch getjSch() {
       return jSch;
     }
 
-    public Session getSftpSession() {
+    Session getSftpSession() {
       return sftpSession;
     }
 
-    public void setSftpSession(Session sftpSession) {
+    void setSftpSession(Session sftpSession) {
       this.sftpSession = sftpSession;
     }
 
-    private Session sftpSession;
-
-    public ChannelSftp getSftpChannel() {
+    ChannelSftp getSftpChannel() {
       return sftpChannel;
     }
 
-    public void setSftpChannel(ChannelSftp sftpChannel) {
+    void setSftpChannel(ChannelSftp sftpChannel) {
       this.sftpChannel = sftpChannel;
     }
-
-    private ChannelSftp sftpChannel;
 
     private SftpResourceContainer(final JSch jSch) {
       this.jSch = jSch;
@@ -67,12 +66,10 @@ public class MeldingLinjeSftpReader
   }
 
   private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeSftpReader.class);
-
   private static final String JSCH_CHANNEL_TYPE_SFTP = "sftp";
-
   private final JSch jSch;
 
-  public JSch getjSch() {
+  private JSch getjSch() {
     return jSch;
   }
 
@@ -84,7 +81,7 @@ public class MeldingLinjeSftpReader
     this(okosynkConfiguration, batchType, fullyQualifiedInputFileName, new JSch());
   }
 
-  protected MeldingLinjeSftpReader(
+  private MeldingLinjeSftpReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE batchType,
       final String fullyQualifiedInputFileName,
@@ -99,9 +96,10 @@ public class MeldingLinjeSftpReader
   protected BufferedReader lagBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final AbstractMeldingLinjeFileReader.IResourceContainer resourceContainer)
-      throws LinjeUnreadableException {
+      throws OkosynkIoException {
 
-    establishSftpResources(okosynkConfiguration,
+    establishSftpResources(
+        okosynkConfiguration,
         (MeldingLinjeSftpReader.SftpResourceContainer) resourceContainer);
     final BufferedReader bufferedReader =
         createBufferedReader(okosynkConfiguration,
@@ -118,8 +116,7 @@ public class MeldingLinjeSftpReader
   private void establishSftpResources(
       final IOkosynkConfiguration okosynkConfiguration,
       final MeldingLinjeSftpReader.SftpResourceContainer sftpResourceContainer)
-      throws LinjeUnreadableException {
-
+      throws OkosynkIoException {
     try {
       final String sftpUser = this.getFtpUser(okosynkConfiguration);
       final String sftpHostServerName = this.getFtpHostServerName(okosynkConfiguration);
@@ -129,25 +126,29 @@ public class MeldingLinjeSftpReader
       sftpResourceContainer.setSftpSession(sftpSession);
     } catch (JSchException e) {
       final String msg =
-          "Could not establish an sftp session. " + System.lineSeparator()
-              + this.toString();
+            "Could not establish an sftp session. " + System.lineSeparator()
+          + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.CONFIGURE_OR_INITIALIZE, msg, e);
     }
 
     // TODO: What's this?
     sftpResourceContainer.getSftpSession().setConfig("StrictHostKeyChecking", "no");
     final String sftpPassword = this.getFtpPassword(okosynkConfiguration);
     sftpResourceContainer.getSftpSession().setPassword(sftpPassword);
-
     try {
       sftpResourceContainer.getSftpSession().connect();
     } catch (JSchException e) {
       final String msg =
           "Could not connect SFTP session. " + System.lineSeparator()
-              + this.toString();
+        + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      if ("Auth fail".equals(e.getMessage())) {
+        throw new OkosynkIoException(ErrorCode.AUTHENTICATION, msg, e);
+      } else {
+        throw new OkosynkIoException(ErrorCode.CONFIGURE_OR_INITIALIZE, msg, e);
+      }
+
     }
 
     try {
@@ -159,7 +160,7 @@ public class MeldingLinjeSftpReader
           "Could not run openChannel on SFTP session. " + System.lineSeparator()
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.IO, msg, e);
     }
 
     try {
@@ -169,45 +170,55 @@ public class MeldingLinjeSftpReader
           "Could not connect to channel. " + System.lineSeparator()
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new LinjeUnreadableException(msg, e);
+      throw new OkosynkIoException(ErrorCode.IO, msg, e);
     }
   }
 
   private BufferedReader createBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final MeldingLinjeSftpReader.SftpResourceContainer sftpResourceContainer)
-      throws LinjeUnreadableException {
-
+      throws OkosynkIoException {
     try {
+      logger.debug("About to acquire an InputStream from the batch input file...");
       final String fullyQualifiedInputFileName = this.getFullyQualifiedInputFileName();
       final InputStream inputStream =
-          sftpResourceContainer.getSftpChannel().get(fullyQualifiedInputFileName);
+          sftpResourceContainer
+              .getSftpChannel()
+              .get(fullyQualifiedInputFileName);
       if (inputStream == null) {
         final String msg =
-            "InputStream instance acquired from ChannelSftp is null, "
-                + "which most probably is caused by the file not existing." + System.lineSeparator()
-                + this.toString();
-        throw new LinjeUnreadableException(msg);
+              "InputStream instance acquired from ChannelSftp is null, "
+            + "which most probably is caused by the file not existing.";
+        throw new SftpException(ChannelSftp.SSH_FX_NO_SUCH_FILE, msg);
       }
       sftpResourceContainer.setInputStream(inputStream);
-
     } catch (SftpException e) {
-      final String msg =
-          "Could not acquire an input stream from the sftp channel. " + System.lineSeparator()
-              + this.toString();
-      throw new LinjeUnreadableException(msg, e);
+      final ErrorCode errorCode;
+      final String msg;
+      if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
+        errorCode = ErrorCode.NOT_FOUND;
+        msg = "Input file does not exist";
+      } else {
+        errorCode = ErrorCode.IO;
+        msg = "Could not acquire an input stream from the sftp channel.";
+      }
+      throw new OkosynkIoException(errorCode, msg + System.lineSeparator() + this.toString(), e);
     }
-
     final InputStreamReader inputStreamReader;
     try {
-      inputStreamReader = createInputStreamReader(okosynkConfiguration, sftpResourceContainer);
+      inputStreamReader =
+          createInputStreamReader(okosynkConfiguration, sftpResourceContainer);
     } catch (UnsupportedEncodingException e) {
       final String msg =
-          "Could not acquire an InputStreamReaderfor the input stream. " + System.lineSeparator()
-              + this.toString();
-      throw new LinjeUnreadableException(msg, e);
+            "Could not acquire an InputStreamReader for the input stream. "
+          + System.lineSeparator()
+          + this.toString();
+      throw new OkosynkIoException(ErrorCode.ENCODING, msg, e);
     }
-
+    assert
+        (inputStreamReader != null)
+        :
+        "Programming error: (inputStreamReader == null) after leaving the while loop.";
     final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
     return bufferedReader;

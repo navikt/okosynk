@@ -24,9 +24,9 @@ public class UrMeldingLinjeFtpReaderTest
     }
     // =========================================================================
     @Override
-    protected Function<String, IMeldingLinjeFileReader> getCreator() {
-        return (
-            fullyQualifiedInputFileNames) ->
+    protected Function<String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator() {
+        return
+            (fullyQualifiedInputFileNames) ->
             new MeldingLinjeFtpReader(getOkosynkConfiguration(), Constants.BATCH_TYPE.UR, fullyQualifiedInputFileNames);
     }
 

@@ -5,52 +5,63 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 public class FakeOkosynkConfiguration
     implements IOkosynkConfiguration {
 
-    @Override
-    public void setBoolean(final String key, final boolean defaultValue) {
+  @Override
+  public void setBoolean(final String key, final boolean defaultValue) {
 
-        System.setProperty(
-            key,
-            Boolean.valueOf(defaultValue).toString());
+    System.setProperty(
+        key,
+        Boolean.valueOf(defaultValue).toString());
+  }
+
+  @Override
+  public boolean getBoolean(final String key, final boolean defaultValue) {
+
+    return Boolean
+        .parseBoolean(
+            System.getProperty(key,
+                Boolean.valueOf(defaultValue).toString())
+        );
+  }
+
+  @Override
+  public int getRequiredInt(final String key) {
+    final String value = System.getProperty(key);
+    if (value == null)  {
+      throw new IllegalStateException(String.format("There is no system property set for the key " + key));
     }
+    return Integer.valueOf(value);
+  }
 
-    @Override
-    public boolean getBoolean(final String key, final boolean defaultValue) {
+  @Override
+  public String getRequiredString(final String key) {
 
-        return Boolean
-            .parseBoolean(
-                System.getProperty(key,
-                    Boolean.valueOf(defaultValue).toString())
-            );
+    final String value = System.getProperty(key);
+    if (value == null)  {
+      throw new IllegalStateException(String.format("There is no system property set for the key " + key));
     }
+    return value;
+  }
 
-    @Override
-    public String getRequiredString(final String key) {
+  @Override
+  public void clearSystemProperty(final String key) {
+    System.clearProperty(key);
+  }
 
-        final String value = System.getProperty(key);
-        assert (value != null) : "There is no system property set for the key " + key;
-        return value;
-    }
+  @Override
+  public void setSystemProperty(final String key, final String value) {
 
-    @Override
-    public void clearSystemProperty(final String key) {
-        System.clearProperty(key);
-    }
+    System.setProperty(key, value);
+  }
 
-    @Override
-    public void setSystemProperty(final String key, final String value) {
+  @Override
+  public String getString(final String key) {
 
-        System.setProperty(key, value);
-    }
+    return System.getProperty(key);
+  }
 
-    @Override
-    public String getString(final String key) {
+  @Override
+  public String getString(final String key, final String defaulValue) {
 
-        return System.getProperty(key);
-    }
-
-    @Override
-    public String getString(final String key, final String defaulValue) {
-
-        return System.getProperty(key, defaulValue);
-    }
+    return System.getProperty(key, defaulValue);
+  }
 }

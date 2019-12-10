@@ -302,6 +302,8 @@ public class Constants {
          static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
          static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
   public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
+  public static final String FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY = "file.reader.retry.wait.time.in.ms";
+  public static final String FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY = "file.reader.max.number.of.tries";
 
   public enum FTP_PROTOCOL {
     FTP, SFTP

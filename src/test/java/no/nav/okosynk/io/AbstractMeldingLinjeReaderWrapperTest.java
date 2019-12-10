@@ -1,16 +1,19 @@
 package no.nav.okosynk.io;
 
 import java.util.function.Supplier;
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.io.os.OsMeldingLinjeReaderWrapperTest;
 import no.nav.okosynk.io.ur.UrMeldingLinjeReaderWrapperTest;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMeldingLinjeReaderWrapperTest {
+
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
@@ -21,8 +24,18 @@ public abstract class AbstractMeldingLinjeReaderWrapperTest {
     private final IOkosynkConfiguration okosynkConfiguration =
         new FakeOkosynkConfiguration();
 
+    @BeforeEach
+    void beforeEach() {
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+            "2");
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+            "1000");
+    }
+
     @Test
-    void testSuccessfulCreationUsingFtp() {
+    void when_a_wrapper_is_created_using_ftp_then_no_errors_should_result() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -67,7 +80,7 @@ public abstract class AbstractMeldingLinjeReaderWrapperTest {
     }
 
     @Test
-    void testSuccessfulCreationUsingSftp() {
+    void when_a_wrapper_is_created_using_sftp_then_no_errors_should_result() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -137,5 +150,4 @@ public abstract class AbstractMeldingLinjeReaderWrapperTest {
         final String ftpPasswordKey = getFtpPasswordKey();
         this.okosynkConfiguration.setSystemProperty(ftpPasswordKey, ftpPassword);
     }
-
 }

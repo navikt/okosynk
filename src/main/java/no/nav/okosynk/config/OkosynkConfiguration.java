@@ -138,6 +138,20 @@ public class OkosynkConfiguration
 
     return value;
   }
+
+  @Override
+  public int getRequiredInt(final String key) {
+    final String firstPriorityKey = convertToFirstPriorityKey(key);
+    final String secondPriorityKey = key;
+    final int value;
+    if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
+      value = compositeConfigurationForFirstPriority.getInt(firstPriorityKey);
+    } else {
+      checkRequired(secondPriorityKey);
+      value = compositeConfigurationForSecondPriority.getInt(secondPriorityKey);
+    }
+    return value;
+  }
   //
   // --------- Getters END ---------------------------------------------------
 

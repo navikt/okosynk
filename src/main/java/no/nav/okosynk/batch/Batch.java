@@ -17,7 +17,7 @@ import no.nav.okosynk.domain.IMeldingReader;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.LinjeUnreadableException;
+import no.nav.okosynk.io.OkosynkIoException;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -202,7 +202,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   }
 
 
-  private void handterLinjeUnreadableException(LinjeUnreadableException e) {
+  private void handterLinjeUnreadableException(OkosynkIoException e) {
 
     logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
         e);
@@ -245,7 +245,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
           "STATISTIKK: {} meldinger ble lest inn. Batch name: {}",
           linjerMedUspesifikkeMeldinger.size(),
           getBatchName());
-    } catch (LinjeUnreadableException e) {
+    } catch (OkosynkIoException e) {
       handterLinjeUnreadableException(e);
     }
 

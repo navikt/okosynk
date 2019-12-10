@@ -3,17 +3,14 @@ package no.nav.okosynk.batch;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
@@ -23,8 +20,10 @@ import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.LinjeUnreadableException;
+import no.nav.okosynk.io.OkosynkIoException;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,8 +51,18 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     this.batch = batch;
   }
 
-  public IMeldingReader<SPESIFIKKMELDINGTYPE> getMeldingReader() {
+  private IMeldingReader<SPESIFIKKMELDINGTYPE> getMeldingReader() {
     return meldingReader;
+  }
+
+  @BeforeEach
+  void beforeEach() {
+    getOkosynkConfiguration().setSystemProperty(
+        Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+        "2");
+    getOkosynkConfiguration().setSystemProperty(
+        Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+        "1000");
   }
 
   void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
@@ -80,7 +89,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
   private final Constants.BATCH_TYPE batchType;
 
-  protected AbstractBatchTest(final Constants.BATCH_TYPE batchType) {
+  AbstractBatchTest(final Constants.BATCH_TYPE batchType) {
     this.batchType = batchType;
   }
 
@@ -110,16 +119,16 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
   }
   // =========================================================================
 
-  void commonPostSetUp() throws LinjeUnreadableException, MeldingUnreadableException {
+  void commonPostSetUp() throws OkosynkIoException, MeldingUnreadableException {
 
     getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
-    getBatch().setSpesifikkMeldingReader(meldingReader);
+    getBatch().setSpesifikkMeldingReader(getMeldingReader());
     getBatch().setSpesifikkMapper(meldingMapper);
     getBatch().setOppgaveSynkroniserer(oppgaveSynkroniserer);
 
     when(mockedUspesifikkMeldingLinjeReader.read())
         .thenReturn(emptyList());
-    when(meldingReader
+    when(getMeldingReader()
         .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
         .thenReturn(new ArrayList<>());
     when(meldingMapper.lagOppgaver(anyList()))
@@ -160,7 +169,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
   @Test
   @Disabled
-  void runLeserFraFil() throws LinjeUnreadableException {
+  void runLeserFraFil() throws OkosynkIoException {
 
     enteringTestHeaderLogger.debug(null);
 
@@ -177,18 +186,18 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    verify(meldingReader)
+    verify(getMeldingReader())
         .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
   }
 
   @Test
   @Disabled
-  void statusSettesTilFeilHvisLesingFraFilFeiler() throws LinjeUnreadableException {
+  void statusSettesTilFeilHvisLesingFraFilFeiler() throws OkosynkIoException {
 
     enteringTestHeaderLogger.debug(null);
 
     when(mockedUspesifikkMeldingLinjeReader.read())
-        .thenThrow(new LinjeUnreadableException(new IOException("Noe gikk skeis")));
+        .thenThrow(new OkosynkIoException(ErrorCode.IO, new IOException("Noe gikk skeis")));
 
     getBatch().run();
 
@@ -203,7 +212,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    verify(meldingReader)
+    verify(getMeldingReader())
         .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream());
   }
 
@@ -213,7 +222,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     enteringTestHeaderLogger.debug(null);
 
-    when(meldingReader
+    when(getMeldingReader()
         .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(anyCollection().stream()))
         .thenThrow(new MeldingUnreadableException(new IOException("Noe gikk skeis")));
 

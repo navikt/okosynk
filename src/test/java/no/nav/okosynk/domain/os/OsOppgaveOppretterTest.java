@@ -4,23 +4,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
-
-import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.domain.AbstractOppgaveOppretterTest;
 import no.nav.okosynk.domain.Oppgave;
-import no.nav.okosynk.domain.os.OsMappingRegelRepository;
-import no.nav.okosynk.domain.os.OsMelding;
-import no.nav.okosynk.domain.os.OsOppgaveOppretter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("ConstantConditions")
-class OsOppgaveOppretterTest {
+class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
@@ -30,7 +28,6 @@ class OsOppgaveOppretterTest {
 
     private static final OsMelding OS_MELDING_1 = new OsMelding("10108000398022828640 2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    10108000398            ");
     private static final OsMelding OS_MELDING_2 = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         INNT    06025812345            ");
-
     private static final OsMelding OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF06025812345            ");
 
     private static final String OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "RETU;   1230kr;   beregningsdato/id:04.07.09/022828640;   periode:01.05.09-31.07.09;   feilkonto: ;   statusdato:26.09.09;   ;   UtbTil:10108000398;   K231B350";

@@ -4,23 +4,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.*;
-
-import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.domain.AbstractOppgaveOppretterTest;
 import no.nav.okosynk.domain.Oppgave;
-import no.nav.okosynk.domain.ur.UrMappingRegelRepository;
-import no.nav.okosynk.domain.ur.UrMelding;
-import no.nav.okosynk.domain.ur.UrOppgaveOppretter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("ConstantConditions")
-class UrOppgaveOppretterTest {
+class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");

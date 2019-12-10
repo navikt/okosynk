@@ -1,10 +1,11 @@
 package no.nav.okosynk.io;
 
 import java.util.function.Function;
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,22 +37,61 @@ abstract class AbstractMeldingLinjeFileReaderTest {
 
     private static String INPUT_FILE_NAME;
 
+    @BeforeEach
+    void beforeEach() {
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
+            "2");
+        getOkosynkConfiguration().setSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
+            "1000");
+    }
+
     // =========================================================================
     @Test
-    @DisplayName("Tests that fullyQualifiedInputFileName is not null when creating an instance of IMeldingLinjeFileReader")
-    void testUspesifikkMeldingLinjeFtpReaderFullyQualifiedInputFileNameIsNull() {
+    void when_number_of_retries_is_not_set_then_an_exception_should_upon_initiation_of_MeldingLinjeFileReader() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        getOkosynkConfiguration().clearSystemProperty(
+            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
+        final String fullyQualifiedInputFileName = "someNonEmptyFileName";
+
+        Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName)
+        );
+    }
+
+    @Test
+    void when_retry_wait_time_is_not_set_then_an_exception_should_upon_initiation_of_MeldingLinjeFileReader() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        getOkosynkConfiguration().clearSystemProperty(
+            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY);
+
+        final String fullyQualifiedInputFileName = "someNonEmptyFileName";
+
+        Assertions.assertThrows(
+            IllegalStateException.class,
+            () -> getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName)
+        );
+    }
+
+    @Test
+    void when_fully_qualified_input_file_name_is_null_then_an_npe_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
         Assertions.assertThrows(
             NullPointerException.class,
-            () -> getCreator().apply(null)
+            () -> getMeldingLinjeFileReaderCreator().apply(null)
         );
     }
 
     @Test
-    @DisplayName("Status set to not ok if fullyQualifiedInputFileName is empty")
-    void statusSetToFeilIfFullyQualifiedInputFileNameIsEmpty() {
+    void when_fully_qualified_input_file_name_is_empty_then_an_npe_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -61,12 +101,12 @@ abstract class AbstractMeldingLinjeFileReaderTest {
 
             Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> getCreator().apply(fullyQualifiedInputFileName)
+                () -> getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName)
             );
         }
     }
 
     // =========================================================================
 
-    protected abstract Function  <String           , IMeldingLinjeFileReader> getCreator();
+    protected abstract Function  <String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator();
 }

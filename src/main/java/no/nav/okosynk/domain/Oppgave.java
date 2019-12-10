@@ -32,7 +32,7 @@ public class Oppgave {
   public final String mappeId;
   public final String ansvarligSaksbehandlerIdent;
 
-  public Oppgave(OppgaveBuilder oppgaveBuilder) {
+  private Oppgave(OppgaveBuilder oppgaveBuilder) {
     this.oppgaveId = oppgaveBuilder.oppgaveId;
     this.aktoerId = oppgaveBuilder.aktoerId;
     this.samhandlernr = oppgaveBuilder.samhandlernr;
@@ -204,24 +204,7 @@ public class Oppgave {
 
     public Oppgave build() {
 
-      String warnStr = "";
-
-//            if (brukerId == null) {
-//                warnStr += "An oppgave is about to be built with brukerId null" + LOG_PARAGRAPH_SEPARATOR;
-//            }
-//            if (behandlingstema == null && behandlingstype == null) {
-//                warnStr += "An oppgave is about to be built with underkategoriKode null" + LOG_PARAGRAPH_SEPARATOR;
-//            }
-//            if (ansvarligEnhetId == null) {
-//                warnStr += "An oppgave is about to be built with ansvarligEnhetId null" + LOG_PARAGRAPH_SEPARATOR;
-//            }
-
       final Oppgave oppgave = new Oppgave(this);
-
-      if (!warnStr.isEmpty()) {
-        warnStr += "Oppgave: " + LOG_FIELD_SEPARATOR + oppgave.toString();
-        logger.warn(warnStr);
-      }
 
       return oppgave;
     }
@@ -266,29 +249,22 @@ public class Oppgave {
         new StringBuffer()
             .append("oppgaveId                  : ").append(oppgaveId).append(LOG_FIELD_SEPARATOR)
             .append("aktoerId                   : ").append(aktoerId).append(LOG_FIELD_SEPARATOR)
-            .append("samhandlernr               : ").append(samhandlernr)
-            .append(LOG_FIELD_SEPARATOR)
+            .append("samhandlernr               : ").append(samhandlernr).append(LOG_FIELD_SEPARATOR)
+            .append("beskrivelse                : ").append(beskrivelse == null ? "<null>" : beskrivelse.substring(0, Math.min(beskrivelse.length(), 30))).append("...").append(LOG_FIELD_SEPARATOR)
             .append("orgnr                      : ").append(orgnr).append(LOG_FIELD_SEPARATOR)
             .append("bnr                        : ").append(bnr).append(LOG_FIELD_SEPARATOR)
-            .append("oppgavetypeKode            : ").append(oppgavetypeKode)
-            .append(LOG_FIELD_SEPARATOR)
-            .append("fagomradeKode              : ").append(fagomradeKode)
-            .append(LOG_FIELD_SEPARATOR)
-            .append("behandlingstema            : ").append(behandlingstema)
-            .append(LOG_FIELD_SEPARATOR)
-            .append("behandlingstype            : ").append(behandlingstype)
-            .append(LOG_FIELD_SEPARATOR)
-            .append("prioritetKode              : ").append(prioritetKode)
-            .append(LOG_FIELD_SEPARATOR)
+            .append("oppgavetypeKode            : ").append(oppgavetypeKode).append(LOG_FIELD_SEPARATOR)
+            .append("fagomradeKode              : ").append(fagomradeKode).append(LOG_FIELD_SEPARATOR)
+            .append("behandlingstema            : ").append(behandlingstema).append(LOG_FIELD_SEPARATOR)
+            .append("behandlingstype            : ").append(behandlingstype).append(LOG_FIELD_SEPARATOR)
+            .append("prioritetKode              : ").append(prioritetKode).append(LOG_FIELD_SEPARATOR)
             .append("aktivFra                   : ").append(aktivFra).append(LOG_FIELD_SEPARATOR)
             .append("aktivTil                   : ").append(aktivTil).append(LOG_FIELD_SEPARATOR)
-            .append("ansvarligEnhetId           : ").append(ansvarligEnhetId)
-            .append(LOG_FIELD_SEPARATOR)
+            .append("ansvarligEnhetId           : ").append(ansvarligEnhetId).append(LOG_FIELD_SEPARATOR)
             .append("lest                       : ").append(lest).append(LOG_FIELD_SEPARATOR)
             .append("versjon                    : ").append(versjon).append(LOG_FIELD_SEPARATOR)
             .append("sistEndret                 : ").append(sistEndret).append(LOG_FIELD_SEPARATOR)
-            .append("antallMeldinger            : ").append(antallMeldinger)
-            .append(LOG_FIELD_SEPARATOR)
+            .append("antallMeldinger            : ").append(antallMeldinger).append(LOG_FIELD_SEPARATOR)
             .append("mappeId                    : ").append(mappeId).append(LOG_FIELD_SEPARATOR)
             .append("ansvarligSaksbehandlerIdent: ").append(ansvarligSaksbehandlerIdent);
 

@@ -1,7 +1,5 @@
 package no.nav.okosynk.domain;
 
-import no.nav.okosynk.domain.os.OsMelding;
-
 import java.util.Objects;
 
 public class MappingRegel {
@@ -10,8 +8,10 @@ public class MappingRegel {
     public final String behandlingstype;
     public final String ansvarligEnhetId;
 
-    public MappingRegel(String behandlingstema, String behandlingstype, String ansvarligEnhetId) {
-
+    public MappingRegel(
+        final String behandlingstema,
+        final String behandlingstype,
+        final String ansvarligEnhetId) {
         this.behandlingstema = behandlingstema;
         this.behandlingstype = behandlingstype;
         this.ansvarligEnhetId = ansvarligEnhetId;
