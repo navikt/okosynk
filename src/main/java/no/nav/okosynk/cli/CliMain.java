@@ -1,5 +1,6 @@
 package no.nav.okosynk.cli;
 
+import java.util.Map;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.cli.os.OsBatchService;
 import no.nav.okosynk.cli.testcertificates.TestCertificates_Copy;
@@ -16,8 +17,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 public class CliMain {
 
@@ -52,11 +51,20 @@ public class CliMain {
   private static final String CLI_UR_ONLY_LONG_KEY = "onlyUr";
   private static final String CLI_UR_ONLY_DESCRIPTION = "Only run ur batch";
 
+  private final IOkosynkConfiguration okosynkConfiguration;
+
+  public CliMain(final String applicationPropertiesFileName) {
+
+    // TODO: This instance of IOkosynkConfiguration should maybe be injected around.
+    final IOkosynkConfiguration okosynkConfiguration =
+        getOkosynkConfiguration(applicationPropertiesFileName);
+    this.okosynkConfiguration = okosynkConfiguration;
+    setUpCertificates();
+  }
+
   private IOkosynkConfiguration getOkosynkConfiguration() {
     return okosynkConfiguration;
   }
-
-  private final IOkosynkConfiguration okosynkConfiguration;
 
   private IStartableAndStoppable getFtpServerTestStarter() {
     return ftpServerTestStarter;
@@ -67,15 +75,6 @@ public class CliMain {
   }
 
   private IStartableAndStoppable ftpServerTestStarter = null;
-
-  public CliMain(final String applicationPropertiesFileName) {
-
-    // TODO: This instance of IOkosynkConfiguration should maybe be injected around.
-    final IOkosynkConfiguration okosynkConfiguration =
-        getOkosynkConfiguration(applicationPropertiesFileName);
-    this.okosynkConfiguration = okosynkConfiguration;
-    setUpCertificates();
-  }
 
   public static void main(String[] args) throws Exception {
 
@@ -391,7 +390,7 @@ public class CliMain {
     try {
       TestCertificates_Copy.setupKeyAndTrustStore();
     } catch (Throwable e) {
-      final String msg = "Exceptiond received when setting up test certificates.";
+      final String msg = "Exception received when setting up test certificates.";
       logger.info(msg);
       throw new RuntimeException(msg, e);
     }

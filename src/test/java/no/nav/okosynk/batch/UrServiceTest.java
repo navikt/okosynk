@@ -49,7 +49,7 @@ class UrServiceTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        System.setProperty("REST_STS_URL", "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
+        System.setProperty(Constants.REST_STS_URL_KEY, "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
         System.setProperty("URFTPBASEURL_URL", "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input");
         System.setProperty("URFTPCREDENTIALS_USERNAME", "someShitUserIdNotBeingUsedByNeitherThisOrThat");
         System.setProperty("URFTPCREDENTIALS_PASSWORD", "someShitPasswordNotBeingUsedByNeitherThisOrThat");

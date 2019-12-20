@@ -59,7 +59,7 @@ class OsServiceTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        System.setProperty("REST_STS_URL", "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
+        System.setProperty(Constants.REST_STS_URL_KEY, "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
         System.setProperty("OSFTPBASEURL_URL", "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input");
         System.setProperty("OSFTPCREDENTIALS_USERNAME", "someShitUserIdNotBeingUsedByNeitherThisOrThat");
         System.setProperty("OSFTPCREDENTIALS_PASSWORD", "someShitPasswordNotBeingUsedByNeitherThisOrThat");

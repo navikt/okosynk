@@ -2,27 +2,28 @@ package no.nav.okosynk.consumer.aktoer;
 
 import java.util.List;
 
-public class AktoerIdent {
-    private List<AktoerIdentEntry> identer;
-    private String feilmelding;
+class AktoerIdent {
 
-    public AktoerIdent() {
-        //JaxRs
-    }
+  private List<AktoerIdentEntry> identer;
+  private String feilmelding;
 
-    public List<AktoerIdentEntry> getIdenter() {
-        return identer;
-    }
+  public AktoerIdent() {
+    //JaxRs
+  }
 
-    public void setIdenter(List<AktoerIdentEntry> identer) {
-        this.identer = identer;
-    }
+  public List<AktoerIdentEntry> getIdenter() {
+    return identer;
+  }
 
-    public String getFeilmelding() {
-        return feilmelding;
-    }
+  public void setIdenter(final List<AktoerIdentEntry> identer) {
+    this.identer = identer;
+  }
 
-    public void setFeilmelding(String feilmelding) {
-        this.feilmelding = feilmelding;
-    }
+  public String getFeilmelding() {
+    return feilmelding;
+  }
+
+  public void setFeilmelding(final String feilmelding) {
+    this.feilmelding = feilmelding;
+  }
 }

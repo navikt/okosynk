@@ -2,7 +2,7 @@ package no.nav.okosynk.io.ur;
 
 import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.io.AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
+import no.nav.okosynk.io.AbstractMeldingLinjeSftpReaderUsingRealSftpTest;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,20 +14,40 @@ import org.junit.jupiter.api.BeforeAll;
  * <a href="https://stackoverflow.com/questions/12803942/secure-ftp-with-org-apache-commons-net-ftp-ftpclient">Secure FTP with org.apache.commons.net.ftp.FTPClient</a>
  */
 public class UrMeldingLinjeSftpReaderUsingRealSftpTest
-    extends AbstractUrMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
+    extends AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
     static {
-        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp
+        AbstractMeldingLinjeSftpReaderUsingRealSftpTest
             .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.SFTP);
     }
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         establishAndStartFTPServer();
     }
 
     @Override
-    protected Function<String, IMeldingLinjeFileReader> getCreator() {
+    protected boolean shouldRenameFileAfterSuccessfulRead() {
+        return true;
+    }
+
+    @Override
+    protected String getFtpHostUriKey() {
+        return Constants.BATCH_TYPE.UR.getFtpHostUrlKey();
+    };
+
+    @Override
+    protected String getFtpUserKey() {
+        return Constants.BATCH_TYPE.UR.getFtpUserKey();
+    };
+
+    @Override
+    protected String getFtpPasswordKey() {
+        return Constants.BATCH_TYPE.UR.getFtpPasswordKey();
+    };
+
+    @Override
+    protected Function<String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator() {
 
         return (
             fullyQualifiedInputFileName) ->

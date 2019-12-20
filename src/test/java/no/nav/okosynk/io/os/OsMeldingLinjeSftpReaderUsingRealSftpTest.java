@@ -1,11 +1,21 @@
 package no.nav.okosynk.io.os;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.io.AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp;
+import no.nav.okosynk.io.AbstractMeldingLinjeSftpReaderUsingRealSftpTest;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.MeldingLinjeSftpReader;
+import no.nav.okosynk.io.OkosynkIoException;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 /**
  * Refs.:
@@ -14,20 +24,45 @@ import org.junit.jupiter.api.BeforeAll;
  * <a href="https://stackoverflow.com/questions/12803942/secure-ftp-with-org-apache-commons-net-ftp-ftpclient">Secure FTP with org.apache.commons.net.ftp.FTPClient</a>
  */
 public class OsMeldingLinjeSftpReaderUsingRealSftpTest
-    extends AbstractOsMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
+    extends AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
     static {
-        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp
+        AbstractMeldingLinjeSftpReaderUsingRealSftpTest
             .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.SFTP);
     }
 
     @BeforeAll
-    public static void beforeAll() {
+    static void beforeAll() {
         establishAndStartFTPServer();
     }
 
     @Override
-    protected Function<String, IMeldingLinjeFileReader> getCreator() {
-        return (fullyQualifiedInputFileName) -> new MeldingLinjeSftpReader(getOkosynkConfiguration(), Constants.BATCH_TYPE.OS, fullyQualifiedInputFileName);
+    protected boolean shouldRenameFileAfterSuccessfulRead() {
+        return true;
+    }
+
+    @Override
+    protected String getFtpHostUriKey() {
+        return Constants.BATCH_TYPE.OS.getFtpHostUrlKey();
+    }
+
+    @Override
+    protected String getFtpUserKey() {
+        return Constants.BATCH_TYPE.OS.getFtpUserKey();
+    }
+
+    @Override
+    protected String getFtpPasswordKey() {
+        return Constants.BATCH_TYPE.OS.getFtpPasswordKey();
+    }
+
+    @Override
+    protected Function<String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator() {
+        return (
+            fullyQualifiedInputFileName)
+            ->
+            new MeldingLinjeSftpReader(
+                getOkosynkConfiguration(), Constants.BATCH_TYPE.OS, fullyQualifiedInputFileName
+            );
     }
 }

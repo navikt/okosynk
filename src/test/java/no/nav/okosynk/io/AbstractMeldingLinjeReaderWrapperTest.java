@@ -57,15 +57,11 @@ public abstract class AbstractMeldingLinjeReaderWrapperTest {
             (
                 MeldingLinjeReaderWrapper.class.getName().equals(actualWrappingMeldingLinjeFileReaderClassname)
                 &&
-                MeldingLinjeFtpReader.class.getName().equals(actualWrappedMeldingLinjeFileReaderClassname)
-                &&
                 OsMeldingLinjeReaderWrapperTest.class.getName().equals(actualTestClassname)
             )
             ||
             (
                 MeldingLinjeReaderWrapper.class.getName().equals(actualWrappingMeldingLinjeFileReaderClassname)
-                &&
-                MeldingLinjeFtpReader.class.getName().equals(actualWrappedMeldingLinjeFileReaderClassname)
                 &&
                 UrMeldingLinjeReaderWrapperTest.class.getName().equals(actualTestClassname)
             ),

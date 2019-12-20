@@ -1,11 +1,20 @@
 package no.nav.okosynk.io;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +25,9 @@ import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import no.nav.okosynk.testutil.AbstractTestFtpServer;
 import no.nav.okosynk.testutil.TestFtpServer;
 import no.nav.okosynk.testutil.TestSftpServer;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,14 +35,15 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
+public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.class);
+        LoggerFactory.getLogger(AbstractMeldingLinjeSftpReaderUsingRealSftpTest.class);
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
 
-    static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL = "testfilForMeldingsleser.txt";
+            static final String FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL = "testfilForMeldingsleser.txt";
+    private static final String INPUT_TEST_DATA_FILE_NAME_BACKUP_SUFFIX = ".test.backup";
     // =========================================================================
 
     public IOkosynkConfiguration getOkosynkConfiguration() {
@@ -42,30 +54,9 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     // =========================================================================
 
-    protected static void setFtpHostUriKey(String ftpHostUriKey) {
-        FTP_HOST_URI_KEY = ftpHostUriKey;
-    }
-
-    // Set by subclass:
-    private static String FTP_HOST_URI_KEY;
-
-    public static void setFtpHostPortKey(String ftpHostPortKey) {
-        FTP_HOST_PORT_KEY = ftpHostPortKey;
-    }
-
-    private static String FTP_HOST_PORT_KEY;
-
-    protected static void setFtpUserKey(String ftpUserKey) {
-        FTP_USER_KEY = ftpUserKey;
-    }
-
-    private static String FTP_USER_KEY;
-
-    protected static void setFtpPasswordKey(String ftpPasswordKey) {
-        FTP_PASSWORD_KEY = ftpPasswordKey;
-    }
-
-    private static String FTP_PASSWORD_KEY;
+    protected abstract String getFtpHostUriKey();
+    protected abstract String getFtpUserKey();
+    protected abstract String getFtpPasswordKey();
 
     private static String getFtpInputFilePath() {
         return FTP_INPUT_FILE_PATH;
@@ -82,7 +73,8 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         return FTP_INPUT_FILE_NAME;
     }
 
-    private static final String FTP_INPUT_FILE_NAME = AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
+    private static final String FTP_INPUT_FILE_NAME =
+        AbstractMeldingLinjeSftpReaderUsingRealSftpTest.FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
 
     public static void setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL ftpTestServerFtpProtocol) {
         FTP_TEST_SERVER_FTP_PROTOCOL = ftpTestServerFtpProtocol;
@@ -96,14 +88,15 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     }
 
     private static void setFtpTestServer(AbstractTestFtpServer ftpTestServer) {
-        AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.ftpTestServer = ftpTestServer;
+        AbstractMeldingLinjeSftpReaderUsingRealSftpTest.ftpTestServer = ftpTestServer;
     }
 
     // =========================================================================
     private static AbstractTestFtpServer ftpTestServer;
     // =========================================================================
+
     @AfterAll
-    protected static void freeFTPServerResources() {
+    static void freeFTPServerResources() {
         final AbstractTestFtpServer ftpTestServer = getFtpTestServer();
         if (ftpTestServer != null) {
             ftpTestServer.stop();
@@ -130,12 +123,23 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
     }
 
     @BeforeEach
-    public void setup() throws IOException {
+    void setup() throws IOException, URISyntaxException {
 
         final IOkosynkConfiguration okosynkConfiguration =
             new FakeOkosynkConfiguration();
 
-        setWorkingSystemProperties(okosynkConfiguration);
+        try {
+            setWorkingSystemProperties(okosynkConfiguration);
+        } catch (Throwable e) {
+            logger.error(
+                  "Call to setWorkingSystemProperties(okosynkConfiguration) threw. "
+                + "There may be many(?) causes to this, "
+                + "one is that there is trouble with the test data input file "
+                + "which implicitly means that the backup/restore "
+                + "methods in before/after each test has failed.",
+                e
+            );
+        }
 
         okosynkConfiguration.setSystemProperty(
             Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
@@ -147,6 +151,99 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         this.okosynkConfiguration = okosynkConfiguration;
 
         createAWorkingMeldingLinjeFtpOrSftpFileReader();
+
+        backupInputFileBeforeEach();
+    }
+
+    /**
+     * Since the input file will be
+     * renamed by many of the tests,
+     * a backup is made as a source
+     * for restore before each test
+     *
+     * @throws URISyntaxException
+     */
+    private void backupInputFileBeforeEach() throws URISyntaxException {
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+
+        if (!new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0()).exists()) {
+            restoreInputFileAfterEach();
+        } else {
+            try {
+                final File from = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+                final File to   = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue1());
+                System.out.println("from: " + from + ", to: " + to);
+                Files.copy(from.toPath(), to.toPath());
+            } catch (FileAlreadyExistsException e) {
+                // Probably OK, as the test did not succeed,
+                // and hence the input file was not renamed.
+            } catch (Throwable e) {
+                logger.error(
+                    "Could not back up input file before a test. "
+                        + "Some tests will or will not fail after this;-)",
+                    e
+                );
+            }
+        }
+    }
+
+    @AfterEach
+    void restoreInputFileAfterEach() {
+        // Since the input file will be
+        // renamed by many of the tests,
+        // a backup is made as a source
+        // for restore before each test:
+        try {
+            final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+                getFullyQualifiedOperatingSystemInputTestDataFileNames();
+            final File from = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue1());
+            final File to   = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+            System.out.println("from: " + from + ", to: " + to);
+            if (!to.exists()) {
+                Files.copy(from.toPath(), to.toPath());
+            }
+        } catch (Throwable e) {
+            logger.error(
+                  "Could not restore backed up input file after a test. "
+                + "Some tests will or will not fail after this;-)",
+                e
+            );
+        }
+    }
+
+    private Pair<String, String> getFullyQualifiedOperatingSystemInputTestDataFileNames()
+        throws URISyntaxException {
+
+        final String inputTestDataFileName       = FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL;
+        final String suffix                      = INPUT_TEST_DATA_FILE_NAME_BACKUP_SUFFIX;
+        final String inputTestDataBackupFileName = FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL + suffix;
+        final String[] fullyQualifiedOperatingSystemFileNames = new String[2];
+        int counter = 0;
+        for (final String fileName : new String[]{inputTestDataFileName, inputTestDataBackupFileName}) {
+            final URL resource =
+                AbstractTestFtpServer
+                    .class
+                    .getClassLoader()
+                    .getResource(fileName);
+            try {
+                final String fullyQualifiedOperatingSystemFileName =
+                    Paths.get(resource.toURI()).toString();
+                fullyQualifiedOperatingSystemFileNames[counter] = fullyQualifiedOperatingSystemFileName;
+            } catch (Throwable e) {
+                fullyQualifiedOperatingSystemFileNames[counter] = null;
+            }
+            counter++;
+        } // END for
+
+        if (fullyQualifiedOperatingSystemFileNames[0] == null) {
+            fullyQualifiedOperatingSystemFileNames[0] = fullyQualifiedOperatingSystemFileNames[1].replace(suffix, "");
+        } else {
+            fullyQualifiedOperatingSystemFileNames[1] = fullyQualifiedOperatingSystemFileNames[0] + suffix;
+        }
+
+        return Pair.fromArray(fullyQualifiedOperatingSystemFileNames);
     }
 
     private void setWorkingSystemProperties(final IOkosynkConfiguration okosynkConfiguration) {
@@ -165,6 +262,12 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
             try {
                 fullyQualifiedInputOperatingSystemFileName = Paths.get(resource.toURI()).toString();
             } catch (URISyntaxException e) {
+                logger.error(
+                      "Input file most probably not found, "
+                    + "which implicitly means that the backup/restore "
+                    + "methods in before/after each test has failed.",
+                    e
+                );
                 throw new RuntimeException(e);
             }
 
@@ -176,7 +279,8 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         // =====================================================================
         // === Used by OsMeldingLinjeFtpReader and UrMeldingLinjeFtpReader:
         // ===
-        final String ftpHostUriKey  = FTP_HOST_URI_KEY;
+        final String ftpHostUriKey  = getFtpHostUriKey();
+
         final String ftpHostUri     =
               FTP_TEST_SERVER_FTP_PROTOCOL
             + "://"
@@ -185,13 +289,13 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
             + AbstractTestFtpServer.FTP_TEST_SERVER_PORT
             + "/"
             + new File(
-                  AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFilePath(),
-                  AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp.getFtpInputFileName()
+                  AbstractMeldingLinjeSftpReaderUsingRealSftpTest.getFtpInputFilePath(),
+                  AbstractMeldingLinjeSftpReaderUsingRealSftpTest.getFtpInputFileName()
               ).getPath().replace('\\', '/')
             ;
-        final String ftpUserKey     = FTP_USER_KEY;
+        final String ftpUserKey     = getFtpUserKey();
         final String ftpUser        = AbstractTestFtpServer.FTP_TEST_SERVER_USER;
-        final String ftpPasswordKey = FTP_PASSWORD_KEY;
+        final String ftpPasswordKey = getFtpPasswordKey();
         final String ftpPassword    = AbstractTestFtpServer.FTP_TEST_SERVER_PASSWORD;
         // ---------------------------------------------------------------------
         okosynkConfiguration.setSystemProperty(ftpHostUriKey , ftpHostUri );
@@ -206,9 +310,12 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
     private IMeldingLinjeFileReader uspesifikkMeldingLinjeFileReader;
 
+    protected abstract boolean shouldRenameFileAfterSuccessfulRead();
+
     @Test
-    @DisplayName("Tets that reading an existing file using FTP is successful.")
-    void when_connecting_with_ok_parameters_and_reading_an_existing_file_then_no_error_should_result() throws OkosynkIoException {
+    @DisplayName("Tests that reading an existing file using FTP is successful.")
+    void when_connecting_with_ok_parameters_and_reading_an_existing_file_then_no_error_should_result()
+        throws OkosynkIoException, URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -220,10 +327,20 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         final List<String> actualLines = uspesifikkMeldingLinjeReader.read();
 
         assertEquals(3, actualLines.size());
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+        final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+
+        final boolean inputFileExistsAfterSuccessfulRead  = inputTestDataFile.exists();
+        final boolean shouldRenameFileAfterSuccessfulRead = shouldRenameFileAfterSuccessfulRead();
+
+        assertNotEquals(inputFileExistsAfterSuccessfulRead, shouldRenameFileAfterSuccessfulRead);
     }
 
     @Test
-    void when_connecting_ftp_with_an_invalid_host_then_an_configuration_exception_should_be_thrown() {
+    void when_connecting_ftp_with_an_invalid_host_then_an_configuration_exception_should_be_thrown()
+        throws URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -232,7 +349,7 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         // Invalidate a parameter so that
         // OsMeldingLinjeFtpReader and UrMeldingLinjeFtpReader don't not work any more:
-        final String key   = FTP_HOST_URI_KEY;
+        final String key   = getFtpHostUriKey();
         final String value = AbstractTestFtpServer.FTP_TEST_SERVER_HOST_URI + "__NOT";
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         okosynkConfiguration.setSystemProperty(key, value);
@@ -242,10 +359,17 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         final OkosynkIoException okosynkIoException =
             Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
         assertEquals(ErrorCode.CONFIGURE_OR_INITIALIZE, okosynkIoException.getErrorCode());
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+        final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+
+        assertTrue(inputTestDataFile.exists());
     }
 
     @Test
-    void when_connecting_ftp_with_an_invalid_userid_then_an_authentication_exception_should_be_thrown() {
+    void when_connecting_ftp_with_an_invalid_userid_then_an_authentication_exception_should_be_thrown()
+        throws URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -254,7 +378,7 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         // Invalidate a parameter so that
         // OsMeldingLinjeFtpReader and UrMeldingLinjeFtpReader don't not work any more:
-        final String key   = FTP_USER_KEY;
+        final String key   = getFtpUserKey();
         final String value = AbstractTestFtpServer.FTP_TEST_SERVER_USER + "__NOT";
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         okosynkConfiguration.setSystemProperty(key, value);
@@ -264,10 +388,17 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         final OkosynkIoException okosynkIoException =
             Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
         assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+        final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+
+        assertTrue(inputTestDataFile.exists());
     }
 
     @Test
-    void when_connecting_ftp_with_an_invalid_password_then_an_authentication_exception_should_be_thrown() {
+    void when_connecting_ftp_with_an_invalid_password_then_an_authentication_exception_should_be_thrown()
+        throws URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -276,7 +407,7 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
 
         // Invalidate a parameter so that
         // OsMeldingLinjeFtpReader and UrMeldingLinjeFtpReader don't not work any more:
-        final String key   = FTP_PASSWORD_KEY;
+        final String key   = getFtpPasswordKey();
         final String value = AbstractTestFtpServer.FTP_TEST_SERVER_PASSWORD + "__NOT";
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         okosynkConfiguration.setSystemProperty(key, value);
@@ -286,10 +417,17 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         final OkosynkIoException okosynkIoException =
             Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
         assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+        final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+
+        assertTrue(inputTestDataFile.exists());
     }
 
     @Test
-    void when_the_input_file_does_not_exist_then_an_adequate_exception_should_be_thrown_after_a_specified_number_of_retries() {
+    void when_the_input_file_does_not_exist_then_an_adequate_exception_should_be_thrown_after_a_specified_number_of_retries()
+        throws URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -305,13 +443,49 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
         assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
         assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
+
+        final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
+            getFullyQualifiedOperatingSystemInputTestDataFileNames();
+        final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
+
+        assertTrue(inputTestDataFile.exists());
+    }
+
+    @Test
+    void when_input_file_does_not_exist_then_a_read_should_be_retried_a_maximum_number_of_times()
+        throws OkosynkIoException {
+
+        final String fullyQualifiedInputFileName = "FileNameOfNonExistingFile";
+
+        final Function<String, IMeldingLinjeFileReader> meldingLinjeSftpReaderCreator =
+            getMeldingLinjeFileReaderCreator();
+
+        final int expectedNumberOfRetries =
+            getOkosynkConfiguration()
+                .getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
+        final OkosynkIoException.ErrorCode expectedErrorCode =
+            ErrorCode.NUMBER_OF_RETRIES_EXCEEDED;
+
+        final MeldingLinjeSftpReader meldingLinjeSftpReader =
+            (MeldingLinjeSftpReader)
+                meldingLinjeSftpReaderCreator.apply(fullyQualifiedInputFileName);
+
+        final MeldingLinjeSftpReader spiedMeldingLinjeSftpReader =
+            spy(meldingLinjeSftpReader);
+
+        final OkosynkIoException actualOkosynkIoException =
+            assertThrows(OkosynkIoException.class, () -> spiedMeldingLinjeSftpReader.read());
+
+        assertEquals(expectedErrorCode, actualOkosynkIoException.getErrorCode());
+        verify(spiedMeldingLinjeSftpReader, times(expectedNumberOfRetries)).lesMeldingerFraFil(any());
     }
 
     private void createAWorkingMeldingLinjeFtpOrSftpFileReader() throws IOException {
 
         final File path = new File(FTP_INPUT_FILE_PATH, FILNAVN_EXISTING_UR_OR_OS_INPUT_FIL);
 
-        this.uspesifikkMeldingLinjeFileReader = getCreator().apply(path.getCanonicalPath());
+        this.uspesifikkMeldingLinjeFileReader =
+            getMeldingLinjeFileReaderCreator().apply(path.getCanonicalPath());
     }
 
     private IMeldingLinjeFileReader createAWorkingFtpServerAndAnInstanceOfMeldingLinjeFtpOrSftpFileReader() {
@@ -323,16 +497,16 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
             new File(ftpFilePath, ftpFileName).getPath().replace('\\', '/');
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader =
-            getCreator().apply(fullyQualifiedInputFileName);
+            getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName);
 
         return uspesifikkMeldingLinjeReader;
     }
 
     private void logTestProperties() {
 
-        final String ftpHostUriKey  = FTP_HOST_URI_KEY;
-        final String ftpUserKey     = FTP_USER_KEY;
-        final String ftpPasswordKey = FTP_PASSWORD_KEY;
+        final String ftpHostUriKey  = getFtpHostUriKey();
+        final String ftpUserKey     = getFtpUserKey();
+        final String ftpPasswordKey = getFtpPasswordKey();
         final String ftpFilePath    = FTP_INPUT_FILE_PATH;
         final String ftpFileName    = FTP_INPUT_FILE_NAME;
 
@@ -353,5 +527,5 @@ public abstract class AbstractMeldingLinjeFtpReaderTestUsingRealFtpOrSftp {
         );
     }
 
-    protected abstract Function<String, IMeldingLinjeFileReader> getCreator();
+    protected abstract Function<String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator();
 }

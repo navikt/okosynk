@@ -7,12 +7,12 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-
+import java.util.Base64;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.STSOidcResponse;
@@ -31,20 +31,25 @@ import org.slf4j.LoggerFactory;
 class OidcStsClient {
 
   private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
+
   private final CloseableHttpClient httpClient;
   private final URI endpointUri;
   private final UsernamePasswordCredentials credentials;
   private final String batchBruker;
   private String oidcToken;
 
-  OidcStsClient(IOkosynkConfiguration okosynkConfiguration, Constants.BATCH_TYPE batchType) {
+  OidcStsClient(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE  batchType) {
+
     this.batchBruker = okosynkConfiguration
         .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
     this.credentials = new UsernamePasswordCredentials(this.batchBruker,
         okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
 
     try {
-      this.endpointUri = new URIBuilder(okosynkConfiguration.getRequiredString("REST_STS_URL"))
+      this.endpointUri =
+          new URIBuilder(okosynkConfiguration.getRequiredString(Constants.REST_STS_URL_KEY))
           .addParameter("grant_type", "client_credentials")
           .addParameter("scope", "openid")
           .build();
@@ -53,69 +58,74 @@ class OidcStsClient {
     }
 
     this.httpClient = HttpClients.createDefault();
-    this.oidcToken = getTokenFromSts();
+    this.oidcToken  = getTokenFromSts();
   }
 
   String getOidcToken() {
-    if (isExpired(oidcToken)) {
+
+    if (isExpired(this.oidcToken)) {
       log.info("OIDC Token for {} expired, getting a new one from the STS", this.batchBruker);
-      oidcToken = getTokenFromSts();
+      this.oidcToken = getTokenFromSts();
     }
 
-    return oidcToken;
+    return this.oidcToken;
   }
 
-  private boolean isExpired(String oidcToken) {
-    ObjectMapper mapper = new ObjectMapper();
+  private boolean isExpired(final String oidcToken) {
 
+    final boolean isExpired;
+    final ObjectMapper mapper = new ObjectMapper();
+    final String oidcTokenBetweenTags = substringBetween(oidcToken, ".");
+    final String tokenBody = new String(Base64.getDecoder().decode(oidcTokenBetweenTags));
+    final JsonNode node;
     try {
-      String tokenBody = new String(
-          java.util.Base64.getDecoder().decode(substringBetween(oidcToken, ".")));
-      JsonNode node = mapper.readTree(tokenBody);
-
-      Instant now = Instant.now();
-      Instant expiry = Instant.ofEpochSecond(node.get("exp").longValue())
-          .minusSeconds(300);//5 min timeskew
-
-      if (now.isAfter(expiry)) {
-        log.info("OIDC token expired {} is after {}", now, expiry);
-        return true;
-      }
+      node = mapper.readTree(tokenBody);
     } catch (IOException e) {
       throw new IllegalStateException("Klarte ikke parse oidc token fra STS", e);
     }
+    final Instant now = Instant.now();
+    final Instant expiry = Instant.ofEpochSecond(node.get("exp").longValue())
+        .minusSeconds(300);//5 min timeskew
+    if (now.isAfter(expiry)) {
+      log.info("OIDC token expired {} is after {}", now, expiry);
+      isExpired = true;
+    } else {
+      isExpired = false;
+    }
 
-    return false;
+    return isExpired;
   }
 
   private String getTokenFromSts() {
-    log.info("henter OIDC Token for {}.", this.batchBruker);
-    HttpGet request = new HttpGet(this.endpointUri);
-    request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
 
+    log.info("henter OIDC Token for {}.", this.batchBruker);
+    final HttpGet request = new HttpGet(this.endpointUri);
+    request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
     try {
-      request.addHeader(new BasicScheme(UTF_8).authenticate(credentials, request, null));
+      request.addHeader(new BasicScheme(UTF_8).authenticate(this.credentials, request, null));
     } catch (AuthenticationException e) {
+      // As far as I have found out,
+      // the declared exception is NEVER thrown.
       throw new IllegalStateException(e);
     }
 
-    try (CloseableHttpResponse response = httpClient.execute(request)) {
-      StatusLine statusLine = response.getStatusLine();
-      if (statusLine.getStatusCode() != 200) {
-        throw new IllegalStateException(String
-            .format("Feil oppsto under henting av token fra STS - %s",
-                statusLine.getReasonPhrase()));
+    try (final CloseableHttpResponse response = this.httpClient.execute(request)) {
+      final StatusLine statusLine = response.getStatusLine();
+      if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
+        final STSOidcResponse stsOidcResponse;
+        try {
+          stsOidcResponse = new ObjectMapper()
+              .readValue(response.getEntity().getContent(), STSOidcResponse.class);
+        } catch (IOException e) {
+          throw new IllegalStateException("Klarte ikke deserialisere respons fra STS", e);
+        }
+        return stsOidcResponse.getAccessToken();
+      } else {
+        final String msg =
+              "Feil oppsto under henting av token fra STS - %s"
+            + HttpResponseUtil.createStringRepresentationOfResponseEntity(response);
+        throw new IllegalStateException(String.format(msg, statusLine.getReasonPhrase()));
       }
-
-      STSOidcResponse stsOidcResponse;
-      try {
-        stsOidcResponse = new ObjectMapper()
-            .readValue(response.getEntity().getContent(), STSOidcResponse.class);
-      } catch (IOException e) {
-        throw new IllegalStateException("Klarte ikke deserialisere respons fra STS", e);
-      }
-
-      return stsOidcResponse.getAccess_token();
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }

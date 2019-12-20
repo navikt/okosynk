@@ -155,9 +155,9 @@ public class Constants {
   private static final String OS_FTP_USER_KEY = "OSFTPCREDENTIALS_USERNAME";
   private static final String OS_FTP_PASSWORD_KEY = "OSFTPCREDENTIALS_PASSWORD";
   private static final String OS_FTP_CONNECTION_TIMEOUT_KEY = "OS_FTP_CONNECT_TIMEOUT_IN_MS";
-  private static final int    OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
+  private static final int OS_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
   private static final String OS_FTP_CHARSET_NAME_KEY = "OS_FTP_CHARSET";
-  private static final long   OS_EXECUTION_ID_OFFSET = 0L;
+  private static final long OS_EXECUTION_ID_OFFSET = 0L;
   private static final String OS_MAPPING_RULES_PROPERTIES_FILENAME = "os_mapping_regler.properties";
   // -------------------------------------------------------------------------
   private static final String UR_BATCH_NAVN = "bokosynk002";
@@ -170,9 +170,9 @@ public class Constants {
   private static final String UR_FTP_USER_KEY = "URFTPCREDENTIALS_USERNAME";
   private static final String UR_FTP_PASSWORD_KEY = "URFTPCREDENTIALS_PASSWORD";
   private static final String UR_FTP_CONNECTION_TIMEOUT_KEY = "UR_FTP_CONNECT_TIMEOUT_IN_MS";
-  private static final int    UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
+  private static final int UR_FTP_CONNECTION_TIMEOUT_DEFAULT_VALUE_IN_MS = 20000;
   private static final String UR_FTP_CHARSET_NAME_KEY = "UR_FTP_CHARSET";
-  private static final long   UR_EXECUTION_ID_OFFSET = Long.MAX_VALUE / 2;
+  private static final long UR_EXECUTION_ID_OFFSET = Long.MAX_VALUE / 2;
   private static final String UR_MAPPING_RULES_PROPERTIES_FILENAME = "ur_mapping_regler.properties";
   // =========================================================================
   // =========================================================================
@@ -283,7 +283,7 @@ public class Constants {
   private static final String OPPGAVEBEHANDLING_WITHMOCK_KEY = "OPPGAVEBEHANDLING_WITHMOCK";
   private static final String VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL_KEY = "VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL";
   private static final String OPPGAVE_BEHANDLING_TJENESTEBESKRIVELSE = "OppgavebehandlingV3";
-  private static final int    OPPGAVE_BEHANDLING_TIMEOUT = 120000;
+  private static final int OPPGAVE_BEHANDLING_TIMEOUT = 120000;
   private static final String OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_KEY = "OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL";
   private static final String OPPGAVEBEHANDLING_OPPRETTOPPGAVEBOLK_MAXANTALL_DEFAULT_VALUE = "50";
   private static final String OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL_KEY = "OPPGAVEBEHANDLING_OPPDATEROPPGAVEBOLK_MAXANTALL";
@@ -292,15 +292,15 @@ public class Constants {
   // ==========================================================================================================================
   public static final String OKOSYNK_SHOULD_RUN_DRY_KEY = "OKOSYNK_SHOULD_RUN_DRY";
   public static final boolean OKOSYNK_SHOULD_RUN_DRY_DEFAULT_VALUE = false;
-         static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
-         static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
+  static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
+  static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
   public static final String SHOULD_USE_SOAP_KEY = "SHOULD_USE_SOAP";
-         static final String SRVBOKOSYNK_USERNAME_KEY = "SRVBOKOSYNK_USERNAME";
-         static final String SRVBOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.username";
-         static final String SRVBOKOSYNK_PASSWORD_KEY = "SRVBOKOSYNK_PASSWORD";
-         static final String SYSTEM_USER_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.password";
-         static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
-         static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
+  static final String SRVBOKOSYNK_USERNAME_KEY = "SRVBOKOSYNK_USERNAME";
+  static final String SRVBOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.username";
+  static final String SRVBOKOSYNK_PASSWORD_KEY = "SRVBOKOSYNK_PASSWORD";
+  static final String SYSTEM_USER_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.password";
+  static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
+  static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
   public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
   public static final String FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY = "file.reader.retry.wait.time.in.ms";
   public static final String FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY = "file.reader.max.number.of.tries";
@@ -321,6 +321,8 @@ public class Constants {
   public static final String NAV_TRUSTSTORE_PATH_EXT_KEY = "javax.net.ssl.trustStore";
   public static final String NAV_TRUSTSTORE_PASSWORD_KEY = "NAV_TRUSTSTORE_PASSWORD";
   public static final String NAV_TRUSTSTORE_PASSWORD_EXT_KEY = "javax.net.ssl.trustStorePassword";
+  public static final String REST_STS_URL_KEY = "REST_STS_URL";
+  public static final String REST_AKTOER_REGISTER_URL_KEY = "AKTOERREGISTER_URL";
   // ==========================================================================================================================
   // ==========================================================================================================================
 }

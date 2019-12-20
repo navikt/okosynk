@@ -2,35 +2,35 @@ package no.nav.okosynk.consumer;
 
 public class STSOidcResponse {
 
-    public STSOidcResponse() {
+  public STSOidcResponse() {
 
-    }
+  }
 
-    private String access_token;
-    private String token_type;
-    private Integer expires_in;
+  private String accessToken;
+  private String tokenType;
+  private Integer expiresIn;
 
-    public String getAccess_token() {
-        return access_token;
-    }
+  public String getAccessToken() {
+    return this.accessToken;
+  }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
-    }
+  public void setAccessToken(final String accessToken) {
+    this.accessToken = accessToken;
+  }
 
-    public String getToken_type() {
-        return token_type;
-    }
+  public String getTokenType() {
+    return this.tokenType;
+  }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
-    }
+  public void setTokenType(final String tokenType) {
+    this.tokenType = tokenType;
+  }
 
-    public Integer getExpires_in() {
-        return expires_in;
-    }
+  public Integer getExpiresIn() {
+    return this.expiresIn;
+  }
 
-    public void setExpires_in(Integer expires_in) {
-        this.expires_in = expires_in;
-    }
+  public void setExpiresIn(final Integer expiresIn) {
+    this.expiresIn = expiresIn;
+  }
 }
