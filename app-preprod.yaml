@@ -103,9 +103,9 @@ spec:
                 - name: SECURITYTOKENSERVICE_URL
                   value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
-                  value: 300000
+                  value: "300000"
                 - name: FILE_READER_MAX_NUMBER_OF_TRIES
-                  value: 18
+                  value: "18"
               volumeMounts:
                 - name: okosynk
                   mountPath: "/var/run/secrets/naisd.io/"
