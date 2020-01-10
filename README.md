@@ -248,6 +248,10 @@ Følgene kommando er heller ikke å forakte:<BR/>
 | ```kubectl config set-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) | ```--namespace="okosynk"``` |      |
 | ```kubectl create job --from=cronjob/okosynk "oor-manually-started-2019-03-11-13-07"``` |                      |      |                   |                             |      |
 
+### Slett en jobb
+
+```kubectl delete job oor-manually-started-2020-01-10-18-18```
+
 ### Logging
 Hver batch har sin egen logg-fil, i tillegg logger hver batch alle tjenestekall til sensitiv logg.
 
