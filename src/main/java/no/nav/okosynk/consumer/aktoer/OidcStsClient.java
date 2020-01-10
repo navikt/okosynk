@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Scanner;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.STSOidcResponse;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -112,12 +115,20 @@ class OidcStsClient {
     try (final CloseableHttpResponse response = this.httpClient.execute(request)) {
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
+              String          stsOidcResponseAsString = null;
         final STSOidcResponse stsOidcResponse;
         try {
-          stsOidcResponse = new ObjectMapper()
-              .readValue(response.getEntity().getContent(), STSOidcResponse.class);
+          stsOidcResponseAsString =
+              IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8.name());
+          stsOidcResponse =
+              new ObjectMapper().readValue(stsOidcResponseAsString, STSOidcResponse.class);
         } catch (IOException e) {
-          throw new IllegalStateException("Klarte ikke deserialisere respons fra STS", e);
+          throw new IllegalStateException(
+                "Klarte ikke deserialisere respons fra STS. stsOidcResponseAsString: "
+              + System.lineSeparator()
+              + stsOidcResponseAsString,
+              e
+          );
         }
         return stsOidcResponse.getAccessToken();
       } else {
