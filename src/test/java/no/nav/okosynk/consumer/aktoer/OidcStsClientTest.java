@@ -24,7 +24,7 @@ import java.util.Base64;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.STSOidcResponse;
+import no.nav.okosynk.consumer.StsOidcResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +72,7 @@ public class OidcStsClientTest {
 
   static void setupStubWithOKResponseEntityAndWithAnInterpretableToken(final WireMockServer wireMockServer) throws JsonProcessingException {
 
-    final STSOidcResponse stsOidcResponse = new STSOidcResponse();
+    final StsOidcResponse stsOidcResponse = new StsOidcResponse();
 
     stsOidcResponse.setAccessToken(OidcStsClientTest.TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN);
     stsOidcResponse.setExpiresIn(Integer.MAX_VALUE);
@@ -302,13 +302,13 @@ public class OidcStsClientTest {
   private void setupStubWithOKResponseEntityAndWithAnInterpretableTokenThatIsFirstExpiredAndThenFresh()
       throws JsonProcessingException {
 
-    final STSOidcResponse stsOidcResponse1 = new STSOidcResponse();
+    final StsOidcResponse stsOidcResponse1 = new StsOidcResponse();
     stsOidcResponse1.setAccessToken(TEST_BASE64_ENCODED_AND_TAGGED_EXPIRED_JSON_TOKEN);
     stsOidcResponse1.setExpiresIn(78);
     stsOidcResponse1.setTokenType("SOME RUBBISH TOKEN TYPE FOR TESTING PURPOSES");
     final String presumableJsonOfFirstSTSOidcResponse = new ObjectMapper().writeValueAsString(stsOidcResponse1);
 
-    final STSOidcResponse stsOidcResponse2 = new STSOidcResponse();
+    final StsOidcResponse stsOidcResponse2 = new StsOidcResponse();
     stsOidcResponse2.setAccessToken(TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN);
     stsOidcResponse2.setExpiresIn(78);
     stsOidcResponse2.setTokenType("SOME RUBBISH TOKEN TYPE FOR TESTING PURPOSES");
@@ -323,7 +323,7 @@ public class OidcStsClientTest {
 
   private void setupStubWithOKResponseEntityAndWithAnInterpretableTokenButWithAnErroneousUrl() throws JsonProcessingException {
 
-    final STSOidcResponse stsOidcResponse = new STSOidcResponse();
+    final StsOidcResponse stsOidcResponse = new StsOidcResponse();
 
     stsOidcResponse.setAccessToken(TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN);
     stsOidcResponse.setExpiresIn(78);
@@ -339,7 +339,7 @@ public class OidcStsClientTest {
 
   private void setupStubWithOKResponseEntityButWithAnUninterpretableToken() throws JsonProcessingException {
 
-    final STSOidcResponse stsOidcResponse = new STSOidcResponse();
+    final StsOidcResponse stsOidcResponse = new StsOidcResponse();
     stsOidcResponse.setAccessToken("kjnjdfskjnskjnckjsnc");
     stsOidcResponse.setExpiresIn(78);
     stsOidcResponse.setTokenType("SOME RUBBISH TOKEN TYPE FOR TESTING PURPOSES");

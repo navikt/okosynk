@@ -14,10 +14,9 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
-import java.util.Scanner;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.STSOidcResponse;
+import no.nav.okosynk.consumer.StsOidcResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
@@ -116,12 +115,12 @@ class OidcStsClient {
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
               String          stsOidcResponseAsString = null;
-        final STSOidcResponse stsOidcResponse;
+        final StsOidcResponse stsOidcResponse;
         try {
           stsOidcResponseAsString =
               IOUtils.toString(response.getEntity().getContent(), StandardCharsets.UTF_8.name());
           stsOidcResponse =
-              new ObjectMapper().readValue(stsOidcResponseAsString, STSOidcResponse.class);
+              new ObjectMapper().readValue(stsOidcResponseAsString, StsOidcResponse.class);
         } catch (IOException e) {
           throw new IllegalStateException(
                 "Klarte ikke deserialisere respons fra STS. stsOidcResponseAsString: "
