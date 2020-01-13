@@ -37,7 +37,7 @@ som oppført i docker-compose.yml.
                     AND o.opprettet_av = 'srvokosynk'
                     AND o.k_oppgave_t = 'OKO_UR';
             ```
-        
+            
             ```
            SELECT e.NUMMER, o.K_UNDERKATEGORI, COUNT(*) AS antall
            FROM T_OPPGAVE o, T_ORG_ENHET e
@@ -50,7 +50,7 @@ som oppført i docker-compose.yml.
         
        ```
         
-           ```
+       ```
            CREATE TYPE strings AS TABLE OF VARCHAR2(40);
            /
            CREATE TYPE numbers AS TABLE OF NUMBER(10);
@@ -73,9 +73,9 @@ som oppført i docker-compose.yml.
            DROP TYPE strings;
            /
            DROP TYPE numbers;
-
+    
            ```
-        
+            
            ```
            CREATE TYPE strings AS TABLE OF VARCHAR2(40);
            /
@@ -98,9 +98,9 @@ som oppført i docker-compose.yml.
            DROP TYPE strings;
            /
            DROP TYPE numbers;
-        
+            
            ```
-        
+            
            ```
 
 0. Noter
@@ -130,7 +130,14 @@ docker login -u <uid> -p <password> repo.adeo.no:5443
 docker push repo.adeo.no:5443/okosynk:<version>
 ```
 (The uid and pwd are your ldap/AD NAV user logon ident, like e.g. R149852)
-### Deploy til Kubernetes
+### Kubernetes deployment
+
+If you have trouble accessing ```kubectl``` through the [NAV Tunnel](https://github.com/navikt/navtunnel), try update your config like this (having your kubeconfigs directory as the current one):
+
+```git reset --hard && git checkout master && git pull```
+
+Ref.: [kubectl](https://github.com/navikt/kubeconfigs)
+
 Husk: Teamet som forvalter okosynk må ha definert en
 korresponderende gruppe her: [Teams](https://navno.sharepoint.com/sites/Bestillinger/Lists/Nytt%20Team/AllItems.aspx). Og alle teamets medlemmer (levende mennesker av kjøtt og blod) må legges inn som medlemmer af gruppas eier her: [Legg til medlemmer](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/GroupsManagementMenuBlade/AllGroups)
 
