@@ -115,8 +115,6 @@ public class OppgaveSynkroniserer {
         new HashSet<>(alleOppgaverLestFraBatchenFuncParm);
 
     final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
-    //final ConsumerStatistics consumerStatistics_finn =
-    //     oppgaveGateway.finnOppgaver(bruker, oppgaverLestFraDatabasen);
     final ConsumerStatistics consumerStatistics_finn =
         getOppgaveRestClient()
           .finnOppgaver(oppgaverLestFraDatabasen);
@@ -179,7 +177,6 @@ public class OppgaveSynkroniserer {
       } else {
         logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker,
             oppgaverSomSkalFerdigstilles.size());
-        //consumerStatistics = oppgaveBehandlingGateway.patchOppgaver(oppgaverSomSkalFerdigstilles);
         consumerStatistics = getOppgaveRestClient()
             .patchOppgaver(oppgaverSomSkalFerdigstilles, true);
         logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker,
@@ -213,8 +210,6 @@ public class OppgaveSynkroniserer {
               .stream()
               .map(OppgaveOppdatering::oppdater)
               .collect(Collectors.toSet());
-      // consumerStatistics =
-      //     oppgaveBehandlingGateway.oppdaterOppgaver(okosynkConfiguration, oppdaterteOppgaver);
       consumerStatistics = getOppgaveRestClient().patchOppgaver(oppdaterteOppgaver, false);
       logger.info("Bruker {} har oppdatert {} oppgaver", bruker,
           consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
@@ -280,7 +275,7 @@ public class OppgaveSynkroniserer {
 
     logger.info(
         "STATISTIKK: accumulatedConsumerStatistics etter synkronisering: {}",
-        accumulatedConsumerStatistics
+        accumulatedConsumerStatistics.toString()
     );
   }
 

@@ -19,7 +19,7 @@ public class ConsumerStatistics {
   private final int antallOppgaverSomMedSikkerhetErFerdigstilt;
   private final int antallOppgaverSomMedSikkerhetIkkeErFerdigstilt;
   private final int antallOppgaverSomKanVaereFerdigstilt;
-  private final int numberOfExceptionReceivedDuringRun;
+  private final int numberOfExceptionsReceivedDuringRun;
 
   private ConsumerStatistics(final Builder builder) {
 
@@ -46,8 +46,8 @@ public class ConsumerStatistics {
         builder.antallOppgaverSomMedSikkerhetIkkeErFerdigstilt;
     this.antallOppgaverSomKanVaereFerdigstilt =
         builder.antallOppgaverSomKanVaereFerdigstilt;
-    this.numberOfExceptionReceivedDuringRun =
-        builder.numberOfExceptionReceivedDuringRun;
+    this.numberOfExceptionsReceivedDuringRun =
+        builder.numberOfExceptionsReceivedDuringRun;
   }
 
   public static ConsumerStatistics zero(final BATCH_TYPE batchType) {
@@ -125,8 +125,8 @@ public class ConsumerStatistics {
         .antallOppgaverSomMedSikkerhetIkkeErOppdatert(
             other.antallOppgaverSomMedSikkerhetIkkeErOppdatert
                 + this.antallOppgaverSomMedSikkerhetIkkeErOppdatert)
-        .numberOfExceptionReceivedDuringRun(
-            other.numberOfExceptionReceivedDuringRun + this.numberOfExceptionReceivedDuringRun)
+        .numberOfExceptionsReceivedDuringRun(
+            other.numberOfExceptionsReceivedDuringRun + this.numberOfExceptionsReceivedDuringRun)
         .build();
   }
 
@@ -155,7 +155,7 @@ public class ConsumerStatistics {
     private int antallOppgaverSomMedSikkerhetErFerdigstilt;
     private int antallOppgaverSomMedSikkerhetIkkeErFerdigstilt;
     private int antallOppgaverSomKanVaereFerdigstilt;
-    private int numberOfExceptionReceivedDuringRun;
+    private int numberOfExceptionsReceivedDuringRun;
 
     private Builder() {
     }
@@ -223,8 +223,8 @@ public class ConsumerStatistics {
       return this;
     }
 
-    Builder numberOfExceptionReceivedDuringRun(final int value) {
-      this.numberOfExceptionReceivedDuringRun = value;
+    Builder numberOfExceptionsReceivedDuringRun(final int value) {
+      this.numberOfExceptionsReceivedDuringRun = value;
       return this;
     }
   }
@@ -236,6 +236,7 @@ public class ConsumerStatistics {
         .append("antallOppgaverSomErHentetFraDatabasen", this.antallOppgaverSomErHentetFraDatabasen)
         .append("antallOppgaverSomMedSikkerhetErOpprettet",
             this.antallOppgaverSomMedSikkerhetErOpprettet)
+        .append("antallOppgaverSomMedSikkerhetIkkeErOpprettet", this.antallOppgaverSomMedSikkerhetIkkeErOpprettet)
         .append("antallOppgaverSomKanVaereOpprettet", this.antallOppgaverSomKanVaereOpprettet)
         .append("antallOppgaverSomMedSikkerhetErOppdatert",
             this.antallOppgaverSomMedSikkerhetErOppdatert)
@@ -247,6 +248,7 @@ public class ConsumerStatistics {
         .append("antallOppgaverSomMedSikkerhetIkkeErFerdigstilt",
             this.antallOppgaverSomMedSikkerhetIkkeErFerdigstilt)
         .append("antallOppgaverSomKanVaereFerdigstilt", this.antallOppgaverSomKanVaereFerdigstilt)
+        .append("numberOfExceptionsReceivedDuringRun", this.numberOfExceptionsReceivedDuringRun)
         .toString();
   }
 
@@ -297,8 +299,8 @@ public class ConsumerStatistics {
                       this.antallOppgaverSomKanVaereFerdigstilt == otherConsumerStatistics
                           .getAntallOppgaverSomKanVaereFerdigstilt()
                       &&
-                      this.numberOfExceptionReceivedDuringRun == otherConsumerStatistics
-                          .getNumberOfExceptionReceivedDuringRun()
+                      this.numberOfExceptionsReceivedDuringRun == otherConsumerStatistics
+                          .getNumberOfExceptionsReceivedDuringRun()
               )
       ;
     }
@@ -317,6 +319,10 @@ public class ConsumerStatistics {
 
   public int getAntallOppgaverSomMedSikkerhetErOpprettet() {
     return this.antallOppgaverSomMedSikkerhetErOpprettet;
+  }
+
+  public int getAntallOppgaverSomMedSikkerhetIkkeErOpprettet() {
+    return this.antallOppgaverSomMedSikkerhetIkkeErOpprettet;
   }
 
   public int getAntallOppgaverSomKanVaereOpprettet() {
@@ -347,7 +353,7 @@ public class ConsumerStatistics {
     return this.antallOppgaverSomKanVaereFerdigstilt;
   }
 
-  public int getNumberOfExceptionReceivedDuringRun() {
-    return this.numberOfExceptionReceivedDuringRun;
+  public int getNumberOfExceptionsReceivedDuringRun() {
+    return this.numberOfExceptionsReceivedDuringRun;
   }
 }

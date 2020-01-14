@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -79,6 +78,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomMedSikkerhetErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetErOppdatert(primes[i++])
             .antallOppgaverSomMedSikkerhetErOpprettet(primes[i++])
+            .antallOppgaverSomMedSikkerhetIkkeErOpprettet(primes[i++])
 
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetIkkeErOppdatert(primes[i++])
@@ -87,7 +87,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomKanVaereOppdatert(primes[i++])
             .antallOppgaverSomKanVaereOpprettet(primes[i++])
 
-            .numberOfExceptionReceivedDuringRun(primes[i++])
+            .numberOfExceptionsReceivedDuringRun(primes[i++])
 
             .build();
 
@@ -102,6 +102,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomMedSikkerhetErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetErOppdatert(primes[i++])
             .antallOppgaverSomMedSikkerhetErOpprettet(primes[i++])
+            .antallOppgaverSomMedSikkerhetIkkeErOpprettet(primes[i++])
 
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetIkkeErOppdatert(primes[i++])
@@ -110,7 +111,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomKanVaereOppdatert(primes[i++])
             .antallOppgaverSomKanVaereOpprettet(primes[i++])
 
-            .numberOfExceptionReceivedDuringRun(primes[i++])
+            .numberOfExceptionsReceivedDuringRun(primes[i++])
 
             .build();
 
@@ -125,6 +126,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomMedSikkerhetErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetErOppdatert(primes[i++])
             .antallOppgaverSomMedSikkerhetErOpprettet(primes[i++])
+            .antallOppgaverSomMedSikkerhetIkkeErOpprettet(primes[i++])
 
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(primes[i++])
             .antallOppgaverSomMedSikkerhetIkkeErOppdatert(primes[i++])
@@ -133,7 +135,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomKanVaereOppdatert(primes[i++])
             .antallOppgaverSomKanVaereOpprettet(primes[i++])
 
-            .numberOfExceptionReceivedDuringRun(primes[i++])
+            .numberOfExceptionsReceivedDuringRun(primes[i++])
 
             .build();
 
@@ -141,7 +143,7 @@ public class ConsumerStatisticsTest {
         ConsumerStatistics.addAll(consumerStatistics1, consumerStatistics2, consumerStatistics3);
 
     i = 0;
-    final int numberOfFields = 10;
+    final int numberOfFields = 11;
     final ConsumerStatistics expectedConsumerStatisticsSum =
         ConsumerStatistics
 
@@ -158,6 +160,8 @@ public class ConsumerStatisticsTest {
                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
             .antallOppgaverSomMedSikkerhetErOpprettet(
                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
+            .antallOppgaverSomMedSikkerhetIkkeErOpprettet(
+                primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
 
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(
                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
@@ -171,7 +175,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomKanVaereOpprettet(
                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
 
-            .numberOfExceptionReceivedDuringRun(
+            .numberOfExceptionsReceivedDuringRun(
                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
 
             .build();
@@ -283,6 +287,56 @@ public class ConsumerStatisticsTest {
           System.out.println("ConsumerStatistics.toString() => " + s);
         }
     );
+  }
+
+  @Test
+  public void when_stringified_then_all_field_names_and_values_should_be_present() {
+
+    enteringTestHeaderLogger.debug(null);
+
+    final ConsumerStatistics consumerStatistics =
+      ConsumerStatistics.builder()
+          .name("x")
+          .antallOppgaverSomMedSikkerhetErFerdigstilt(7)
+          .antallOppgaverSomMedSikkerhetErOppdatert(11)
+          .antallOppgaverSomMedSikkerhetErOpprettet(13)
+          .antallOppgaverSomErHentetFraDatabasen(17)
+          .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(19)
+          .antallOppgaverSomMedSikkerhetIkkeErOppdatert(23)
+          .antallOppgaverSomKanVaereFerdigstilt(29)
+          .antallOppgaverSomKanVaereOppdatert(31)
+          .antallOppgaverSomKanVaereOpprettet(37)
+          .numberOfExceptionsReceivedDuringRun(41)
+          .antallOppgaverSomMedSikkerhetIkkeErOpprettet(43)
+          .numberOfExceptionsReceivedDuringRun(47)
+          .build();
+
+    final String consumerStatisticsString = consumerStatistics.toString();
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomErHentetFraDatabasen())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomKanVaereFerdigstilt())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomKanVaereOppdatert())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomKanVaereOpprettet())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOpprettet())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getName())));
+    assertTrue(consumerStatisticsString.contains(String.valueOf(consumerStatistics.getNumberOfExceptionsReceivedDuringRun())));
+
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomErHentetFraDatabasen"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetErFerdigstilt"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetErOppdatert"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetErOpprettet"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomKanVaereFerdigstilt"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomKanVaereOppdatert"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomKanVaereOpprettet"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetIkkeErFerdigstilt"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetIkkeErOppdatert"));
+    assertTrue(consumerStatisticsString.contains("name"));
+    assertTrue(consumerStatisticsString.contains("numberOfExceptionsReceivedDuringRun"));
+    assertTrue(consumerStatisticsString.contains("antallOppgaverSomMedSikkerhetIkkeErOpprettet"));
   }
 
   @Test
@@ -398,7 +452,7 @@ public class ConsumerStatisticsTest {
             .antallOppgaverSomMedSikkerhetErFerdigstilt(firstEverySecondPrimes[ix++])
             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(firstEverySecondPrimes[ix++])
             .antallOppgaverSomKanVaereFerdigstilt(firstEverySecondPrimes[ix++])
-            .numberOfExceptionReceivedDuringRun(firstEverySecondPrimes[ix++])
+            .numberOfExceptionsReceivedDuringRun(firstEverySecondPrimes[ix++])
             .build();
 
     final Random random = new Random(13897654);
@@ -426,7 +480,7 @@ public class ConsumerStatisticsTest {
               .antallOppgaverSomMedSikkerhetErFerdigstilt(changedValues.get(iix++))
               .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(changedValues.get(iix++))
               .antallOppgaverSomKanVaereFerdigstilt(changedValues.get(iix++))
-              .numberOfExceptionReceivedDuringRun(changedValues.get(iix++))
+              .numberOfExceptionsReceivedDuringRun(changedValues.get(iix++))
               .build();
       if (fixedConsumerStatistics.equals(varyingConsumerStatistics)) {
         assertEquals(fixedConsumerStatistics.getName(), varyingConsumerStatistics.getName());
@@ -439,7 +493,7 @@ public class ConsumerStatisticsTest {
         assertEquals(fixedConsumerStatistics.getAntallOppgaverSomKanVaereOpprettet(), varyingConsumerStatistics.getAntallOppgaverSomKanVaereOpprettet());
         assertEquals(fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt(), varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt());
         assertEquals(fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert(), varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert());
-        assertEquals(fixedConsumerStatistics.getNumberOfExceptionReceivedDuringRun(), varyingConsumerStatistics.getNumberOfExceptionReceivedDuringRun());
+        assertEquals(fixedConsumerStatistics.getNumberOfExceptionsReceivedDuringRun(), varyingConsumerStatistics.getNumberOfExceptionsReceivedDuringRun());
       } else {
         assertTrue(
             fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt()
@@ -460,7 +514,7 @@ public class ConsumerStatisticsTest {
                 ||
                 fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert()
                 ||
-                fixedConsumerStatistics.getNumberOfExceptionReceivedDuringRun() != varyingConsumerStatistics.getNumberOfExceptionReceivedDuringRun()
+                fixedConsumerStatistics.getNumberOfExceptionsReceivedDuringRun() != varyingConsumerStatistics.getNumberOfExceptionsReceivedDuringRun()
         );
       }
 
