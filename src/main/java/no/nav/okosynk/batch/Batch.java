@@ -1,18 +1,12 @@
 package no.nav.okosynk.batch;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.exporter.PushGateway;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
-import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.AbstractMelding;
+import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
@@ -22,8 +16,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runnable {
 
@@ -66,38 +58,12 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
   @Override
   public void run() {
+
     MDC.put("batchnavn", getBatchName());
-
-    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-
-    final CollectorRegistry registry = new CollectorRegistry();
-
-    final Gauge oppgaverOpprettet = Gauge.build()
-        .name("okosynk_job_oppgaver_opprettet")
-        .help("Antall oppgaver opprettet")
-        .register(registry);
-
-    final Gauge oppgaverOppdatert = Gauge.build()
-        .name("okosynk_job_oppgaver_oppdatert")
-        .help("Antall oppgaver oppdatert")
-        .register(registry);
-
-    final Gauge oppgaverFerdigstilt = Gauge.build()
-        .name("okosynk_job_oppgaver_ferdigstilt")
-        .help("Antall oppgaver ferdigstilt")
-        .register(registry);
-
-    final Gauge duration = Gauge.build()
-        .name("okosynk_job_duration_seconds")
-        .help("Duration of okosynk batch job in seconds.")
-        .register(registry);
-
-    final Gauge.Timer durationTimer = duration.startTimer();
-
+    final BatchMetrics batchMetrics = new BatchMetrics(getBatchType());
     setStatus(BatchStatus.STARTET);
     logger.info("Batch " + getBatchName() + " har startet.");
     try {
-
       final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
       final int actualnumberOfOppgaverRetrievedFromBatchInput = alleOppgaverLestFraBatchen.size();
       if (actualnumberOfOppgaverRetrievedFromBatchInput
@@ -112,45 +78,24 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
             );
         throw new RuntimeException(msg);
       }
-
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
-
-      BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
+      final BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
       setStatus(status);
       logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
-
-      oppgaverOpprettet.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
-      oppgaverOppdatert.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
-      oppgaverFerdigstilt.set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
-
-      final Gauge lastSuccess = Gauge.build()
-          .name("okosynk_batch_job_last_success_unixtime")
-          .help("Last time okosynk batch job succeeded, in unixtime.")
-          .register(registry);
-      lastSuccess.setToCurrentTime();
+      batchMetrics.setSuccessfulMetrics(consumerStatistics);
     } catch (Throwable e) {
-      logger.error("Noe uventet har gått galt under kjøring av " + getBatchName() + ". ", e);
-      setStatus(BatchStatus.FEIL);
-      oppgaverOpprettet.set(0);
-      oppgaverOppdatert.set(0);
-      oppgaverFerdigstilt.set(0);
+      final BatchStatus status = BatchStatus.FEIL;
+      setStatus(status);
+      logger.error(
+            "Noe uventet har gått galt under kjøring av "
+          + getBatchName()
+          + ". Status settes til " + status,
+          e
+      );
+      batchMetrics.setUnsuccessfulMetrics();
     } finally {
-      durationTimer.setDuration();
-      String pushGateway = this.okosynkConfiguration.getRequiredString("PUSH_GATEWAY_ADDRESS");
-
-      if (isNotBlank(pushGateway)) {
-        logger.info("Pusher metrikker til {}", pushGateway);
-        try {
-          new PushGateway(pushGateway).pushAdd(registry, "kubernetes-pods",
-              Collections.singletonMap("cronjob", getBatchName()));
-        } catch (IOException e) {
-          logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
-        }
-      } else {
-        logger.warn("Konfigurasjonsnøkkel PUSH_GATEWAY_ADDRESS mangler, får ikke pushet metrikker");
-      }
-
+      batchMetrics.log(getOkosynkConfiguration());
       MDC.remove("batchnavn");
     }
   }
@@ -284,7 +229,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   private Constants.BATCH_TYPE getBatchType() {
     return batchType;
   }
-
 
   public long getExecutionId() {
     return executionId;

@@ -323,6 +323,7 @@ public class Constants {
   public static final String NAV_TRUSTSTORE_PASSWORD_EXT_KEY = "javax.net.ssl.trustStorePassword";
   public static final String REST_STS_URL_KEY = "REST_STS_URL";
   public static final String REST_AKTOER_REGISTER_URL_KEY = "AKTOERREGISTER_URL";
+  public static final String PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY = "PUSH_GATEWAY_ADDRESS";
   // ==========================================================================================================================
   // ==========================================================================================================================
 }
