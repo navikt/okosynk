@@ -19,6 +19,8 @@
 
     <logger name="no.nav.okosynk" level="INFO" />
 
+    <logger name="no.nav.okosynk.batch" level="DEBUG" />
+
     <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
     </root>

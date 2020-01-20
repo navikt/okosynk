@@ -20,11 +20,6 @@ import org.slf4j.LoggerFactory;
 
 public class CliMain {
 
-  private enum ExitCode {
-    OK, // MUST BE ORDINAL 0!
-    ERROR
-  }
-
   private static final Logger logger = LoggerFactory.getLogger(CliMain.class);
 
   private static final String CLI_PROGRAM_NAME = "java -jar okosynk.jar";
@@ -76,12 +71,16 @@ public class CliMain {
 
   private IStartableAndStoppable ftpServerTestStarter = null;
 
+  @SuppressWarnings("checkstyle:MissingJavadocMethod")
   public static void main(String[] args) throws Exception {
 
-    ExitCode exitCode = ExitCode.OK;
-    final CommandLine commandLine = treatCommandLineArgs(args);
-    if (!commandLineContainsHelpOptions(commandLine)) {
+    logger.info("===== ENTERING OKOSYNK =====");
 
+    final ExitStatus exitStatus;
+    final CommandLine commandLine = treatCommandLineArgs(args);
+    if (commandLineContainsHelpOptions(commandLine)) {
+      exitStatus = ExitStatus.OK;
+    } else {
       CliMain cliMain = null;
       try {
         final String applicationPropertiesFileName;
@@ -102,8 +101,7 @@ public class CliMain {
         final BatchStatus batchStatus =
             cliMain.runBatches(shouldOnlyRunOs(commandLine), shouldOnlyRunUr(commandLine));
 
-        exitCode = (BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL.equals(batchStatus)) ? ExitCode.OK
-            : ExitCode.ERROR;
+        exitStatus = batchStatus.getExitStatus();
 
         logger.info("okosynk has finished with the BatchStatus {}", batchStatus);
 
@@ -113,10 +111,12 @@ public class CliMain {
         }
       }
     }
-
-    final int exitNumber = exitCode.ordinal();
-    logger.info("Exiting with exit code {} ({})", exitNumber, exitCode);
-    System.exit(exitCode.ordinal());
+    final int exitStatusOrdinal = exitStatus.ordinal();
+    logger.info(
+        "===== OKOSYNK ABOUT TO EXIT WITH EXIT STATUS {} ({}) =====",
+        exitStatusOrdinal, exitStatus
+    );
+    System.exit(exitStatus.ordinal());
   }
 
   private static boolean commandLineContainsHelpOptions(final CommandLine commandLine) {

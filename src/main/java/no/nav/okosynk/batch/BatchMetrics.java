@@ -103,15 +103,39 @@ public class BatchMetrics {
     );
   }
 
+  /**
+   * TODO: Remove all this superfluous debugging and variable usage when problem solved.
+   * @param consumerStatistics Basis for almost all logging content
+   */
   private void setMetrics(final ConsumerStatistics consumerStatistics) {
+
     this.durationGaugeTimer.setDuration();
+
+    final int antallOppgaverSomMedSikkerhetErOpprettet =
+        consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet();
+    final int antallOppgaverSomMedSikkerhetErOppdatert =
+        consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert();
+    final int antallOppgaverSomMedSikkerhetErFerdigstilt =
+        consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt();
+
     this.oppgaverOpprettetGauge
-        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
+        .set(antallOppgaverSomMedSikkerhetErOpprettet);
     this.oppgaverOppdatertGauge
-        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
+        .set(antallOppgaverSomMedSikkerhetErOppdatert);
     this.oppgaverFerdigstiltGauge
-        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
+        .set(antallOppgaverSomMedSikkerhetErFerdigstilt);
     this.consumerStatistics = consumerStatistics;
+
+    logger.debug("antallOppgaverSomMedSikkerhetErOpprettet {}",
+        antallOppgaverSomMedSikkerhetErOpprettet);
+    logger.debug("antallOppgaverSomMedSikkerhetErOppdatert {}",
+        antallOppgaverSomMedSikkerhetErOppdatert);
+    logger.debug("antallOppgaverSomMedSikkerhetErFerdigstilt {}",
+        antallOppgaverSomMedSikkerhetErFerdigstilt);
+    logger.debug(
+        "STATISTIKK: consumerStatistics ved avslutning av batchen: {}",
+        consumerStatistics.toString()
+    );
   }
 
   private String getBatchName() {

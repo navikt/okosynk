@@ -34,7 +34,7 @@ public class BatchStatusTest {
         for (final BatchStatus batchStatus : BatchStatus.values()) {
             assertEquals(
                 batchStatusMap.get(batchStatus).intValue(),
-                batchStatus.getStatusKode(),
+                batchStatus.getStatusCode(),
                 "BatchStatus " + batchStatus + " has anunexpected status code."
             );
         }
