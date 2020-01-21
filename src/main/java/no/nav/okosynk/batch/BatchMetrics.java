@@ -111,31 +111,14 @@ public class BatchMetrics {
 
     this.durationGaugeTimer.setDuration();
 
-    final int antallOppgaverSomMedSikkerhetErOpprettet =
-        consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet();
-    final int antallOppgaverSomMedSikkerhetErOppdatert =
-        consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert();
-    final int antallOppgaverSomMedSikkerhetErFerdigstilt =
-        consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt();
-
     this.oppgaverOpprettetGauge
-        .set(antallOppgaverSomMedSikkerhetErOpprettet);
+        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet());
     this.oppgaverOppdatertGauge
-        .set(antallOppgaverSomMedSikkerhetErOppdatert);
+        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
     this.oppgaverFerdigstiltGauge
-        .set(antallOppgaverSomMedSikkerhetErFerdigstilt);
-    this.consumerStatistics = consumerStatistics;
+        .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
 
-    logger.debug("antallOppgaverSomMedSikkerhetErOpprettet {}",
-        antallOppgaverSomMedSikkerhetErOpprettet);
-    logger.debug("antallOppgaverSomMedSikkerhetErOppdatert {}",
-        antallOppgaverSomMedSikkerhetErOppdatert);
-    logger.debug("antallOppgaverSomMedSikkerhetErFerdigstilt {}",
-        antallOppgaverSomMedSikkerhetErFerdigstilt);
-    logger.debug(
-        "STATISTIKK: consumerStatistics ved avslutning av batchen: {}",
-        consumerStatistics.toString()
-    );
+    this.consumerStatistics = consumerStatistics;
   }
 
   private String getBatchName() {
