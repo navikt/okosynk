@@ -45,7 +45,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
     this.executionId = executionId;
-    this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
     this.spesifikkMeldingReader = spesifikkMeldingReader;
     this.oppgaveSynkroniserer = new OppgaveSynkroniserer(
         okosynkConfiguration,
@@ -70,7 +69,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
           > UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT) {
         final String msg =
             String.format(
-                  "Batch input innedholder %d oppgaver. "
+                  "Batch input inneholder %d oppgaver. "
                 + "Det største antallet okosynk er satt til å akseptere er %d oppgaver. "
                 + "Okosynk avbrytes.",
                 actualnumberOfOppgaverRetrievedFromBatchInput,
@@ -116,7 +115,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
             ?
             BatchStatus.FEIL
             :
-                BatchStatus.READY
+            BatchStatus.READY
     );
   }
 

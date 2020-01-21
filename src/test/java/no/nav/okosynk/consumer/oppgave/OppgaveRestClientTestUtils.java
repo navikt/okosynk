@@ -207,26 +207,26 @@ class OppgaveRestClientTestUtils {
     return mockedOppgaveRestClient;
   }
 
-  static OppgaveRestClient prepareAMockedOppgaveRestClientThatSucceedsInFinding20Oppgaver()
+  static OppgaveRestClient prepareAMockedOppgaveRestClientThatSucceedsInFinding50Oppgaver()
       throws IOException {
 
     final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
     when(mockedOppgaveRestClient
         .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
-        .thenReturn(createTestResponseWithNOppgaver(20))
+        .thenReturn(createTestResponseWithNOppgaver(50))
         .thenReturn(createTestResponseWithNOppgaver(0))
     ;
 
     return mockedOppgaveRestClient;
   }
 
-  static OppgaveRestClient prepareAMockedOppgaveRestClientThatSucceedsInFinding21Oppgaver()
+  static OppgaveRestClient prepareAMockedOppgaveRestClientThatSucceedsInFinding51Oppgaver()
       throws IOException {
 
     final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
     when(mockedOppgaveRestClient
         .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
-        .thenReturn(createTestResponseWithNOppgaver(20))
+        .thenReturn(createTestResponseWithNOppgaver(50))
         .thenReturn(createTestResponseWithNOppgaver(1))
         .thenReturn(createTestResponseWithNOppgaver(0))
     ;

@@ -7,11 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,11 +21,7 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.Oppgave.OppgaveBuilder;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
@@ -133,15 +125,15 @@ class OppgaveRestClientTest {
     enteringTestHeaderLogger.debug(null);
 
     final OppgaveRestClient mockedOppgaveRestClient =
-        OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding20Oppgaver();
+        OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding50Oppgaver();
 
     final Set<Oppgave> oppgaver = new HashSet<>();
     assertDoesNotThrow(
         () -> {
           final ConsumerStatistics consumerStatistics =
               mockedOppgaveRestClient.finnOppgaver(oppgaver);
-          assertEquals(20, oppgaver.size());
-          assertEquals(20, consumerStatistics.getAntallOppgaverSomErHentetFraDatabasen());
+          assertEquals(50, oppgaver.size());
+          assertEquals(50, consumerStatistics.getAntallOppgaverSomErHentetFraDatabasen());
         }
     );
   }
@@ -153,15 +145,15 @@ class OppgaveRestClientTest {
     enteringTestHeaderLogger.debug(null);
 
     final OppgaveRestClient mockedOppgaveRestClient =
-        OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding21Oppgaver();
+        OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding51Oppgaver();
 
     final Set<Oppgave> oppgaver = new HashSet<>();
     assertDoesNotThrow(
         () -> {
           final ConsumerStatistics consumerStatistics =
               mockedOppgaveRestClient.finnOppgaver(oppgaver);
-          assertEquals(21, oppgaver.size());
-          assertEquals(21, consumerStatistics.getAntallOppgaverSomErHentetFraDatabasen());
+          assertEquals(51, oppgaver.size());
+          assertEquals(51, consumerStatistics.getAntallOppgaverSomErHentetFraDatabasen());
         }
     );
   }
