@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200120.1401.f1e9f427
+              image: repo.adeo.no:5443/okosynk:20200121.0928.9a914007
               resources:
                 limits:
                   cpu: 250m

@@ -14,7 +14,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
@@ -142,7 +141,6 @@ public class OppgaveSynkroniserer {
             consumerStatistics_opprett);
 
     loggAntallMeldingerMedOppgave(oppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes);
-    loggAccumulatedConsumerStatistics(consumerStatistics_accumulated);
 
     return consumerStatistics_accumulated;
   }
@@ -267,15 +265,6 @@ public class OppgaveSynkroniserer {
         "STATISTIKK: Etter synkronisering finnes det {} åpne oppgaver basert på {} meldinger.",
         antallOppgaver,
         antallMeldinger
-    );
-  }
-
-  private void loggAccumulatedConsumerStatistics(
-      final ConsumerStatistics accumulatedConsumerStatistics) {
-
-    logger.info(
-        "STATISTIKK: accumulatedConsumerStatistics etter synkronisering: {}",
-        accumulatedConsumerStatistics.toString()
     );
   }
 

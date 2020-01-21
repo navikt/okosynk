@@ -257,7 +257,7 @@ public class OppgaveRestClient {
     final String opprettetAv =
         OppgaveRestClient.getBatchBruker(getOkosynkConfiguration(), getBatchType());
 
-    final int bulkSize = 20;
+    final int bulkSize = 50;
     int offset = 0;
     log.info("Starter søk i og evt. inkrementell henting av oppgaver fra oppgave-servicen...");
     FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(opprettetAv, bulkSize, offset);
@@ -266,7 +266,7 @@ public class OppgaveRestClient {
         finnOppgaveResponse.getAntallTreffTotalt()
     );
     while (!finnOppgaveResponse.getOppgaver().isEmpty()) {
-      log.info("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
+      log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
       oppgaver.addAll(finnOppgaveResponse.getOppgaver()
           .stream()
           .map(this::tilOppgave)
