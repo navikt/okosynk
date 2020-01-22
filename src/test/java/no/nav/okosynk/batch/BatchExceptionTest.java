@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BatchExecutionExceptionTest {
+public class BatchExceptionTest {
 
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
@@ -21,12 +21,12 @@ public class BatchExecutionExceptionTest {
         final RuntimeException runtimeExceptionCause =
             new RuntimeException("Too badd wheather");
 
-        final BatchExecutionException batchExecutionException =
-            new BatchExecutionException(runtimeExceptionCause);
+        final BatchException batchException =
+            new BatchException(runtimeExceptionCause);
 
         assertEquals(
             runtimeExceptionCause.toString(),
-            batchExecutionException.toString(),
-            "The string representation of BatchExecutionException is NOT as expected");
+            batchException.toString(),
+            "The string representation of BatchException is NOT as expected");
     }
 }

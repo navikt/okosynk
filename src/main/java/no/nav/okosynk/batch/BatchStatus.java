@@ -9,7 +9,8 @@ public enum BatchStatus {
     FEIL(8, ExitStatus.OK),
     STOPPET(10, ExitStatus.OK),
     READY(100, ExitStatus.OK),
-    FULLFORT_MED_UVENTEDE_FEIL(371, ExitStatus.OK)
+    FULLFORT_MED_UVENTEDE_FEIL(371, ExitStatus.OK),
+    FEIL_NUMBER_OF_RETRIES_EXCEEDED(919, ExitStatus.ERROR)
     ;
 
     private final int statusCode;

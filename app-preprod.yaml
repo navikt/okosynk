@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200121.0928.9a914007
+              image: repo.adeo.no:5443/okosynk:20200121.1345.7b42dcd0
               resources:
                 limits:
                   cpu: 250m
@@ -103,9 +103,9 @@ spec:
                 - name: SECURITYTOKENSERVICE_URL
                   value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
-                  value: "300000"
+                  value: "30000"
                 - name: FILE_READER_MAX_NUMBER_OF_TRIES
-                  value: "18"
+                  value: "3"
               volumeMounts:
                 - name: okosynk
                   mountPath: "/var/run/secrets/naisd.io/"

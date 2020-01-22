@@ -4,10 +4,10 @@ import java.util.List;
 
 public interface IMeldingLinjeFileReader {
 
-    public enum Status {
-        UNSET,
-        ERROR,
-        OK
+    enum Status {
+    UNSET,
+    ERROR,
+    OK
     }
 
     List<String> read() throws OkosynkIoException;

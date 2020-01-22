@@ -1,10 +1,10 @@
 package no.nav.okosynk.batch;
 
-public class BatchExecutionException extends RuntimeException {
+public class BatchException extends Exception {
 
     public final Exception cause;
 
-    public BatchExecutionException(Exception cause) {
+    public BatchException(Exception cause) {
         this.cause = cause;
     }
 

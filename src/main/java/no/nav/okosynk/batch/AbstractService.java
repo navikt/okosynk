@@ -49,7 +49,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
       final Batch<? extends AbstractMelding> batch = createAndConfigureBatch(okosynkConfiguration);
       final Callable<BatchStatus> task = () -> {
         batch.run();
-        final BatchStatus batchStatusTemp = batch.getStatus();
+        final BatchStatus batchStatusTemp = batch.getBatchStatus();
 
         return batchStatusTemp;
       };
@@ -94,7 +94,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
       logger.warn("Status for batch med eksekverings-id " + executionId
           + " ble etterspurt, men ingen batch med eksekverings-id " + executionId + " kjorer.");
     }
-    return batch.map(Batch::getStatus);
+    return batch.map(Batch::getBatchStatus);
   }
 
   public boolean stoppBatch() {

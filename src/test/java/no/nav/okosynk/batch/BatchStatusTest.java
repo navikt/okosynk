@@ -29,13 +29,14 @@ public class BatchStatusTest {
                 put(BatchStatus.STOPPET, 10);
                 put(BatchStatus.READY, 100);
                 put(BatchStatus.FULLFORT_MED_UVENTEDE_FEIL, 371);
+                put(BatchStatus.FEIL_NUMBER_OF_RETRIES_EXCEEDED, 919);
             }};
 
         for (final BatchStatus batchStatus : BatchStatus.values()) {
             assertEquals(
                 batchStatusMap.get(batchStatus).intValue(),
                 batchStatus.getStatusCode(),
-                "BatchStatus " + batchStatus + " has anunexpected status code."
+                "BatchStatus " + batchStatus + " has an unexpected status code."
             );
         }
     }

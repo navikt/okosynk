@@ -12,6 +12,7 @@ import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.OkosynkIoException;
+import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   private final IOkosynkConfiguration okosynkConfiguration;
   final Constants.BATCH_TYPE batchType;
   private final long executionId;
-  private BatchStatus status;
+  private BatchStatus batchStatus;
   private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
 
   private IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
@@ -40,7 +41,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
     // Assume failure, set to ready by the descendant if successful:
-    this.setStatus(BatchStatus.FEIL);
+    this.setBatchStatus(BatchStatus.FEIL);
 
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
@@ -48,11 +49,11 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     this.spesifikkMeldingReader = spesifikkMeldingReader;
     this.oppgaveSynkroniserer = new OppgaveSynkroniserer(
         okosynkConfiguration,
-        this::getStatus,
+        this::getBatchStatus,
         new OppgaveRestClient(okosynkConfiguration, batchType));
     this.spesifikkMapper = spesifikkMapper;
 
-    this.setStatus(BatchStatus.READY);
+    this.setBatchStatus(BatchStatus.READY);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
     MDC.put("batchnavn", getBatchName());
     final BatchMetrics batchMetrics = new BatchMetrics(getBatchType());
-    setStatus(BatchStatus.STARTET);
+    setBatchStatus(BatchStatus.STARTET);
     logger.info("Batch " + getBatchName() + " har startet.");
     try {
       final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
@@ -80,12 +81,22 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
       final BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
-      setStatus(status);
+      setBatchStatus(status);
       logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
+    } catch(BatchException e) {
+      final Throwable cause = e.getCause();
+      setBatchStatus(BatchStatus.FEIL);
+      if (cause instanceof OkosynkIoException) {
+        final OkosynkIoException okosynkIoException = (OkosynkIoException)cause;
+        if (ErrorCode.NUMBER_OF_RETRIES_EXCEEDED.equals(okosynkIoException.getErrorCode())) {
+          setBatchStatus(BatchStatus.FEIL_NUMBER_OF_RETRIES_EXCEEDED);
+        }
+      }
+      batchMetrics.setUnsuccessfulMetrics();
     } catch (Throwable e) {
       final BatchStatus status = BatchStatus.FEIL;
-      setStatus(status);
+      setBatchStatus(status);
       logger.error(
             "Noe uventet har gått galt under kjøring av "
           + getBatchName()
@@ -110,7 +121,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
         "The parameter IMeldingLinjeFileReader supplied is null");
 
     this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
-    setStatus(
+    setBatchStatus(
         (!IMeldingLinjeFileReader.Status.OK.equals(this.uspesifikkMeldingLinjeReader.getStatus()))
             ?
             BatchStatus.FEIL
@@ -119,9 +130,9 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     );
   }
 
-  public synchronized void setStatus(final BatchStatus status) {
-    if (this.status != BatchStatus.STOPPET) {
-      this.status = status;
+  public synchronized void setBatchStatus(final BatchStatus status) {
+    if (this.batchStatus != BatchStatus.STOPPET) {
+      this.batchStatus = status;
     }
   }
 
@@ -142,29 +153,10 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   }
 
   public void stopp() {
-    setStatus(BatchStatus.STOPPET);
+    setBatchStatus(BatchStatus.STOPPET);
   }
 
-
-  private void handterLinjeUnreadableException(OkosynkIoException e) {
-
-    logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
-        e);
-    setStatus(BatchStatus.FEIL);
-
-    throw new BatchExecutionException(e);
-  }
-
-  private void handterMeldingUnreadableException(final MeldingUnreadableException e) {
-
-    logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
-        e);
-    setStatus(BatchStatus.FEIL);
-
-    throw new BatchExecutionException(e);
-  }
-
-  private List<Oppgave> hentBatchOppgaver() {
+  private List<Oppgave> hentBatchOppgaver() throws BatchException {
 
     logger.debug("Entering Batch.hentBatchOppgaver...");
 
@@ -178,7 +170,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     return batchOppgaver;
   }
 
-  private List<String> hentLinjerMedUspesifikkeMeldinger() {
+  private List<String> hentLinjerMedUspesifikkeMeldinger() throws BatchException {
 
     logger.debug("Entering Batch.hentLinjerMedUspesifikkeMeldinger...");
 
@@ -190,7 +182,10 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
           linjerMedUspesifikkeMeldinger.size(),
           getBatchName());
     } catch (OkosynkIoException e) {
-      handterLinjeUnreadableException(e);
+      logger.error(
+          "Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
+          e);
+      throw new BatchException(e);
     }
 
     logger.debug("About to normally leave Batch.hentLinjerMedUspesifikkeMeldinger");
@@ -199,7 +194,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   }
 
   private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(
-      final List<String> linjerMedUspesifikkeMeldinger) {
+      final List<String> linjerMedUspesifikkeMeldinger) throws BatchException {
+
     logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
 
     List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = null;
@@ -209,7 +205,9 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
               .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
                   linjerMedUspesifikkeMeldinger.stream());
     } catch (MeldingUnreadableException e) {
-      handterMeldingUnreadableException(e);
+      logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
+          e);
+      throw new BatchException(e);
     }
 
     logger.debug("About to normally leave Batch.opprettSpesifikkeMeldinger");
@@ -217,8 +215,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     return spesifikkeMeldinger;
   }
 
-  public BatchStatus getStatus() {
-    return status;
+  public BatchStatus getBatchStatus() {
+    return batchStatus;
   }
 
   public IOkosynkConfiguration getOkosynkConfiguration() {

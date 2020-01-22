@@ -149,7 +149,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     )
         .thenReturn(IMeldingLinjeFileReader.Status.ERROR);
 
-    Assertions.assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+    Assertions.assertEquals(BatchStatus.FEIL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -164,7 +164,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, getBatch().getStatus());
+    assertEquals(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -201,7 +201,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+    assertEquals(BatchStatus.FEIL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -228,7 +228,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.FEIL, getBatch().getStatus());
+    assertEquals(BatchStatus.FEIL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -262,7 +262,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().stopp();
 
-    assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
+    assertEquals(BatchStatus.STOPPET, getBatch().getBatchStatus());
   }
 
   @Test
@@ -271,9 +271,9 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     enteringTestHeaderLogger.debug(null);
 
     getBatch().stopp();
-    getBatch().setStatus(BatchStatus.FEIL);
+    getBatch().setBatchStatus(BatchStatus.FEIL);
 
-    assertEquals(BatchStatus.STOPPET, getBatch().getStatus());
+    assertEquals(BatchStatus.STOPPET, getBatch().getBatchStatus());
   }
 
   @Test

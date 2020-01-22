@@ -75,12 +75,8 @@ public class CliMain {
   public static void main(String[] args) throws Exception {
 
     logger.info("===== ENTERING OKOSYNK =====");
-
-    final ExitStatus exitStatus;
     final CommandLine commandLine = treatCommandLineArgs(args);
-    if (commandLineContainsHelpOptions(commandLine)) {
-      exitStatus = ExitStatus.OK;
-    } else {
+    if (!commandLineContainsHelpOptions(commandLine)) {
       CliMain cliMain = null;
       try {
         final String applicationPropertiesFileName;
@@ -98,12 +94,7 @@ public class CliMain {
         if (shouldStartFtpServer(commandLine)) {
           cliMain.startFtpServer();
         }
-        final BatchStatus batchStatus =
-            cliMain.runBatches(shouldOnlyRunOs(commandLine), shouldOnlyRunUr(commandLine));
-
-        exitStatus = batchStatus.getExitStatus();
-
-        logger.info("okosynk has finished with the BatchStatus {}", batchStatus);
+        cliMain.runBatches(shouldOnlyRunOs(commandLine), shouldOnlyRunUr(commandLine));
 
       } finally {
         if ((cliMain != null) && shouldStartFtpServer(commandLine)) {
@@ -111,12 +102,35 @@ public class CliMain {
         }
       }
     }
-    final int exitStatusOrdinal = exitStatus.ordinal();
-    logger.info(
-        "===== OKOSYNK ABOUT TO EXIT WITH EXIT STATUS {} ({}) =====",
-        exitStatusOrdinal, exitStatus
-    );
-    System.exit(exitStatus.ordinal());
+    logger.info("===== OKOSYNK ABOUT TO EXIT WITH EXIT STATUS 0 =====");
+    System.exit(0);
+  }
+
+  private void runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
+
+    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+    logSelectedProperties(okosynkConfiguration, logger);
+    // TODO: Error situations.
+    // TODO: Remove file.
+    // TODO: Which file first?
+    // TODO: Counter in file name?
+    if (shouldOnlyRunUr) {
+      logger.info("Only running ur, not os");
+    } else {
+      runBatch(new OsBatchService(okosynkConfiguration));
+    }
+    if (shouldOnlyRunOs) {
+      logger.info("Only running os, not ur");
+    } else {
+      runBatch(new UrBatchService(okosynkConfiguration));
+    }
+  }
+
+  private void runBatch(final AbstractBatchService batchService) {
+    final String batchName = batchService.batchType.getName();
+    logger.info("About to run batch {}...", batchName);
+    final BatchStatus batchStatus = batchService.startBatchSynchronously();
+    logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
   }
 
   private static boolean commandLineContainsHelpOptions(final CommandLine commandLine) {
@@ -278,74 +292,6 @@ public class CliMain {
     if (ftpServerTestStarter != null) {
       ftpServerTestStarter.stop();
     }
-  }
-
-  private BatchStatus runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
-    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    logSelectedProperties(okosynkConfiguration, logger);
-
-    // TODO: Error situations.
-    // TODO: Remove file.
-    // TODO: Which file first?
-    // TODO: Counter in file name?
-    // TODO: Anyhow, do this stuff belong here?
-    final BatchStatus osBatchStatus;
-    if (shouldOnlyRunUr) {
-      logger.info("Only running ur, not os");
-      osBatchStatus = null;
-    } else {
-      osBatchStatus = runOs(okosynkConfiguration);
-    }
-
-    final BatchStatus urBatchStatus;
-    if (shouldOnlyRunOs) {
-      logger.info("Only running os, not ur");
-      urBatchStatus = null;
-    } else {
-      urBatchStatus = runUr(okosynkConfiguration);
-    }
-
-    return (
-        (
-            BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL.equals(osBatchStatus)
-                ||
-                osBatchStatus == null
-        )
-            &&
-            (
-                BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL.equals(urBatchStatus)
-                    ||
-                    urBatchStatus == null
-            )
-    )
-        ?
-        BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL
-        :
-            BatchStatus.FEIL
-        ;
-  }
-
-  private BatchStatus runOs(final IOkosynkConfiguration okosynkConfiguration) {
-
-    return run(new OsBatchService(okosynkConfiguration));
-  }
-
-  private BatchStatus runUr(final IOkosynkConfiguration okosynkConfiguration) {
-
-    return run(new UrBatchService(okosynkConfiguration));
-  }
-
-  private BatchStatus run(final AbstractBatchService batchService) {
-
-    final String batchName = batchService.batchType.getName();
-
-    logger.info("About to run batch {}...", batchName);
-
-    final BatchStatus batchStatus = batchService.startBatchSynchronously();
-
-    logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
-
-    return batchStatus;
   }
 
   private IOkosynkConfiguration getOkosynkConfiguration(

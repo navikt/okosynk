@@ -10,13 +10,21 @@ spec:
       channel: '#oh-prod-varsling'
       prependText: 'Okosynk batch ser ut til å ha feilet'
     email:
-      to: 'jorgen.markussen@nav.no'
+      to: 'jorgen.markussen@nav.no;oyvind.roth@nav.no'
   alerts:
-    - alert: Okosynk batch status failed
-      expr: 'sum(rate(kube_job_status_failed{namespace="okosynk"}[24h])) > 0'
-      for: 5m
-      action: Se status på batch i kibana
-      description: Okosynk (OS) batch job ser ut til å ha feilet under kjøring
-      documentation: okosynk
-      sla: N/A
-      severity: critical
+    - alert: Check the logs of Okosynk OS batch
+        expr: 'sum(rate(okosynk_os_batch_alert{namespace="okosynk"}[24h])) > 0'
+        for: 5m
+        action: Se status på batch i kibana
+        description: Okosynk UR bla-bla
+        documentation: okosynk
+        sla: N/A
+        severity: critical
+    - alert: Check the logs of Okosynk UR batch
+        expr: 'sum(rate(okosynk_ur_batch_alert{namespace="okosynk"}[24h])) > 0'
+        for: 5m
+        action: Se status på batch i kibana
+        description: Okosynk OS bla-bla
+        documentation: okosynk
+        sla: N/A
+        severity: critical
