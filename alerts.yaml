@@ -12,19 +12,19 @@ spec:
     email:
       to: 'jorgen.markussen@nav.no;oyvind.roth@nav.no'
   alerts:
-    - alert: Check the logs of Okosynk OS batch
-        expr: 'sum(rate(okosynk_os_batch_alert{namespace="okosynk"}[24h])) > 0'
-        for: 5m
-        action: Se status på batch i kibana
-        description: Okosynk UR bla-bla
-        documentation: okosynk
-        sla: N/A
-        severity: critical
-    - alert: Check the logs of Okosynk UR batch
-        expr: 'sum(rate(okosynk_ur_batch_alert{namespace="okosynk"}[24h])) > 0'
-        for: 5m
-        action: Se status på batch i kibana
-        description: Okosynk OS bla-bla
-        documentation: okosynk
-        sla: N/A
-        severity: critical
+    - alert: Check the logs of Okosynk for potential OS batch problems
+      expr: 'okosynk_os_batch_alert{cronjob="bokosynk001",job="kubernetes-pods"} > 0'
+      for: 5m
+      action: Se status på batch i kibana
+      description: Okosynk OS bla-bla
+      documentation: okosynk
+      sla: N/A
+      severity: danger
+    - alert: Check the logs of Okosynk for potential UR batch problems
+      expr: 'okosynk_ur_batch_alert{cronjob="bokosynk002",job="kubernetes-pods"} > 0'
+      for: 5m
+      action: Se status på UR batch i kibana
+      description: Okosynk UR bla-bla
+      documentation: okosynk
+      sla: N/A
+      severity: danger

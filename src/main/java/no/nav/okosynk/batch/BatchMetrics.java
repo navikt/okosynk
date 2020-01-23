@@ -98,10 +98,12 @@ public class BatchMetrics {
   void setUnsuccessfulMetrics() {
 
     setMetrics(ConsumerStatistics.zero(getBatchType()));
-    // TODO: This is an anti OO pattern:
+    // TODO: This following is an anti OO pattern:
     if (BATCH_TYPE.OS.equals(getBatchType())) {
+      logger.warn("About to increase the osBatchAlert Gauge...");
       osBatchAlert.inc();
     } else {
+      logger.warn("About to increase the urBatchAlert Gauge...");
       urBatchAlert.inc();
     }
   }
