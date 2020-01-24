@@ -106,14 +106,16 @@ public class CliMain {
     System.exit(0);
   }
 
+  /**
+   * The outcome of the batch jobs is neglected at this level.
+   * It has already been taken care of at a deeper lever.
+   * @param shouldOnlyRunOs Self explanatory
+   * @param shouldOnlyRunUr Self explanatory
+   */
   private void runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
     logSelectedProperties(okosynkConfiguration, logger);
-    // TODO: Error situations.
-    // TODO: Remove file.
-    // TODO: Which file first?
-    // TODO: Counter in file name?
     if (shouldOnlyRunUr) {
       logger.info("Only running ur, not os");
     } else {

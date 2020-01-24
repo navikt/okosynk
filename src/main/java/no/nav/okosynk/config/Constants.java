@@ -17,7 +17,8 @@ public class Constants {
         OS_FTP_CHARSET_NAME_KEY,
         OS_EXECUTION_ID_OFFSET,
         OS_MAPPING_RULES_PROPERTIES_FILENAME,
-        OS_BATCH_BRUKER_PASSWORD_KEY
+        OS_BATCH_BRUKER_PASSWORD_KEY,
+        OS_ALERT_COLLECTOR_METRIC_NAME
     ),
     UR(
         UR_BATCH_NAVN,
@@ -33,7 +34,8 @@ public class Constants {
         UR_FTP_CHARSET_NAME_KEY,
         UR_EXECUTION_ID_OFFSET,
         UR_MAPPING_RULES_PROPERTIES_FILENAME,
-        UR_BATCH_BRUKER_PASSWORD_KEY
+        UR_BATCH_BRUKER_PASSWORD_KEY,
+        UR_ALERT_COLLECTOR_METRIC_NAME
     );
 
     private final String name;
@@ -50,6 +52,7 @@ public class Constants {
     private final long executionIdOffset;
     private final String mappingRulesPropertiesFileName;
     private final String batchBrukerPasswordKey;
+    private final String alertCollectorMetricName;
 
     public String getConsumerStatisticsName() {
       return name() + " - " + getName();
@@ -61,6 +64,10 @@ public class Constants {
 
     public String getName() {
       return name;
+    }
+
+    public String getAlertCollectorMetricName() {
+      return this.alertCollectorMetricName;
     }
 
     public String getBatchBrukerKey() {
@@ -125,7 +132,8 @@ public class Constants {
         final String ftpCharsetNameKey,
         final long executionIdOffset,
         final String mappingRulesPropertiesFileName,
-        final String batchBrukerPasswordKey
+        final String batchBrukerPasswordKey,
+        final String alertCollectorMetricName
     ) {
       this.name = name;
       this.batchBrukerKey = batchBrukerKey;
@@ -141,6 +149,7 @@ public class Constants {
       this.executionIdOffset = executionIdOffset;
       this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
       this.batchBrukerPasswordKey = batchBrukerPasswordKey;
+      this.alertCollectorMetricName = alertCollectorMetricName;
     }
   }
 
@@ -159,6 +168,7 @@ public class Constants {
   private static final String OS_FTP_CHARSET_NAME_KEY = "OS_FTP_CHARSET";
   private static final long OS_EXECUTION_ID_OFFSET = 0L;
   private static final String OS_MAPPING_RULES_PROPERTIES_FILENAME = "os_mapping_regler.properties";
+  private static final String OS_ALERT_COLLECTOR_METRIC_NAME = "okosynk_os_batch_alert";
   // -------------------------------------------------------------------------
   private static final String UR_BATCH_NAVN = "bokosynk002";
   private static final String UR_BATCH_BRUKER_KEY = "SRVBOKOSYNK002_USERNAME";
@@ -174,7 +184,7 @@ public class Constants {
   private static final String UR_FTP_CHARSET_NAME_KEY = "UR_FTP_CHARSET";
   private static final long UR_EXECUTION_ID_OFFSET = Long.MAX_VALUE / 2;
   private static final String UR_MAPPING_RULES_PROPERTIES_FILENAME = "ur_mapping_regler.properties";
-  // =========================================================================
+  private static final String UR_ALERT_COLLECTOR_METRIC_NAME = "okosynk_ur_batch_alert";
   // =========================================================================
 
   public enum CONSUMER_TYPE {

@@ -20,7 +20,7 @@ public class BatchMetricsTest {
 
     enteringTestHeaderLogger.debug(null);
 
-    assertDoesNotThrow(() -> new BatchMetrics(BATCH_TYPE.UR));
+    assertDoesNotThrow(() -> new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR));
   }
 
   @Test
@@ -29,7 +29,7 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     assertDoesNotThrow(
         () ->
             batchMetrics.setSuccessfulMetrics(ConsumerStatistics.zero(BATCH_TYPE.UR.getName()))
@@ -42,7 +42,7 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     assertDoesNotThrow(
         () ->
             batchMetrics.setSuccessfulMetrics(ConsumerStatistics.zero(BATCH_TYPE.UR.getName()))
@@ -55,7 +55,7 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     assertDoesNotThrow(
         () -> batchMetrics.setUnsuccessfulMetrics()
     );
@@ -67,7 +67,7 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     assertDoesNotThrow(
         () -> batchMetrics.setUnsuccessfulMetrics()
     );
@@ -79,10 +79,10 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     batchMetrics.setUnsuccessfulMetrics();
     assertDoesNotThrow(
-        () -> batchMetrics.log(new FakeOkosynkConfiguration())
+        () -> batchMetrics.log()
     );
   }
 
@@ -92,10 +92,10 @@ public class BatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-    final BatchMetrics batchMetrics = new BatchMetrics(BATCH_TYPE.UR);
+    final BatchMetrics batchMetrics = new BatchMetrics(new FakeOkosynkConfiguration(), BATCH_TYPE.UR);
     batchMetrics.setUnsuccessfulMetrics();
     assertDoesNotThrow(
-        () -> batchMetrics.log(new FakeOkosynkConfiguration())
+        () -> batchMetrics.log()
     );
   }
 }

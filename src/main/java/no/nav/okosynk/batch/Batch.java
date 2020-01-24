@@ -60,7 +60,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   public void run() {
 
     MDC.put("batchnavn", getBatchName());
-    final BatchMetrics batchMetrics = new BatchMetrics(getBatchType());
+    final BatchMetrics batchMetrics = new BatchMetrics(getOkosynkConfiguration(), getBatchType());
     setBatchStatus(BatchStatus.STARTET);
     logger.info("Batch " + getBatchName() + " har startet.");
     try {
@@ -84,7 +84,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       setBatchStatus(status);
       logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
-    } catch(BatchException e) {
+    } catch (BatchException e) {
       final Throwable cause = e.getCause();
       setBatchStatus(BatchStatus.FEIL);
       if (cause instanceof OkosynkIoException) {
@@ -105,14 +105,14 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       );
       batchMetrics.setUnsuccessfulMetrics();
     } finally {
-      batchMetrics.log(getOkosynkConfiguration());
+      batchMetrics.log();
       MDC.remove("batchnavn");
     }
   }
 
   /**
    * TODO: OBS! Is it possible to set a reader that conflicts with the batch type?
-   * @param uspesifikkMeldingLinjeReader
+   * @param uspesifikkMeldingLinjeReader Self explanatory
    */
   public void setMeldingLinjeReader(final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader) {
 

@@ -1,14 +1,11 @@
 package no.nav.okosynk.batch;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
 import java.util.Collections;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import org.slf4j.Logger;
@@ -18,23 +15,28 @@ public class BatchMetrics {
 
   private static final Logger logger = LoggerFactory.getLogger(BatchMetrics.class);
 
-  private final Constants.BATCH_TYPE batchType;
-  private final CollectorRegistry    collectorRegistry;
-  private final Gauge                oppgaverOpprettetGauge;
-  private final Gauge                oppgaverOppdatertGauge;
-  private final Gauge                oppgaverFerdigstiltGauge;
-  private final Gauge                osBatchAlert;
-  private final Gauge                urBatchAlert;
-  private final Gauge.Timer          durationGaugeTimer;
-  private       ConsumerStatistics   consumerStatistics = null;
+  private final Constants.BATCH_TYPE  batchType;
+  private final String                pushGatewayEndpointNameAndPort;
+  private final CollectorRegistry     collectorRegistry;
+  private final Gauge                 oppgaverOpprettetGauge;
+  private final Gauge                 oppgaverOppdatertGauge;
+  private final Gauge                 oppgaverFerdigstiltGauge;
+  private final Gauge                 batchAlert;
+  private final Gauge.Timer           durationGaugeTimer;
+  private       ConsumerStatistics    consumerStatistics = null;
 
   /**
    * Ref. setting 0: https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics
    * @param batchType
    */
-  BatchMetrics(final Constants.BATCH_TYPE batchType) {
+  BatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
 
     this.batchType = batchType;
+    this.pushGatewayEndpointNameAndPort =
+        okosynkConfiguration.getString(
+            Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY,
+            "nais-prometheus-prometheus-pushgateway.nais:9091"
+    );
     this.collectorRegistry = new CollectorRegistry();
     this.collectorRegistry.clear();
     this.oppgaverOpprettetGauge =
@@ -58,20 +60,13 @@ public class BatchMetrics {
             .help("Antall oppgaver ferdigstilt")
             .register(this.collectorRegistry);
     this.oppgaverFerdigstiltGauge.set(0);
-    this.osBatchAlert =
+    this.batchAlert =
         Gauge
           .build()
-          .name("okosynk_os_batch_alert")
-          .help("The (Kibana) log for OKOSYNK-OS should be checked. Takes on only the values 0 and 1. If 1, the log should be checked. It may be that the job succeeded e.g. by later retries, or e.g. that there may be some warnings that should be manually looked at.")
+          .name(getBatchType().getAlertCollectorMetricName())
+          .help("Relates to: Okosynk OS: It is as expected that the logs indicate that no further action must be taken. The potential problems can have been automatically solved by e.g. retries. However, the opposite may also be the case. This alert is based on a counter that counts up for each time an OS batch fails, so it may be anything above 0. 0 indicates, of course, no errors.")
           .register(this.collectorRegistry);
-    this.osBatchAlert.set(0);
-    this.urBatchAlert =
-        Gauge
-          .build()
-          .name("okosynk_ur_batch_alert")
-          .help("The (Kibana) log for OKOSYNK-UR should be checked. Takes on only the values 0 and 1. If 1, the log should be checked. It may be that the job succeeded e.g. by later retries, or e.g. that there may be some warnings that should be manually looked at.")
-          .register(this.collectorRegistry);
-    this.urBatchAlert.set(0);
+    this.batchAlert.set(0);
     final Gauge durationGauge =
         Gauge
             .build()
@@ -79,6 +74,18 @@ public class BatchMetrics {
             .help("Duration of okosynk batch job in seconds.")
             .register(this.collectorRegistry);
     durationGauge.set(0);
+    // Zero out:
+    try {
+      new PushGateway(pushGatewayEndpointNameAndPort)
+          .pushAdd(
+              this.collectorRegistry,
+              "kubernetes-pods",
+              Collections.singletonMap("cronjob", getBatchName())
+          );
+    } catch (IOException e) {
+      // Intentionally NOP
+    }
+
     this.durationGaugeTimer = durationGauge.startTimer();
   }
 
@@ -96,44 +103,24 @@ public class BatchMetrics {
   }
 
   void setUnsuccessfulMetrics() {
-
     setMetrics(ConsumerStatistics.zero(getBatchType()));
-    // TODO: This following is an anti OO pattern:
-    if (BATCH_TYPE.OS.equals(getBatchType())) {
-      logger.warn("About to increase the osBatchAlert Gauge...");
-      osBatchAlert.inc();
-    } else {
-      logger.warn("About to increase the urBatchAlert Gauge...");
-      urBatchAlert.inc();
-    }
+    batchAlert.inc();
   }
 
-  void log(final IOkosynkConfiguration okosynkConfiguration) {
+  void log() {
+
+    logger.info("Pusher metrikker til {}", this.pushGatewayEndpointNameAndPort);
     try {
-      final String pushGatewayEndpointNameAndPort =
-        okosynkConfiguration.getRequiredString(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-      if (isNotBlank(pushGatewayEndpointNameAndPort)) {
-        logger.info("Pusher metrikker til {}", pushGatewayEndpointNameAndPort);
-        try {
-          new PushGateway(pushGatewayEndpointNameAndPort)
-              .pushAdd(
-                  this.collectorRegistry,
-                  "kubernetes-pods",
-                  Collections.singletonMap("cronjob", getBatchName())
-              );
-        } catch (IOException e) {
-          logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
-        }
-      } else {
-        throw new IllegalStateException(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY + " is not set.");
-      }
-    } catch (IllegalStateException e) {
-      logger.warn(
-            "Konfigurasjonsnøkkel "
-          + Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY
-          + " mangler, får ikke pushet metrikker."
-      );
+      new PushGateway(this.pushGatewayEndpointNameAndPort)
+          .pushAdd(
+              this.collectorRegistry,
+              "kubernetes-pods",
+              Collections.singletonMap("cronjob", getBatchName())
+          );
+    } catch (IOException e) {
+      logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
     }
+
     logger.info(
         "STATISTIKK: consumerStatistics ved avslutning av batchen: {}",
         this.consumerStatistics.toString()
