@@ -23,11 +23,11 @@ public class BatchStatusTest {
         final Map<BatchStatus, Integer> batchStatusMap =
             new HashMap<BatchStatus, Integer>() {{
                 put(BatchStatus.STARTET, -1);
-                put(BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL, 0);
-                put(BatchStatus.FEIL, 8);
+                put(BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS, 0);
+                put(BatchStatus.ERROR, 8);
                 put(BatchStatus.STOPPET, 10);
                 put(BatchStatus.READY, 100);
-                put(BatchStatus.FEIL_NUMBER_OF_RETRIES_EXCEEDED, 919);
+                put(BatchStatus.ERROR_NUMBER_OF_RETRIES_EXCEEDED, 919);
             }};
 
         for (final BatchStatus batchStatus : BatchStatus.values()) {

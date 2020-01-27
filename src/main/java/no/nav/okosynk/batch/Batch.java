@@ -41,7 +41,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
     // Assume failure, set to ready by the descendant if successful:
-    this.setBatchStatus(BatchStatus.FEIL);
+    this.setBatchStatus(BatchStatus.ERROR);
 
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
@@ -80,22 +80,22 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
       }
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
-      final BatchStatus status = BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
+      final BatchStatus status = BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS;
       setBatchStatus(status);
       logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
     } catch (BatchException e) {
       final Throwable cause = e.getCause();
-      setBatchStatus(BatchStatus.FEIL);
+      setBatchStatus(BatchStatus.ERROR);
       if (cause instanceof OkosynkIoException) {
         final OkosynkIoException okosynkIoException = (OkosynkIoException)cause;
         if (ErrorCode.NUMBER_OF_RETRIES_EXCEEDED.equals(okosynkIoException.getErrorCode())) {
-          setBatchStatus(BatchStatus.FEIL_NUMBER_OF_RETRIES_EXCEEDED);
+          setBatchStatus(BatchStatus.ERROR_NUMBER_OF_RETRIES_EXCEEDED);
         }
       }
       batchMetrics.setUnsuccessfulMetrics();
     } catch (Throwable e) {
-      final BatchStatus status = BatchStatus.FEIL;
+      final BatchStatus status = BatchStatus.ERROR;
       setBatchStatus(status);
       logger.error(
             "Noe uventet har gått galt under kjøring av "
@@ -124,7 +124,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     setBatchStatus(
         (!IMeldingLinjeFileReader.Status.OK.equals(this.uspesifikkMeldingLinjeReader.getStatus()))
             ?
-            BatchStatus.FEIL
+            BatchStatus.ERROR
             :
             BatchStatus.READY
     );

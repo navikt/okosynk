@@ -64,7 +64,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
       executor.awaitTermination(1, TimeUnit.MINUTES);
     } catch (Throwable e) {
       logger.error("Exception received when waiting for job thread to finish.", e);
-      batchStatus = BatchStatus.FEIL;
+      batchStatus = BatchStatus.ERROR;
     } finally {
       executor.shutdownNow();
     }
