@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200123.1054.8947018a
+              image: repo.adeo.no:5443/okosynk:20200124.1001.cd0b78ae
               resources:
                 limits:
                   cpu: 250m
@@ -102,10 +102,16 @@ spec:
                       key: urftpcredentials_password
                 - name: SECURITYTOKENSERVICE_URL
                   value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
+
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
-                  value: "30000"
+                  value: "10000"
                 - name: FILE_READER_MAX_NUMBER_OF_TRIES
+                  value: "2"
+                - name: BATCH_RETRY_WAIT_TIME_IN_MS
+                  value: "30000"
+                - name: BATCH_MAX_NUMBER_OF_TRIES
                   value: "3"
+
               volumeMounts:
                 - name: okosynk
                   mountPath: "/var/run/secrets/naisd.io/"

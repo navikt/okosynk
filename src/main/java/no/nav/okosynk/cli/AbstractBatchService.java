@@ -1,12 +1,5 @@
 package no.nav.okosynk.cli;
 
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.Gauge;
-import io.prometheus.client.exporter.PushGateway;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Objects;
-
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.batch.BatchStatus;
@@ -16,50 +9,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import static no.nav.okosynk.batch.BatchStatus.FULLFORT_UTEN_UVENTEDE_FEIL;
-
 public abstract class AbstractBatchService {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractBatchService.class);
 
+  private final IOkosynkConfiguration okosynkConfiguration;
+  private final Constants.BATCH_TYPE batchType;
   private final AbstractService service;
-  final IOkosynkConfiguration okosynkConfiguration;
-  final Constants.BATCH_TYPE batchType;
+  private boolean shouldRun;
 
-  private AbstractService getService() {
-    return service;
-  }
-
-  public IOkosynkConfiguration getOkosynkConfiguration() {
-    return okosynkConfiguration;
-  }
-
-  private Constants.BATCH_TYPE getBatchType() {
-    return batchType;
-  }
-
-  public AbstractBatchService(final IOkosynkConfiguration okosynkConfiguration,
+  public AbstractBatchService(
+      final IOkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE batchType) {
 
     final AbstractService service = createService(okosynkConfiguration);
-
-    this.service = service;
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
+    this.service = service;
+    this.shouldRun = true;
   }
-
-  private AbstractService createService(final IOkosynkConfiguration okosynkConfiguration) {
-    final BatchRepository batchRepository = new BatchRepository();
-
-    return createService(okosynkConfiguration, batchRepository);
-  }
-
-  protected abstract AbstractService createService(final IOkosynkConfiguration okosynkConfiguration,
-      final BatchRepository batchRepository);
 
   public BatchStatus startBatchSynchronously() {
     MDC.put("batchnavn", getBatchNavn());
-    final BatchStatus batchStatus;
+    BatchStatus batchStatus = null;
     try {
       logger
           .info("Mottatt kall til " + this.getClass().getSimpleName() + ".startBatchSynchronously");
@@ -67,9 +39,38 @@ public abstract class AbstractBatchService {
       batchStatus = service.startBatchSynchronously();
     } finally {
       MDC.remove(getBatchNavn());
+      setShouldRun(batchStatus.failedButRerunningMaySucceed());
     }
 
     return batchStatus;
+  }
+
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
+  }
+
+  public AbstractBatchService setShouldRun(final boolean shouldRun) {
+    this.shouldRun = shouldRun;
+    return this;
+  }
+  Constants.BATCH_TYPE getBatchType() {
+    return batchType;
+  }
+
+  boolean shouldRun() {
+    return this.shouldRun;
+  }
+
+  protected abstract AbstractService createService(final IOkosynkConfiguration okosynkConfiguration,
+      final BatchRepository batchRepository);
+
+  private AbstractService getService() {
+    return this.service;
+  }
+
+  private AbstractService createService(final IOkosynkConfiguration okosynkConfiguration) {
+    final BatchRepository batchRepository = new BatchRepository();
+    return createService(okosynkConfiguration, batchRepository);
   }
 
   private String getBatchNavn() {

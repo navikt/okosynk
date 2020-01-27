@@ -4,16 +4,16 @@ import no.nav.okosynk.cli.ExitStatus;
 
 public enum BatchStatus {
 
-    STARTET(-1, ExitStatus.OK),
-    FULLFORT_UTEN_UVENTEDE_FEIL(0, ExitStatus.OK),
-    FEIL(8, ExitStatus.OK),
-    STOPPET(10, ExitStatus.OK),
-    READY(100, ExitStatus.OK),
-    FULLFORT_MED_UVENTEDE_FEIL(371, ExitStatus.OK),
-    FEIL_NUMBER_OF_RETRIES_EXCEEDED(919, ExitStatus.ERROR)
+    STARTET(-1, ExitStatus.OK, false),
+    FULLFORT_UTEN_UVENTEDE_FEIL(0, ExitStatus.OK, false),
+    FEIL(8, ExitStatus.OK, true),
+    STOPPET(10, ExitStatus.OK, false),
+    READY(100, ExitStatus.OK, false),
+    FEIL_NUMBER_OF_RETRIES_EXCEEDED(919, ExitStatus.ERROR, false)
     ;
 
     private final int statusCode;
+    private final boolean failedButRerunningMaySucceed;
 
     // The exit status with which the
     // main method returns back to
@@ -24,16 +24,24 @@ public enum BatchStatus {
     // https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#example-states
     final ExitStatus exitStatus;
 
-    BatchStatus(final int statusCode, final ExitStatus exitCode) {
+    BatchStatus(
+        final int statusCode,
+        final ExitStatus exitCode,
+        final boolean failedButRerunningMaySucceed) {
         this.statusCode = statusCode;
         this.exitStatus = exitCode;
+        this.failedButRerunningMaySucceed = failedButRerunningMaySucceed;
     }
 
     public int getStatusCode() {
-        return statusCode;
+        return this.statusCode;
     }
 
     public ExitStatus getExitStatus() {
-        return exitStatus;
+        return this.exitStatus;
+    }
+
+    public boolean failedButRerunningMaySucceed() {
+        return this.failedButRerunningMaySucceed;
     }
 }

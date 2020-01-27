@@ -9,8 +9,9 @@ spec:
     slack:
       channel: '#oh-prod-varsling'
       prependText: 'Parts of Okosynk may have failed: '
-    email:
-      to: 'jorgen.markussen@nav.no;oyvind.roth@nav.no'
+      email_configs:
+        - to: jorgen.markussen@nav.no
+        - to: oyvind.roth@nav.no
   alerts:
     - alert: Check the logs of Okosynk for potential OS batch problems
       expr: 'okosynk_os_batch_alert{cronjob="bokosynk001",job="kubernetes-pods"} > 0'

@@ -72,18 +72,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return batchStatus;
   }
 
-  public Long startBatchAsynchronously() {
-
-    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-
-    stoppBatch();
-    final Batch<MELDINGSTYPE> batch = createAndConfigureBatch(okosynkConfiguration);
-    final Long eksekveringsId = batch.getExecutionId();
-    new Thread(batch).start();
-
-    return eksekveringsId;
-  }
-
   public Optional<BatchStatus> pollBatch(final long executionId) {
 
     final Optional<Batch<? extends AbstractMelding>> batch = this.batchRepository
@@ -115,7 +103,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   public Batch<MELDINGSTYPE> createAndConfigureBatch(
       final IOkosynkConfiguration okosynkConfiguration) {
 
-    final Batch<MELDINGSTYPE> batch = this.createBatch(okosynkConfiguration);
+    final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
     batch.setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
     this.getBatchRepository().leggTil(batch);
 

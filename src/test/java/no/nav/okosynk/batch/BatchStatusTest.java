@@ -1,12 +1,11 @@
 package no.nav.okosynk.batch;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +27,6 @@ public class BatchStatusTest {
                 put(BatchStatus.FEIL, 8);
                 put(BatchStatus.STOPPET, 10);
                 put(BatchStatus.READY, 100);
-                put(BatchStatus.FULLFORT_MED_UVENTEDE_FEIL, 371);
                 put(BatchStatus.FEIL_NUMBER_OF_RETRIES_EXCEEDED, 919);
             }};
 

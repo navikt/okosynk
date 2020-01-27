@@ -1,5 +1,7 @@
 package no.nav.okosynk.cli;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.cli.os.OsBatchService;
@@ -106,6 +108,20 @@ public class CliMain {
     System.exit(0);
   }
 
+  private static int getRetryWaitTimeInMilliseconds(
+      final IOkosynkConfiguration okosynkConfiguration
+  ) {
+    return okosynkConfiguration
+        .getRequiredInt(Constants.BATCH_RETRY_WAIT_TIME_IN_MS_KEY);
+  }
+
+  private static int getMaxNumberOfReadTries(
+      final IOkosynkConfiguration okosynkConfiguration
+  ) {
+    return okosynkConfiguration
+        .getRequiredInt(Constants.BATCH_MAX_NUMBER_OF_TRIES_KEY);
+  }
+
   /**
    * The outcome of the batch jobs is neglected at this level.
    * It has already been taken care of at a deeper lever.
@@ -115,21 +131,62 @@ public class CliMain {
   private void runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    logSelectedProperties(okosynkConfiguration, logger);
-    if (shouldOnlyRunUr) {
-      logger.info("Only running ur, not os");
-    } else {
-      runBatch(new OsBatchService(okosynkConfiguration));
-    }
-    if (shouldOnlyRunOs) {
-      logger.info("Only running os, not ur");
-    } else {
-      runBatch(new UrBatchService(okosynkConfiguration));
-    }
+    final Collection<AbstractBatchService> services = new ArrayList<>();
+    services.add(new OsBatchService(okosynkConfiguration).setShouldRun(!shouldOnlyRunUr));
+    services.add(new UrBatchService(okosynkConfiguration).setShouldRun(!shouldOnlyRunOs));
+    final int sleepTimeBetweenRunsInMs = getRetryWaitTimeInMilliseconds(okosynkConfiguration);
+    final int maxNumberOfRuns = getMaxNumberOfReadTries(okosynkConfiguration);
+    int actualNumberOfRuns = 0;
+    do {
+      logger.debug("About to run the batch(es)  for the {}. time ...", actualNumberOfRuns + 1);
+      services
+          .stream()
+          .forEach(
+              (final AbstractBatchService service) -> {
+                if (service.shouldRun()) {
+                  runBatch(service);
+                }
+              }
+          );
+      actualNumberOfRuns++;
+      if (
+          actualNumberOfRuns < maxNumberOfRuns
+          &&
+          // A new run may potentially succeed:
+          services
+              .stream()
+              .map((final AbstractBatchService service) -> service.shouldRun())
+              .reduce(false, ((b1, b2) -> b1 || b2))
+      ) {
+        try {
+          final String msg =
+              System.lineSeparator()
+                  + "I have tried running the batch {}"
+                  + " times, and I will not give up until I have tried {}"
+                  + " times."
+                  + System.lineSeparator()
+                  + "I will try again in {}"
+                  + " ms. Until then, I will take a nap."
+                  + System.lineSeparator();
+          logger.warn(msg, actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
+          logger.debug("Going to sleep, good night!");
+          Thread.sleep(sleepTimeBetweenRunsInMs);
+          logger.debug("Good morning, I just woke up again!");
+        } catch (InterruptedException ex) {
+          logger.warn(
+              "Ooooops, of unknown reasons, I was woken up by \"something\" before {} ms had passed.",
+              sleepTimeBetweenRunsInMs
+          );
+        }
+        logger.info("I will try re-running the batch(es)...");
+      } else {
+        break;
+      }
+    } while (true);
   }
 
   private void runBatch(final AbstractBatchService batchService) {
-    final String batchName = batchService.batchType.getName();
+    final String batchName = batchService.getBatchType().getName();
     logger.info("About to run batch {}...", batchName);
     final BatchStatus batchStatus = batchService.startBatchSynchronously();
     logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
