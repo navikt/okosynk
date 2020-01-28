@@ -28,7 +28,6 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
             new Batch<>(
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
-                getEksekveringsId(),
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper(mock(AktoerRestClient.class))
             )

@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runnable {
+public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
   private static final Logger logger = LoggerFactory.getLogger(Batch.class);
 
@@ -26,7 +26,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
   private final IOkosynkConfiguration okosynkConfiguration;
   final Constants.BATCH_TYPE batchType;
-  private final long executionId;
   private BatchStatus batchStatus;
   private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
 
@@ -36,7 +35,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
   public Batch(final IOkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE batchType,
-      final long executionId,
       final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
       final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
@@ -45,7 +43,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
-    this.executionId = executionId;
     this.spesifikkMeldingReader = spesifikkMeldingReader;
     this.oppgaveSynkroniserer = new OppgaveSynkroniserer(
         okosynkConfiguration,
@@ -56,7 +53,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     this.setBatchStatus(BatchStatus.READY);
   }
 
-  @Override
   public void run() {
 
     MDC.put("batchnavn", getBatchName());
@@ -131,9 +127,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
   }
 
   public synchronized void setBatchStatus(final BatchStatus status) {
-    if (this.batchStatus != BatchStatus.STOPPET) {
-      this.batchStatus = status;
-    }
+    this.batchStatus = status;
   }
 
   public String getBatchName() {
@@ -152,17 +146,13 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
     return batchBruker;
   }
 
-  public void stopp() {
-    setBatchStatus(BatchStatus.STOPPET);
-  }
-
   private List<Oppgave> hentBatchOppgaver() throws BatchException {
 
     logger.debug("Entering Batch.hentBatchOppgaver...");
 
     final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
-    final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger = opprettSpesifikkeMeldinger(
-        linjerMedUspesifikkeMeldinger);
+    final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger =
+        opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
     final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
 
     logger.debug("About to normally leave Batch.hentBatchOppgaver");
@@ -174,7 +164,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
     logger.debug("Entering Batch.hentLinjerMedUspesifikkeMeldinger...");
 
-    List<String> linjerMedUspesifikkeMeldinger = null;
+    List<String> linjerMedUspesifikkeMeldinger;
     try {
       linjerMedUspesifikkeMeldinger = getUspesifikkMeldingLinjeReader().read();
       logger.info(
@@ -225,10 +215,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> implements Runn
 
   private Constants.BATCH_TYPE getBatchType() {
     return batchType;
-  }
-
-  public long getExecutionId() {
-    return executionId;
   }
 
   private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {

@@ -1,19 +1,14 @@
 package no.nav.okosynk.batch;
 
-import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import no.nav.okosynk.config.*;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
-import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.os.OsMelding;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -34,7 +29,6 @@ class OsServiceTest {
 //    private IOppgaveBehandlingConsumerGateway mockedOppgaveBehandlingGateway =
 //        mock(IOppgaveBehandlingConsumerGateway.class);
 
-    private BatchRepository batchRepository;
     private OsService osService;
     private IOkosynkConfiguration okosynkConfiguration;
 
@@ -43,15 +37,13 @@ class OsServiceTest {
 
         this.okosynkConfiguration = new FakeOkosynkConfiguration();
 
-        batchRepository = new BatchRepository();
-        batchRepository.cleanTestRepository();
         okosynkConfiguration.setSystemProperty(
             Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
             "2");
         okosynkConfiguration.setSystemProperty(
             Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
             "1000");
-        osService = new OsService(okosynkConfiguration, batchRepository);
+        osService = new OsService(okosynkConfiguration);
     }
 
     @Test
@@ -66,28 +58,12 @@ class OsServiceTest {
 
         final OsService mockedOsService = mock(OsService.class);
         when(mockedOsService.createAndConfigureBatch(any())).thenCallRealMethod();
-        when(mockedOsService.getNextExecutionId()).thenReturn(new AtomicLong());
         when(mockedOsService.getBatchType()).thenReturn(BATCH_TYPE.OS);
-        when(mockedOsService.getBatchRepository()).thenReturn(new BatchRepository());
 
         final Batch<? extends AbstractMelding> osBatch =
             mockedOsService.createAndConfigureBatch(this.okosynkConfiguration);
 
         assertNotNull(osBatch);
-        assertTrue(
-            batchRepository
-                .hentBatch(osBatch.getExecutionId())
-                .isPresent(),
-            "Batchen finnes ikke i repositoryet"
-        );
-    }
-
-    @Test
-    void stoppBatchReturnererFalseForIkkeEksisterendeBatch() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        assertFalse(osService.stoppBatch(), "En ikke-eksisterende batch har blitt stoppet");
     }
 
 //    @Test
@@ -102,11 +78,6 @@ class OsServiceTest {
 //
 //        assertEquals(BatchStatus.STOPPET, batchStatus);
 //    }
-
-    @Test
-    void batchSomIkkeHarStartetHarIkkeStatus() {
-        assertFalse(osService.pollBatch(-1).isPresent(), "En batch som ikke har startet finnes i repositoryet");
-    }
 
 //    @Test
 //    void startAlleredeStartetBatchStopperOpprinneligBatch() throws MeldingUnreadableException {
@@ -148,7 +119,7 @@ class OsServiceTest {
 
     private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
 
-        this.osService = Mockito.spy(new OsService(okosynkConfiguration, batchRepository));
+        this.osService = Mockito.spy(new OsService(okosynkConfiguration));
         final Batch<OsMelding> batch = (Batch<OsMelding>)osService.createAndConfigureBatch(this.okosynkConfiguration);
         batch.setMeldingLinjeReader(new MeldingLinjeFileReaderMock(MOCK_OS_LINJE));
         when(osService.createAndConfigureBatch(this.okosynkConfiguration)).thenReturn((Batch)batch);

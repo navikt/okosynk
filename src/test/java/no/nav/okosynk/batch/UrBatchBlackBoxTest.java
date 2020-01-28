@@ -40,7 +40,6 @@ public class UrBatchBlackBoxTest {
             new Batch<UrMelding>(
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
-                EKSEKVERINGS_ID,
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR)));
         batch.setMeldingLinjeReader(meldingReaderMock);

@@ -3,10 +3,11 @@ package no.nav.okosynk.cli;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
-import no.nav.okosynk.cli.os.OsBatchService;
+import no.nav.okosynk.batch.OsService;
+import no.nav.okosynk.batch.UrService;
 import no.nav.okosynk.cli.testcertificates.TestCertificates_Copy;
-import no.nav.okosynk.cli.ur.UrBatchService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
@@ -96,7 +97,7 @@ public class CliMain {
         if (shouldStartFtpServer(commandLine)) {
           cliMain.startFtpServer();
         }
-        cliMain.runBatches(shouldOnlyRunOs(commandLine), shouldOnlyRunUr(commandLine));
+        cliMain.runAllBatches(shouldOnlyRunOs(commandLine), shouldOnlyRunUr(commandLine));
 
       } finally {
         if ((cliMain != null) && shouldStartFtpServer(commandLine)) {
@@ -128,23 +129,23 @@ public class CliMain {
    * @param shouldOnlyRunOs Self explanatory
    * @param shouldOnlyRunUr Self explanatory
    */
-  private void runBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
+  private void runAllBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    final Collection<AbstractBatchService> services = new ArrayList<>();
-    services.add(new OsBatchService(okosynkConfiguration).setShouldRun(!shouldOnlyRunUr));
-    services.add(new UrBatchService(okosynkConfiguration).setShouldRun(!shouldOnlyRunOs));
+    final Collection<AbstractService> services = new ArrayList<>();
+    services.add(new OsService(okosynkConfiguration).setShouldRun(!shouldOnlyRunUr));
+    services.add(new UrService(okosynkConfiguration).setShouldRun(!shouldOnlyRunOs));
     final int sleepTimeBetweenRunsInMs = getRetryWaitTimeInMilliseconds(okosynkConfiguration);
     final int maxNumberOfRuns = getMaxNumberOfReadTries(okosynkConfiguration);
     int actualNumberOfRuns = 0;
     do {
-      logger.debug("About to run the batch(es)  for the {}. time ...", actualNumberOfRuns + 1);
+      logger.info("About to run the batch(es) for the {}. time ...", actualNumberOfRuns + 1);
       services
           .stream()
           .forEach(
-              (final AbstractBatchService service) -> {
+              (final AbstractService service) -> {
                 if (service.shouldRun()) {
-                  runBatch(service);
+                  runOneBatch(service);
                 }
               }
           );
@@ -155,26 +156,24 @@ public class CliMain {
           // A new run may potentially succeed:
           services
               .stream()
-              .map((final AbstractBatchService service) -> service.shouldRun())
+              .map((final AbstractService service) -> service.shouldRun())
               .reduce(false, ((b1, b2) -> b1 || b2))
       ) {
         try {
           final String msg =
               System.lineSeparator()
-                  + "I have tried running the batch {}"
-                  + " times, and I will not give up until I have tried {}"
-                  + " times."
+                  + "I have tried running the batch {} times, "
+                  + "and I will not give up until I have tried {} times."
                   + System.lineSeparator()
-                  + "I will try again in {}"
-                  + " ms. Until then, I will take a nap."
+                  + "I will try again in {} ms. Until then, I will take a nap."
                   + System.lineSeparator();
           logger.warn(msg, actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
-          logger.debug("Going to sleep, good night!");
           Thread.sleep(sleepTimeBetweenRunsInMs);
           logger.debug("Good morning, I just woke up again!");
         } catch (InterruptedException ex) {
           logger.warn(
-              "Ooooops, of unknown reasons, I was woken up by \"something\" before {} ms had passed.",
+                "Ooooops, of unknown reasons, "
+              + "I was woken up by \"something\" before {} ms had passed.",
               sleepTimeBetweenRunsInMs
           );
         }
@@ -185,10 +184,10 @@ public class CliMain {
     } while (true);
   }
 
-  private void runBatch(final AbstractBatchService batchService) {
-    final String batchName = batchService.getBatchType().getName();
+  private void runOneBatch(final AbstractService service) {
+    final String batchName = service.getBatchType().getName();
     logger.info("About to run batch {}...", batchName);
-    final BatchStatus batchStatus = batchService.startBatchSynchronously();
+    final BatchStatus batchStatus = service.run();
     logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
   }
 

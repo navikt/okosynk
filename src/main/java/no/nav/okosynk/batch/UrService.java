@@ -1,7 +1,5 @@
 package no.nav.okosynk.batch;
 
-import no.nav.okosynk.batch.AbstractService;
-import no.nav.okosynk.batch.BatchRepository;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
@@ -13,10 +11,8 @@ import no.nav.okosynk.domain.ur.UrMeldingReader;
 
 public class UrService extends AbstractService<UrMelding> {
 
-    public UrService(final IOkosynkConfiguration okosynkConfiguration,
-                     final BatchRepository       batchRepository) {
-
-        super(Constants.BATCH_TYPE.UR, okosynkConfiguration, batchRepository);
+    public UrService(final IOkosynkConfiguration okosynkConfiguration) {
+        super(Constants.BATCH_TYPE.UR, okosynkConfiguration);
     }
 
     @Override

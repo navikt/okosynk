@@ -256,27 +256,6 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
   }
 
   @Test
-  void stoppSetterStatusTilStoppet() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    getBatch().stopp();
-
-    assertEquals(BatchStatus.STOPPET, getBatch().getBatchStatus());
-  }
-
-  @Test
-  void setStatusOverskriverIkkeStatusDersomBatchErStoppet() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    getBatch().stopp();
-    getBatch().setBatchStatus(BatchStatus.ERROR);
-
-    assertEquals(BatchStatus.STOPPET, getBatch().getBatchStatus());
-  }
-
-  @Test
   @DisplayName("Assert that a null pointer exception is thrown when trying to inject null for uspesifikkMeldingLinjeReader")
   void setUspesifikkMeldingLinjeReaderToNull() {
 

@@ -25,7 +25,6 @@ public class BatchStatusTest {
                 put(BatchStatus.STARTET, -1);
                 put(BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS, 0);
                 put(BatchStatus.ERROR, 8);
-                put(BatchStatus.STOPPET, 10);
                 put(BatchStatus.READY, 100);
                 put(BatchStatus.ERROR_NUMBER_OF_RETRIES_EXCEEDED, 919);
             }};

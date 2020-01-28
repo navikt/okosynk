@@ -39,7 +39,6 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
             new Batch<>(
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.UR,
-                getEksekveringsId(),
                 new UrMeldingReader(UrMelding::new),
                 new UrMapper(mock(AktoerRestClient.class))
             )

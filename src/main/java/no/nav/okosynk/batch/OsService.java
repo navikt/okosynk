@@ -11,9 +11,8 @@ import no.nav.okosynk.domain.os.OsMeldingReader;
 
 public class OsService extends AbstractService<OsMelding> {
 
-    public OsService(final IOkosynkConfiguration okosynkConfiguration,
-                     final BatchRepository batchRepository) {
-        super(Constants.BATCH_TYPE.OS, okosynkConfiguration, batchRepository);
+    public OsService(final IOkosynkConfiguration okosynkConfiguration) {
+        super(Constants.BATCH_TYPE.OS, okosynkConfiguration);
     }
 
     @Override

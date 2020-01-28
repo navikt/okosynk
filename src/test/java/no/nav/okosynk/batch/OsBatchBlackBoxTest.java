@@ -10,7 +10,6 @@ import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
-import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.os.OsMapper;
 import no.nav.okosynk.domain.os.OsMelding;
@@ -24,8 +23,6 @@ public class OsBatchBlackBoxTest {
 
     private static final Logger enteringTestHeaderLogger =
         LoggerFactory.getLogger("EnteringTestHeader");
-
-    private static final long EKSEKVERINGS_ID = 0;
 
     private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
@@ -43,7 +40,6 @@ public class OsBatchBlackBoxTest {
             new Batch<OsMelding>(
                 okosynkConfiguration,
                 Constants.BATCH_TYPE.OS,
-                EKSEKVERINGS_ID,
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS)));
         batch.setMeldingLinjeReader(meldingReaderMock);

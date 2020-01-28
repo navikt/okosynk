@@ -154,40 +154,6 @@ class OppgaveSynkronisererTest {
   }
 
   @Test
-  void when_the_batch_is_stopped_when_synchronize_is_called_then_no_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    this.batchStatus = BatchStatus.STOPPET;
-    this.oppgaveSynkronisererWithInjectedMocks
-        .synkroniser(lagOppgaveliste(OPPGAVEID, BRUKERID));
-    verify(this.mockedOppgaveRestClient, times(0)).patchOppgaver   (anySet(), anyBoolean());
-    verify(this.mockedOppgaveRestClient, times(0)).opprettOppgaver (anyCollection());
-  }
-
-  @Test
-  void when_the_batch_is_stopped_then_synchronizer_opprettOppgaver_should_not_call_rest_clients_opprettOppgaver() {
-
-      enteringTestHeaderLogger.debug(null);
-
-      batchStatus = BatchStatus.STOPPET;
-      this.oppgaveSynkronisererWithInjectedMocks
-          .opprettOppgaver(lagOppgaveliste(OPPGAVEID, BRUKERID));
-      verify(this.mockedOppgaveRestClient, times(0)).opprettOppgaver(anyCollection());
-  }
-
-  @Test
-  void when_the_batch_is_stopped_then_synchronizer_oppdaterOppgaver_should_not_call_rest_clients_oppdaterOppgaver() {
-
-      enteringTestHeaderLogger.debug(null);
-
-      batchStatus = BatchStatus.STOPPET;
-      this.oppgaveSynkronisererWithInjectedMocks
-          .oppdaterOppgaver(lagOppgaveOppdatering(lagOppgave(OPPGAVEID, BRUKERID), lagOppgave(OPPGAVEID_GSAK, BRUKERID)));
-      verify(this.mockedOppgaveRestClient, times(0)).patchOppgaver(anySet(), anyBoolean());
-  }
-
-  @Test
   void when_synkroniser_is_called_then_all_rest_client_methods_should_be_called_once() {
 
       enteringTestHeaderLogger.debug(null);

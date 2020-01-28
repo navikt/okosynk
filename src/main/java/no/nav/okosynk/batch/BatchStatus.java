@@ -2,9 +2,8 @@ package no.nav.okosynk.batch;
 
 public enum BatchStatus {
 
-    STARTET(-1, false),
     READY(100, false),
-    STOPPET(10, false),
+    STARTET(-1, false),
     OK_ENDED_WITHOUT_UNEXPECTED_ERRORS(0, false),
     ERROR(8, true),
     ERROR_NUMBER_OF_RETRIES_EXCEEDED(919, true)

@@ -153,33 +153,28 @@ public class OppgaveSynkroniserer {
         getBatchType().getConsumerStatisticsName();
 
     final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å ferdigstille oppgaver");
+    final String oppgaveType = getBatchType().getOppgaveType();
+    final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
+        .equals(oppgave.oppgavetypeKode, oppgaveType);
+    final Predicate<Oppgave> ikkeNyligEndret = oppgave -> oppgave.sistEndret
+        .isBefore(LocalDateTime.now().minusHours(8));
+    final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()
+        .filter(ikkeNyligEndret)
+        .filter(harUendretOppgaveType)
+        .collect(Collectors.toSet());
+
+    if (oppgaverSomSkalFerdigstilles.isEmpty()) {
+      logger.info(
+          "Bruker {} forsøker å ferdigstille oppgaver, men det er ingen oppgaver å ferdigstille.",
+          bruker);
       consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
     } else {
-      final String oppgaveType = getBatchType().getOppgaveType();
-      final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
-          .equals(oppgave.oppgavetypeKode, oppgaveType);
-      final Predicate<Oppgave> ikkeNyligEndret = oppgave -> oppgave.sistEndret
-          .isBefore(LocalDateTime.now().minusHours(8));
-      final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()
-          .filter(ikkeNyligEndret)
-          .filter(harUendretOppgaveType)
-          .collect(Collectors.toSet());
-
-      if (oppgaverSomSkalFerdigstilles.isEmpty()) {
-        logger.info(
-            "Bruker {} forsøker å ferdigstille oppgaver, men det er ingen oppgaver å ferdigstille.",
-            bruker);
-        consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-      } else {
-        logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker,
-            oppgaverSomSkalFerdigstilles.size());
-        consumerStatistics = getOppgaveRestClient()
-            .patchOppgaver(oppgaverSomSkalFerdigstilles, true);
-        logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker,
-            consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
-      }
+      logger.info("Bruker {} forsøker å ferdigstille {} oppgaver.", bruker,
+          oppgaverSomSkalFerdigstilles.size());
+      consumerStatistics = getOppgaveRestClient()
+          .patchOppgaver(oppgaverSomSkalFerdigstilles, true);
+      logger.info("Bruker {} har ferdigstilt {} oppgaver", bruker,
+          consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
     }
 
     return consumerStatistics;
@@ -193,10 +188,7 @@ public class OppgaveSynkroniserer {
         getBatchType().getConsumerStatisticsName();
 
     final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å oppdatere oppgaver");
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else if (oppgaveOppdateringer.isEmpty()) {
+    if (oppgaveOppdateringer.isEmpty()) {
       logger.info("Bruker {} forsøker å oppdatere oppgaver, men det er ingen oppgaver å oppdatere.",
           bruker);
       consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
@@ -224,10 +216,7 @@ public class OppgaveSynkroniserer {
         getBatchType().getConsumerStatisticsName();
 
     final ConsumerStatistics consumerStatistics;
-    if (batchErStoppet()) {
-      logger.info("Batchen er stoppet, avslutter uten å opprette oppgaver");
-      consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
-    } else if (oppgaver.isEmpty()) {
+    if (oppgaver.isEmpty()) {
       logger.info("Bruker {} forsøker å opprette oppgaver, men det er ingen oppgaver å opprette.",
           bruker);
       consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
@@ -266,10 +255,6 @@ public class OppgaveSynkroniserer {
         antallOppgaver,
         antallMeldinger
     );
-  }
-
-  private boolean batchErStoppet() {
-    return BatchStatus.STOPPET.equals(batchStatusSupplier.get());
   }
 
   private OppgaveRestClient getOppgaveRestClient() {

@@ -1,13 +1,5 @@
 package no.nav.okosynk.batch;
 
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.domain.AbstractMelding;
@@ -24,80 +16,33 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
   private final Constants.BATCH_TYPE batchType;
   private final IOkosynkConfiguration okosynkConfiguration;
-  private final BatchRepository batchRepository;
-  private final AtomicLong nextExecutionId;
+  private boolean shouldRun;
 
   protected AbstractService(
       final Constants.BATCH_TYPE  batchType,
-      final IOkosynkConfiguration okosynkConfiguration,
-      final BatchRepository       batchRepository) {
+      final IOkosynkConfiguration okosynkConfiguration) {
 
     this.batchType = batchType;
     this.okosynkConfiguration = okosynkConfiguration;
-    this.batchRepository = batchRepository;
-    this.nextExecutionId = new AtomicLong(
-        this.getBatchType().getExecutionIdOffset() + System.currentTimeMillis());
+    this.shouldRun = true;
   }
 
-  public BatchStatus startBatchSynchronously() {
+  public BatchStatus run() {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    BatchStatus batchStatus;
-    final ExecutorService executor = Executors.newFixedThreadPool(1);
+    BatchStatus batchStatus = null;
     try {
-      stoppBatch();
       final Batch<? extends AbstractMelding> batch = createAndConfigureBatch(okosynkConfiguration);
-      final Callable<BatchStatus> task = () -> {
-        batch.run();
-        final BatchStatus batchStatusTemp = batch.getBatchStatus();
-
-        return batchStatusTemp;
-      };
-
-      logger.info("job thread about to be started...");
-      final Future<BatchStatus> future = executor.submit(task);
-      logger.info("Waiting for job thread to finish...");
-      batchStatus = future.get();
-      logger.info("job thread finished normally with outcome: " + batchStatus);
-      stoppBatch();
-      executor.shutdown();
-      executor.awaitTermination(1, TimeUnit.MINUTES);
+      batch.run();
+      batchStatus = batch.getBatchStatus();
     } catch (Throwable e) {
-      logger.error("Exception received when waiting for job thread to finish.", e);
+      logger.error("Exception received when waiting for batchService to finish.", e);
       batchStatus = BatchStatus.ERROR;
     } finally {
-      executor.shutdownNow();
+      setShouldRun(batchStatus.failedButRerunningMaySucceed());
     }
 
     return batchStatus;
-  }
-
-  public Optional<BatchStatus> pollBatch(final long executionId) {
-
-    final Optional<Batch<? extends AbstractMelding>> batch = this.batchRepository
-        .hentBatch(executionId);
-    if (batch.isPresent()) {
-      logger.debug("Status for batch med eksekverings-id " + executionId + " ble etterspurt.");
-    } else {
-      logger.warn("Status for batch med eksekverings-id " + executionId
-          + " ble etterspurt, men ingen batch med eksekverings-id " + executionId + " kjorer.");
-    }
-    return batch.map(Batch::getBatchStatus);
-  }
-
-  public boolean stoppBatch() {
-
-    final Optional<Batch<? extends AbstractMelding>> batch = this.batchRepository
-        .hentBatch(this.getBatchType().getName());
-    final boolean batchStoppet = batch.isPresent();
-    if (batchStoppet) {
-      batch.get().stopp();
-      logger.info("Batch " + this.getBatchType().getName() + " ble stoppet.");
-    } else {
-      logger.warn("Batch med batchNavn " + this.getBatchType().getName()
-          + " ble forsøkt stoppet, men batch kjører ikke.");
-    }
-    return batchStoppet;
   }
 
   public Batch<MELDINGSTYPE> createAndConfigureBatch(
@@ -105,9 +50,25 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
     batch.setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
-    this.getBatchRepository().leggTil(batch);
 
     return batch;
+  }
+
+  public AbstractService setShouldRun(final boolean shouldRun) {
+    this.shouldRun = shouldRun;
+    return this;
+  }
+
+  public boolean shouldRun() {
+    return this.shouldRun;
+  }
+
+  public Constants.BATCH_TYPE getBatchType() {
+    return batchType;
+  }
+
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
   }
 
   protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();
@@ -125,28 +86,10 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         new Batch<>(
             okosynkConfiguration,
             getBatchType(),
-            getNextExecutionId().getAndIncrement(),
             createMeldingReader(),
             createMeldingMapper()
         );
 
     return batch;
   }
-
-  protected Constants.BATCH_TYPE getBatchType() {
-    return batchType;
-  }
-
-  public IOkosynkConfiguration getOkosynkConfiguration() {
-    return okosynkConfiguration;
-  }
-
-  public BatchRepository getBatchRepository() {
-    return batchRepository;
-  }
-
-  AtomicLong getNextExecutionId() {
-    return nextExecutionId;
-  }
-
 }

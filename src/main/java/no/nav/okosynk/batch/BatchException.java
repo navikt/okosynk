@@ -4,7 +4,7 @@ public class BatchException extends Exception {
 
     public final Exception cause;
 
-    public BatchException(Exception cause) {
+    public BatchException(final Exception cause) {
         this.cause = cause;
     }
 
