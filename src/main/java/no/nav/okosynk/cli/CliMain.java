@@ -182,6 +182,16 @@ public class CliMain {
         break;
       }
     } while (true);
+
+    services
+        .stream()
+        .forEach(
+            (final AbstractService service) -> {
+              if (service.getLastBatchStatus().shouldAlert()) {
+                service.getAlertMetrics().generateCheckTheLogAlert();
+              }
+            }
+        );
   }
 
   private void runOneBatch(final AbstractService service) {

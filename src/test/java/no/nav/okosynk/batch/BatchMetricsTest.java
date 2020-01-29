@@ -2,6 +2,7 @@ package no.nav.okosynk.batch;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import no.nav.okosynk.cli.BatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;

@@ -1,6 +1,7 @@
 package no.nav.okosynk.batch;
 
 import java.util.List;
+import no.nav.okosynk.cli.BatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -34,9 +35,10 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
   private IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
 
   public Batch(final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType,
-      final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
-      final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+
+    final Constants.BATCH_TYPE batchType,
+    final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
+    final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
     // Assume failure, set to ready by the descendant if successful:
     this.setBatchStatus(BatchStatus.ERROR);
@@ -44,10 +46,12 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
     this.spesifikkMeldingReader = spesifikkMeldingReader;
-    this.oppgaveSynkroniserer = new OppgaveSynkroniserer(
-        okosynkConfiguration,
-        this::getBatchStatus,
-        new OppgaveRestClient(okosynkConfiguration, batchType));
+    this.oppgaveSynkroniserer =
+        new OppgaveSynkroniserer(
+          okosynkConfiguration,
+          this::getBatchStatus,
+          new OppgaveRestClient(okosynkConfiguration, batchType)
+        );
     this.spesifikkMapper = spesifikkMapper;
 
     this.setBatchStatus(BatchStatus.READY);

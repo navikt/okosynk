@@ -1,5 +1,6 @@
 package no.nav.okosynk.batch;
 
+import no.nav.okosynk.cli.AbstractAlertMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.domain.AbstractMelding;
@@ -17,6 +18,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   private final Constants.BATCH_TYPE batchType;
   private final IOkosynkConfiguration okosynkConfiguration;
   private boolean shouldRun;
+  private BatchStatus lastBatchStatus;
 
   protected AbstractService(
       final Constants.BATCH_TYPE  batchType,
@@ -26,6 +28,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     this.okosynkConfiguration = okosynkConfiguration;
     this.shouldRun = true;
   }
+
 
   public BatchStatus run() {
 
@@ -42,7 +45,13 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
       setShouldRun(batchStatus.failedButRerunningMaySucceed());
     }
 
+    this.lastBatchStatus = batchStatus;
+
     return batchStatus;
+  }
+
+  public BatchStatus getLastBatchStatus() {
+    return lastBatchStatus;
   }
 
   public Batch<MELDINGSTYPE> createAndConfigureBatch(
@@ -69,6 +78,14 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
   public IOkosynkConfiguration getOkosynkConfiguration() {
     return okosynkConfiguration;
+  }
+
+  public AbstractAlertMetrics getAlertMetrics() {
+    return getOkosynkConfiguration().getAlertMetrics(getBatchType());
+  }
+
+  public void generateCheckTheLogAlert() {
+
   }
 
   protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();

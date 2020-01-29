@@ -1,6 +1,5 @@
-package no.nav.okosynk.batch;
+package no.nav.okosynk.cli;
 
-import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.io.IOException;
@@ -11,17 +10,13 @@ import no.nav.okosynk.consumer.ConsumerStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BatchMetrics {
+public class BatchMetrics extends AbstractMetrics {
 
   private static final Logger logger = LoggerFactory.getLogger(BatchMetrics.class);
 
-  private final Constants.BATCH_TYPE  batchType;
-  private final String                pushGatewayEndpointNameAndPort;
-  private final CollectorRegistry     collectorRegistry;
   private final Gauge                 oppgaverOpprettetGauge;
   private final Gauge                 oppgaverOppdatertGauge;
   private final Gauge                 oppgaverFerdigstiltGauge;
-  private final Gauge                 batchAlert;
   private final Gauge.Timer           durationGaugeTimer;
   private       ConsumerStatistics    consumerStatistics = null;
 
@@ -29,56 +24,43 @@ public class BatchMetrics {
    * Ref. setting 0: https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics
    * @param batchType
    */
-  BatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
+  public BatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
 
-    this.batchType = batchType;
-    this.pushGatewayEndpointNameAndPort =
-        okosynkConfiguration.getString(
-            Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY,
-            "nais-prometheus-prometheus-pushgateway.nais:9091"
-    );
-    this.collectorRegistry = new CollectorRegistry();
-    this.collectorRegistry.clear();
+    super(okosynkConfiguration, batchType);
+
     this.oppgaverOpprettetGauge =
       Gauge
         .build()
         .name("okosynk_job_oppgaver_opprettet")
         .help("Antall oppgaver opprettet")
-        .register(this.collectorRegistry);
+        .register(getCollectorRegistry());
     this.oppgaverOpprettetGauge.set(0);
     this.oppgaverOppdatertGauge =
         Gauge
             .build()
             .name("okosynk_job_oppgaver_oppdatert")
             .help("Antall oppgaver oppdatert")
-            .register(this.collectorRegistry);
+            .register(getCollectorRegistry());
     this.oppgaverOppdatertGauge.set(0);
     this.oppgaverFerdigstiltGauge =
         Gauge
             .build()
             .name("okosynk_job_oppgaver_ferdigstilt")
             .help("Antall oppgaver ferdigstilt")
-            .register(this.collectorRegistry);
+            .register(getCollectorRegistry());
     this.oppgaverFerdigstiltGauge.set(0);
-    this.batchAlert =
-        Gauge
-          .build()
-          .name(getBatchType().getAlertCollectorMetricName())
-          .help("Relates to: Okosynk OS: It is as expected that the logs indicate that no further action must be taken. The potential problems can have been automatically solved by e.g. retries. However, the opposite may also be the case. This alert is based on a counter that counts up for each time an OS batch fails, so it may be anything above 0. 0 indicates, of course, no errors.")
-          .register(this.collectorRegistry);
-    this.batchAlert.set(0);
     final Gauge durationGauge =
         Gauge
             .build()
             .name("okosynk_job_duration_seconds")
             .help("Duration of okosynk batch job in seconds.")
-            .register(this.collectorRegistry);
+            .register(getCollectorRegistry());
     durationGauge.set(0);
     // Zero out:
     try {
-      new PushGateway(pushGatewayEndpointNameAndPort)
+      new PushGateway(getPushGatewayEndpointNameAndPort())
           .pushAdd(
-              this.collectorRegistry,
+              getCollectorRegistry(),
               "kubernetes-pods",
               Collections.singletonMap("cronjob", getBatchName())
           );
@@ -89,7 +71,7 @@ public class BatchMetrics {
     this.durationGaugeTimer = durationGauge.startTimer();
   }
 
-  void setSuccessfulMetrics(final ConsumerStatistics consumerStatistics) {
+  public void setSuccessfulMetrics(final ConsumerStatistics consumerStatistics) {
 
     setMetrics(consumerStatistics);
     final Gauge lastSuccess =
@@ -97,23 +79,22 @@ public class BatchMetrics {
             .build()
             .name("okosynk_batch_job_last_success_unixtime")
             .help("Last time okosynk batch job succeeded, in unixtime.")
-            .register(this.collectorRegistry);
+            .register(getCollectorRegistry());
     lastSuccess.set(0);
     lastSuccess.setToCurrentTime();
   }
 
-  void setUnsuccessfulMetrics() {
+  public void setUnsuccessfulMetrics() {
     setMetrics(ConsumerStatistics.zero(getBatchType()));
-    batchAlert.inc();
   }
 
-  void log() {
+  public void log() {
 
-    logger.info("Pusher metrikker til {}", this.pushGatewayEndpointNameAndPort);
+    logger.info("Pusher metrikker til {}", getPushGatewayEndpointNameAndPort());
     try {
-      new PushGateway(this.pushGatewayEndpointNameAndPort)
+      new PushGateway(getPushGatewayEndpointNameAndPort())
           .pushAdd(
-              this.collectorRegistry,
+              getCollectorRegistry(),
               "kubernetes-pods",
               Collections.singletonMap("cronjob", getBatchName())
           );
@@ -142,13 +123,5 @@ public class BatchMetrics {
         .set(consumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt());
 
     this.consumerStatistics = consumerStatistics;
-  }
-
-  private String getBatchName() {
-    return getBatchType().getName();
-  }
-
-  private Constants.BATCH_TYPE getBatchType() {
-    return this.batchType;
   }
 }
