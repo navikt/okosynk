@@ -22,11 +22,13 @@ public class BatchStatusTest {
 
         final Map<BatchStatus, Integer> batchStatusMap =
             new HashMap<BatchStatus, Integer>() {{
-                put(BatchStatus.STARTET, -1);
-                put(BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS, 0);
-                put(BatchStatus.ERROR, 8);
-                put(BatchStatus.READY, 100);
-                put(BatchStatus.ERROR_NUMBER_OF_RETRIES_EXCEEDED, 919);
+              put(BatchStatus.READY, 100);
+              put(BatchStatus.STARTED, -1);
+              put(BatchStatus.ENDED_WITH_OK, 0);
+              put(BatchStatus.ENDED_WITH_ERROR_GENERAL, 8);
+              put(BatchStatus.ENDED_WITH_WARNIING_BATCH_INPUT_DATA_NOT_FOUND, 708);
+              put(BatchStatus.ENDED_WITH_WARNIING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN, 1023);
+              put(BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED, 919);
             }};
 
         for (final BatchStatus batchStatus : BatchStatus.values()) {

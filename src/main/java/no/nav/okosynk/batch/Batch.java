@@ -17,7 +17,6 @@ import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
@@ -41,7 +40,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
 
     // Assume failure, set to ready by the descendant if successful:
-    this.setBatchStatus(BatchStatus.ERROR);
+    this.setBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL);
 
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
@@ -59,9 +58,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
   public void run() {
 
-    MDC.put("batchnavn", getBatchName());
     final BatchMetrics batchMetrics = new BatchMetrics(getOkosynkConfiguration(), getBatchType());
-    setBatchStatus(BatchStatus.STARTET);
+    setBatchStatus(BatchStatus.STARTED);
     logger.info("Batch " + getBatchName() + " har startet.");
     try {
       final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
@@ -80,22 +78,35 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       }
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
-      final BatchStatus status = BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS;
+      final BatchStatus status = BatchStatus.ENDED_WITH_OK;
       setBatchStatus(status);
       logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
+
+
+
+      if (BatchStatus.ENDED_WITH_OK.equals(batchStatus)) {
+        // TODO: Here, rename/remove/move the input file(, or maybe better in the Batch class?):
+        final boolean deletionOfInputDataFailed = false;
+        if (deletionOfInputDataFailed) {
+          batchStatus = BatchStatus.ENDED_WITH_WARNIING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
+        }
+      }
+
+
+
     } catch (BatchException e) {
       final Throwable cause = e.getCause();
-      setBatchStatus(BatchStatus.ERROR);
+      setBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL);
       if (cause instanceof OkosynkIoException) {
         final OkosynkIoException okosynkIoException = (OkosynkIoException)cause;
         if (ErrorCode.NUMBER_OF_RETRIES_EXCEEDED.equals(okosynkIoException.getErrorCode())) {
-          setBatchStatus(BatchStatus.ERROR_NUMBER_OF_RETRIES_EXCEEDED);
+          setBatchStatus(BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED);
         }
       }
       batchMetrics.setUnsuccessfulMetrics();
     } catch (Throwable e) {
-      final BatchStatus status = BatchStatus.ERROR;
+      final BatchStatus status = BatchStatus.ENDED_WITH_ERROR_GENERAL;
       setBatchStatus(status);
       logger.error(
             "Noe uventet har gått galt under kjøring av "
@@ -106,7 +117,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       batchMetrics.setUnsuccessfulMetrics();
     } finally {
       batchMetrics.log();
-      MDC.remove("batchnavn");
     }
   }
 
@@ -124,7 +134,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     setBatchStatus(
         (!IMeldingLinjeFileReader.Status.OK.equals(this.uspesifikkMeldingLinjeReader.getStatus()))
             ?
-            BatchStatus.ERROR
+            BatchStatus.ENDED_WITH_ERROR_GENERAL
             :
             BatchStatus.READY
     );

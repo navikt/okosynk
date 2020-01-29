@@ -3,6 +3,7 @@ package no.nav.okosynk.batch;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import no.nav.okosynk.batch.os.OsService;
 import no.nav.okosynk.config.*;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.domain.AbstractMelding;

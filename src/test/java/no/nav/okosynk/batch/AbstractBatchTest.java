@@ -149,7 +149,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     )
         .thenReturn(IMeldingLinjeFileReader.Status.ERROR);
 
-    Assertions.assertEquals(BatchStatus.ERROR, getBatch().getBatchStatus());
+    Assertions.assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -164,7 +164,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.OK_ENDED_WITHOUT_UNEXPECTED_ERRORS, getBatch().getBatchStatus());
+    assertEquals(BatchStatus.ENDED_WITH_OK, getBatch().getBatchStatus());
   }
 
   @Test
@@ -201,7 +201,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.ERROR, getBatch().getBatchStatus());
+    assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, getBatch().getBatchStatus());
   }
 
   @Test
@@ -228,7 +228,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     getBatch().run();
 
-    assertEquals(BatchStatus.ERROR, getBatch().getBatchStatus());
+    assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, getBatch().getBatchStatus());
   }
 
   @Test

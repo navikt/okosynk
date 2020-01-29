@@ -77,7 +77,7 @@ class OppgaveSynkronisererTest {
             this::getBatchStatus,
             mockedOppgaveRestClient);
 
-    this.batchStatus = BatchStatus.STARTET;
+    this.batchStatus = BatchStatus.STARTED;
 
     final Set<Oppgave> oppgaveListe =
         lagOppgaveliste(OPPGAVEID_GSAK, BRUKERID_GSAK);
@@ -145,7 +145,7 @@ class OppgaveSynkronisererTest {
     enteringTestHeaderLogger.debug(null);
 
     final String batchBruker = getBatchBruker(OppgaveSynkronisererTest.okosynkConfiguration);
-    this.batchStatus = BatchStatus.STARTET;
+    this.batchStatus = BatchStatus.STARTED;
     this.oppgaveSynkronisererWithInjectedMocks
         .synkroniser(lagOppgaveliste(OPPGAVEID, BRUKERID));
 

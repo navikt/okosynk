@@ -403,9 +403,17 @@ public class MeldingLinjeSftpReader
           }
         }
       }
+
+
+
+
       // At this point in code the read process has been successful,
-      //      // and the input file may be renamed:
-      renameInputFile(okosynkConfiguration, resourceContainer);
+      // and the input file may be renamed:
+      // TODO: Here, move the rename/remove/move functionality to the caller.
+      renameInputFile(this.okosynkConfiguration, resourceContainer);
+
+
+
     } finally {
       resourceContainer.free();
     }

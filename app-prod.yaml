@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200128.1305.ec0a2791
+              image: repo.adeo.no:5443/okosynk:20200129.1245.ae0a53c4
               resources:
                 limits:
                   cpu: 500m
@@ -104,9 +104,9 @@ spec:
                   value: https://sts.adeo.no/SecurityTokenServiceProvider/
 
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
-                  value: "10000"
+                  value: "0"
                 - name: FILE_READER_MAX_NUMBER_OF_TRIES
-                  value: "2"
+                  value: "1"
                 - name: BATCH_RETRY_WAIT_TIME_IN_MS
                   value: "300000"
                 - name: BATCH_MAX_NUMBER_OF_TRIES

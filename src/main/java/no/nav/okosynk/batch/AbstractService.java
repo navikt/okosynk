@@ -40,7 +40,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
       batchStatus = batch.getBatchStatus();
     } catch (Throwable e) {
       logger.error("Exception received when waiting for batchService to finish.", e);
-      batchStatus = BatchStatus.ERROR;
+      batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
     } finally {
       setShouldRun(batchStatus.failedButRerunningMaySucceed());
     }
@@ -63,7 +63,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return batch;
   }
 
-  public AbstractService setShouldRun(final boolean shouldRun) {
+  public AbstractService<MELDINGSTYPE> setShouldRun(final boolean shouldRun) {
     this.shouldRun = shouldRun;
     return this;
   }
@@ -82,10 +82,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
   public AbstractAlertMetrics getAlertMetrics() {
     return getOkosynkConfiguration().getAlertMetrics(getBatchType());
-  }
-
-  public void generateCheckTheLogAlert() {
-
   }
 
   protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();

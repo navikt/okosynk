@@ -3,6 +3,9 @@ package no.nav.okosynk.cli;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import java.util.Collections;
+import no.nav.okosynk.batch.BatchStatus;
+import no.nav.okosynk.cli.os.OsAlertMetrics;
+import no.nav.okosynk.cli.ur.UrAlertMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
@@ -42,11 +45,20 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
     }
   }
 
+  public void generateCheckTheLogAlertBasedOnBatchStatus(final BatchStatus batchStatus) {
+    if (batchStatus.shouldAlert()) {
+      generateCheckTheLogAlert();
+    }
+  }
+
+  /**
+   * Never throws any exception
+   */
   public void generateCheckTheLogAlert() {
 
-    batchAlert.inc();
+    this.batchAlert.inc();
 
-    logger.info("Pusher alert metrikk(er) til {}", getPushGatewayEndpointNameAndPort());
+    logger.warn("About to push alert metric(s) to {}...", getPushGatewayEndpointNameAndPort());
     try {
       new PushGateway(getPushGatewayEndpointNameAndPort())
           .pushAdd(
@@ -55,7 +67,7 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
               Collections.singletonMap("cronjob", getBatchName())
           );
     } catch (Throwable e) {
-      logger.error("Klarte ikke pushe alert metrikk(er), ukjent feil", e);
+      logger.error("Pushing alert metric(s) failed", e);
     }
   }
 }

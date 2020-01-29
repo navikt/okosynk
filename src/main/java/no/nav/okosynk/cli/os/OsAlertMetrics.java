@@ -1,5 +1,6 @@
-package no.nav.okosynk.cli;
+package no.nav.okosynk.cli.os;
 
+import no.nav.okosynk.cli.AbstractAlertMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 
@@ -7,7 +8,7 @@ public class OsAlertMetrics extends AbstractAlertMetrics {
 
   private static OsAlertMetrics singletonInstance;
 
-  protected static OsAlertMetrics getSingletonInstance(
+  public static OsAlertMetrics getSingletonInstance(
       final IOkosynkConfiguration okosynkConfiguration
   ) {
     if (singletonInstance == null) {

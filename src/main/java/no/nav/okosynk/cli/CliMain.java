@@ -5,12 +5,13 @@ import java.util.Collection;
 import java.util.Map;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
-import no.nav.okosynk.batch.OsService;
-import no.nav.okosynk.batch.UrService;
+import no.nav.okosynk.batch.os.OsService;
+import no.nav.okosynk.batch.ur.UrService;
 import no.nav.okosynk.cli.testcertificates.TestCertificates_Copy;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
+import no.nav.okosynk.domain.AbstractMelding;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -132,7 +133,7 @@ public class CliMain {
   private void runAllBatches(final boolean shouldOnlyRunOs, final boolean shouldOnlyRunUr) {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    final Collection<AbstractService> services = new ArrayList<>();
+    final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
     services.add(new OsService(okosynkConfiguration).setShouldRun(!shouldOnlyRunUr));
     services.add(new UrService(okosynkConfiguration).setShouldRun(!shouldOnlyRunOs));
     final int sleepTimeBetweenRunsInMs = getRetryWaitTimeInMilliseconds(okosynkConfiguration);
@@ -143,7 +144,7 @@ public class CliMain {
       services
           .stream()
           .forEach(
-              (final AbstractService service) -> {
+              service -> {
                 if (service.shouldRun()) {
                   runOneBatch(service);
                 }
@@ -156,7 +157,7 @@ public class CliMain {
           // A new run may potentially succeed:
           services
               .stream()
-              .map((final AbstractService service) -> service.shouldRun())
+              .map(AbstractService::shouldRun)
               .reduce(false, ((b1, b2) -> b1 || b2))
       ) {
         try {
@@ -186,15 +187,14 @@ public class CliMain {
     services
         .stream()
         .forEach(
-            (final AbstractService service) -> {
-              if (service.getLastBatchStatus().shouldAlert()) {
-                service.getAlertMetrics().generateCheckTheLogAlert();
-              }
-            }
+            service ->
+              service
+                  .getAlertMetrics()
+                  .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
         );
   }
 
-  private void runOneBatch(final AbstractService service) {
+  private void runOneBatch(final AbstractService<? extends AbstractMelding> service) {
     final String batchName = service.getBatchType().getName();
     logger.info("About to run batch {}...", batchName);
     final BatchStatus batchStatus = service.run();

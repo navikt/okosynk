@@ -3,10 +3,12 @@ package no.nav.okosynk.batch;
 public enum BatchStatus {
 
     READY(100, false, false),
-    STARTET(-1, false, false),
-    OK_ENDED_WITHOUT_UNEXPECTED_ERRORS(0, false, false),
-    ERROR(8, true, true),
-    ERROR_NUMBER_OF_RETRIES_EXCEEDED(919, true, true)
+    STARTED(-1, false, false),
+    ENDED_WITH_OK(0, false, false),
+    ENDED_WITH_WARNIING_BATCH_INPUT_DATA_NOT_FOUND(708, true, false),
+    ENDED_WITH_WARNIING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN(1023, false, true),
+    ENDED_WITH_ERROR_GENERAL(8, true, true),
+    ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED(919, true, true)
     ;
 
     private final int statusCode;

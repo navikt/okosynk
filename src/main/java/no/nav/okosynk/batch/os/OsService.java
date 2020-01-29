@@ -1,5 +1,6 @@
-package no.nav.okosynk.batch;
+package no.nav.okosynk.batch.os;
 
+import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
