@@ -29,4 +29,10 @@ public class MeldingLinjeFileReaderMock
 
         return fil;
     }
+
+    @Override
+    public boolean renameInputFile() {
+        // Intentionally doing nothing
+        return true;
+    }
 }
