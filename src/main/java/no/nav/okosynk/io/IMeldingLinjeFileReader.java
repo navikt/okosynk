@@ -12,5 +12,12 @@ public interface IMeldingLinjeFileReader {
 
     List<String> read() throws OkosynkIoException;
 
+    /**
+     * Never throws anything, because renaming is considered relatively harmless.
+     *
+     * @return <code>true</code> if OK, <code>false</code> otherwise.
+     */
+    boolean renameInputFile();
+
     Status getStatus();
 }

@@ -49,6 +49,9 @@ class SftpResourceContainer {
     this.inputStream = inputStream;
   }
 
+  /**
+   * Never throws.
+   */
   void free() {
 
     if (getInputStream() != null) {
@@ -58,13 +61,14 @@ class SftpResourceContainer {
         logger.warn("Exception when closing the input stream.", e);
       }
     }
-
     if (this.sftpSession != null) {
       this.sftpSession.disconnect();
     }
+    this.sftpSession = null;
 
     if (this.sftpChannel != null) {
       this.sftpChannel.disconnect();
     }
+    this.sftpChannel = null;
   }
 }

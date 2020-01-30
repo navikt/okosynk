@@ -29,7 +29,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     this.shouldRun = true;
   }
 
-
   public BatchStatus run() {
 
     final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();

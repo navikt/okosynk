@@ -108,10 +108,6 @@ public class BatchMetrics extends AbstractMetrics {
     );
   }
 
-  /**
-   * TODO: Remove all this superfluous debugging and variable usage when problem solved.
-   * @param consumerStatistics Basis for almost all logging content
-   */
   private void setMetrics(final ConsumerStatistics consumerStatistics) {
 
     this.durationGaugeTimer.setDuration();

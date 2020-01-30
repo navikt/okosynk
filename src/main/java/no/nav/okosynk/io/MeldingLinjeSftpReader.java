@@ -337,6 +337,9 @@ public class MeldingLinjeSftpReader
   }
 
   @Override
+  /**
+   * Calls resourceContainer.free(); regardless whether the method succeeds or not.
+   */
   final public List<String> read() throws OkosynkIoException {
 
     List<String> meldinger = null;
@@ -363,8 +366,8 @@ public class MeldingLinjeSftpReader
           numberOfTriesDone++;
           if (
               ErrorCode.NOT_FOUND.equals(okosynkIoException.getErrorCode())
-                  ||
-                  ErrorCode.IO.equals(okosynkIoException.getErrorCode())
+              ||
+              ErrorCode.IO.equals(okosynkIoException.getErrorCode())
           ) {
             if (numberOfTriesDone < this.maxNumberOfReadTries) {
               final String msg =
@@ -403,22 +406,39 @@ public class MeldingLinjeSftpReader
           }
         }
       }
-
-
-
-
-      // At this point in code the read process has been successful,
-      // and the input file may be renamed:
-      // TODO: Here, move the rename/remove/move functionality to the caller.
-      renameInputFile(this.okosynkConfiguration, resourceContainer);
-
-
-
     } finally {
       resourceContainer.free();
     }
 
     return meldinger;
+  }
+
+  /**
+   * Calls resourceContainer.free(); regardless whether the method succeeds or not.
+   * Never throws anything, because renaming is considered relatively harmless.
+   *
+   * @return <code>true</code> if OK, <code>false</code> otherwise.
+   */
+  @Override
+  public boolean renameInputFile() {
+
+    SftpResourceContainer resourceContainer = null;
+    boolean thisMethodHasSucceeded = true;
+    try {
+      final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+      resourceContainer = createResourceContainer();
+      establishSftpResources(okosynkConfiguration, resourceContainer);
+      renameInputFile(okosynkConfiguration, resourceContainer);
+    } catch (Throwable e) {
+      logger.error("Exception received when trying to rename the input file.", e);
+      resourceContainer = null;
+      thisMethodHasSucceeded = false;
+    } finally {
+      if (resourceContainer != null) {
+        resourceContainer.free();;
+      }
+    }
+    return thisMethodHasSucceeded;
   }
 
   @Override
@@ -466,7 +486,7 @@ public class MeldingLinjeSftpReader
       throws OkosynkIoException {
 
     final BufferedReader bufferedReader =
-        lagBufferedReader(this.getOkosynkConfiguration(), resourceContainer);
+        lagBufferedReader(getOkosynkConfiguration(), resourceContainer);
     final List<String> lines;
     try {
       lines = bufferedReader.lines().collect(Collectors.toList());
@@ -536,8 +556,10 @@ public class MeldingLinjeSftpReader
       final LocalDateTime now = LocalDateTime.now();
       final String formatDateTime = now.format(formatter);
       final String toFileName = inputFilePath + "." + formatDateTime;
+      logger.debug("About to rename the input file.");
       channelSftp.cd(home);
       channelSftp.rename(inputFilePath, toFileName);
+      logger.info("The input file is successfully renamed.");
     } catch (Throwable e) {
       logger.warn(
           "Exception when trying to rename the (s)ftp input file. "

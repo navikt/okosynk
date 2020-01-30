@@ -53,6 +53,11 @@ public class MeldingLinjeReaderWrapper
   }
 
   @Override
+  public boolean renameInputFile() {
+    return getWrappedMeldingLinjeFileReader().renameInputFile();
+  }
+
+  @Override
   public Status getStatus() {
     return getWrappedMeldingLinjeFileReader().getStatus();
   }

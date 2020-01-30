@@ -59,7 +59,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
   public void run() {
 
     final BatchMetrics batchMetrics = new BatchMetrics(getOkosynkConfiguration(), getBatchType());
-    setBatchStatus(BatchStatus.STARTED);
+    BatchStatus batchStatus = BatchStatus.STARTED;
+    setBatchStatus(batchStatus);
     logger.info("Batch " + getBatchName() + " har startet.");
     try {
       final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
@@ -78,44 +79,36 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       }
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
-      final BatchStatus status = BatchStatus.ENDED_WITH_OK;
-      setBatchStatus(status);
-      logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + status);
+      // At this point in code the read and treat process has been successful,
+      // and the input file may be renamed:
+      batchStatus =
+        getUspesifikkMeldingLinjeReader().renameInputFile()
+        ?
+        BatchStatus.ENDED_WITH_OK
+        :
+        BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
-
-
-
-      if (BatchStatus.ENDED_WITH_OK.equals(batchStatus)) {
-        // TODO: Here, rename/remove/move the input file(, or maybe better in the Batch class?):
-        final boolean deletionOfInputDataFailed = false;
-        if (deletionOfInputDataFailed) {
-          batchStatus = BatchStatus.ENDED_WITH_WARNIING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
-        }
-      }
-
-
-
+      logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + batchStatus);
     } catch (BatchException e) {
       final Throwable cause = e.getCause();
-      setBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL);
       if (cause instanceof OkosynkIoException) {
         final OkosynkIoException okosynkIoException = (OkosynkIoException)cause;
         if (ErrorCode.NUMBER_OF_RETRIES_EXCEEDED.equals(okosynkIoException.getErrorCode())) {
-          setBatchStatus(BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED);
+          batchStatus = BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED;
+        } else {
+          batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
         }
+      } else {
+        batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
       }
       batchMetrics.setUnsuccessfulMetrics();
+      logger.error("Exception received when reading lines from the input file when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input file will not be renamed.", e);
     } catch (Throwable e) {
-      final BatchStatus status = BatchStatus.ENDED_WITH_ERROR_GENERAL;
-      setBatchStatus(status);
-      logger.error(
-            "Noe uventet har gått galt under kjøring av "
-          + getBatchName()
-          + ". Status settes til " + status,
-          e
-      );
+      batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
       batchMetrics.setUnsuccessfulMetrics();
+      logger.error("Exception received when reading lines from the input file when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input file will not be renamed.", e);
     } finally {
+      setBatchStatus(batchStatus);
       batchMetrics.log();
     }
   }
