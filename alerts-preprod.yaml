@@ -10,7 +10,6 @@ spec:
       channel: '#oh-preprod-varsling'
       prependText: 'Parts of Okosynk may have failed: '
       email_configs:
-        - to: jorgen.markussen@nav.no
         - to: oyvind.roth@nav.no
   alerts:
     - alert: Check the logs of Okosynk for potential OS batch problems
