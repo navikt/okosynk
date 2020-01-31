@@ -521,6 +521,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
   @Test
   void when_trying_to_create_meldingLinjeFileReader_with_null_filename_then_an_exception_should_be_thrown() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Function<String, IMeldingLinjeFileReader> meldingLinjeFileReaderCreator =
         getMeldingLinjeFileReaderCreator();
 
@@ -737,6 +739,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
   @Test
   void when_trying_to_create_an_meldingLinjeSftpReader_with_any_of_the_parameters_null_then_a_npe_should_be_thrown() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final List<Quartet<IOkosynkConfiguration, BATCH_TYPE, String, Boolean>> testData =
         new ArrayList<Quartet<IOkosynkConfiguration, BATCH_TYPE, String, Boolean>> () {{
           add(new Quartet<>(null                          , null          , null , true ));
@@ -794,6 +798,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
   @Test
   void when_trying_to_parse_a_file_path_from_an_illeagal_uri_then_an_exception_shouild_be_thrown() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final OkosynkIoException okosynkIoException =
         assertThrows(

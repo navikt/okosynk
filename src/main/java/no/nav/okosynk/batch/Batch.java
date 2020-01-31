@@ -88,7 +88,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         :
         BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
-      logger.info("Batch " + getBatchName() + " er fullført med batchStatus " + batchStatus);
     } catch (BatchException e) {
       final Throwable cause = e.getCause();
       if (cause instanceof OkosynkIoException) {
@@ -102,11 +101,11 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
       }
       batchMetrics.setUnsuccessfulMetrics();
-      logger.error("Exception received when reading lines from the input file when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input file will not be renamed.", e);
+      logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input data will not be removed.", e);
     } catch (Throwable e) {
       batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
       batchMetrics.setUnsuccessfulMetrics();
-      logger.error("Exception received when reading lines from the input file when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input file will not be renamed.", e);
+      logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatus + ". The input data will not be removed.", e);
     } finally {
       setBatchStatus(batchStatus);
       batchMetrics.log();

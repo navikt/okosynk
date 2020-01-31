@@ -16,7 +16,7 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAlertMetrics.class);
 
-  private final Gauge                batchAlert;
+  private final Gauge batchAlert;
 
   protected AbstractAlertMetrics(
       final IOkosynkConfiguration okosynkConfiguration,
@@ -58,7 +58,7 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
 
     this.batchAlert.inc();
 
-    logger.warn("About to push alert metric(s) to {}...", getPushGatewayEndpointNameAndPort());
+    logger.warn(getBatchName() + " about to push alert metric(s) to {}...", getPushGatewayEndpointNameAndPort());
     try {
       new PushGateway(getPushGatewayEndpointNameAndPort())
           .pushAdd(
@@ -67,7 +67,7 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
               Collections.singletonMap("cronjob", getBatchName())
           );
     } catch (Throwable e) {
-      logger.error("Pushing alert metric(s) failed", e);
+      logger.error(getBatchName() + " failed pushing alert metric(s) ", e);
     }
   }
 }

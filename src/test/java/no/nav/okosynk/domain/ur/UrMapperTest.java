@@ -52,8 +52,10 @@ class UrMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med oppdragsKode \"EFOG\" som skal bli til oppgave.")
     void lagUrOppgaveMedOppdragsKodeEFOG() {
-        Mockito.reset(aktoerRestClient);
+
         enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
 
         when(aktoerRestClient.hentGjeldendeAktoerId("02029512345")).thenReturn(AktoerRespons.ok("123"));
         final List<Oppgave> oppgaver =
@@ -71,8 +73,10 @@ class UrMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer to oppgaver hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void lagUrOppgaverFraUrMeldingListeReturnererToOppgaver() {
-        Mockito.reset(aktoerRestClient);
+
         enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
 
         when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         when(aktoerRestClient.hentGjeldendeAktoerId("05073512345")).thenReturn(AktoerRespons.ok("1234"));
@@ -88,8 +92,10 @@ class UrMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
     void lagUrOppgaverFraUrMeldingListeReturnererEnOppgave() {
-        Mockito.reset(aktoerRestClient);
+
         enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
 
         when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
 
@@ -164,6 +170,9 @@ class UrMapperTest {
     @Test
     @DisplayName("UR-melding som ikke gjelder TSS og har en mappingregel skal bli til oppgave")
     void urMeldingSomSkalBliTilOppgave() {
+
+        enteringTestHeaderLogger.debug(null);
+
         assertTrue(urMapper.urMeldingSkalBliOppgave().test(urMeldingSomSkalBliTilOppgave),
                 "Det blir ikke oppgave for melding som ikke gjelder TSS og som har mappingregel");
     }

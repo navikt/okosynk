@@ -197,6 +197,8 @@ class OppgaveRestClientTest {
   void when_opprettOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
       throws IOException {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Random random = new Random(38762486);
 
     final OppgaveRestClient mockedOppgaveRestClient =
@@ -301,12 +303,18 @@ class OppgaveRestClientTest {
   @Test
   void when_patchOppgaver_gets_one_oppgave_for_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
       throws IOException {
+
+    enteringTestHeaderLogger.debug(null);
+
     when_patchOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(true);
   }
 
   @Test
   void when_patchOppgaver_gets_one_oppgave_for_non_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
       throws IOException {
+
+    enteringTestHeaderLogger.debug(null);
+
     when_patchOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(false);
   }
 

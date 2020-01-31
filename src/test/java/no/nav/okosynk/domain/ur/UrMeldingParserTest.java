@@ -138,6 +138,9 @@ class UrMeldingParserTest {
 
     @Test
     void parseDatoMedKlokkeslettKasterMeldingFormatExceptionForUgyldigDato() {
+
+        enteringTestHeaderLogger.debug(null);
+
         String ugyldigDato = "UGYLDIG DATO";
 
         assertThrows(IncorrectMeldingFormatException.class, () -> UR_MELDING_PARSER.parseDatoMedKlokkeslett(ugyldigDato));

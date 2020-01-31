@@ -47,8 +47,10 @@ class OsMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med faggruppe \"EFOG\" som skal bli til oppgave.")
     void lagUrOppgaveMedFaggruppeEFOG() {
-        Mockito.reset(aktoerRestClient);
+
         enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
 
         when(aktoerRestClient.hentGjeldendeAktoerId("01017812345")).thenReturn(AktoerRespons.ok("123"));
 
@@ -67,8 +69,10 @@ class OsMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer to oppgaver hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void lagOsOppgaverFraOsMeldingListeReturnererToOppgaver() {
-        Mockito.reset(aktoerRestClient);
+
         enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
 
         when(aktoerRestClient.hentGjeldendeAktoerId("07063012345")).thenReturn(AktoerRespons.ok("123"));
         when(aktoerRestClient.hentGjeldendeAktoerId("06128012345")).thenReturn(AktoerRespons.ok("1234"));
@@ -87,6 +91,7 @@ class OsMapperTest {
         Mockito.reset(aktoerRestClient);
 
         enteringTestHeaderLogger.debug(null);
+
         when(aktoerRestClient.hentGjeldendeAktoerId("07063012345")).thenReturn(AktoerRespons.ok("123"));
         List<Oppgave> oppgaver = osMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
@@ -100,6 +105,9 @@ class OsMapperTest {
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med to OS-meldinger hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void hentMeldingerSomSkalBliOsOppgaverReturnererToMeldinger() {
+
+        enteringTestHeaderLogger.debug(null);
+
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, annenOsMeldingSomSkalBliTilOppgave));
 
@@ -110,6 +118,9 @@ class OsMapperTest {
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en OS-melding hvis den får inn to meldinger der kun en skal bli til oppgaver")
     void hentMeldingerSomSkalBliOsOppgaverReturnererEnMelding() {
+
+        enteringTestHeaderLogger.debug(null);
+
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomIkkeHarMapping));
 
@@ -120,6 +131,9 @@ class OsMapperTest {
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en OS-melding hvis den får inn to meldinger som er like")
     void hentMeldingerSomSkalBliOsOppgaverReturnererEnMeldingHvisInputErLike() {
+
+        enteringTestHeaderLogger.debug(null);
+
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
 
@@ -131,6 +145,9 @@ class OsMapperTest {
     @Test
     @DisplayName("OS-melding som gjelder TSS skal bli til oppgave")
     void osMeldingGjelderTssOgDetSkalOpprettesOppgaveForSamhandlere() {
+
+        enteringTestHeaderLogger.debug(null);
+
         OsMelding osMeldingSomGjelderTss = new OsMelding(OS_MELDING_SOM_GJELDER_TSS);
 
         assertTrue(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomGjelderTss), "AbstractMelding som gjelder TSS blir ikke oppgave");
@@ -140,12 +157,16 @@ class OsMapperTest {
     @DisplayName("OS-melding som mangler mapping skal ikke bli til oppgave")
     void osMeldingUtenMapping() {
 
+        enteringTestHeaderLogger.debug(null);
+
         assertFalse(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomIkkeHarMapping), "AbstractMelding som mangler mapping blir oppgave");
     }
 
     @Test
     @DisplayName("OS-melding som ikke gjelder TSS og har mapping skal bli til oppgave")
     void osMeldingSomSkalBliTilOppgave() {
+
+        enteringTestHeaderLogger.debug(null);
         assertTrue(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomSkalBliTilOppgave),
                 "Det blir ikke oppgave for melding som ikke gjelder TSS og som har mapping");
     }

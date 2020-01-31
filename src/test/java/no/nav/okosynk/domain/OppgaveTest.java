@@ -6,11 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class OppgaveTest {
 
+  private static final Logger enteringTestHeaderLogger =
+      LoggerFactory.getLogger("EnteringTestHeader");
+
   @Test
   void when_an_oppgave_is_compared_to_null_it_should_differ() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave =
         new Oppgave.OppgaveBuilder()
@@ -22,6 +29,8 @@ class OppgaveTest {
   @Test
   void when_an_oppgave_is_compared_to_a_string_it_should_differ() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave =
         new Oppgave.OppgaveBuilder()
             .build();
@@ -31,6 +40,8 @@ class OppgaveTest {
 
   @Test
   void when_two_emopty_oppgaver_are_compared_then_it_should_equal() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -46,6 +57,8 @@ class OppgaveTest {
   @Test
   void when_an_oppgave_is_compared_to_itself_then_it_should_equal() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave =
         new Oppgave.OppgaveBuilder()
             .build();
@@ -55,6 +68,8 @@ class OppgaveTest {
 
   @Test
   void when_two_oppgaver_with_differing_ansvarligEnhetId_are_compared_then_they_should_differ() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -72,6 +87,8 @@ class OppgaveTest {
   @Test
   void when_two_oppgaver_with_differing_behandlingstype_are_compared_then_they_should_differ() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withBehandlingstype("OPOPOP")
@@ -87,6 +104,8 @@ class OppgaveTest {
 
   @Test
   void when_two_oppgaver_with_differing_behandlingstema_are_compared_then_they_should_differ() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -104,6 +123,8 @@ class OppgaveTest {
   @Test
   void when_two_oppgaver_with_differing_bnr_are_compared_then_they_should_differ() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withBnr("1237890")
@@ -119,6 +140,8 @@ class OppgaveTest {
 
   @Test
   void when_two_oppgaver_with_differing_orgnr_are_compared_then_they_should_differ() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -136,6 +159,8 @@ class OppgaveTest {
   @Test
   void when_two_oppgaver_with_differing_samhandlernr_are_compared_then_they_should_differ() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withSamhandlernr("123")
@@ -152,6 +177,8 @@ class OppgaveTest {
   @Test
   void when_two_oppgaver_with_differing_aktoerId_are_compared_then_they_should_differ() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withAktoerId("X")
@@ -167,6 +194,8 @@ class OppgaveTest {
 
   @Test
   void when_two_oppgaver_with_no_differing_important_fields_are_compared_then_they_should_equal() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -195,6 +224,8 @@ class OppgaveTest {
 
   @Test
   void when_two_oppgaver_with_no_differing_important_fields_and_some_differing_not_so_important_fields_are_compared_then_they_should_still_equal() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
@@ -234,6 +265,8 @@ class OppgaveTest {
   @Test
   void when_a_presentation_string_is_produced_from_an_oppgave_with_null_beskrivelse_then_it_should_not_fail() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final String expectedBeskrivelse = null;
     final Oppgave oppgave =
         new Oppgave.OppgaveBuilder()
@@ -248,6 +281,8 @@ class OppgaveTest {
 
   @Test
   void when_a_presentation_string_is_produced_from_an_oppgave_with_a_long_beskrivelse_then_it_should_be_presented_with_a_string_33_long() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final String originalBeskrivelse = "klmdscømsømdcølmsdløcmløsdmcølmsdølmvcølsdmølvmsdølmvølsdmølvmsølmvølsmølvmølsdmvømsdølvmøsdølvmsølmvølmsølvmølsmølvmsømvølsmdølvmsøldmvølmsdølvmølsdmøvlmsdølmvølsmølvmølsdmølvmsdlmvøsm";
     final String expectedBeskrivelse = originalBeskrivelse.substring(0, 30) + "...";
@@ -265,6 +300,8 @@ class OppgaveTest {
   @Test
   void when_a_presentation_string_is_produced_from_an_oppgave_with_empty_beskrivelse_then_it_should_not_fail() {
 
+    enteringTestHeaderLogger.debug(null);
+
     final String expectedBeskrivelse = "";
     final Oppgave oppgave =
         new Oppgave.OppgaveBuilder()
@@ -276,6 +313,8 @@ class OppgaveTest {
 
   @Test
   void when_a_presentation_string_is_produced_from_an_oppgave_then_it_should_contain_some_important_fields() {
+
+    enteringTestHeaderLogger.debug(null);
 
     final LocalDate expectedAktivFra = LocalDate.now();
     final LocalDate expectedAktivTil = LocalDate.now().plusDays(1);

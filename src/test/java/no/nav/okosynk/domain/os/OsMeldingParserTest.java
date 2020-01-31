@@ -97,6 +97,9 @@ class OsMeldingParserTest {
 
     @Test
     void parseSisteTomIPeriode() {
+
+        enteringTestHeaderLogger.debug(null);
+
         assertEquals(LocalDate.of(2009, 8, 31), OS_MELDING_PARSER.parseSisteTomIPeriode(OS_MELDING));
     }
 

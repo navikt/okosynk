@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.batch.MeldingLinjeFileReaderMock;
-import no.nav.okosynk.batch.ur.UrService;
 import no.nav.okosynk.config.*;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.domain.AbstractMelding;
