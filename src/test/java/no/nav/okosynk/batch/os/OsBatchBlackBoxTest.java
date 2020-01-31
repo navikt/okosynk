@@ -1,10 +1,11 @@
-package no.nav.okosynk.batch;
+package no.nav.okosynk.batch.os;
 
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;

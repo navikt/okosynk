@@ -28,7 +28,7 @@ public class UrMeldingLinjeSftpReaderUsingRealSftpTest
 
     @Override
     protected boolean shouldRenameFileAfterSuccessfulRead() {
-        return true;
+        return false;
     }
 
     @Override

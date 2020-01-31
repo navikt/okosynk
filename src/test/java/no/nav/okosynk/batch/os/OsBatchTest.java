@@ -1,7 +1,9 @@
-package no.nav.okosynk.batch;
+package no.nav.okosynk.batch.os;
 
 import static org.mockito.Mockito.mock;
 
+import no.nav.okosynk.batch.AbstractBatchTest;
+import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.os.OsMapper;

@@ -17,7 +17,7 @@ public interface IMeldingLinjeFileReader {
      *
      * @return <code>true</code> if OK, <code>false</code> otherwise.
      */
-    boolean renameInputFile();
+    boolean removeInputData();
 
     Status getStatus();
 }

@@ -53,8 +53,8 @@ public class MeldingLinjeReaderWrapper
   }
 
   @Override
-  public boolean renameInputFile() {
-    return getWrappedMeldingLinjeFileReader().renameInputFile();
+  public boolean removeInputData() {
+    return getWrappedMeldingLinjeFileReader().removeInputData();
   }
 
   @Override

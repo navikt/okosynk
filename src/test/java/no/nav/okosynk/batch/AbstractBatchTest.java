@@ -65,7 +65,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
         "1000");
   }
 
-  void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
+  protected void setMeldingReader(IMeldingReader<SPESIFIKKMELDINGTYPE> meldingReader) {
     this.meldingReader = meldingReader;
   }
 
@@ -73,7 +73,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     return meldingMapper;
   }
 
-  void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
+  protected void setMeldingMapper(IMeldingMapper<SPESIFIKKMELDINGTYPE> meldingMapper) {
     this.meldingMapper = meldingMapper;
   }
 
@@ -89,7 +89,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
   private final Constants.BATCH_TYPE batchType;
 
-  AbstractBatchTest(final Constants.BATCH_TYPE batchType) {
+  protected AbstractBatchTest(final Constants.BATCH_TYPE batchType) {
     this.batchType = batchType;
   }
 
@@ -114,12 +114,8 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
   private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
   // =========================================================================
-  static long getEksekveringsId() {
-    return EKSEKVERINGS_ID;
-  }
-  // =========================================================================
 
-  void commonPostSetUp() throws OkosynkIoException, MeldingUnreadableException {
+  protected void commonPostSetUp() throws OkosynkIoException, MeldingUnreadableException {
 
     getBatch().setMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
     getBatch().setSpesifikkMeldingReader(getMeldingReader());
@@ -249,8 +245,6 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     enteringTestHeaderLogger.debug(null);
 
     getBatch().run();
-
-    final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     verify(oppgaveSynkroniserer).synkroniser(anyCollection());
   }

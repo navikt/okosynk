@@ -31,7 +31,7 @@ public class MeldingLinjeFileReaderMock
     }
 
     @Override
-    public boolean renameInputFile() {
+    public boolean removeInputData() {
         // Intentionally doing nothing
         return true;
     }

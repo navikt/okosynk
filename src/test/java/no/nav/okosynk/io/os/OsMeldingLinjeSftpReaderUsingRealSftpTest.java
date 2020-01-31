@@ -38,7 +38,7 @@ public class OsMeldingLinjeSftpReaderUsingRealSftpTest
 
     @Override
     protected boolean shouldRenameFileAfterSuccessfulRead() {
-        return true;
+        return false;
     }
 
     @Override

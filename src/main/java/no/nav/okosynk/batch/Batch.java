@@ -82,7 +82,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       // At this point in code the read and treat process has been successful,
       // and the input file may be renamed:
       batchStatus =
-        getUspesifikkMeldingLinjeReader().renameInputFile()
+        getUspesifikkMeldingLinjeReader().removeInputData()
         ?
         BatchStatus.ENDED_WITH_OK
         :

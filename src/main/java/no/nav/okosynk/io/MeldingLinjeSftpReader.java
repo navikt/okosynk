@@ -414,31 +414,32 @@ public class MeldingLinjeSftpReader
   }
 
   /**
+   * Should be called after a successfull treatment of the lines read from the input file.
    * Calls resourceContainer.free(); regardless whether the method succeeds or not.
    * Never throws anything, because renaming is considered relatively harmless.
    *
    * @return <code>true</code> if OK, <code>false</code> otherwise.
    */
   @Override
-  public boolean renameInputFile() {
+  public boolean removeInputData() {
 
     SftpResourceContainer resourceContainer = null;
-    boolean thisMethodHasSucceeded = true;
+    boolean inputFileWasSuccessfullyRenamed;
     try {
       final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
       resourceContainer = createResourceContainer();
       establishSftpResources(okosynkConfiguration, resourceContainer);
-      renameInputFile(okosynkConfiguration, resourceContainer);
+      inputFileWasSuccessfullyRenamed = removeInputData(okosynkConfiguration, resourceContainer);
     } catch (Throwable e) {
       logger.error("Exception received when trying to rename the input file.", e);
       resourceContainer = null;
-      thisMethodHasSucceeded = false;
+      inputFileWasSuccessfullyRenamed = false;
     } finally {
       if (resourceContainer != null) {
         resourceContainer.free();;
       }
     }
-    return thisMethodHasSucceeded;
+    return inputFileWasSuccessfullyRenamed;
   }
 
   @Override
@@ -543,10 +544,12 @@ public class MeldingLinjeSftpReader
     return bufferedReader;
   }
 
-  private void renameInputFile(
+  private boolean removeInputData(
       final IOkosynkConfiguration okosynkConfiguration,
       final SftpResourceContainer resourceContainer
   ) {
+
+    boolean inputFileWasSuccessfullyRenamed;
     try {
       final ChannelSftp channelSftp = resourceContainer.getSftpChannel();
       final String home = channelSftp.getHome();
@@ -560,14 +563,18 @@ public class MeldingLinjeSftpReader
       channelSftp.cd(home);
       channelSftp.rename(inputFilePath, toFileName);
       logger.info("The input file is successfully renamed.");
+      inputFileWasSuccessfullyRenamed = true;
     } catch (Throwable e) {
       logger.warn(
-          "Exception when trying to rename the (s)ftp input file. "
-              + "Rename will not be done, "
-              + "but the program will not be exited. This implies that "
-              + "the input file will be re-read the next time the batch is run, "
-              + "unless it has been overwritten by a new one.", e);
+            "Exception when trying to rename the (s)ftp input file. "
+          + "Rename will not be done, "
+          + "but the program will not be exited. This implies that "
+          + "the input file will be re-read the next time the batch is run, "
+          + "unless it has been overwritten by a new one.", e);
+      inputFileWasSuccessfullyRenamed = false;
     }
+
+    return inputFileWasSuccessfullyRenamed;
   }
 
   private void establishSftpResources(
