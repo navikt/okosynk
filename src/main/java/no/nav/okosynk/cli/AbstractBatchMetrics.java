@@ -1,40 +1,52 @@
 package no.nav.okosynk.cli;
 
 import io.prometheus.client.Gauge;
-import io.prometheus.client.exporter.PushGateway;
-import java.io.IOException;
-import java.util.Collections;
+import no.nav.okosynk.cli.os.OsBatchMetrics;
+import no.nav.okosynk.cli.ur.UrBatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BatchMetrics extends AbstractMetrics {
+public abstract class AbstractBatchMetrics extends AbstractMetrics {
 
-  private static final Logger logger = LoggerFactory.getLogger(BatchMetrics.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractBatchMetrics.class);
 
-  private final Gauge                 oppgaverOpprettetGauge;
-  private final Gauge                 oppgaverOppdatertGauge;
-  private final Gauge                 oppgaverFerdigstiltGauge;
-  private final Gauge.Timer           durationGaugeTimer;
-  private       ConsumerStatistics    consumerStatistics = null;
+  private final Gauge              oppgaverOpprettetGauge;
+  private final Gauge              oppgaverOppdatertGauge;
+  private final Gauge              oppgaverFerdigstiltGauge;
+  private final Gauge.Timer        durationGaugeTimer;
+  private final Gauge              lastSuccessGauge;
+  private       ConsumerStatistics consumerStatistics = null;
+
+  public static AbstractBatchMetrics getSingletonInstance(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE batchType
+  ) {
+    if (Constants.BATCH_TYPE.UR.equals(batchType)) {
+      return UrBatchMetrics.getSingletonInstance(okosynkConfiguration);
+    } else {
+      return OsBatchMetrics.getSingletonInstance(okosynkConfiguration);
+    }
+  }
 
   /**
    * Ref. setting 0: https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics
    * @param batchType
    */
-  public BatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
+  protected AbstractBatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
 
     super(okosynkConfiguration, batchType);
 
     this.oppgaverOpprettetGauge =
-      Gauge
-        .build()
-        .name("okosynk_job_oppgaver_opprettet")
-        .help("Antall oppgaver opprettet")
-        .register(getCollectorRegistry());
+        Gauge
+            .build()
+            .name("okosynk_job_oppgaver_opprettet")
+            .help("Antall oppgaver opprettet")
+            .register(getCollectorRegistry());
     this.oppgaverOpprettetGauge.set(0);
+
     this.oppgaverOppdatertGauge =
         Gauge
             .build()
@@ -42,6 +54,7 @@ public class BatchMetrics extends AbstractMetrics {
             .help("Antall oppgaver oppdatert")
             .register(getCollectorRegistry());
     this.oppgaverOppdatertGauge.set(0);
+
     this.oppgaverFerdigstiltGauge =
         Gauge
             .build()
@@ -49,6 +62,7 @@ public class BatchMetrics extends AbstractMetrics {
             .help("Antall oppgaver ferdigstilt")
             .register(getCollectorRegistry());
     this.oppgaverFerdigstiltGauge.set(0);
+
     final Gauge durationGauge =
         Gauge
             .build()
@@ -56,17 +70,16 @@ public class BatchMetrics extends AbstractMetrics {
             .help("Duration of okosynk batch job in seconds.")
             .register(getCollectorRegistry());
     durationGauge.set(0);
-    // Zero out:
-    try {
-      new PushGateway(getPushGatewayEndpointNameAndPort())
-          .pushAdd(
-              getCollectorRegistry(),
-              "kubernetes-pods",
-              Collections.singletonMap("cronjob", getBatchName())
-          );
-    } catch (IOException e) {
-      // Intentionally NOP
-    }
+
+    this.lastSuccessGauge =
+        Gauge
+            .build()
+            .name("okosynk_batch_job_last_success_unixtime")
+            .help("Last time okosynk batch job succeeded, in unixtime.")
+            .register(getCollectorRegistry());
+    this.lastSuccessGauge.set(0);
+
+    pushAdd();
 
     this.durationGaugeTimer = durationGauge.startTimer();
   }
@@ -74,14 +87,7 @@ public class BatchMetrics extends AbstractMetrics {
   public void setSuccessfulMetrics(final ConsumerStatistics consumerStatistics) {
 
     setMetrics(consumerStatistics);
-    final Gauge lastSuccess =
-        Gauge
-            .build()
-            .name("okosynk_batch_job_last_success_unixtime")
-            .help("Last time okosynk batch job succeeded, in unixtime.")
-            .register(getCollectorRegistry());
-    lastSuccess.set(0);
-    lastSuccess.setToCurrentTime();
+    this.lastSuccessGauge.setToCurrentTime();
   }
 
   public void setUnsuccessfulMetrics() {
@@ -90,17 +96,7 @@ public class BatchMetrics extends AbstractMetrics {
 
   public void log() {
 
-    logger.info("Pusher metrikker til {}", getPushGatewayEndpointNameAndPort());
-    try {
-      new PushGateway(getPushGatewayEndpointNameAndPort())
-          .pushAdd(
-              getCollectorRegistry(),
-              "kubernetes-pods",
-              Collections.singletonMap("cronjob", getBatchName())
-          );
-    } catch (IOException e) {
-      logger.error("Klarte ikke pushe metrikker, ukjent feil", e);
-    }
+    pushAdd();
 
     logger.info(
         "STATISTIKK: consumerStatistics ved avslutning av batchen: {}",

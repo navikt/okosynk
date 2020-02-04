@@ -1,7 +1,7 @@
 package no.nav.okosynk.batch;
 
 import java.util.List;
-import no.nav.okosynk.cli.BatchMetrics;
+import no.nav.okosynk.cli.AbstractBatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -13,7 +13,6 @@ import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.OkosynkIoException;
-import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +57,9 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
   public void run() {
 
-    final BatchMetrics batchMetrics = new BatchMetrics(getOkosynkConfiguration(), getBatchType());
+    final AbstractBatchMetrics batchMetrics =
+        getOkosynkConfiguration().getBatchMetrics(getBatchType());
+
     BatchStatus batchStatus = BatchStatus.STARTED;
     setBatchStatus(batchStatus);
     logger.info("Batch " + getBatchName() + " har startet.");
@@ -92,10 +93,20 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       final Throwable cause = e.getCause();
       if (cause instanceof OkosynkIoException) {
         final OkosynkIoException okosynkIoException = (OkosynkIoException)cause;
-        if (ErrorCode.NUMBER_OF_RETRIES_EXCEEDED.equals(okosynkIoException.getErrorCode())) {
-          batchStatus = BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED;
-        } else {
-          batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
+
+        switch (okosynkIoException.getErrorCode()) {
+          case NUMBER_OF_RETRIES_EXCEEDED_IO: {
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_NUMBER_OF_RETRIES_EXCEEDED_IO;
+            break;
+          }
+          case NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND: {
+            batchStatus = BatchStatus.ENDED_WITH_WARNING_NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND;
+            break;
+          }
+          default: {
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
+            break;
+          }
         }
       } else {
         batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;

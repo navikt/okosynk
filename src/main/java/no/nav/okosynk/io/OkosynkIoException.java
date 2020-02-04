@@ -3,7 +3,14 @@ package no.nav.okosynk.io;
 public class OkosynkIoException extends Exception {
 
   public enum ErrorCode {
-      CONFIGURE_OR_INITIALIZE, IO, NOT_FOUND, ENCODING, READ, AUTHENTICATION, NUMBER_OF_RETRIES_EXCEEDED
+    CONFIGURE_OR_INITIALIZE,
+    IO,
+    NOT_FOUND,
+    ENCODING,
+    READ,
+    AUTHENTICATION,
+    NUMBER_OF_RETRIES_EXCEEDED_IO,
+    NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND
   }
 
   final ErrorCode errorCode;

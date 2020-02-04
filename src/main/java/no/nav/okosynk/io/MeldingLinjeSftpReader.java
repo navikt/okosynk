@@ -398,8 +398,15 @@ public class MeldingLinjeSftpReader
             } else {
               final String msg = "maxNumberOfTries: " + this.maxNumberOfReadTries
                   + ", retryWaitTimeInMilliseconds: " + retryWaitTimeInMilliseconds;
-              throw new OkosynkIoException(OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED,
-                  msg, okosynkIoException);
+
+              final OkosynkIoException.ErrorCode errorCode =
+                ErrorCode.NOT_FOUND.equals(okosynkIoException.getErrorCode())
+                ?
+                OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND
+                :
+                OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO;
+
+              throw new OkosynkIoException(errorCode, msg, okosynkIoException);
             }
           } else {
             throw okosynkIoException;

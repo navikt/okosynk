@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.jcraft.jsch.JSch;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -21,7 +20,6 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.javatuples.Quartet;
-import org.javatuples.Quintet;
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -541,7 +539,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final OkosynkIoException okosynkIoException =
         Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
 
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
+    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
     assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
     assertEquals(ErrorCode.IO, ((OkosynkIoException) okosynkIoException.getCause()).getErrorCode());
   }
@@ -585,7 +583,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     final OkosynkIoException okosynkIoException =
         Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
+    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
     assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
     assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
   }
@@ -620,7 +618,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     final OkosynkIoException okosynkIoException =
         Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
+    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
     assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
     assertEquals(ErrorCode.IO, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
   }

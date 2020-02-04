@@ -289,7 +289,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
         final OkosynkIoException okosynkIoException =
             Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
-        assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED, okosynkIoException.getErrorCode());
+        assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND, okosynkIoException.getErrorCode());
         assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
         assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
 
@@ -315,7 +315,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
             getOkosynkConfiguration()
                 .getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
         final OkosynkIoException.ErrorCode expectedErrorCode =
-            ErrorCode.NUMBER_OF_RETRIES_EXCEEDED;
+            ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND;
 
         final MeldingLinjeSftpReader meldingLinjeSftpReader =
             (MeldingLinjeSftpReader)

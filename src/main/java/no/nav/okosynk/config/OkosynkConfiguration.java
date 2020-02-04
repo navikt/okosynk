@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import no.nav.okosynk.cli.AbstractAlertMetrics;
+import no.nav.okosynk.cli.AbstractBatchMetrics;
 import org.apache.commons.configuration2.CompositeConfiguration;
 import org.apache.commons.configuration2.EnvironmentConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
@@ -251,6 +252,11 @@ public class OkosynkConfiguration
     final String convertedKey = originalKey.toUpperCase().replace('.', '_');
 
     return convertedKey;
+  }
+
+  @Override
+  public AbstractBatchMetrics getBatchMetrics(final Constants.BATCH_TYPE batchType) {
+    return AbstractBatchMetrics.getSingletonInstance(this, batchType);
   }
 
   @Override

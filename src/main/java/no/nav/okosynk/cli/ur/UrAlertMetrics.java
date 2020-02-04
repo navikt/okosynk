@@ -8,6 +8,10 @@ public class UrAlertMetrics extends AbstractAlertMetrics {
 
   private static UrAlertMetrics singletonInstance;
 
+  private UrAlertMetrics(final IOkosynkConfiguration okosynkConfiguration) {
+    super(okosynkConfiguration, Constants.BATCH_TYPE.UR);
+  }
+
   public static UrAlertMetrics getSingletonInstance(
       final IOkosynkConfiguration okosynkConfiguration
   ) {
@@ -15,9 +19,5 @@ public class UrAlertMetrics extends AbstractAlertMetrics {
       singletonInstance = new UrAlertMetrics(okosynkConfiguration);
     }
     return UrAlertMetrics.singletonInstance;
-  }
-
-  private UrAlertMetrics(final IOkosynkConfiguration okosynkConfiguration) {
-    super(okosynkConfiguration, Constants.BATCH_TYPE.UR);
   }
 }

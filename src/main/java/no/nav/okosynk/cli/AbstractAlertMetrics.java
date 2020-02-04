@@ -1,8 +1,6 @@
 package no.nav.okosynk.cli;
 
 import io.prometheus.client.Gauge;
-import io.prometheus.client.exporter.PushGateway;
-import java.util.Collections;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.cli.os.OsAlertMetrics;
 import no.nav.okosynk.cli.ur.UrAlertMetrics;
@@ -16,7 +14,7 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractAlertMetrics.class);
 
-  private final Gauge batchAlert;
+  private final Gauge batchAlertGauge;
 
   protected AbstractAlertMetrics(
       final IOkosynkConfiguration okosynkConfiguration,
@@ -24,14 +22,16 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
 
     super(okosynkConfiguration, batchType);
 
-    final Gauge batchAlert =
+    final Gauge batchAlertGauge =
         Gauge
             .build()
             .name(batchType.getAlertCollectorMetricName())
             .help("Relates to: Okosynk " + batchType + ": It is as expected that the logs indicate that no further action must be taken. The potential problems can have been automatically solved by e.g. retries. However, the opposite may also be the case. This alert is based on a counter that counts up for each time an " + batchType + " batch fails, so it may be anything above 0. 0 indicates, of course, no errors.")
             .register(getCollectorRegistry());
-    batchAlert.set(0);
-    this.batchAlert = batchAlert;
+    this.batchAlertGauge = batchAlertGauge;
+
+    batchAlertGauge.set(0);
+    pushAdd();
   }
 
   public static AbstractAlertMetrics getSingletonInstance(
@@ -56,18 +56,8 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
    */
   public void generateCheckTheLogAlert() {
 
-    this.batchAlert.inc();
-
+    this.batchAlertGauge.inc();
     logger.warn(getBatchName() + " about to push alert metric(s) to {}...", getPushGatewayEndpointNameAndPort());
-    try {
-      new PushGateway(getPushGatewayEndpointNameAndPort())
-          .pushAdd(
-              getCollectorRegistry(),
-              "kubernetes-pods",
-              Collections.singletonMap("cronjob", getBatchName())
-          );
-    } catch (Throwable e) {
-      logger.error(getBatchName() + " failed pushing alert metric(s) ", e);
-    }
+    pushAdd();
   }
 }

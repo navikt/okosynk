@@ -8,6 +8,10 @@ public class OsAlertMetrics extends AbstractAlertMetrics {
 
   private static OsAlertMetrics singletonInstance;
 
+  private OsAlertMetrics(final IOkosynkConfiguration okosynkConfiguration) {
+    super(okosynkConfiguration, Constants.BATCH_TYPE.OS);
+  }
+
   public static OsAlertMetrics getSingletonInstance(
       final IOkosynkConfiguration okosynkConfiguration
   ) {
@@ -15,9 +19,5 @@ public class OsAlertMetrics extends AbstractAlertMetrics {
       singletonInstance = new OsAlertMetrics(okosynkConfiguration);
     }
     return OsAlertMetrics.singletonInstance;
-  }
-
-  private OsAlertMetrics(final IOkosynkConfiguration okosynkConfiguration) {
-    super(okosynkConfiguration, Constants.BATCH_TYPE.OS);
   }
 }
