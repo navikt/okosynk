@@ -3,6 +3,7 @@ package no.nav.okosynk.io;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -18,7 +19,6 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.javatuples.Quartet;
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.Assertions;
@@ -148,7 +148,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
   @Test
   void when_ftp_url_is_or_is_not_valid_then_it_should_or_should_not_be_possible_to_parse_out_the_correct_protocol()
-      throws OkosynkIoException {
+      throws AbstractOkosynkIoException {
 
     enteringTestHeaderLogger.debug(null);
 
@@ -161,18 +161,18 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     final Collection<Triplet<String, Constants.FTP_PROTOCOL, Class<? extends Exception>>> testData =
         new ArrayList<Triplet<String, Constants.FTP_PROTOCOL, Class<? extends Exception>>>() {{
-          add(new Triplet<>(null, null, OkosynkIoException.class));
-          add(new Triplet<>("", null, OkosynkIoException.class));
-          add(new Triplet<>(" ", null, OkosynkIoException.class));
-          add(new Triplet<>("  ", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser:por/con", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser:por", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser", null, OkosynkIoException.class));
-          add(new Triplet<>("ser:por", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser:377", null, OkosynkIoException.class));
+          add(new Triplet<>(null, null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>(" ", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("  ", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser:por/con", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser:por", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("ser:por", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser:377", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("ser", Constants.FTP_PROTOCOL_DEFAULT_VALUE, null));
-          add(new Triplet<>("ser:377", null, OkosynkIoException.class));
-          add(new Triplet<>("http://ser:377", null, OkosynkIoException.class));
+          add(new Triplet<>("ser:377", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("http://ser:377", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("ftp://ser:377", Constants.FTP_PROTOCOL.FTP, null));
           add(new Triplet<>("ftp://ser:377/", Constants.FTP_PROTOCOL.FTP, null));
           add(new Triplet<>("ftp://ser:377/a", Constants.FTP_PROTOCOL.FTP, null));
@@ -245,7 +245,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
   @Test
   void when_ftp_url_is_or_is_not_valid_then_it_should_or_should_not_be_possible_to_parse_out_the_correct_host_name()
-      throws OkosynkIoException {
+      throws AbstractOkosynkIoException {
 
     enteringTestHeaderLogger.debug(null);
 
@@ -259,17 +259,17 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     final Collection<Triplet<String, String, Class<? extends Exception>>> testData =
         new ArrayList<Triplet<String, String, Class<? extends Exception>>>() {{
-          add(new Triplet<>(null, null, OkosynkIoException.class));
-          add(new Triplet<>("", null, OkosynkIoException.class));
-          add(new Triplet<>(" ", null, OkosynkIoException.class));
-          add(new Triplet<>("  ", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser:por/con", null, OkosynkIoException.class));
-          add(new Triplet<>("pro://ser:por", null, OkosynkIoException.class));
+          add(new Triplet<>(null, null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>(" ", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("  ", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser:por/con", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("pro://ser:por", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("pro://ser", "ser", null));
-          add(new Triplet<>("ser:por", null, OkosynkIoException.class));
+          add(new Triplet<>("ser:por", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("pro://ser:377", "ser", null));
           add(new Triplet<>("ser", "ser", null));
-          add(new Triplet<>("ser:377", null, OkosynkIoException.class));
+          add(new Triplet<>("ser:377", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("http://ser:377", "ser", null));
           add(new Triplet<>("ftp://ser:377", "ser", null));
           add(new Triplet<>("ftp://ser:377/", "ser", null));
@@ -333,7 +333,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
   @Test
   void when_ftp_url_is_or_is_not_valid_then_it_should_or_should_not_be_possible_to_parse_out_the_correct_port_number()
-      throws OkosynkIoException {
+      throws AbstractOkosynkIoException {
 
     enteringTestHeaderLogger.debug(null);
 
@@ -347,10 +347,10 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     final Collection<Triplet<String, Integer, Class<? extends Exception>>> testData =
         new ArrayList<Triplet<String, Integer, Class<? extends Exception>>>() {{
-          add(new Triplet<>(null, null, OkosynkIoException.class));
-          add(new Triplet<>("", null, OkosynkIoException.class));
-          add(new Triplet<>(" ", null, OkosynkIoException.class));
-          add(new Triplet<>("  ", null, OkosynkIoException.class));
+          add(new Triplet<>(null, null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>(" ", null, AbstractOkosynkIoException.class));
+          add(new Triplet<>("  ", null, AbstractOkosynkIoException.class));
           add(new Triplet<>("pro://ser:por/con", Constants.FTP_HOST_PORT_DEFAULT_VALUE, null));
           add(new Triplet<>("pro://ser:por", Constants.FTP_HOST_PORT_DEFAULT_VALUE, null));
           add(new Triplet<>("pro://ser", Constants.FTP_HOST_PORT_DEFAULT_VALUE, null));
@@ -503,7 +503,6 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
   }
 
   @Test
-  @DisplayName("Tests that a correct exception is thrown when trying to connect")
   void when_connect_fails_then_a_correct_OkosynkIoException_should_be_thrown() {
 
     enteringTestHeaderLogger.debug(null);
@@ -511,9 +510,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.CONFIGURE_OR_INITIALIZE, okosynkIoException.getErrorCode());
+    assertThrows(ConfigureOrInitializeOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
   }
 
   @Test
@@ -536,12 +533,10 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
+    final IoOkosynkIoException okosynkIoException =
+        Assertions.assertThrows(IoOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
 
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
-    assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
-    assertEquals(ErrorCode.IO, ((OkosynkIoException) okosynkIoException.getCause()).getErrorCode());
+    assertEquals(AbstractOkosynkIoException.class, okosynkIoException.getCause().getClass());
   }
 
   @Disabled
@@ -553,9 +548,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+    final AuthenticationOkosynkIoException okosynkIoException =
+        Assertions.assertThrows(AuthenticationOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
   }
 
   @Disabled
@@ -567,9 +561,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+    final AuthenticationOkosynkIoException okosynkIoException =
+        Assertions.assertThrows(AuthenticationOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
   }
 
   @Disabled
@@ -581,11 +574,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
-    assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
-    assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
+    final IoOkosynkIoException okosynkIoException =
+        Assertions.assertThrows(IoOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
   }
 
   @Disabled
@@ -616,11 +606,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
         getMeldingLinjeFileReaderCreator().apply(syntacticallyAcceptableFullyQualifiedInputFileName);
 
-    final OkosynkIoException okosynkIoException =
-        Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
-    assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO, okosynkIoException.getErrorCode());
-    assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
-    assertEquals(ErrorCode.IO, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
+    final IoOkosynkIoException okosynkIoException =
+        Assertions.assertThrows(IoOkosynkIoException.class, uspesifikkMeldingLinjeFtpReader::read);
   }
 
   @Disabled
@@ -799,17 +786,14 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
     enteringTestHeaderLogger.debug(null);
 
-    final OkosynkIoException okosynkIoException =
+    final AbstractOkosynkIoException okosynkIoException =
         assertThrows(
-            OkosynkIoException.class,
+            AbstractOkosynkIoException.class,
             ()
             ->
             MeldingLinjeSftpReader.getFtpInputFilePath("\\:-978y&&65fuyuv_tullepath")
         );
-    assertEquals(ErrorCode.CONFIGURE_OR_INITIALIZE, okosynkIoException.getErrorCode());
-    assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
-    final Throwable okosynkIoExceptionCause = okosynkIoException.getCause();
-    assertEquals(URISyntaxException.class, okosynkIoExceptionCause.getCause().getClass());
+    assertTrue(okosynkIoException instanceof  ConfigureOrInitializeOkosynkIoException);
   }
 
   protected abstract Constants.BATCH_TYPE getBatchType();

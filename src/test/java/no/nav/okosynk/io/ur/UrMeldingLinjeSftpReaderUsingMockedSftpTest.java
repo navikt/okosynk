@@ -1,10 +1,7 @@
 package no.nav.okosynk.io.ur;
 
-import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.io.AbstractMeldingLinjeSftpReaderUsingMockedSftpTest;
-import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.MeldingLinjeSftpReader;
 
 public class UrMeldingLinjeSftpReaderUsingMockedSftpTest
     extends AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {

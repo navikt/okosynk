@@ -22,7 +22,6 @@ import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import no.nav.okosynk.testutil.AbstractTestFtpServer;
 import no.nav.okosynk.testutil.TestFtpServer;
 import no.nav.okosynk.testutil.TestSftpServer;
@@ -164,7 +163,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
     @Test
     @DisplayName("Tests that reading an existing file using FTP is successful.")
     void when_connecting_with_ok_parameters_and_reading_an_existing_file_then_no_error_should_result()
-        throws OkosynkIoException, URISyntaxException {
+        throws AbstractOkosynkIoException, URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -205,9 +204,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
         logTestProperties();
 
-        final OkosynkIoException okosynkIoException =
-            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
-        assertEquals(ErrorCode.CONFIGURE_OR_INITIALIZE, okosynkIoException.getErrorCode());
+        final ConfigureOrInitializeOkosynkIoException okosynkIoException =
+            Assertions.assertThrows(ConfigureOrInitializeOkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
 
         final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
             getFullyQualifiedOperatingSystemInputTestDataFileNames();
@@ -234,9 +232,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
         logTestProperties();
 
-        final OkosynkIoException okosynkIoException =
-            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
-        assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+        final AuthenticationOkosynkIoException okosynkIoException =
+            Assertions.assertThrows(AuthenticationOkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
 
         final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
             getFullyQualifiedOperatingSystemInputTestDataFileNames();
@@ -263,9 +260,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
         logTestProperties();
 
-        final OkosynkIoException okosynkIoException =
-            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
-        assertEquals(ErrorCode.AUTHENTICATION, okosynkIoException.getErrorCode());
+        final AuthenticationOkosynkIoException okosynkIoException =
+            Assertions.assertThrows(AuthenticationOkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
 
         final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
             getFullyQualifiedOperatingSystemInputTestDataFileNames();
@@ -275,8 +271,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
     }
 
     @Test
-    void when_the_input_file_does_not_exist_then_an_adequate_exception_should_be_thrown_after_a_specified_number_of_retries()
-        throws URISyntaxException {
+    void when_the_input_file_does_not_exist_then_an_adequate_exception_should_be_thrown_after_a_specified_number_of_retries() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -287,11 +282,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
         logTestProperties();
 
-        final OkosynkIoException okosynkIoException =
-            Assertions.assertThrows(OkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
-        assertEquals(ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND, okosynkIoException.getErrorCode());
-        assertEquals(OkosynkIoException.class, okosynkIoException.getCause().getClass());
-        assertEquals(ErrorCode.NOT_FOUND, ((OkosynkIoException)okosynkIoException.getCause()).getErrorCode());
+        final NotFoundOkosynkIoException okosynkIoException =
+            Assertions.assertThrows(NotFoundOkosynkIoException.class, uspesifikkMeldingLinjeReader::read);
 
         final Pair<String, String> fullyQualifiedOperatingSystemInputTestDataFileNames =
             getFullyQualifiedOperatingSystemInputTestDataFileNames();
@@ -302,7 +294,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
     @Test
     void when_input_file_does_not_exist_then_a_read_should_be_retried_a_maximum_number_of_times()
-        throws OkosynkIoException {
+        throws AbstractOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -314,8 +306,6 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
         final int expectedNumberOfRetries =
             getOkosynkConfiguration()
                 .getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
-        final OkosynkIoException.ErrorCode expectedErrorCode =
-            ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND;
 
         final MeldingLinjeSftpReader meldingLinjeSftpReader =
             (MeldingLinjeSftpReader)
@@ -324,16 +314,15 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
         final MeldingLinjeSftpReader spiedMeldingLinjeSftpReader =
             spy(meldingLinjeSftpReader);
 
-        final OkosynkIoException actualOkosynkIoException =
-            assertThrows(OkosynkIoException.class, () -> spiedMeldingLinjeSftpReader.read());
+        final NotFoundOkosynkIoException actualOkosynkIoException =
+            assertThrows(NotFoundOkosynkIoException.class, () -> spiedMeldingLinjeSftpReader.read());
 
-        assertEquals(expectedErrorCode, actualOkosynkIoException.getErrorCode());
         verify(spiedMeldingLinjeSftpReader, times(expectedNumberOfRetries)).lesMeldingerFraFil(any());
     }
 
     @Test
     void when_removeInputData_is_called_then_the_input_file_should_no_more_be_available()
-        throws OkosynkIoException, URISyntaxException {
+        throws AbstractOkosynkIoException, URISyntaxException {
 
         enteringTestHeaderLogger.debug(null);
 

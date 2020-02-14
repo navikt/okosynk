@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.io.OkosynkIoException.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,8 @@ public class MeldingLinjeSftpReader
   private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeSftpReader.class);
 
   private static final String JSCH_CHANNEL_TYPE_SFTP = "sftp";
-  private final JSch jSch;
+
+  private final JSch javaSecureChannel;
   private final IOkosynkConfiguration okosynkConfiguration;
   private final Constants.BATCH_TYPE batchType;
   private final int retryWaitTimeInMilliseconds;
@@ -72,7 +72,7 @@ public class MeldingLinjeSftpReader
     this.fullyQualifiedInputFileName = normalizedFullyQualifiedInputFileName;
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
-    this.jSch = new JSch();
+    this.javaSecureChannel = new JSch();
 
     String msg = "";
     try {
@@ -120,20 +120,19 @@ public class MeldingLinjeSftpReader
   }
 
   static String getFtpInputFilePath(final String ftpHostUrl)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException {
     try {
       final URI uri = MeldingLinjeSftpReader.checkFtpHostUrlAndProduceUri(ftpHostUrl);
       return uri.getPath();
     } catch (Throwable e) {
-      throw new OkosynkIoException(
-          ErrorCode.CONFIGURE_OR_INITIALIZE,
-          "Invalid ftpHostUrl found "
-              + "when trying to parse the file path: " + ftpHostUrl, e);
+      throw new ConfigureOrInitializeOkosynkIoException(
+            "Invalid ftpHostUrl found when trying to parse the file path: " + ftpHostUrl, e
+      );
     }
   }
 
   private static Constants.FTP_PROTOCOL getFtpProtocol(final String ftpHostUrl)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException {
 
     final Constants.FTP_PROTOCOL ftpHostProtocol;
     try {
@@ -149,8 +148,7 @@ public class MeldingLinjeSftpReader
         ftpHostProtocol = Constants.FTP_PROTOCOL.valueOf(uri.getScheme().toUpperCase());
       }
     } catch (Throwable e) {
-      throw new OkosynkIoException(
-          ErrorCode.CONFIGURE_OR_INITIALIZE,
+      throw new ConfigureOrInitializeOkosynkIoException(
           "Invalid ftpHostUrl found when trying to parse the protocol: " + ftpHostUrl, e);
     }
 
@@ -158,7 +156,7 @@ public class MeldingLinjeSftpReader
   }
 
   private static String getFtpHostServerName(final String ftpHostUrl)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException {
 
     String ftpHostServerName;
     try {
@@ -180,8 +178,7 @@ public class MeldingLinjeSftpReader
       }
 
       if (ftpHostServerName.contains(":")) {
-        throw new OkosynkIoException(
-            ErrorCode.CONFIGURE_OR_INITIALIZE,
+        throw new ConfigureOrInitializeOkosynkIoException(
             "Invalid ftpHostUrl: "
                 + ftpHostUrl
                 + ", parsed to give an invalid host containing a colon, "
@@ -190,17 +187,14 @@ public class MeldingLinjeSftpReader
       }
 
     } catch (Throwable e) {
-      throw new OkosynkIoException(
-          ErrorCode.CONFIGURE_OR_INITIALIZE,
-          "Invalid ftpHostUrl found when "
-              + "trying to parse the host name: "
-              + ftpHostUrl, e);
+      throw new ConfigureOrInitializeOkosynkIoException(
+          "Invalid ftpHostUrl found when trying to parse the host name: " + ftpHostUrl, e);
     }
 
     return ftpHostServerName;
   }
 
-  private static int getFtpHostPort(final String ftpHostUrl) throws OkosynkIoException {
+  private static int getFtpHostPort(final String ftpHostUrl) throws ConfigureOrInitializeOkosynkIoException {
 
     final int ftpHostPort;
     try {
@@ -243,17 +237,15 @@ public class MeldingLinjeSftpReader
         ftpHostPort = tempFtpHostPort;
       }
     } catch (Throwable e) {
-      throw new OkosynkIoException(
-          ErrorCode.CONFIGURE_OR_INITIALIZE,
-          "Invalid ftpHostUrl found when "
-              + "trying to parse the port: " + ftpHostUrl, e);
+      throw new ConfigureOrInitializeOkosynkIoException(
+            "Invalid ftpHostUrl found when trying to parse the port: " + ftpHostUrl, e);
     }
 
     return ftpHostPort;
   }
 
   private static URI checkFtpHostUrlAndProduceUri(final String ftpHostUrl)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException {
 
     final URI uri;
     try {
@@ -265,11 +257,8 @@ public class MeldingLinjeSftpReader
         uri = new URI(ftpHostUrl);
       }
     } catch (Throwable e) {
-      throw new OkosynkIoException(
-          ErrorCode.CONFIGURE_OR_INITIALIZE,
-          "Invalid ftpHostUrl found when trying"
-              + " to parse the host name: "
-              + ftpHostUrl, e);
+      throw new ConfigureOrInitializeOkosynkIoException(
+          "Invalid ftpHostUrl found when trying to parse the host name: " + ftpHostUrl, e);
     }
 
     return uri;
@@ -287,8 +276,7 @@ public class MeldingLinjeSftpReader
 
   private static String getFtpInputFilePath(
       final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType)
-      throws OkosynkIoException {
+      final Constants.BATCH_TYPE batchType) throws ConfigureOrInitializeOkosynkIoException {
 
     return MeldingLinjeSftpReader
         .getFtpInputFilePath(getFtpHostUrl(okosynkConfiguration, batchType));
@@ -320,7 +308,7 @@ public class MeldingLinjeSftpReader
   }
 
   public SftpResourceContainer createResourceContainer() {
-    return new SftpResourceContainer(this.jSch);
+    return new SftpResourceContainer(this.javaSecureChannel);
   }
 
   public IOkosynkConfiguration getOkosynkConfiguration() {
@@ -340,7 +328,12 @@ public class MeldingLinjeSftpReader
   /**
    * Calls resourceContainer.free(); regardless whether the method succeeds or not.
    */
-  final public List<String> read() throws OkosynkIoException {
+  public List<String> read()
+      throws IoOkosynkIoException,
+             NotFoundOkosynkIoException,
+             ConfigureOrInitializeOkosynkIoException,
+             AuthenticationOkosynkIoException,
+             EncodingOkosynkIoException {
 
     List<String> meldinger = null;
     SftpResourceContainer resourceContainer = null;
@@ -362,55 +355,42 @@ public class MeldingLinjeSftpReader
           meldinger = lesMeldingerFraFil(resourceContainer);
           numberOfTriesDone++;
           shouldTryReadingTheInputFile = false;
-        } catch (OkosynkIoException okosynkIoException) {
+        } catch (IoOkosynkIoException | NotFoundOkosynkIoException okosynkIoException) {
           numberOfTriesDone++;
-          if (
-              ErrorCode.NOT_FOUND.equals(okosynkIoException.getErrorCode())
-              ||
-              ErrorCode.IO.equals(okosynkIoException.getErrorCode())
-          ) {
-            if (numberOfTriesDone < this.maxNumberOfReadTries) {
-              final String msg =
-                  System.lineSeparator()
-                      + "I have tried reading the input file {}"
-                      + " times, and I will not give up until I have tried {}"
-                      + " times."
-                      + System.lineSeparator()
-                      + "I will try again in {}"
-                      + " ms. Until then, I will take a nap."
-                      + System.lineSeparator();
+
+          if (numberOfTriesDone < this.maxNumberOfReadTries) {
+            final String msg =
+                System.lineSeparator()
+                    + "I have tried reading the input file {}"
+                    + " times, and I will not give up until I have tried {}"
+                    + " times."
+                    + System.lineSeparator()
+                    + "I will try again in {}"
+                    + " ms. Until then, I will take a nap."
+                    + System.lineSeparator();
+            logger.warn(
+                msg,
+                numberOfTriesDone,
+                this.maxNumberOfReadTries,
+                retryWaitTimeInMilliseconds);
+            try {
+              logger.debug("Going to sleep, good night!");
+              Thread.sleep(retryWaitTimeInMilliseconds);
+              logger.debug("Good morning, I just woke up again!");
+            } catch (InterruptedException ex) {
               logger.warn(
-                  msg,
-                  numberOfTriesDone,
-                  this.maxNumberOfReadTries,
+                  "Ooooops, of unknown reasons, I was waked up before {} "
+                      + "ms had passed.",
                   retryWaitTimeInMilliseconds);
-              try {
-                logger.debug("Going to sleep, good night!");
-                Thread.sleep(retryWaitTimeInMilliseconds);
-                logger.debug("Good morning, I just woke up again!");
-              } catch (InterruptedException ex) {
-                logger.warn(
-                    "Ooooops, of unknown reasons, I was waked up before {} "
-                        + "ms had passed.",
-                    retryWaitTimeInMilliseconds);
-              }
-              logger.info("I will try re-reading...");
-            } else {
-              final String msg = "maxNumberOfTries: " + this.maxNumberOfReadTries
-                  + ", retryWaitTimeInMilliseconds: " + retryWaitTimeInMilliseconds;
-
-              final OkosynkIoException.ErrorCode errorCode =
-                ErrorCode.NOT_FOUND.equals(okosynkIoException.getErrorCode())
-                ?
-                OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_NOT_FOUND
-                :
-                OkosynkIoException.ErrorCode.NUMBER_OF_RETRIES_EXCEEDED_IO;
-
-              throw new OkosynkIoException(errorCode, msg, okosynkIoException);
             }
+            logger.info("I will try re-reading...");
           } else {
+            final String msg = "maxNumberOfTries: " + this.maxNumberOfReadTries
+                + ", retryWaitTimeInMilliseconds: " + retryWaitTimeInMilliseconds;
             throw okosynkIoException;
           }
+        } catch (AuthenticationOkosynkIoException| ConfigureOrInitializeOkosynkIoException | EncodingOkosynkIoException e) {
+          throw e;
         }
       }
     } finally {
@@ -491,7 +471,11 @@ public class MeldingLinjeSftpReader
   }
 
   List<String> lesMeldingerFraFil(final SftpResourceContainer resourceContainer)
-      throws OkosynkIoException {
+      throws IoOkosynkIoException,
+             ConfigureOrInitializeOkosynkIoException,
+             EncodingOkosynkIoException,
+             AuthenticationOkosynkIoException,
+             NotFoundOkosynkIoException {
 
     final BufferedReader bufferedReader =
         lagBufferedReader(getOkosynkConfiguration(), resourceContainer);
@@ -502,14 +486,14 @@ public class MeldingLinjeSftpReader
       final String msg =
           "Could not read lines from buffered reader. " + System.lineSeparator()
               + this.toString();
-      throw new OkosynkIoException(ErrorCode.READ, msg, e);
+      throw new IoOkosynkIoException(msg, e);
     }
 
     return lines;
   }
 
   Constants.FTP_PROTOCOL getFtpProtocol(final IOkosynkConfiguration okosynkConfiguration)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException {
 
     return MeldingLinjeSftpReader
         .getFtpProtocol(
@@ -520,7 +504,7 @@ public class MeldingLinjeSftpReader
   }
 
   String getFtpHostServerName(
-      final IOkosynkConfiguration okosynkConfiguration) throws OkosynkIoException {
+      final IOkosynkConfiguration okosynkConfiguration) throws ConfigureOrInitializeOkosynkIoException {
 
     return MeldingLinjeSftpReader
         .getFtpHostServerName(
@@ -528,7 +512,8 @@ public class MeldingLinjeSftpReader
   }
 
   int getFtpHostPort(
-      final IOkosynkConfiguration okosynkConfiguration) throws OkosynkIoException {
+      final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
 
     return MeldingLinjeSftpReader
         .getFtpHostPort(
@@ -539,7 +524,11 @@ public class MeldingLinjeSftpReader
   private BufferedReader lagBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final SftpResourceContainer resourceContainer)
-      throws OkosynkIoException {
+      throws AuthenticationOkosynkIoException,
+             ConfigureOrInitializeOkosynkIoException,
+             IoOkosynkIoException,
+             NotFoundOkosynkIoException,
+             EncodingOkosynkIoException {
 
     establishSftpResources(okosynkConfiguration, resourceContainer);
 
@@ -587,7 +576,9 @@ public class MeldingLinjeSftpReader
   private void establishSftpResources(
       final IOkosynkConfiguration okosynkConfiguration,
       final SftpResourceContainer sftpResourceContainer)
-      throws OkosynkIoException {
+      throws ConfigureOrInitializeOkosynkIoException,
+             AuthenticationOkosynkIoException,
+             IoOkosynkIoException {
 
     final Session sftpSession;
     try {
@@ -596,18 +587,17 @@ public class MeldingLinjeSftpReader
       final String sftpHostServerName = this.getFtpHostServerName(okosynkConfiguration);
       final int sftpPort = this.getFtpHostPort(okosynkConfiguration);
       sftpSession =
-          sftpResourceContainer.getjSch().getSession(sftpUser, sftpHostServerName, sftpPort);
+          sftpResourceContainer.getJavaSecureChannel().getSession(sftpUser, sftpHostServerName, sftpPort);
 
     } catch (JSchException e) {
       final String msg =
           "Could not establish an sftp session. " + System.lineSeparator()
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new OkosynkIoException(ErrorCode.CONFIGURE_OR_INITIALIZE, msg, e);
+      throw new ConfigureOrInitializeOkosynkIoException(msg, e);
     }
     sftpResourceContainer.setSftpSession(sftpSession);
 
-    // TODO: What's this?
     sftpResourceContainer.getSftpSession().setConfig("StrictHostKeyChecking", "no");
     final String sftpPassword =
         MeldingLinjeSftpReader.getFtpPassword(okosynkConfiguration, getBatchType());
@@ -620,9 +610,9 @@ public class MeldingLinjeSftpReader
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
       if ("Auth fail".equals(e.getMessage())) {
-        throw new OkosynkIoException(ErrorCode.AUTHENTICATION, msg, e);
+        throw new AuthenticationOkosynkIoException(msg, e);
       } else {
-        throw new OkosynkIoException(ErrorCode.CONFIGURE_OR_INITIALIZE, msg, e);
+        throw new ConfigureOrInitializeOkosynkIoException(msg, e);
       }
     }
 
@@ -635,7 +625,7 @@ public class MeldingLinjeSftpReader
           "Could not run openChannel on SFTP session. " + System.lineSeparator()
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new OkosynkIoException(ErrorCode.IO, msg, e);
+      throw new IoOkosynkIoException(msg, e);
     }
 
     try {
@@ -645,14 +635,16 @@ public class MeldingLinjeSftpReader
           "Could not connect to channel. " + System.lineSeparator()
               + this.toString();
       setStatus(IMeldingLinjeFileReader.Status.ERROR);
-      throw new OkosynkIoException(ErrorCode.IO, msg, e);
+      throw new IoOkosynkIoException(msg, e);
     }
   }
 
   private BufferedReader createBufferedReader(
       final IOkosynkConfiguration okosynkConfiguration,
       final SftpResourceContainer sftpResourceContainer)
-      throws OkosynkIoException {
+      throws EncodingOkosynkIoException,
+             IoOkosynkIoException,
+             NotFoundOkosynkIoException {
     try {
       logger.debug("About to acquire an InputStream from the batch input file...");
       final String fullyQualifiedInputFileName = this.fullyQualifiedInputFileName;
@@ -668,16 +660,15 @@ public class MeldingLinjeSftpReader
       }
       sftpResourceContainer.setInputStream(inputStream);
     } catch (SftpException e) {
-      final ErrorCode errorCode;
       final String msg;
       if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
-        errorCode = ErrorCode.NOT_FOUND;
         msg = "Input file does not exist";
+        throw new NotFoundOkosynkIoException(msg + System.lineSeparator() + this.toString(), e);
       } else {
-        errorCode = ErrorCode.IO;
         msg = "Could not acquire an input stream from the sftp channel.";
+        throw new IoOkosynkIoException(msg + System.lineSeparator() + this.toString(), e);
       }
-      throw new OkosynkIoException(errorCode, msg + System.lineSeparator() + this.toString(), e);
+
     }
     final InputStreamReader inputStreamReader;
     try {
@@ -688,7 +679,7 @@ public class MeldingLinjeSftpReader
           "Could not acquire an InputStreamReader for the input stream. "
               + System.lineSeparator()
               + this.toString();
-      throw new OkosynkIoException(ErrorCode.ENCODING, msg, e);
+      throw new EncodingOkosynkIoException(msg, e);
     }
     assert
         (inputStreamReader != null)

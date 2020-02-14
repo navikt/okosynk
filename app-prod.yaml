@@ -16,14 +16,14 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200131.1313.90133728
+              image: repo.adeo.no:5443/okosynk:20200210.0933.1b4c9429
               resources:
-                limits:
-                  cpu: 500m
-                  memory: 1Gi
                 requests:
                   cpu: 500m
-                  memory: 1Gi
+                  memory: 2Gi
+                limits:
+                  cpu: 500m
+                  memory: 4Gi
               env:
                 - name: OKOSYNK_SHOULD_RUN_DRY
                   value: "false"

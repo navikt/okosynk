@@ -249,8 +249,7 @@ class OppgaveRestClientTestUtils {
     return mockedOppgaveRestClient;
   }
 
-  static OppgaveRestClient prepareAMockedOpprettOppgaverRestClientBaseThatDoesNotFail()
-      throws IOException {
+  static OppgaveRestClient prepareAMockedOpprettOppgaverRestClientBaseThatDoesNotFail() {
 
     System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
@@ -330,15 +329,20 @@ class OppgaveRestClientTestUtils {
     return mockedOppgaveRestClient;
   }
 
-  private static String createRandomDate(final Random random) {
+  private static String createRandomDate(final Random random, final boolean mayBeNull) {
 
-    final String randomDate =
-        String.format(
-            "%04d-%02d-%02d",
-            2013 + random.nextInt(5),
-            1 + random.nextInt(11),
-            1 + random.nextInt(27)
-        );
+    final String randomDate;
+    if ((random.nextInt(1000) < 900) || !mayBeNull) {
+      randomDate =
+          String.format(
+              "%04d-%02d-%02d",
+              2013 + random.nextInt(5),
+              1 + random.nextInt(11),
+              1 + random.nextInt(27)
+          );
+    } else {
+      randomDate = null;
+    }
 
     return randomDate;
   }
@@ -362,7 +366,7 @@ class OppgaveRestClientTestUtils {
   private static OppgaveDto createOneOppgaveDto(final Random random) {
     final OppgaveDto oppgaveDto = new OppgaveDto();
 
-    oppgaveDto.setAktivDato(createRandomDate(random));
+    oppgaveDto.setAktivDato(createRandomDate(random, true));
     oppgaveDto.setVersjon(1 + random.nextInt(319));
     oppgaveDto.setAktoerId(RandomStringUtils.randomAlphanumeric(7));
     oppgaveDto.setStatus(OppgaveStatus.values()[random.nextInt(OppgaveStatus.values().length)]);
@@ -379,7 +383,7 @@ class OppgaveRestClientTestUtils {
     oppgaveDto.setBehandlingstype(RandomStringUtils.randomAlphanumeric(12));
     oppgaveDto.setPrioritet(RandomStringUtils.randomAlphanumeric(19));
     oppgaveDto.setBeskrivelse(RandomStringUtils.randomAlphanumeric(319));
-    oppgaveDto.setFristFerdigstillelse(createRandomDate(random));
+    oppgaveDto.setFristFerdigstillelse(createRandomDate(random, true));
     oppgaveDto.setTildeltEnhetsnr(RandomStringUtils.randomAlphanumeric(7));
     oppgaveDto.setMappeId(RandomStringUtils.randomAlphanumeric(21));
     oppgaveDto.setTilordnetRessurs(RandomStringUtils.randomAlphanumeric(14));

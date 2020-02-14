@@ -58,7 +58,7 @@ public class CliMain {
     final IOkosynkConfiguration okosynkConfiguration =
         getOkosynkConfiguration(applicationPropertiesFileName);
     this.okosynkConfiguration = okosynkConfiguration;
-    setUpCertificates();
+    //setUpCertificates();
   }
 
   private IOkosynkConfiguration getOkosynkConfiguration() {
@@ -160,25 +160,7 @@ public class CliMain {
               .map(AbstractService::shouldRun)
               .reduce(false, ((b1, b2) -> b1 || b2))
       ) {
-        try {
-          final String msg =
-              System.lineSeparator()
-                  + "I have tried running the batch {} times, "
-                  + "and I will not give up until I have tried {} times."
-                  + System.lineSeparator()
-                  + "I will try again in {} ms. Until then, I will take a nap."
-                  + System.lineSeparator();
-          logger.warn(msg, actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
-          Thread.sleep(sleepTimeBetweenRunsInMs);
-          logger.debug("Good morning, I just woke up again!");
-        } catch (InterruptedException ex) {
-          logger.warn(
-                "Ooooops, of unknown reasons, "
-              + "I was woken up by \"something\" before {} ms had passed.",
-              sleepTimeBetweenRunsInMs
-          );
-        }
-        logger.info("I will try re-running the batch(es)...");
+        retrySleep(actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
       } else {
         break;
       }
@@ -192,6 +174,28 @@ public class CliMain {
                   .getAlertMetrics()
                   .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
         );
+  }
+
+  private void retrySleep(final int actualNumberOfRuns, final int maxNumberOfRuns, final int sleepTimeBetweenRunsInMs) {
+    try {
+      final String msg =
+          System.lineSeparator()
+              + "I have tried running the batch {} times, "
+              + "and I will not give up until I have tried {} times."
+              + System.lineSeparator()
+              + "I will try again in {} ms. Until then, I will take a nap."
+              + System.lineSeparator();
+      logger.warn(msg, actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
+      Thread.sleep(sleepTimeBetweenRunsInMs);
+      logger.debug("Good morning, I just woke up again!");
+    } catch (InterruptedException ex) {
+      logger.warn(
+          "Ooooops, of unknown reasons, "
+              + "I was woken up by \"something\" before {} ms had passed.",
+          sleepTimeBetweenRunsInMs
+      );
+    }
+    logger.info("I will try re-running the batch(es)...");
   }
 
   private void runOneBatch(final AbstractService<? extends AbstractMelding> service) {

@@ -12,17 +12,17 @@ class SftpResourceContainer {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpResourceContainer.class);
 
-  private final JSch jSch;
+  private final JSch javaSecureChannel;
   private Session sftpSession;
   private ChannelSftp sftpChannel;
   private InputStream inputStream;
 
-  SftpResourceContainer(final JSch jSch) {
-    this.jSch = jSch;
+  SftpResourceContainer(final JSch javaSecureChannel) {
+    this.javaSecureChannel = javaSecureChannel;
   }
 
-  JSch getjSch() {
-    return this.jSch;
+  JSch getJavaSecureChannel() {
+    return this.javaSecureChannel;
   }
 
   Session getSftpSession() {

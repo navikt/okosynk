@@ -3,6 +3,7 @@ package no.nav.okosynk.batch;
 import no.nav.okosynk.cli.AbstractAlertMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
@@ -19,6 +20,9 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   private final IOkosynkConfiguration okosynkConfiguration;
   private boolean shouldRun;
   private BatchStatus lastBatchStatus;
+  private AktoerRestClient aktoerRestClient;
+  private Batch<? extends AbstractMelding> batch;
+  private IMeldingLinjeFileReader meldingLinjeFileReader;
 
   protected AbstractService(
       final Constants.BATCH_TYPE  batchType,
@@ -29,37 +33,23 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     this.shouldRun = true;
   }
 
+  /**
+   * Never throws. The outcome can be seen solely from the return code.
+   * @return The outcome of the run.
+   */
   public BatchStatus run() {
 
-    final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-    BatchStatus batchStatus = null;
-    try {
-      final Batch<? extends AbstractMelding> batch = createAndConfigureBatch(okosynkConfiguration);
-      batch.run();
-      batchStatus = batch.getBatchStatus();
-    } catch (Throwable e) {
-      logger.error("Exception received when waiting for batchService to finish.", e);
-      batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
-    } finally {
-      setShouldRun(batchStatus.failedButRerunningMaySucceed());
-    }
+    final Batch<? extends AbstractMelding> batch = getBatch();
+    batch.run();
+    setLastBatchStatus(batch.getBatchStatus());
+    setShouldRun(batch.getBatchStatus().failedButRerunningMaySucceed());
+    setBatch(null);
 
-    this.lastBatchStatus = batchStatus;
-
-    return batchStatus;
+    return batch.getBatchStatus();
   }
 
   public BatchStatus getLastBatchStatus() {
-    return lastBatchStatus;
-  }
-
-  public Batch<MELDINGSTYPE> createAndConfigureBatch(
-      final IOkosynkConfiguration okosynkConfiguration) {
-
-    final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
-    batch.setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
-
-    return batch;
+    return this.lastBatchStatus;
   }
 
   public AbstractService<MELDINGSTYPE> setShouldRun(final boolean shouldRun) {
@@ -71,21 +61,50 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return this.shouldRun;
   }
 
-  public Constants.BATCH_TYPE getBatchType() {
-    return batchType;
-  }
-
-  public IOkosynkConfiguration getOkosynkConfiguration() {
-    return okosynkConfiguration;
-  }
-
   public AbstractAlertMetrics getAlertMetrics() {
     return getOkosynkConfiguration().getAlertMetrics(getBatchType());
   }
 
+  public Constants.BATCH_TYPE getBatchType() {
+    return this.batchType;
+  }
+
+  public Batch<MELDINGSTYPE> createAndConfigureBatch(
+      final IOkosynkConfiguration okosynkConfiguration) {
+
+    final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
+    batch.setUspesifikkMeldingLinjeReader(getMeldingLinjeReader(okosynkConfiguration));
+
+    return batch;
+  }
+
+  protected AktoerRestClient createAktoerRestClient() {
+    return new AktoerRestClient(getOkosynkConfiguration(), getBatchType());
+  }
+
   protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();
 
-  protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper();
+  protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final AktoerRestClient aktoerRestClient);
+
+  void setBatch(final Batch<? extends AbstractMelding> batch) {
+    this.batch = batch;
+  }
+
+  void setAktoerRestClient(final AktoerRestClient aktoerRestClient) {
+    this.aktoerRestClient = aktoerRestClient;
+  }
+
+  private IOkosynkConfiguration getOkosynkConfiguration() {
+    return this.okosynkConfiguration;
+  }
+
+  private void setLastBatchStatus(final BatchStatus batchStatus) {
+    this.lastBatchStatus = batchStatus;
+  }
+
+  private void setMeldingLinjeReader(final IMeldingLinjeFileReader meldingLinjeFileReader) {
+    this.meldingLinjeFileReader = meldingLinjeFileReader;
+  }
 
   private IMeldingLinjeFileReader createMeldingLinjeReader(
       final IOkosynkConfiguration okosynkConfiguration) {
@@ -99,9 +118,32 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
             okosynkConfiguration,
             getBatchType(),
             createMeldingReader(),
-            createMeldingMapper()
+            createMeldingMapper(getAktoerRestClient())
         );
 
     return batch;
+  }
+
+  private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration) {
+
+    if (this.meldingLinjeFileReader == null) {
+      setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
+    }
+    return this.meldingLinjeFileReader;
+  }
+
+  private Batch<? extends AbstractMelding> getBatch() {
+    if (this.batch == null) {
+      setBatch(createAndConfigureBatch(getOkosynkConfiguration()));
+    }
+    return this.batch;
+  }
+
+  private AktoerRestClient getAktoerRestClient() {
+
+    if (this.aktoerRestClient == null) {
+      setAktoerRestClient(createAktoerRestClient());
+    }
+    return this.aktoerRestClient;
   }
 }

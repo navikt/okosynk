@@ -16,12 +16,12 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
 
   private static final Logger logger = LoggerFactory.getLogger(UrMapper.class);
 
-  private UrOppgaveOppretter urOppgaveOppretter;
+  private UrOppgaveOppretter       urOppgaveOppretter;
   private UrMappingRegelRepository urMappingRegelRepository;
 
   public UrMapper(AktoerRestClient aktoerRestClient) {
-    urMappingRegelRepository = new UrMappingRegelRepository();
-    urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient);
+    this.urMappingRegelRepository = new UrMappingRegelRepository();
+    this.urOppgaveOppretter       = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient);
   }
 
   @Override
@@ -42,17 +42,22 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
   Collection<List<UrMelding>> hentMeldingerSomSkalBliOppgaver(
       final List<UrMelding> ufiltrerteUrMeldinger) {
 
-    List<UrMelding> meldingerMedMappingRegel = ufiltrerteUrMeldinger.stream()
-        .filter(urMeldingSkalBliOppgave())
-        .collect(Collectors.toList());
+    List<UrMelding> meldingerMedMappingRegel =
+        ufiltrerteUrMeldinger
+          .stream()
+          .filter(urMeldingSkalBliOppgave())
+          .collect(Collectors.toList());
 
     logger.info("STATISTIKK: Antall meldinger med duplikater er {}",
         meldingerMedMappingRegel.size());
 
-    return meldingerMedMappingRegel.stream()
-        .distinct()
-        .collect(Collectors
-            .groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList()))
-        .values();
+    return meldingerMedMappingRegel
+            .stream()
+            .distinct()
+            .collect(
+                Collectors
+                  .groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList())
+            )
+            .values();
   }
 }

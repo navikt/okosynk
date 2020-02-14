@@ -41,7 +41,7 @@ public class OsBatchBlackBoxTest {
                 Constants.BATCH_TYPE.OS,
                 new OsMeldingReader(OsMelding::new),
                 new OsMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS)));
-        batch.setMeldingLinjeReader(meldingReaderMock);
+        batch.setUspesifikkMeldingLinjeReader(meldingReaderMock);
     }
 
 //    @Test

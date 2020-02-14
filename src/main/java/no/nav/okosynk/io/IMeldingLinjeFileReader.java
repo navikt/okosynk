@@ -10,7 +10,10 @@ public interface IMeldingLinjeFileReader {
     OK
     }
 
-    List<String> read() throws OkosynkIoException;
+    List<String> read()
+        throws ConfigureOrInitializeOkosynkIoException,
+        IoOkosynkIoException,
+        NotFoundOkosynkIoException, AuthenticationOkosynkIoException, EncodingOkosynkIoException;
 
     /**
      * Never throws anything, because renaming is considered relatively harmless.

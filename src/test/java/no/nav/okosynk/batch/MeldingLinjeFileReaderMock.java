@@ -2,8 +2,8 @@ package no.nav.okosynk.batch;
 
 import java.util.ArrayList;
 import java.util.List;
+import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.OkosynkIoException;
 
 public class MeldingLinjeFileReaderMock
     implements IMeldingLinjeFileReader {
@@ -22,7 +22,7 @@ public class MeldingLinjeFileReaderMock
     }
 
     @Override
-    public List<String> read() throws OkosynkIoException {
+    public List<String> read() throws ConfigureOrInitializeOkosynkIoException {
 
         List<String> fil = new ArrayList<>();
         fil.add(mockLinje);

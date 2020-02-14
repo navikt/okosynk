@@ -1,11 +1,13 @@
 package no.nav.okosynk.batch;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BatchExceptionTest {
 
@@ -21,12 +23,24 @@ public class BatchExceptionTest {
         final RuntimeException runtimeExceptionCause =
             new RuntimeException("Too badd wheather");
 
-        final BatchException batchException =
-            new BatchException(runtimeExceptionCause);
+        final Collection<? extends AbstractBatchException> exceptions =
+            new ArrayList() {{
+                add(new UninterpretableMeldingBatchException(runtimeExceptionCause));
+                add(new IoBatchException(runtimeExceptionCause));
+                add(new GeneralBatchException(runtimeExceptionCause));
+                add(new InputDataNotFoundBatchException(runtimeExceptionCause));
+            }};
 
-        assertEquals(
-            runtimeExceptionCause.toString(),
-            batchException.toString(),
-            "The string representation of BatchException is NOT as expected");
+        exceptions
+            .stream()
+            .forEach(
+                (batchException) -> {
+                    assertEquals(
+                        runtimeExceptionCause.toString(),
+                        batchException.toString(),
+                        "The string representation of AbstractBatchException is NOT as expected"
+                    );
+                }
+            );
     }
 }
