@@ -12,7 +12,7 @@ spec:
       email_configs:
         - to: oyvind.roth@nav.no
   alerts:
-    - alert: okosynk_os_preprod_general_check_logs'
+    - alert: okosynk_general_check_logs_preprod_os
       expr: 'sum(rate(okosynk_os_batch_alert{namespace="okosynk",job="kubernetes-pods"}[24h])) > 0'
       for: 5m
       action: Se på loggene (i Kibana) etter evt. feil og advarsler fra okosynk relatert til OS i preprod
@@ -20,7 +20,7 @@ spec:
       documentation: okosynk readme.md
       sla: N/A
       severity: danger
-    - alert: okosynk_ur_preprod_general_check_logs
+    - alert: okosynk_general_check_logs_preprod_ur
       expr: 'sum(rate(okosynk_ur_batch_alert{namespace="okosynk",job="kubernetes-pods"}[24h])) > 0'
       for: 5m
       action: Se på loggene (i Kibana) etter evt. feil og advarsler fra okosynk relatert til UR i preprod

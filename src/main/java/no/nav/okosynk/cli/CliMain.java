@@ -58,7 +58,9 @@ public class CliMain {
     final IOkosynkConfiguration okosynkConfiguration =
         getOkosynkConfiguration(applicationPropertiesFileName);
     this.okosynkConfiguration = okosynkConfiguration;
-    //setUpCertificates();
+    logSelectedProperties(okosynkConfiguration, logger);
+    setUpCertificates();
+    logSelectedProperties(okosynkConfiguration, logger);
   }
 
   private IOkosynkConfiguration getOkosynkConfiguration() {
