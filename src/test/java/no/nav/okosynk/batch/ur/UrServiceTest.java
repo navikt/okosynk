@@ -12,7 +12,6 @@ import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
-import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

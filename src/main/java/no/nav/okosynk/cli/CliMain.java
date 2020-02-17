@@ -58,9 +58,9 @@ public class CliMain {
     final IOkosynkConfiguration okosynkConfiguration =
         getOkosynkConfiguration(applicationPropertiesFileName);
     this.okosynkConfiguration = okosynkConfiguration;
-    logSelectedProperties(okosynkConfiguration, logger);
+    //logSelectedProperties(okosynkConfiguration, logger);
     setUpCertificates();
-    logSelectedProperties(okosynkConfiguration, logger);
+    //logSelectedProperties(okosynkConfiguration, logger);
   }
 
   private IOkosynkConfiguration getOkosynkConfiguration() {
@@ -377,6 +377,14 @@ public class CliMain {
     return okosynkConfiguration;
   }
 
+  /**
+   * Ends up with having set the following sys props:
+   * no.nav.modig.security.appcert.keystore: /var/run/secrets/naisd.io/srvokosynk_keystore
+   * no.nav.modig.security.appcert.password: ytX7G6r51d
+   *
+   * javax.net.ssl.trustStore: /var/run/secrets/naisd.io/nav_truststore_path
+   * javax.net.ssl.trustStorePassword: 467792be15c4a8807681fd2d5c9c1748
+   */
   private void setUpCertificates() {
     logger.info("About to set up certificates...");
     final Map<String, String> env = System.getenv();
