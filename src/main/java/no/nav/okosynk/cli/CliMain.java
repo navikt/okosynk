@@ -341,7 +341,7 @@ public class CliMain {
         .append(System.lineSeparator())
     ;
 
-    logger.debug(msgStringBuffer.toString());
+    logger.info(msgStringBuffer.toString());
   }
 
   private static void logAllEnvironmentVariables(final IOkosynkConfiguration okosynkConfiguration,
