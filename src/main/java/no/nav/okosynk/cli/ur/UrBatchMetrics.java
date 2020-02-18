@@ -9,7 +9,7 @@ public class UrBatchMetrics extends AbstractBatchMetrics {
   private static UrBatchMetrics singletonInstance;
 
   private UrBatchMetrics(final IOkosynkConfiguration okosynkConfiguration) {
-    super(okosynkConfiguration, Constants.BATCH_TYPE.OS);
+    super(okosynkConfiguration, Constants.BATCH_TYPE.UR);
   }
 
   public static UrBatchMetrics getSingletonInstance(

@@ -1,4 +1,4 @@
-package no.nav.okosynk.batch.ur;
+    package no.nav.okosynk.batch.ur;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +15,7 @@ import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,10 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
     @BeforeEach
     void beforeEach() {
 
-        this.setMockedMeldingReader(mock(UrMeldingReader.class));
-        this.setMockedMeldingMapper(mock(UrMapper.class));
+        super.setMockedMeldingReader(mock(UrMeldingReader.class));
+        super.setMockedMeldingMapper(mock(UrMapper.class));
 
-        this.setBatch(
+        super.setBatch(
             new Batch<>(
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
@@ -93,7 +94,8 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertThrows(NullPointerException.class,
+        assertThrows(
+            NullPointerException.class,
             () ->
             new Batch<>(
                 this.getOkosynkConfiguration(),
@@ -105,6 +107,8 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
     }
 
     @Test
+    // Makes under "certain circumstances" the build JVM crash
+    @Disabled
     void when_the_uspesifikkMeldingLinjeReader_is_not_set_and_calling_run_then_an_appropriate_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);

@@ -1,7 +1,10 @@
 package no.nav.okosynk.cli;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
+import no.nav.okosynk.cli.ur.UrBatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -114,4 +117,5 @@ public abstract class AbstractBatchMetricsTest {
         () -> batchMetrics.log()
     );
   }
+
 }

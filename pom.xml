@@ -443,7 +443,9 @@
         <configuration>
           <forkCount>1</forkCount>
           <reuseForks>false</reuseForks>
+          <!--
           <argLine>-Xmx2048m -XX:MaxPermSize=2048m</argLine>
+          -->
           <environmentVariables>
             <TEST_ENV_001>TEST_ENV_001_VAL</TEST_ENV_001>
             <test_env_002>test_env_002_val</test_env_002>
@@ -452,7 +454,7 @@
             <test_bool_env_003>true</test_bool_env_003>
             <test_bool_env_004>false</test_bool_env_004>
             <argLine>--illegal-access=permit</argLine>
-            <argLine>@{jaCoCoArgLine} -Xmx2048m</argLine>
+            <argLine>@{jaCoCoArgLine} -Xmx1024m</argLine>
           </environmentVariables>
         </configuration>
 

@@ -35,7 +35,7 @@ abstract class AbstractMetrics {
     this.pushGateway = new PushGateway(this.pushGatewayEndpointNameAndPort);
   }
 
-  protected Constants.BATCH_TYPE getBatchType() {
+  public Constants.BATCH_TYPE getBatchType() {
     return this.batchType;
   }
 
