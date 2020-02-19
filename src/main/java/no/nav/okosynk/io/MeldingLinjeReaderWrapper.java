@@ -6,6 +6,9 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TODO: This indirecting class is no longer needed.
+ */
 public class MeldingLinjeReaderWrapper
     implements IMeldingLinjeFileReader {
 

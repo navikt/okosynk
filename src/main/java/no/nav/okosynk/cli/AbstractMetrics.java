@@ -53,7 +53,7 @@ abstract class AbstractMetrics {
 
   protected void pushAdd() {
 
-    logger.info("Pusher metrikk(er) til {}", getPushGatewayEndpointNameAndPort());
+    logger.info("Pusher {}-metrikk(er) til {}", getBatchType(), getPushGatewayEndpointNameAndPort());
     try {
       this.pushGateway
           .pushAdd(
