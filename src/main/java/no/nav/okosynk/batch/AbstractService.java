@@ -7,8 +7,10 @@ import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
+import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.MeldingLinjeReaderWrapper;
+import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,13 +41,20 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
    */
   public BatchStatus run() {
 
-    final Batch<? extends AbstractMelding> batch = getBatch();
-    batch.run();
-    setLastBatchStatus(batch.getBatchStatus());
-    setShouldRun(batch.getBatchStatus().failedButRerunningMaySucceed());
-    setBatch(null);
-
-    return batch.getBatchStatus();
+    final Batch<? extends AbstractMelding> batch;
+    BatchStatus batchStatus = null;
+    try {
+      batch = getBatch();
+      batch.run();
+      batchStatus = batch.getBatchStatus();
+    } catch (ConfigureOrInitializeOkosynkIoException e) {
+      batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
+    } finally {
+      setLastBatchStatus(batchStatus);
+      setShouldRun(batchStatus.failedButRerunningMaySucceed());
+      setBatch(null);
+    }
+    return batchStatus;
   }
 
   public BatchStatus getLastBatchStatus() {
@@ -70,10 +79,16 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   }
 
   public Batch<MELDINGSTYPE> createAndConfigureBatch(
-      final IOkosynkConfiguration okosynkConfiguration) {
+      final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
 
     final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
-    batch.setUspesifikkMeldingLinjeReader(getMeldingLinjeReader(okosynkConfiguration));
+
+    final IMeldingLinjeFileReader meldingLinjeFileReader =
+        //getMeldingLinjeReader(okosynkConfiguration);
+        getMeldingLinjeReader_2(okosynkConfiguration);
+
+    batch.setUspesifikkMeldingLinjeReader(meldingLinjeFileReader);
 
     return batch;
   }
@@ -107,7 +122,8 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   }
 
   private IMeldingLinjeFileReader createMeldingLinjeReader(
-      final IOkosynkConfiguration okosynkConfiguration) {
+      final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
     return new MeldingLinjeReaderWrapper(okosynkConfiguration, this.getBatchType());
   }
 
@@ -124,7 +140,8 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return batch;
   }
 
-  private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration) {
+  private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
 
     if (this.meldingLinjeFileReader == null) {
       setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
@@ -132,7 +149,8 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return this.meldingLinjeFileReader;
   }
 
-  private Batch<? extends AbstractMelding> getBatch() {
+  private Batch<? extends AbstractMelding> getBatch()
+      throws ConfigureOrInitializeOkosynkIoException {
     if (this.batch == null) {
       setBatch(createAndConfigureBatch(getOkosynkConfiguration()));
     }
@@ -146,4 +164,57 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     }
     return this.aktoerRestClient;
   }
+
+
+
+
+
+
+
+  private IMeldingLinjeFileReader getMeldingLinjeReader_2(final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
+
+    if (this.meldingLinjeFileReader == null) {
+      setMeldingLinjeReader(createMeldingLinjeReader_2(okosynkConfiguration));
+    }
+    return this.meldingLinjeFileReader;
+  }
+
+
+
+
+  private IMeldingLinjeFileReader createMeldingLinjeReader_2(
+      final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
+
+    final String fullyQualifiedInputFileName = getFtpInputFilePath_2(okosynkConfiguration);
+    logger.info("Using SFTP for " + this.getClass().getSimpleName()
+        + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
+    final IMeldingLinjeFileReader meldingLinjeFileReader =
+        createMeldingLinjeSftpReader_2(okosynkConfiguration, fullyQualifiedInputFileName);
+
+    return meldingLinjeFileReader;
+  }
+
+  private IMeldingLinjeFileReader createMeldingLinjeSftpReader_2(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final String fullyQualifiedInputFileName) {
+
+    return new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(),
+        fullyQualifiedInputFileName);
+  }
+
+  private String getFtpInputFilePath_2(final IOkosynkConfiguration okosynkConfiguration)
+      throws ConfigureOrInitializeOkosynkIoException {
+    return MeldingLinjeSftpReader.getFtpInputFilePath(
+        okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
+    );
+  }
+
+
+
+
+
+
+
 }

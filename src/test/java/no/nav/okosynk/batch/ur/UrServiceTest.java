@@ -13,6 +13,7 @@ import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
+import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -32,7 +33,8 @@ class UrServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void when_a_batch_is_created_it_should_not_be_null() {
+    public void when_a_batch_is_created_it_should_not_be_null()
+        throws ConfigureOrInitializeOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 

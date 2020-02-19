@@ -3,6 +3,7 @@ package no.nav.okosynk.io.os;
 import java.util.function.Supplier;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.MeldingLinjeReaderWrapper;
 import no.nav.okosynk.io.AbstractMeldingLinjeReaderWrapperTest;
 
@@ -16,7 +17,11 @@ public class OsMeldingLinjeReaderWrapperTest
 
         final Supplier<MeldingLinjeReaderWrapper> creator =
             () -> {
-                return new MeldingLinjeReaderWrapper(okosynkConfiguration, Constants.BATCH_TYPE.OS);
+                try {
+                    return new MeldingLinjeReaderWrapper(okosynkConfiguration, Constants.BATCH_TYPE.OS);
+                } catch (ConfigureOrInitializeOkosynkIoException e) {
+                    throw new RuntimeException(e);
+                }
             };
 
         return creator;

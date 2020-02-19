@@ -25,7 +25,7 @@ public class MeldingLinjeReaderWrapper
   private final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
   private final Constants.BATCH_TYPE batchType;
 
-  private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
+  private String getFtpInputFilePath_2(final IOkosynkConfiguration okosynkConfiguration)
       throws ConfigureOrInitializeOkosynkIoException {
     return MeldingLinjeSftpReader.getFtpInputFilePath(
         okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
@@ -35,17 +35,10 @@ public class MeldingLinjeReaderWrapper
   // =========================================================================
   public MeldingLinjeReaderWrapper(
       final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType) {
+      final Constants.BATCH_TYPE batchType) throws ConfigureOrInitializeOkosynkIoException {
 
     this.batchType = batchType;
-
-    final IMeldingLinjeFileReader wrappedMeldingLinjeFileReader;
-    try {
-      wrappedMeldingLinjeFileReader = createMeldingLinjeReader(okosynkConfiguration);
-    } catch (ConfigureOrInitializeOkosynkIoException e) {
-      throw new RuntimeException("Could not create wrappedMeldingLinjeFileReader", e);
-    }
-    this.wrappedMeldingLinjeFileReader = wrappedMeldingLinjeFileReader;
+    this.wrappedMeldingLinjeFileReader = createMeldingLinjeReader_2(okosynkConfiguration);
   }
   // =========================================================================
 
@@ -71,23 +64,23 @@ public class MeldingLinjeReaderWrapper
 
   // =========================================================================
 
-  private IMeldingLinjeFileReader createMeldingLinjeReader(
+  private IMeldingLinjeFileReader createMeldingLinjeReader_2(
       final IOkosynkConfiguration okosynkConfiguration)
       throws ConfigureOrInitializeOkosynkIoException {
 
     final IMeldingLinjeFileReader meldingLinjeFileReader;
 
-    final String fullyQualifiedInputFileName = getFtpInputFilePath(okosynkConfiguration);
+    final String fullyQualifiedInputFileName = getFtpInputFilePath_2(okosynkConfiguration);
 
     logger.info("Using SFTP for " + this.getClass().getSimpleName()
         + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
-    meldingLinjeFileReader = createMeldingLinjeSftpReader(okosynkConfiguration,
+    meldingLinjeFileReader = createMeldingLinjeSftpReader_2(okosynkConfiguration,
         fullyQualifiedInputFileName);
 
     return meldingLinjeFileReader;
   }
 
-  private IMeldingLinjeFileReader createMeldingLinjeSftpReader(
+  private IMeldingLinjeFileReader createMeldingLinjeSftpReader_2(
       final IOkosynkConfiguration okosynkConfiguration,
       final String fullyQualifiedInputFileName) {
 

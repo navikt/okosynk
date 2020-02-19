@@ -119,7 +119,7 @@ public class MeldingLinjeSftpReader
     }
   }
 
-  static String getFtpInputFilePath(final String ftpHostUrl)
+  public static String getFtpInputFilePath(final String ftpHostUrl)
       throws ConfigureOrInitializeOkosynkIoException {
     try {
       final URI uri = MeldingLinjeSftpReader.checkFtpHostUrlAndProduceUri(ftpHostUrl);
