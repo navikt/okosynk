@@ -152,6 +152,23 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     return getBatchType().getName();
   }
 
+  public BatchStatus getBatchStatus() {
+    return batchStatus;
+  }
+
+  public IOkosynkConfiguration getOkosynkConfiguration() {
+    return okosynkConfiguration;
+  }
+
+  public void setOppgaveSynkroniserer(final OppgaveSynkroniserer oppgaveSynkroniserer) {
+
+    Validate.notNull(
+        oppgaveSynkroniserer,
+        "The parameter OppgaveSynkroniserer supplied is null");
+
+    this.oppgaveSynkroniserer = oppgaveSynkroniserer;
+  }
+
   private List<Oppgave> hentBatchOppgaver()
       throws UninterpretableMeldingBatchException,
              InputDataNotFoundBatchException,
@@ -175,6 +192,10 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     logger.debug("About to normally leave Batch.hentBatchOppgaver");
 
     return batchOppgaver;
+  }
+
+  Constants.BATCH_TYPE getBatchType() {
+    return batchType;
   }
 
   private List<String> hentLinjerMedUspesifikkeMeldinger()
@@ -241,18 +262,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     return spesifikkeMeldinger;
   }
 
-  public BatchStatus getBatchStatus() {
-    return batchStatus;
-  }
-
-  public IOkosynkConfiguration getOkosynkConfiguration() {
-    return okosynkConfiguration;
-  }
-
-  Constants.BATCH_TYPE getBatchType() {
-    return batchType;
-  }
-
   private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {
     return this.uspesifikkMeldingLinjeReader;
   }
@@ -263,15 +272,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
   private OppgaveSynkroniserer getOppgaveSynkroniserer() {
     return oppgaveSynkroniserer;
-  }
-
-  public void setOppgaveSynkroniserer(final OppgaveSynkroniserer oppgaveSynkroniserer) {
-
-    Validate.notNull(
-        oppgaveSynkroniserer,
-        "The parameter OppgaveSynkroniserer supplied is null");
-
-    this.oppgaveSynkroniserer = oppgaveSynkroniserer;
   }
 
   private IMeldingMapper<SPESIFIKKMELDINGTYPE> getSpesifikkMapper() {

@@ -9,7 +9,6 @@ import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
-import no.nav.okosynk.io.MeldingLinjeReaderWrapper;
 import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +84,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
 
     final IMeldingLinjeFileReader meldingLinjeFileReader =
-        //getMeldingLinjeReader(okosynkConfiguration);
-        getMeldingLinjeReader_2(okosynkConfiguration);
+        getMeldingLinjeReader(okosynkConfiguration);
 
     batch.setUspesifikkMeldingLinjeReader(meldingLinjeFileReader);
 
@@ -121,12 +119,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     this.meldingLinjeFileReader = meldingLinjeFileReader;
   }
 
-  private IMeldingLinjeFileReader createMeldingLinjeReader(
-      final IOkosynkConfiguration okosynkConfiguration)
-      throws ConfigureOrInitializeOkosynkIoException {
-    return new MeldingLinjeReaderWrapper(okosynkConfiguration, this.getBatchType());
-  }
-
   private Batch<MELDINGSTYPE> createBatch(final IOkosynkConfiguration okosynkConfiguration) {
 
     final Batch<MELDINGSTYPE> batch =
@@ -138,15 +130,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         );
 
     return batch;
-  }
-
-  private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)
-      throws ConfigureOrInitializeOkosynkIoException {
-
-    if (this.meldingLinjeFileReader == null) {
-      setMeldingLinjeReader(createMeldingLinjeReader(okosynkConfiguration));
-    }
-    return this.meldingLinjeFileReader;
   }
 
   private Batch<? extends AbstractMelding> getBatch()
@@ -165,56 +148,36 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     return this.aktoerRestClient;
   }
 
-
-
-
-
-
-
-  private IMeldingLinjeFileReader getMeldingLinjeReader_2(final IOkosynkConfiguration okosynkConfiguration)
+  private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)
       throws ConfigureOrInitializeOkosynkIoException {
 
     if (this.meldingLinjeFileReader == null) {
-      setMeldingLinjeReader(createMeldingLinjeReader_2(okosynkConfiguration));
+      final IMeldingLinjeFileReader meldingLinjeFileReader =
+          createMeldingLinjeSftpReader(okosynkConfiguration);
+      setMeldingLinjeReader(meldingLinjeFileReader);
     }
     return this.meldingLinjeFileReader;
   }
 
-
-
-
-  private IMeldingLinjeFileReader createMeldingLinjeReader_2(
+  private IMeldingLinjeFileReader createMeldingLinjeSftpReader(
       final IOkosynkConfiguration okosynkConfiguration)
       throws ConfigureOrInitializeOkosynkIoException {
 
-    final String fullyQualifiedInputFileName = getFtpInputFilePath_2(okosynkConfiguration);
+    final String fullyQualifiedInputFileName = getFtpInputFilePath(okosynkConfiguration);
     logger.info("Using SFTP for " + this.getClass().getSimpleName()
         + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
     final IMeldingLinjeFileReader meldingLinjeFileReader =
-        createMeldingLinjeSftpReader_2(okosynkConfiguration, fullyQualifiedInputFileName);
+        new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(),
+            fullyQualifiedInputFileName);
 
     return meldingLinjeFileReader;
   }
 
-  private IMeldingLinjeFileReader createMeldingLinjeSftpReader_2(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final String fullyQualifiedInputFileName) {
-
-    return new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(),
-        fullyQualifiedInputFileName);
-  }
-
-  private String getFtpInputFilePath_2(final IOkosynkConfiguration okosynkConfiguration)
+  private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
       throws ConfigureOrInitializeOkosynkIoException {
     return MeldingLinjeSftpReader.getFtpInputFilePath(
         okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
     );
   }
-
-
-
-
-
-
 
 }

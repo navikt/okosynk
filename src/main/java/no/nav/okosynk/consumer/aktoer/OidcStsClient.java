@@ -34,11 +34,11 @@ class OidcStsClient {
 
   private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
 
-  private final CloseableHttpClient httpClient;
-  private final URI endpointUri;
+  private final URI                         endpointUri;
+  private final String                      batchBruker;
   private final UsernamePasswordCredentials credentials;
-  private final String batchBruker;
-  private String oidcToken;
+  private       String                      oidcToken;
+  private final CloseableHttpClient         httpClient;
 
   OidcStsClient(
       final IOkosynkConfiguration okosynkConfiguration,

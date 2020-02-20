@@ -28,30 +28,39 @@ public class AktoerRestClient {
 
   private static final Logger log = LoggerFactory.getLogger(AktoerRestClient.class);
 
-  private static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
-  private static final String NAV_CALLID = "Nav-Call-Id";
+  private static final String NAV_CONSUMER_ID   = "Nav-Consumer-Id";
+  private static final String NAV_CALLID        = "Nav-Call-Id";
   private static final String NAV_PERSONIDENTER = "Nav-Personidenter";
 
-  private final CloseableHttpClient httpClient;
   private final IOkosynkConfiguration okosynkConfiguration;
-  private final OidcStsClient oidcStsClient;
-  private final String consumerId;
+  private final Constants.BATCH_TYPE  batchType;
+  private final String                consumerId;
+  private       CloseableHttpClient   httpClient;
+  private       OidcStsClient         oidcStsClient;
 
   public AktoerRestClient(
       final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType) {
+      final Constants.BATCH_TYPE  batchType) {
 
     this.okosynkConfiguration = okosynkConfiguration;
-    this.consumerId = this.okosynkConfiguration
-        .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
-    this.oidcStsClient = createOidcStsClient(okosynkConfiguration, batchType);
-    this.httpClient = HttpClients.createDefault();
+    this.batchType            = batchType;
+    this.consumerId           =
+        okosynkConfiguration
+          .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+
     log.info("Aktoerregister REST client bygd opp for {}", this.consumerId);
+  }
+
+  private static CloseableHttpClient createCloseableHttpClient() {
+
+    final CloseableHttpClient httpClient = HttpClients.createDefault();
+
+    return httpClient;
   }
 
   private static OidcStsClient createOidcStsClient(
       final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType
+      final Constants.BATCH_TYPE  batchType
   ) {
     return new OidcStsClient(okosynkConfiguration, batchType);
   }
@@ -71,14 +80,14 @@ public class AktoerRestClient {
     }
 
     final HttpUriRequest request = new HttpGet(uri);
-    final String oidcToken = getOidcToken();
+    final String oidcToken = getOidcToken(okosynkConfiguration, batchType);
     request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + oidcToken);
     request.addHeader(AktoerRestClient.NAV_CALLID, String.valueOf(UUID.randomUUID()));
     request.addHeader(AktoerRestClient.NAV_PERSONIDENTER, fnr);
     request.addHeader(AktoerRestClient.NAV_CONSUMER_ID, this.consumerId);
     request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
-    try (final CloseableHttpResponse response = this.httpClient.execute(request)) {
+    try (final CloseableHttpResponse response = getCloseableHttpClient().execute(request)) {
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -136,7 +145,44 @@ public class AktoerRestClient {
     return aktoerRespons;
   }
 
-  private String getOidcToken() {
-    return this.oidcStsClient.getOidcToken();
+  private String getOidcToken(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE  batchType
+  ) {
+
+    final OidcStsClient oidcStsClient = getOidcStsClient(okosynkConfiguration, batchType);
+    final String        oidcToken     = oidcStsClient.getOidcToken();
+
+    return oidcToken;
+  }
+
+  private void setOidcStsClient(final OidcStsClient oidcStsClient) {
+    this.oidcStsClient = oidcStsClient;
+  }
+
+  private OidcStsClient getOidcStsClient(
+      final IOkosynkConfiguration okosynkConfiguration,
+      final Constants.BATCH_TYPE  batchType) {
+
+    if (this.oidcStsClient == null) {
+      final OidcStsClient oidcStsClient =
+          AktoerRestClient.createOidcStsClient(okosynkConfiguration, batchType);
+      setOidcStsClient(oidcStsClient);
+    }
+    return this.oidcStsClient;
+  }
+
+  private void setCloseableHttpClient(final CloseableHttpClient httpClient) {
+    this.httpClient = httpClient;
+  }
+
+  private CloseableHttpClient getCloseableHttpClient() {
+
+    if (this.httpClient == null) {
+      final CloseableHttpClient httpClient =
+          AktoerRestClient.createCloseableHttpClient();
+      setCloseableHttpClient(httpClient);
+    }
+    return this.httpClient;
   }
 }
