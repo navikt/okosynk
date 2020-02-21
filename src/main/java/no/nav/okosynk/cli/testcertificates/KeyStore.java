@@ -2,9 +2,9 @@ package no.nav.okosynk.cli.testcertificates;
 
 import java.util.Properties;
 
-class KeyStore_Copy extends PropertySetter_Copy {
+final class KeyStore extends PropertySetter {
 
-    KeyStore_Copy(
+  KeyStore(
       final String filePath,
       final String password) {
 
@@ -15,9 +15,10 @@ class KeyStore_Copy extends PropertySetter_Copy {
       final String filePath,
       final String password) {
 
-    Properties props = new Properties();
+    final Properties props = new Properties();
     props.setProperty("no.nav.modig.security.appcert.keystore", filePath);
     props.setProperty("no.nav.modig.security.appcert.password", password);
+
     return props;
   }
 }

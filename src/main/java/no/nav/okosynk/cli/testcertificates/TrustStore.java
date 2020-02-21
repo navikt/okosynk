@@ -2,9 +2,9 @@ package no.nav.okosynk.cli.testcertificates;
 
 import java.util.Properties;
 
-class TrustStore_Copy extends PropertySetter_Copy {
+final class TrustStore extends PropertySetter {
 
-  TrustStore_Copy(
+  TrustStore(
       final String truststoreFilePath,
       final String truststorePassword) {
 
@@ -18,6 +18,7 @@ class TrustStore_Copy extends PropertySetter_Copy {
     Properties props = new Properties();
     props.setProperty("javax.net.ssl.trustStore", truststoreFilePath);
     props.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
+
     return props;
   }
 }

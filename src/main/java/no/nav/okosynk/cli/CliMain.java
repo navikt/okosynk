@@ -7,7 +7,7 @@ import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.os.OsService;
 import no.nav.okosynk.batch.ur.UrService;
-import no.nav.okosynk.cli.testcertificates.TestCertificates_Copy;
+import no.nav.okosynk.cli.testcertificates.TestCertificates;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
@@ -386,7 +386,9 @@ public class CliMain {
    * javax.net.ssl.trustStorePassword: 467792be15c4a8807681fd2d5c9c1748
    */
   private void setUpCertificates() {
+
     logger.info("About to set up certificates...");
+
     final Map<String, String> env = System.getenv();
     setupKeyStore(env);
     if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) {
@@ -397,31 +399,36 @@ public class CliMain {
     } else {
       setUpTestCertificates();
     }
+
     logger.info("Certificates successfully set up");
   }
 
   private void setupKeyStore(Map<String, String> env) {
 
     logger.info("About to set up key store...");
+
     final String keystore = env.getOrDefault(Constants.SRVOKOSYNK_KEYSTORE_KEY,
         Constants.SRVOKOSYNK_KEYSTORE_DEFAULT_VALUE);
     final String keystorePassword = env.getOrDefault(Constants.SRVOKOSYNK_PASSWORD_KEY,
         Constants.SRVOKOSYNK_PASSWORD_DEFAULT_VALUE);
     System.setProperty(Constants.SRVOKOSYNK_KEYSTORE_EXT_KEY, keystore);
     System.setProperty(Constants.SRVOKOSYNK_PASSWORD_EXT_KEY, keystorePassword);
+
     logger.info("key store successfully set up");
   }
 
   private void setUpTestCertificates() {
 
     logger.info("About to set up test certificates...");
+
     try {
-      TestCertificates_Copy.setupKeyAndTrustStore();
+      TestCertificates.setupKeyAndTrustStore();
     } catch (Throwable e) {
       final String msg = "Exception received when setting up test certificates.";
       logger.info(msg);
       throw new RuntimeException(msg, e);
     }
+
     logger.info("Test certificates successfully set up.");
   }
 }

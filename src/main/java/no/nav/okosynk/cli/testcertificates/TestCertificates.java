@@ -2,9 +2,9 @@ package no.nav.okosynk.cli.testcertificates;
 
 import java.io.InputStream;
 
-public final class TestCertificates_Copy {
+public final class TestCertificates {
 
-  private TestCertificates_Copy() {
+  private TestCertificates() {
   }
 
   public static void setupKeyAndTrustStore() {
@@ -22,7 +22,7 @@ public final class TestCertificates_Copy {
       final String keyStoreResourceName,
       final String password) {
 
-    InputStream keyStore = TestCertificates_Copy.class.getClassLoader()
+    final InputStream keyStore = TestCertificates.class.getClassLoader()
         .getResourceAsStream(keyStoreResourceName);
     setupTemporaryKeyStore(keyStore, password);
   }
@@ -31,7 +31,7 @@ public final class TestCertificates_Copy {
       final InputStream keystore,
       final String password) {
 
-    (new KeyStore_Copy(FileUtils_Copy.putInTempFile(keystore).getAbsolutePath(), password))
+    (new KeyStore(FileUtils.putInTempFile(keystore).getAbsolutePath(), password))
         .setOn(System.getProperties());
   }
 
@@ -39,7 +39,7 @@ public final class TestCertificates_Copy {
       final String trustStoreResourceName,
       final String password) {
 
-    InputStream trustStore = TestCertificates_Copy.class.getClassLoader()
+    final InputStream trustStore = TestCertificates.class.getClassLoader()
         .getResourceAsStream(trustStoreResourceName);
     setupTemporaryTrustStore(trustStore, password);
   }
@@ -48,7 +48,7 @@ public final class TestCertificates_Copy {
       final InputStream trustStore,
       final String password) {
 
-    (new TrustStore_Copy(FileUtils_Copy.putInTempFile(trustStore).getAbsolutePath(), password))
+    (new TrustStore(FileUtils.putInTempFile(trustStore).getAbsolutePath(), password))
         .setOn(System.getProperties());
   }
 }

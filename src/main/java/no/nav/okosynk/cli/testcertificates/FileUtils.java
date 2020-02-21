@@ -7,9 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.io.IOUtils;
 
-final class FileUtils_Copy {
+final class FileUtils {
 
-  private FileUtils_Copy() {
+  private FileUtils() {
   }
 
   static File putInTempFile(final InputStream data) {
@@ -24,9 +24,10 @@ final class FileUtils_Copy {
       throw new IllegalArgumentException("InputStream==null. Nothing to write to temporary file");
     } else {
       try {
-        File tempFile = File.createTempFile(navnPrefix + System.currentTimeMillis(), ".tmp");
+        final File tempFile =
+            File.createTempFile(navnPrefix + System.currentTimeMillis(), ".tmp");
         tempFile.deleteOnExit();
-        OutputStream out = new FileOutputStream(tempFile);
+        final OutputStream out = new FileOutputStream(tempFile);
         Throwable var4 = null;
 
         try {

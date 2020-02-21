@@ -1,18 +1,17 @@
 package no.nav.okosynk.cli.testcertificates;
 
+import java.util.Iterator;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.Properties;
+class PropertySetter {
 
-class PropertySetter_Copy {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PropertySetter_Copy.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PropertySetter.class);
 
   private final Properties propertiesToSet;
 
-  public PropertySetter_Copy(
+  public PropertySetter(
       final Properties propertiesToSet) {
 
     this.propertiesToSet = propertiesToSet;
