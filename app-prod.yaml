@@ -4,7 +4,7 @@ metadata:
   name: okosynk
   namespace: okosynk
 spec:
-  schedule: "0 5 * * *" # Every morning at 04:00 UTC
+  schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
     spec:
       template:
@@ -16,7 +16,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: okosynk
-              image: repo.adeo.no:5443/okosynk:20200220.1056.1ccfa0cb
+              image: repo.adeo.no:5443/okosynk:20200225.1554.eeb920d0
               resources:
                 requests:
                   cpu: 500m
