@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.javatuples.Triplet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -79,44 +77,6 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
         .setSystemProperty(Constants.BATCH_TYPE.OS.getFtpCharsetNameKey(), "ISO8859_1");
     this.okosynkConfiguration
         .setSystemProperty(Constants.BATCH_TYPE.UR.getFtpCharsetNameKey(), "ISO8859_1");
-
-    getOkosynkConfiguration().setSystemProperty(
-        Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
-        "2");
-    getOkosynkConfiguration().setSystemProperty(
-        Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
-        "1000");
-  }
-
-  @Test
-  void when_number_of_retries_is_not_set_then_an_exception_should_upon_initiation_of_MeldingLinjeFileReader() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    getOkosynkConfiguration().clearSystemProperty(
-        Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
-    final String fullyQualifiedInputFileName = "someNonEmptyFileName";
-
-    Assertions.assertThrows(
-        IllegalStateException.class,
-        () -> getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName)
-    );
-  }
-
-  @Test
-  void when_retry_wait_time_is_not_set_then_an_exception_should_upon_initiation_of_MeldingLinjeFileReader() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    getOkosynkConfiguration().clearSystemProperty(
-        Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY);
-
-    final String fullyQualifiedInputFileName = "someNonEmptyFileName";
-
-    Assertions.assertThrows(
-        IllegalStateException.class,
-        () -> getMeldingLinjeFileReaderCreator().apply(fullyQualifiedInputFileName)
-    );
   }
 
   @Test

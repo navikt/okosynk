@@ -122,13 +122,6 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
             );
         }
 
-        okosynkConfiguration.setSystemProperty(
-            Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
-            "5");
-        okosynkConfiguration.setSystemProperty(
-            Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
-            "1234");
-
         this.okosynkConfiguration = okosynkConfiguration;
 
         createAWorkingMeldingLinjeFtpOrSftpFileReader();
@@ -290,34 +283,6 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
         final File inputTestDataFile = new File(fullyQualifiedOperatingSystemInputTestDataFileNames.getValue0());
 
         assertTrue(inputTestDataFile.exists());
-    }
-
-    @Test
-    void when_input_file_does_not_exist_then_a_read_should_be_retried_a_maximum_number_of_times()
-        throws AbstractOkosynkIoException {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final String fullyQualifiedInputFileName = "FileNameOfNonExistingFile";
-
-        final Function<String, IMeldingLinjeFileReader> meldingLinjeSftpReaderCreator =
-            getMeldingLinjeFileReaderCreator();
-
-        final int expectedNumberOfRetries =
-            getOkosynkConfiguration()
-                .getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
-
-        final MeldingLinjeSftpReader meldingLinjeSftpReader =
-            (MeldingLinjeSftpReader)
-                meldingLinjeSftpReaderCreator.apply(fullyQualifiedInputFileName);
-
-        final MeldingLinjeSftpReader spiedMeldingLinjeSftpReader =
-            spy(meldingLinjeSftpReader);
-
-        final NotFoundOkosynkIoException actualOkosynkIoException =
-            assertThrows(NotFoundOkosynkIoException.class, () -> spiedMeldingLinjeSftpReader.read());
-
-        verify(spiedMeldingLinjeSftpReader, times(expectedNumberOfRetries)).lesMeldingerFraFil(any());
     }
 
     @Test

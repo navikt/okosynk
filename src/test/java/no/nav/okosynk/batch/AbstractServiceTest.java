@@ -3,10 +3,8 @@ package no.nav.okosynk.batch;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import no.nav.okosynk.config.Constants;
@@ -69,15 +67,7 @@ public abstract class AbstractServiceTest {
   }
 
   protected void commonBeforeEach() {
-
     this.okosynkConfiguration = new FakeOkosynkConfiguration();
-
-    this.okosynkConfiguration.setSystemProperty(
-        Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY,
-        "2");
-    this.okosynkConfiguration.setSystemProperty(
-        Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY,
-        "1000");
   }
 
   protected void setService(final AbstractService<? extends AbstractMelding> service) {

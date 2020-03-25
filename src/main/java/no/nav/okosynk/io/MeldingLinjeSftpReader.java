@@ -31,8 +31,6 @@ public class MeldingLinjeSftpReader
   private final JSch javaSecureChannel;
   private final IOkosynkConfiguration okosynkConfiguration;
   private final Constants.BATCH_TYPE batchType;
-  private final int retryWaitTimeInMilliseconds;
-  private final int maxNumberOfReadTries;
   private Status status = Status.UNSET;
   private final String fullyQualifiedInputFileName;
 
@@ -65,10 +63,6 @@ public class MeldingLinjeSftpReader
 
     setStatus(IMeldingLinjeFileReader.Status.OK);
 
-    this.retryWaitTimeInMilliseconds =
-        MeldingLinjeSftpReader.getRetryWaitTimeInMilliseconds(okosynkConfiguration);
-    this.maxNumberOfReadTries =
-        MeldingLinjeSftpReader.getMaxNumberOfReadTries(okosynkConfiguration);
     this.fullyQualifiedInputFileName = normalizedFullyQualifiedInputFileName;
     this.okosynkConfiguration = okosynkConfiguration;
     this.batchType = batchType;
@@ -264,16 +258,6 @@ public class MeldingLinjeSftpReader
     return uri;
   }
 
-  private static int getRetryWaitTimeInMilliseconds(
-      final IOkosynkConfiguration okosynkConfiguration) {
-    return okosynkConfiguration
-        .getRequiredInt(Constants.FILE_READER_RETRY_WAIT_TIME_IN_MILLISECONDS_KEY);
-  }
-
-  private static int getMaxNumberOfReadTries(final IOkosynkConfiguration okosynkConfiguration) {
-    return okosynkConfiguration.getRequiredInt(Constants.FILE_READER_MAX_NUMBER_OF_READ_TRIES_KEY);
-  }
-
   private static String getFtpInputFilePath(
       final IOkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE batchType) throws ConfigureOrInitializeOkosynkIoException {
@@ -335,66 +319,19 @@ public class MeldingLinjeSftpReader
              AuthenticationOkosynkIoException,
              EncodingOkosynkIoException {
 
-    List<String> meldinger = null;
+    final List<String> meldinger;
     SftpResourceContainer resourceContainer = null;
     try {
-      final int retryWaitTimeInMilliseconds = this.retryWaitTimeInMilliseconds;
-      int numberOfTriesDone = 0;
-      boolean shouldTryReadingTheInputFile = true;
-      while (shouldTryReadingTheInputFile) {
-        try {
-          logger.debug(
-              "About to call lesMeldingerFraFil "
-                  + "from the batch input file for the {}. time ...",
-              numberOfTriesDone + 1
-          );
-          if (resourceContainer != null) {
-            resourceContainer.free();
-          }
-          resourceContainer = createResourceContainer();
-          meldinger = lesMeldingerFraFil(resourceContainer);
-          numberOfTriesDone++;
-          shouldTryReadingTheInputFile = false;
-        } catch (IoOkosynkIoException | NotFoundOkosynkIoException okosynkIoException) {
-          numberOfTriesDone++;
-
-          if (numberOfTriesDone < this.maxNumberOfReadTries) {
-            final String msg =
-                System.lineSeparator()
-                    + "I have tried reading the input file {}"
-                    + " times, and I will not give up until I have tried {}"
-                    + " times."
-                    + System.lineSeparator()
-                    + "I will try again in {}"
-                    + " ms. Until then, I will take a nap."
-                    + System.lineSeparator();
-            logger.warn(
-                msg,
-                numberOfTriesDone,
-                this.maxNumberOfReadTries,
-                retryWaitTimeInMilliseconds);
-            try {
-              logger.debug("Going to sleep, good night!");
-              Thread.sleep(retryWaitTimeInMilliseconds);
-              logger.debug("Good morning, I just woke up again!");
-            } catch (InterruptedException ex) {
-              logger.warn(
-                  "Ooooops, of unknown reasons, I was waked up before {} "
-                      + "ms had passed.",
-                  retryWaitTimeInMilliseconds);
-            }
-            logger.info("I will try re-reading...");
-          } else {
-            final String msg = "maxNumberOfTries: " + this.maxNumberOfReadTries
-                + ", retryWaitTimeInMilliseconds: " + retryWaitTimeInMilliseconds;
-            throw okosynkIoException;
-          }
-        } catch (AuthenticationOkosynkIoException| ConfigureOrInitializeOkosynkIoException | EncodingOkosynkIoException e) {
-          throw e;
-        }
-      }
+      resourceContainer = createResourceContainer();
+      meldinger = lesMeldingerFraFil(resourceContainer);
+    } catch (IoOkosynkIoException | NotFoundOkosynkIoException okosynkIoException) {
+      throw okosynkIoException;
+    } catch (AuthenticationOkosynkIoException| ConfigureOrInitializeOkosynkIoException | EncodingOkosynkIoException e) {
+      throw e;
     } finally {
-      resourceContainer.free();
+      if (resourceContainer != null) {
+        resourceContainer.free();
+      }
     }
 
     return meldinger;
@@ -457,16 +394,12 @@ public class MeldingLinjeSftpReader
             + System.lineSeparator()
             + "fully qualified file name  : "
             + (
-            this.fullyQualifiedInputFileName == null
+                this.fullyQualifiedInputFileName == null
                 ?
                 "null"
                 :
-                    this.fullyQualifiedInputFileName
-        ) + System.lineSeparator()
-            + "retryWaitTimeInMilliseconds: "
-            + this.retryWaitTimeInMilliseconds + System.lineSeparator()
-            + "maxNumberOfReadTries       : "
-            + this.maxNumberOfReadTries + System.lineSeparator()
+                this.fullyQualifiedInputFileName
+            )
         ;
   }
 
