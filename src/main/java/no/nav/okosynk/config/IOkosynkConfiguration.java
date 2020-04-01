@@ -1,8 +1,5 @@
 package no.nav.okosynk.config;
 
-import no.nav.okosynk.cli.AbstractAlertMetrics;
-import no.nav.okosynk.cli.AbstractBatchMetrics;
-
 public interface IOkosynkConfiguration {
 
   void setBoolean(final String key, final boolean value);
@@ -35,7 +32,4 @@ public interface IOkosynkConfiguration {
    * @param value
    */
   void setSystemProperty(final String key, final String value);
-
-  AbstractBatchMetrics getBatchMetrics(final Constants.BATCH_TYPE batchType);
-  AbstractAlertMetrics getAlertMetrics(final Constants.BATCH_TYPE batchType);
 }

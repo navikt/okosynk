@@ -7,7 +7,6 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.ConsumerStatistics;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ public abstract class AbstractAlertMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    assertDoesNotThrow(() -> okosynkConfiguration.getAlertMetrics(this.batchType));
+    assertDoesNotThrow(() -> AlertMetricsFactory.get(okosynkConfiguration, this.batchType));
   }
 
   @Test
@@ -41,7 +40,7 @@ public abstract class AbstractAlertMetricsTest {
 
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
 
-    final AbstractAlertMetrics alertMetrics = okosynkConfiguration.getAlertMetrics(this.batchType);
+    final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             alertMetrics.generateCheckTheLogAlertBasedOnBatchStatus(
@@ -58,7 +57,7 @@ public abstract class AbstractAlertMetricsTest {
 
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
 
-    final AbstractAlertMetrics alertMetrics = okosynkConfiguration.getAlertMetrics(this.batchType);
+    final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             alertMetrics.generateCheckTheLogAlertBasedOnBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL)
@@ -72,7 +71,7 @@ public abstract class AbstractAlertMetricsTest {
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractAlertMetrics alertMetrics = okosynkConfiguration.getAlertMetrics(this.batchType);
+    final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             alertMetrics.generateCheckTheLogAlertBasedOnBatchStatus(
@@ -87,7 +86,7 @@ public abstract class AbstractAlertMetricsTest {
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractAlertMetrics alertMetrics = okosynkConfiguration.getAlertMetrics(this.batchType);
+    final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             alertMetrics.generateCheckTheLogAlertBasedOnBatchStatus(

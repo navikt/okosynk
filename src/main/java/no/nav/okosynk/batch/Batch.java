@@ -2,6 +2,7 @@ package no.nav.okosynk.batch;
 
 import java.util.List;
 import no.nav.okosynk.cli.AbstractBatchMetrics;
+import no.nav.okosynk.cli.BatchMetricsFactory;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -76,7 +77,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
   public void run() {
 
     final AbstractBatchMetrics batchMetrics =
-      getOkosynkConfiguration().getBatchMetrics(getBatchType());
+        BatchMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
     BatchStatus batchStatus = BatchStatus.STARTED;
     setBatchStatus(batchStatus);
     logger.info("Batch " + getBatchName() + " har startet.");
@@ -84,6 +85,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
       final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
       final ConsumerStatistics consumerStatistics =
           getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
+
       // At this point in code the read and treat process has been successful,
       // and the input file may be renamed:
       batchStatus =
@@ -92,6 +94,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         BatchStatus.ENDED_WITH_OK
         :
         BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
+
       batchMetrics.setSuccessfulMetrics(consumerStatistics);
     } catch (InputDataNotFoundBatchException e) {
       batchStatus = BatchStatus.ENDED_WITH_WARNING_INPUT_DATA_NOT_FOUND;

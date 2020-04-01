@@ -2,9 +2,6 @@ package no.nav.okosynk.cli;
 
 import io.prometheus.client.Gauge;
 import no.nav.okosynk.batch.BatchStatus;
-import no.nav.okosynk.cli.os.OsAlertMetrics;
-import no.nav.okosynk.cli.ur.UrAlertMetrics;
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.slf4j.Logger;
@@ -32,17 +29,6 @@ public abstract class AbstractAlertMetrics extends AbstractMetrics {
 
     batchAlertGauge.set(0);
     pushAdd();
-  }
-
-  public static AbstractAlertMetrics getSingletonInstance(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType
-  ) {
-    if (Constants.BATCH_TYPE.UR.equals(batchType)) {
-      return UrAlertMetrics.getSingletonInstance(okosynkConfiguration);
-    } else {
-      return OsAlertMetrics.getSingletonInstance(okosynkConfiguration);
-    }
   }
 
   public void generateCheckTheLogAlertBasedOnBatchStatus(final BatchStatus batchStatus) {

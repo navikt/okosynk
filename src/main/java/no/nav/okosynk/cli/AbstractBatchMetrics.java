@@ -1,8 +1,6 @@
 package no.nav.okosynk.cli;
 
 import io.prometheus.client.Gauge;
-import no.nav.okosynk.cli.os.OsBatchMetrics;
-import no.nav.okosynk.cli.ur.UrBatchMetrics;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -19,17 +17,6 @@ public abstract class AbstractBatchMetrics extends AbstractMetrics {
   private final Gauge.Timer        durationGaugeTimer;
   private final Gauge              lastSuccessGauge;
   private       ConsumerStatistics consumerStatistics = null;
-
-  public static AbstractBatchMetrics getSingletonInstance(
-      final IOkosynkConfiguration okosynkConfiguration,
-      final Constants.BATCH_TYPE batchType
-  ) {
-    if (Constants.BATCH_TYPE.UR.equals(batchType)) {
-      return UrBatchMetrics.getSingletonInstance(okosynkConfiguration);
-    } else {
-      return OsBatchMetrics.getSingletonInstance(okosynkConfiguration);
-    }
-  }
 
   /**
    * Ref. setting 0: https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics

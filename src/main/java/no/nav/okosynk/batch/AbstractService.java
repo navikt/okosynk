@@ -1,6 +1,7 @@
 package no.nav.okosynk.batch;
 
 import no.nav.okosynk.cli.AbstractAlertMetrics;
+import no.nav.okosynk.cli.AlertMetricsFactory;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
@@ -13,6 +14,10 @@ import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TODO: Consider removing the whole service layer and let cliMain caLL batch directly.
+ * @param <MELDINGSTYPE>
+ */
 public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
@@ -70,7 +75,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
   }
 
   public AbstractAlertMetrics getAlertMetrics() {
-    return getOkosynkConfiguration().getAlertMetrics(getBatchType());
+    return AlertMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
   }
 
   public Constants.BATCH_TYPE getBatchType() {

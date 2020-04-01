@@ -1,1 +1,5 @@
 *.sh text eol=lf
+* text=auto
+*.java text
+# Ignore all differences in line endings
+*        -crlf

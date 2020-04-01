@@ -1,11 +1,5 @@
 package no.nav.okosynk.config;
 
-import no.nav.okosynk.cli.AbstractAlertMetrics;
-import no.nav.okosynk.cli.AbstractBatchMetrics;
-import no.nav.okosynk.cli.FakeAlertMetrics;
-import no.nav.okosynk.cli.FakeBatchMetrics;
-import no.nav.okosynk.config.IOkosynkConfiguration;
-
 public class FakeOkosynkConfiguration
     implements IOkosynkConfiguration {
 
@@ -67,15 +61,5 @@ public class FakeOkosynkConfiguration
   public String getString(final String key, final String defaulValue) {
 
     return System.getProperty(key, defaulValue);
-  }
-
-  @Override
-  public AbstractBatchMetrics getBatchMetrics(final Constants.BATCH_TYPE batchType) {
-    return new FakeBatchMetrics(this, batchType);
-  }
-
-  @Override
-  public AbstractAlertMetrics getAlertMetrics(final Constants.BATCH_TYPE batchType) {
-    return new FakeAlertMetrics(this, batchType);
   }
 }

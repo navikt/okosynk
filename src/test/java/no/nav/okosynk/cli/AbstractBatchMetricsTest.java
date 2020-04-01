@@ -1,12 +1,8 @@
 package no.nav.okosynk.cli;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
-import no.nav.okosynk.cli.ur.UrBatchMetrics;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -31,7 +27,7 @@ public abstract class AbstractBatchMetricsTest {
     enteringTestHeaderLogger.debug(null);
 
    final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    assertDoesNotThrow(() -> okosynkConfiguration.getBatchMetrics(this.batchType));
+    assertDoesNotThrow(() -> BatchMetricsFactory.get(okosynkConfiguration, this.batchType));
   }
 
   @Test
@@ -43,7 +39,7 @@ public abstract class AbstractBatchMetricsTest {
 
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
 
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             batchMetrics.setSuccessfulMetrics(ConsumerStatistics.zero(this.batchType.getName()))
@@ -57,7 +53,7 @@ public abstract class AbstractBatchMetricsTest {
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () ->
             batchMetrics.setSuccessfulMetrics(ConsumerStatistics.zero(this.batchType.getName()))
@@ -71,7 +67,7 @@ public abstract class AbstractBatchMetricsTest {
 
     System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () -> batchMetrics.setUnsuccessfulMetrics()
     );
@@ -84,7 +80,7 @@ public abstract class AbstractBatchMetricsTest {
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     assertDoesNotThrow(
         () -> batchMetrics.setUnsuccessfulMetrics()
     );
@@ -97,7 +93,7 @@ public abstract class AbstractBatchMetricsTest {
 
     System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     batchMetrics.setUnsuccessfulMetrics();
     assertDoesNotThrow(
         () -> batchMetrics.log()
@@ -111,7 +107,7 @@ public abstract class AbstractBatchMetricsTest {
 
     System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
     final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-    final AbstractBatchMetrics batchMetrics = okosynkConfiguration.getBatchMetrics(this.batchType);
+    final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
     batchMetrics.setUnsuccessfulMetrics();
     assertDoesNotThrow(
         () -> batchMetrics.log()
