@@ -56,6 +56,14 @@
     <maven-project-info-reports-plugin.version>2.7</maven-project-info-reports-plugin.version>
     <wiremock.version>2.26.3</wiremock.version>
 
+    <!-- Transitive dependencies that have to be updated: -->
+    <!--
+    SNYK recommendation:
+    <jetty-http.version>[9.4.28.v20200408,)</jetty-http.version>
+    -->
+    <guava.version>[29.0-jre,)</guava.version>
+    <mina-core.version>[2.1.3,)</mina-core.version>
+
   </properties>
 
   <dependencyManagement>
@@ -175,6 +183,29 @@
             <artifactId>jsr305</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <!-- Transitive dependencies that have to be updated: -->
+      <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-http -->
+      <!--
+      SNYK recommendation:
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-http</artifactId>
+        <version>${jetty-http.version}</version>
+      </dependency>
+      -->
+      <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.mina/mina-core -->
+      <dependency>
+        <groupId>org.apache.mina</groupId>
+        <artifactId>mina-core</artifactId>
+        <version>${mina-core.version}</version>
       </dependency>
 
     </dependencies>
