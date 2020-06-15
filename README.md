@@ -10,8 +10,8 @@ disse oppgavene som skal ligge i oppgave-applikasjonen.
 
 Okosynk er en batchjobb som skal kjøre kl. 06:00 (Norsk tid) (altså UTC 5:00 om vinteren og UTC 4:00 om sommeren) hver morgen.
 Den kjører på nais-plattformen i to miljøer:
-1) Cluster `preprod-fss`, i namespace `okosynk`
-2) Cluster `prod-fss`, i namespace `okosynk`
+1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
+2) Cluster `prod-fss`, i namespace `oppgavehandtering`
 
 ### Lokal utvikling
 
@@ -147,15 +147,15 @@ Du har en version `<version>` av Okosynk-docker-imaget som du
 Da skal du gjøre som følger:
 
 Først:<BR/>
-Gjør en `git pull` av dette repoet (`okosynk-deploy`) for å få siste versjon (i tilfelle noen har gjort endringer).
+Gjør en `git pull` av dette repoet (`okosynk`) for å få siste versjon (i tilfelle noen har gjort endringer).
 
 |                                       | Preprod                | or   | Prod                |                             | Note |
 | :------------------------------------ | :--------------------- | ---- | ------------------- | :-------------------------- | ---- |
 | ```CD <project root>```               |                        |      |                     |                             | 5)   |
 | ```Editér```                          | ```app-preprod.yaml``` | or   | ```app-prod.yaml``` |                             | 2)   |
 | ```kubectl config use-context```      | ```preprod-fss``` 3)   | or   | ```prod-fss``` 3)   |                             |      |
-| ```kubectl config set-context```      | ```preprod-fss``` 3)   | or   | ```prod-fss``` 3)   | ```--namespace="okosynk"``` |      |
-| ```kubectl -n okosynk apply -f ``` 4) | ```app-preprod.yaml``` | or   | ```app-prod.yaml``` |                             |      |
+| ```kubectl config set-context```      | ```preprod-fss``` 3)   | or   | ```prod-fss``` 3)   | ```--namespace="oppgavehandtering"``` |      |
+| ```kubectl -n oppgavehandtering apply -f ``` 4) | ```app-preprod.yaml``` | or   | ```app-prod.yaml``` |                             |      |
 
 2\) Feltet som heter `image` skal oppdateres til `repo.adeo.no:5443/okosynk:<version>`<BR/>
 3\) Context (== cluster) name<BR/>
@@ -166,7 +166,7 @@ Gjør en `git pull` av dette repoet (`okosynk-deploy`) for å få siste versjon 
 
 ```
 kubectl config use-context "<riktig cluster>" (enten "preprod-fss" eller "prod-fss")
-kubectl config set-context "<riktig cluster>" --namespace="<riktig namespace>" (<riktig namespace> er "okosynk" uavhengig av om det er preprod eller prod)
+kubectl config set-context "<riktig cluster>" --namespace="<riktig namespace>" (<riktig namespace> er "oppgavehandtering" uavhengig av om det er preprod eller prod)
 ```
 
 Ved å kjøre
@@ -252,7 +252,7 @@ Følgene kommando er heller ikke å forakte:<BR/>
 |                                                              | Preprod              | or   | Prod              |                             | Note |
 | :----------------------------------------------------------- | :------------------- | ---- | :---------------- | :-------------------------- | ---- |
 | ```kubectl config use-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) |                             |      |
-| ```kubectl config set-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) | ```--namespace="okosynk"``` |      |
+| ```kubectl config set-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) | ```--namespace="oppgavehandtering"``` |      |
 | ```kubectl create job --from=cronjob/okosynk "oor-manually-started-2019-03-11-13-07"``` |                      |      |                   |                             |      |
 
 ### Slett en jobb
