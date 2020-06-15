@@ -2,7 +2,7 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: okosynk
-  namespace: okosynk
+  namespace: oppgavehandtering
 spec:
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
