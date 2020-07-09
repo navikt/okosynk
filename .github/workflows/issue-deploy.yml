@@ -1,0 +1,137 @@
+name: issue-deploy
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  parse-title-checkout:
+    name: issue-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: create tags from issue title
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          IMAGE_TAG_USED=""
+          BRANCH_NAME_USED=""
+          DEPLOY_TAG=$(echo $ISSUE_TITLE | awk '{print $1}'| awk -F: '{print $2}')
+          IMAGE_TAG=$(echo $ISSUE_TITLE | awk '{print $2}'| awk -FImage: '{print $2}')
+          COMMIT_TAG=$(echo $ISSUE_TITLE | awk '{print $2}'| awk -FCommit: '{print $2}')
+
+          echo ISSUE_TITLE:$ISSUE_TITLE
+          echo DEPLOY_TAG:$DEPLOY_TAG
+          echo IMAGE_TAG:$IMAGE_TAG
+          echo COMMIT_TAG:$COMMIT_TAG
+
+          if [ -z $IMAGE_TAG ] && [ -z $COMMIT_TAG ]
+          then
+            echo "syntax error for image or commit tag in issue title"
+            exit 1
+          fi
+
+          if ! [[ $DEPLOY_TAG =~ .*(prod|q1).* ]]
+          then
+            echo "syntax error for deploy tag in issue title"
+            exit 1
+          fi
+
+          if ! [ -z $IMAGE_TAG ]
+            then
+              IMAGE_TAG_USED="yes"
+          fi
+
+          if [[ $COMMIT_TAG =~ ^[A-Za-z] ]]
+            then
+              echo "commit tag is branch name and not commit sha"
+              BRANCH_NAME_USED="yes"
+          fi
+
+          echo "::set-env name=DEPLOY_TAG::$DEPLOY_TAG"
+          echo "::set-env name=IMAGE_TAG::$IMAGE_TAG"
+          echo "::set-env name=COMMIT_TAG::$COMMIT_TAG"
+          echo "::set-env name=IMAGE_TAG_USED::$IMAGE_TAG_USED"
+          echo "::set-env name=BRANCH_NAME_USED::$BRANCH_NAME_USED"
+
+          echo IMAGE_TAG_USED::$IMAGE_TAG_USED
+          echo BRANCH_NAME_USED::$BRANCH_NAME_USED
+      - name: fetch commit sha from tag
+        if: env.BRANCH_NAME_USED== ''
+        run: |
+          if [ -z $IMAGE_TAG_USED ]
+          then
+            IMAGE_TAG=$COMMIT_TAG
+            COMMIT_TAG=$(echo $COMMIT_TAG | awk -F- '{print $2}')
+          else
+            COMMIT_TAG=$(echo $IMAGE_TAG | awk -F- '{print $2}')
+          fi
+          echo "::set-env name=IMAGE_TAG::$IMAGE_TAG"
+          echo "::set-env name=COMMIT_TAG::$COMMIT_TAG"
+          echo IMAGE_TAG:$IMAGE_TAG
+          echo COMMIT_TAG:$COMMIT_TAG
+      - name: checkout
+        uses: actions/checkout@v1
+        with:
+          ref: ${{env.COMMIT_TAG}}
+      - name: create docker tag
+        run: |
+          if ! [ -z $BRANCH_NAME_USED ]
+          then
+            COMMIT_SHA=$(git rev-parse --short HEAD)
+            DATE=$(git show -s --pretty=format:'%cd' --date=format:'%Y.%m.%d' $COMMIT_SHA)
+            IMAGE_TAG=$DATE-$COMMIT_SHA
+          fi
+
+          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
+          IMAGE=$DOCKER_IMAGE:$IMAGE_TAG
+          echo "::set-env name=IMAGE::$IMAGE"
+          echo IMAGE:$IMAGE
+      - name: cache maven dependencies
+        if: env.IMAGE_TAG_USED == ''
+        uses: actions/cache@preview
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: setup-java
+        if: env.IMAGE_TAG_USED == ''
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+      - name: build and test app
+        if: env.IMAGE_TAG_USED == ''
+        env:
+          GITHUB_USERNAME: x-access-token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_GPR_TOKEN: ${{ secrets.MAVEN_GPR_TOKEN}}
+        run: |
+          mvn --settings ./.github/.m2/settings.xml clean install
+      - name: build docker image
+        if: env.IMAGE_TAG_USED == ''
+        run: |
+          docker build --tag $IMAGE .
+      - name: login to Github Package Registry
+        if: env.IMAGE_TAG_USED == ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
+      - name: push docker image
+        if: env.IMAGE_TAG_USED == ''
+        run: |
+          docker push $IMAGE
+      - name: deploy to q1
+        if: success() && contains(env.DEPLOY_TAG, 'q1')
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: dev-fss
+          RESOURCE: nais/app-preprod.yaml
+      - name: deploy to prod
+        if: success() && contains(env.DEPLOY_TAG, 'prod')
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: prod-fss
+          RESOURCE: nais/app-prod.yaml
