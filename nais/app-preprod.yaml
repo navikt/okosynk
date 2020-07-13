@@ -11,6 +11,8 @@ spec:
     spec:
       template:
         spec:
+          imagePullSecrets:
+            - name: gpr-credentials
           volumes:
             - name: okosynk
               secret:
