@@ -64,7 +64,7 @@ spec:
                 - name: REST_STS_URL
                   value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
                 - name: PUSH_GATEWAY_ADDRESS
-                  value: nais-prometheus-prometheus-pushgateway.nais:9091
+                  value: nais-prometheus-pushgateway.nais:9091
                 - name: SRVBOKOSYNK_USERNAME
                   value: srvbokosynk
                 - name: SRVBOKOSYNK_PASSWORD
