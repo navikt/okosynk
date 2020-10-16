@@ -24,7 +24,7 @@
     <fasterxml.jackson.version>2.10.3</fasterxml.jackson.version>
     <guava.version>29.0-jre</guava.version>
     <hamcrest.version>1.3</hamcrest.version>
-    <httpclient.version>4.5.12</httpclient.version>
+    <httpclient.version>4.5.13</httpclient.version>
     <jaCoCoArgLine/>
     <jacoco-maven-plugin.version>${jacoco.version}</jacoco-maven-plugin.version>
     <jacoco.version>0.8.3</jacoco.version>
