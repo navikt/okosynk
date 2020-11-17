@@ -46,11 +46,11 @@ jobs:
               BRANCH_NAME_USED="yes"
           fi
 
-          echo "::set-env name=DEPLOY_TAG::$DEPLOY_TAG"
-          echo "::set-env name=IMAGE_TAG::$IMAGE_TAG"
-          echo "::set-env name=COMMIT_TAG::$COMMIT_TAG"
-          echo "::set-env name=IMAGE_TAG_USED::$IMAGE_TAG_USED"
-          echo "::set-env name=BRANCH_NAME_USED::$BRANCH_NAME_USED"
+          echo "DEPLOY_TAG=$DEPLOY_TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "COMMIT_TAG=$COMMIT_TAG" >> $GITHUB_ENV
+          echo "IMAGE_TAG_USED=$IMAGE_TAG_USED" >> $GITHUB_ENV
+          echo "BRANCH_NAME_USED=$BRANCH_NAME_USED" >> $GITHUB_ENV
 
           echo IMAGE_TAG_USED::$IMAGE_TAG_USED
           echo BRANCH_NAME_USED::$BRANCH_NAME_USED
@@ -64,8 +64,8 @@ jobs:
           else
             COMMIT_TAG=$(echo $IMAGE_TAG | awk -F- '{print $2}')
           fi
-          echo "::set-env name=IMAGE_TAG::$IMAGE_TAG"
-          echo "::set-env name=COMMIT_TAG::$COMMIT_TAG"
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "COMMIT_TAG=$COMMIT_TAG" >> $GITHUB_ENV
           echo IMAGE_TAG:$IMAGE_TAG
           echo COMMIT_TAG:$COMMIT_TAG
       - name: checkout
@@ -84,7 +84,7 @@ jobs:
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
           DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
           IMAGE=$DOCKER_IMAGE:$IMAGE_TAG
-          echo "::set-env name=IMAGE::$IMAGE"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
           echo IMAGE:$IMAGE
       - name: cache maven dependencies
         if: env.IMAGE_TAG_USED == ''
