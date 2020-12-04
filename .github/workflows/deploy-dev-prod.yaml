@@ -30,9 +30,9 @@ jobs:
           DOCKER_TAG=$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)
           DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
           IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
-          echo "::set-env name=APPLICATION::$APPLICATION"
-          echo "::set-env name=DOCKER_TAG::$DOCKER_TAG"
-          echo "::set-env name=IMAGE::$IMAGE"
+          echo "APPLICATION=$APPLICATION" >> $GITHUB_ENV
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
       - name: build docker image
         run: |
           docker build --tag $IMAGE .
