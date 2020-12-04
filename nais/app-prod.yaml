@@ -9,6 +9,7 @@ spec:
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
     spec:
+      ttlSecondsAfterFinished: 432000
       template:
         spec:
           imagePullSecrets:
