@@ -1,0 +1,8 @@
+{
+  "feilet": 0,
+  "suksess": 1,
+  "totalt": 1,
+  "data": {
+    "200": [{{jsonPath request.body '$.oppgaver.[0].id'}}]
+  }
+}

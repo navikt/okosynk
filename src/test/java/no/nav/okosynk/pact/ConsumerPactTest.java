@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
+
 
 @ExtendWith(PactConsumerTestExt.class)
 @PactTestFor(providerName = "OppgaveResource")
@@ -80,7 +82,7 @@ public class ConsumerPactTest {
         HttpResponse httpResponse = Request.Post(mockServer.getUrl() + "/api/v1/oppgaver")
                 .setHeader("Authorization", "Basic srvbokosynk001")
                 .setHeader("Accept", "application/json")
-                .setHeader("X-Correlation-ID", "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
+                .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .bodyString(createOpprettOppgaveJson(), ContentType.APPLICATION_JSON)
                 .execute()
                 .returnResponse();
@@ -92,14 +94,14 @@ public class ConsumerPactTest {
         HttpResponse httpResponse = Request.Get(mockServer.getUrl() + "/api/v1/oppgaver?opprettetAv=srvbokosynk001&tema=OKO&statuskategori=AAPEN")
                 .setHeader("Authorization", "Basic srvbokosynk001")
                 .setHeader("Accept", "application/json")
-                .setHeader("X-Correlation-ID", "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
+                .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .execute()
                 .returnResponse();
 
         httpResponse = Request.Get(mockServer.getUrl() + "/api/v1/oppgaver?opprettetAv=srvbokosynk002&tema=OKO&statuskategori=AAPEN")
                 .setHeader("Authorization", "Basic srvbokosynk001")
                 .setHeader("Accept", "application/json")
-                .setHeader("X-Correlation-ID", "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
+                .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .execute()
                 .returnResponse();
 
@@ -125,7 +127,7 @@ public class ConsumerPactTest {
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Basic srvbokosynk001");
         headers.put("Accept", "application/json");
-        headers.put("X-Correlation-ID", "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb");
+        headers.put(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb");
         return headers;
     }
 }

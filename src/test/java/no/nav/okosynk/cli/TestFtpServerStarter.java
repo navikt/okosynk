@@ -1,21 +1,21 @@
 package no.nav.okosynk.cli;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.testutil.TestFtpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FtpServerTestStarter
-    implements IStartableAndStoppable {
+public class TestFtpServerStarter
+        implements IStartableAndStoppable {
 
     // =========================================================================
-    private static final Logger logger = LoggerFactory.getLogger(FtpServerTestStarter.class);
-    // =========================================================================
-    private TestFtpServer testFtpServer;
+    private static final Logger logger = LoggerFactory.getLogger(TestFtpServerStarter.class);
     // =========================================================================
 
-    public FtpServerTestStarter(final IOkosynkConfiguration okosynkConfiguration) {
-        this.testFtpServer = new TestFtpServer();
+    private AbstractTestFtpServer testFtpServer;
+    // =========================================================================
+
+    public TestFtpServerStarter(final IOkosynkConfiguration okosynkConfiguration) {
+        this.testFtpServer = new TestSftpServer();
     }
 
     @Override

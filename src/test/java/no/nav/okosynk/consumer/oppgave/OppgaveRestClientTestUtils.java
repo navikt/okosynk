@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyCollection;
@@ -237,7 +238,7 @@ class OppgaveRestClientTestUtils {
   static OppgaveRestClient prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail()
       throws IOException {
 
-    System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
     when(mockedOppgaveRestClient.finnOppgaver(anySet())).thenCallRealMethod();
     when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
@@ -251,7 +252,7 @@ class OppgaveRestClientTestUtils {
 
   static OppgaveRestClient prepareAMockedOpprettOppgaverRestClientBaseThatDoesNotFail() {
 
-    System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
     when(mockedOppgaveRestClient.opprettOppgaver(anyCollection())).thenCallRealMethod();
     when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
@@ -265,7 +266,7 @@ class OppgaveRestClientTestUtils {
 
   static OppgaveRestClient prepareAMockedPatchOppgaverRestClientBaseThatDoesNotFail() {
 
-    System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
     when(mockedOppgaveRestClient.patchOppgaver(anySet(), anyBoolean())).thenCallRealMethod();
     when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
@@ -298,7 +299,7 @@ class OppgaveRestClientTestUtils {
   private static OppgaveRestClient prepareAMockedOpprettOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400()
       throws IOException {
 
-    System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
     when(mockedOppgaveRestClient.opprettOppgaver(anyCollection())).thenCallRealMethod();
     when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
@@ -315,7 +316,7 @@ class OppgaveRestClientTestUtils {
   private static OppgaveRestClient prepareAMockedPatchOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400()
       throws IOException {
 
-    System.setProperty("OPPGAVE_URL", "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
     final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
     when(mockedOppgaveRestClient.patchOppgaver(anyCollection(), anyBoolean())).thenCallRealMethod();
     when(mockedOppgaveRestClient.getUsernamePasswordCredentials())

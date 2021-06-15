@@ -8,16 +8,10 @@ disse oppgavene som skal ligge i oppgave-applikasjonen.
 * Oppgaver som ligger både i oppgave-applikasjonen og i flatfil oppdateres med ny informasjon.
 * Oppgaver som ligger i flatfil men ikke i oppgave-applikasjonen blir opprettet i oppgave-applikasjonen.
 
-Okosynk er en batchjobb som skal kjøre kl. 06:00 (Norsk tid) (altså UTC 5:00 om vinteren og UTC 4:00 om sommeren) hver morgen.
+Okosynk er en batchjobb som kjører kl. UTC 4:00 hver morgen hele året (altså kl 05:00 om vinteren og kl 0:600 om sommeren norsk tid).
 Den kjører på nais-plattformen i to miljøer:
 1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
 2) Cluster `prod-fss`, i namespace `oppgavehandtering`
-
-### Lokal utvikling
-
-Hvis du har gjort endringer i koden, kjør `docker-compose build`.
-Kjør `docker-compose run okosynk` for å kjøre appen, slik
-som oppført i docker-compose.yml.
 
 ## Lokal testing
 1. Kopiér `web/src/test/resources/environment-test.properties.default` til `environment-test.properties` og editér innholdet i henhold til hva som ønskes testet.
@@ -108,59 +102,13 @@ som oppført i docker-compose.yml.
        SAML-token til en LTPA-token.
     0. En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
 
-# Bygg av okosynk
-
-1. Du trenger Docker installert på maskinen.
-2. CD &lt;project root&gt;/
-3. Kjør `docker build -t okosynk .` (Legg godt merke til at kommandoen slutter med blank og punktum):
-Denne kommandoen vil bygge Docker-imaget basert på det som står i &lt;project root&gt;/Dockerfile.
-
-(Hvis du har problemer med å kjøre denne docker-kommandoen, forsøk å kjøre factory reset med påfølgende restart. Husk også at hvis du kjører factory reset, da må du også sette proxy-konfigurasjonen på nytt, se under. Dessverre et dette en fix som tar rundt en kvart dag :-( )
-### Last opp bygd artifakt
-Husk: Windows: Docker |  Settings | Proxies: ALT det følgende må settes:
-![Docker settings dialog box](./docker.settings.proxies.jpg)
-
-Use same for both: ```http://webproxy-utvikler.nav.no:8088```
-Use no proxy for : ```localhost,127.0.0.1,*.adeo.no,.local,.adeo.no,.nav.no,.aetat.no,.devillo.no,.oera.no,devel```
-
-Finn på en passende `<versjon>`, og kjør (legg godt merke til at den første kommandoen slutter med blank og punktum):
-```
-docker build -t repo.adeo.no:5443/okosynk:<version> .
-docker login -u <uid> -p <password> repo.adeo.no:5443
-docker push repo.adeo.no:5443/okosynk:<version>
-```
-(The uid and pwd are your ldap/AD NAV user logon ident, like e.g. R149852)
-### Kubernetes deployment
-
-If you have trouble accessing ```kubectl``` through the [NAV Tunnel](https://github.com/navikt/navtunnel), try update your config like this (having your kubeconfigs directory as the current one):
-
-```git reset --hard && git checkout master && git pull```
-
-Ref.: [kubectl](https://github.com/navikt/kubeconfigs)
-
-Husk: Teamet som forvalter okosynk må ha definert en
-korresponderende gruppe her: [Teams](https://navno.sharepoint.com/sites/Bestillinger/Lists/Nytt%20Team/AllItems.aspx). Og alle teamets medlemmer (levende mennesker av kjøtt og blod) må legges inn som medlemmer af gruppas eier her: [Legg til medlemmer](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/GroupsManagementMenuBlade/AllGroups)
-
-Situasjon er sannsynligvis slik:<BR/>
-Du har en version `<version>` av Okosynk-docker-imaget som du
-ønsker å deploye til Kubernetes.<BR/>
-Da skal du gjøre som følger:
-
-Først:<BR/>
-Gjør en `git pull` av dette repoet (`okosynk`) for å få siste versjon (i tilfelle noen har gjort endringer).
-
-|                                       | Preprod                | or   | Prod                |                             | Note |
-| :------------------------------------ | :--------------------- | ---- | ------------------- | :-------------------------- | ---- |
-| ```CD <project root>```               |                        |      |                     |                             | 5)   |
-| ```Editér```                          | ```app-preprod.yaml``` | or   | ```app-prod.yaml``` |                             | 2)   |
-| ```kubectl config use-context```      | ```preprod-fss``` 3)   | or   | ```prod-fss``` 3)   |                             |      |
-| ```kubectl config set-context```      | ```preprod-fss``` 3)   | or   | ```prod-fss``` 3)   | ```--namespace="oppgavehandtering"``` |      |
-| ```kubectl -n oppgavehandtering apply -f ``` 4) | ```app-preprod.yaml``` | or   | ```app-prod.yaml``` |                             |      |
-
-2\) Feltet som heter `image` skal oppdateres til `repo.adeo.no:5443/okosynk:<version>`<BR/>
-3\) Context (== cluster) name<BR/>
-4\) -n angir namespace, som er det samme for preprod og prod<BR/>
-5\) In this repository
+# Bygg og deployment
+Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
+Dette skjer på GitHub vha. action scriptene
+`<PROJECT ROOT>/.github/workflows/deploy-dev-prod.yaml` 
+og
+`<PROJECT ROOT>/.github/workflows/issue-deploy.yml`.
+ Hvis dette ikke er ønskelig, bør man vurdere å arbeide på en egen grein.
 
 ## Sjekk hvordan det står til i drift
 
@@ -176,7 +124,7 @@ Ved å kjøre
 får man en liste over alle cronjobs i dette
 namespacet, og okosynk skal være blant dem.
 
-Man får et resultat ala det her:
+Man får et resultat alla det her:
 
 ```
 NAME      SCHEDULE    SUSPEND   ACTIVE    LAST SCHEDULE   AGE
@@ -258,6 +206,15 @@ Følgene kommando er heller ikke å forakte:<BR/>
 ### Slett en jobb
 
 ```kubectl delete job oor-manually-started-2020-01-10-18-18```
+
+### General practical commands
+- Which ports are being listened to (e.g. to see whether the SFTP server is running and loistening to the expected port)
+<BR/>
+```sudo lsof -i -P | grep -i "listen"``` (MAC)
+<BR/>
+and
+<BR/>
+```netstat -an -ptcp | grep LISTEN``` (MAC)
 
 ### Logging
 Hver batch har sin egen logg-fil, i tillegg logger hver batch alle tjenestekall til sensitiv logg.

@@ -1,0 +1,313 @@
+package no.nav.okosynk.cli;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.oppgave.FinnOppgaveResponse;
+import no.nav.okosynk.consumer.oppgave.OppgaveDto;
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
+import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+
+public class CliMainWithTestScope extends CliMain {
+
+    private static final Logger logger = LoggerFactory.getLogger(CliMainWithTestScope.class);
+
+    private IStartableAndStoppable testFtpServerStarter = null;
+    private Collection<WireMockServer> mockedProviderServers;
+
+    private CliMainWithTestScope(final String applicationPropertiesFileName) {
+        super(applicationPropertiesFileName);
+    }
+
+    public static void main(final String[] args) throws Exception {
+        CliMain.runMain(args, CliMainWithTestScope::new);
+    }
+
+    private static Collection<WireMockServer> startMockedProviderServers(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+        final Collection<WireMockServer> mockedProviderServers = new ArrayList<>();
+        mockedProviderServers.add(CliMainWithTestScope.mockPrometheusProviderAndStartIt(okosynkConfiguration));
+        mockedProviderServers.add(CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(okosynkConfiguration));
+        mockedProviderServers.add(CliMainWithTestScope.mockStsProviderAndStartIt(okosynkConfiguration));
+        mockedProviderServers.add(CliMainWithTestScope.mockOppgaveProviderAndStartIt(okosynkConfiguration));
+
+        return mockedProviderServers;
+    }
+
+    private static WireMockServer mockPrometheusProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+
+        final String pushGatewayEndpointNameAndPort =
+                okosynkConfiguration.getString(
+                        Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY,
+                        "http://localhost:5678"
+                );
+        final String urlAsString =
+                (
+                        pushGatewayEndpointNameAndPort.startsWith("http://") ||
+                                pushGatewayEndpointNameAndPort.startsWith("https://")
+                ) ? pushGatewayEndpointNameAndPort : "http://" + pushGatewayEndpointNameAndPort;
+        final URL url = new URL(urlAsString);
+        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
+        wireMockConfiguration.port(url.getPort());
+        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
+        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logPrometheusRequest);
+        wireMockServer.start();
+        CliMainWithTestScope.mockPrometheusProviderAndStartIt(wireMockServer, "/metrics/job/kubernetes-pods/cronjob/bokosynk001");
+        CliMainWithTestScope.mockPrometheusProviderAndStartIt(wireMockServer, "/metrics/job/kubernetes-pods/cronjob/bokosynk002");
+
+        return wireMockServer;
+    }
+
+    private static void mockPrometheusProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext) {
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .post(WireMock.urlEqualTo(urlContext))
+                                .willReturn(
+                                        aResponse()
+                                                .withStatus(200)
+                                )
+                )
+        ;
+    }
+
+    private static void logPrometheusRequest(
+            final com.github.tomakehurst.wiremock.http.Request request,
+            final com.github.tomakehurst.wiremock.http.Response response) {
+        logger.info("*** Mocked *** Prometheus request body: \n{}", request.getBodyAsString());
+    }
+
+    private static WireMockServer mockAktoerRegisterProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+        final String restAktoerRegisterUrl =
+                okosynkConfiguration.getRequiredString(Constants.REST_AKTOER_REGISTER_URL_KEY);
+        final URL url = new URL(restAktoerRegisterUrl);
+        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
+        wireMockConfiguration.port(url.getPort());
+        wireMockConfiguration.extensions(new ResponseTemplateTransformer(true));
+        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
+        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logAktoerRegisterRequest);
+        wireMockServer.start();
+        CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(wireMockServer);
+
+        return wireMockServer;
+    }
+
+    private static void mockAktoerRegisterProviderAndStartIt(final WireMockServer wireMockServer) {
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .get(WireMock.urlEqualTo("/aktoerregister/api/v1/identer?identgruppe=AktoerId&gjeldende=true"))
+                                .withQueryParam("identgruppe", equalTo("AktoerId"))
+                                .withQueryParam("gjeldende", equalTo("true"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer "))
+                                .withHeader(AktoerRestClient.NAV_CALLID, matching(".*"))
+                                .withHeader(AktoerRestClient.NAV_PERSONIDENTER, matching(".*"))
+                                .withHeader(AktoerRestClient.NAV_CONSUMER_ID, matching(".*"))
+                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile("aktoerRegisterResponseFnrToAktoerId.json")
+                                                .withStatus(200)
+                                )
+                )
+        ;
+    }
+
+    private static void logAktoerRegisterRequest(
+            final com.github.tomakehurst.wiremock.http.Request request,
+            final com.github.tomakehurst.wiremock.http.Response response) {
+        logger.info("*** Mocked *** AktoerRegister request absoluteUrl: {}", request.getAbsoluteUrl());
+        logger.info("*** Mocked *** AktoerRegister request headers: \n{}", request.getHeaders());
+        logger.info("*** Mocked *** AktoerRegister request parameter: {}", request.queryParameter("identgruppe"));
+        logger.info("*** Mocked *** AktoerRegister request parameter: {}", request.queryParameter("gjeldende"));
+        logger.info("*** Mocked *** AktoerRegister response body: {}", new String(response.getBody()));
+    }
+
+    private static WireMockServer mockStsProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+        final String stsUrl = okosynkConfiguration.getRequiredString(Constants.REST_STS_URL_KEY);
+        final URL url = new URL(stsUrl);
+        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
+        wireMockConfiguration.port(url.getPort());
+        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
+        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logStsRequest);
+        wireMockServer.start();
+        CliMainWithTestScope.mockStsProviderAndStartIt(wireMockServer, "/rest/v1/sts/token?grant_type=client_credentials&scope=openid");
+
+        return wireMockServer;
+    }
+
+    private static void mockStsProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext) {
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .get(WireMock.urlEqualTo(urlContext))
+                                .withQueryParam("grant_type", equalTo("client_credentials"))
+                                .withQueryParam("scope", equalTo("openid"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile("stsResponse.json")
+                                                .withStatus(200)
+                                )
+                )
+        ;
+    }
+
+    private static void logStsRequest(
+            final com.github.tomakehurst.wiremock.http.Request request,
+            final com.github.tomakehurst.wiremock.http.Response response) {
+        logger.info("*** Mocked *** Sts parameter: {}", request.queryParameter("grant_type"));
+        logger.info("*** Mocked *** Sts parameter: {}", request.queryParameter("scope"));
+        logger.info("*** Mocked *** Sts response body: {}", new String(response.getBody()));
+    }
+
+    private static WireMockServer mockOppgaveProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+        final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
+        final URL url = new URL(oppgaveUrl);
+        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
+        wireMockConfiguration.port(url.getPort());
+        wireMockConfiguration.extensions(new ResponseTemplateTransformer(true));
+        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
+        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logOppgaveRequest);
+        wireMockServer.start();
+        CliMainWithTestScope.mockOppgaveProviderAndStartIt(wireMockServer, "/api/v1/oppgaver");
+
+        return wireMockServer;
+    }
+
+    private static void mockOppgaveProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext) {
+
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .get(WireMock.urlMatching(urlContext + "\\?opprettetAv=.*&tema=.*&statuskategori=.*&limit=.*&offset=.*"))
+                                .withQueryParam("opprettetAv", matching("srvbokosynk00[12]"))
+                                .withQueryParam("tema", matching("OKO"))
+                                .withQueryParam("statuskategori", matching("AAPEN"))
+                                .withQueryParam("limit", matching(".*"))
+                                .withQueryParam("offset", matching(".*"))
+                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile("oppgaveResponseFinnOppgaver.json")
+                                                .withStatus(200)
+                                )
+                )
+        ;
+
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .post(WireMock.urlEqualTo(urlContext))
+                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile("oppgaveResponseOpprettOppgaver.json")
+                                                .withStatus(200)
+                                )
+                )
+        ;
+
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .patch(WireMock.urlEqualTo(urlContext))
+                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .withHeader(CONTENT_TYPE,equalTo("application/json; charset=UTF-8"))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile("oppgaveResponsePatchOppgaver.json")
+                                                .withStatus(200)
+                                )
+                )
+        ;
+    }
+
+    private static void logOppgaveRequest(
+            final com.github.tomakehurst.wiremock.http.Request request,
+            final com.github.tomakehurst.wiremock.http.Response response) {
+        logger.info("*** Mocked *** Oppgave request absoluteUrl: {}", request.getAbsoluteUrl());
+        logger.info("*** Mocked *** Oppgave request headers: \n{}", request.getHeaders());
+        logger.info("*** Mocked *** Oppgave request parameter: {}", request.queryParameter("opprettetAv"));
+        logger.info("*** Mocked *** Oppgave request parameter: {}", request.queryParameter("tema"));
+        logger.info("*** Mocked *** Oppgave request parameter: {}", request.queryParameter("statuskategori"));
+        logger.info("*** Mocked *** Oppgave request parameter: {}", request.queryParameter("limit"));
+        logger.info("*** Mocked *** Oppgave request parameter: {}", request.queryParameter("offset"));
+        logger.info("*** Mocked *** Oppgave request body: {}", response.getBody() == null ? null : new String(request.getBody()));
+        logger.info("*** Mocked *** Oppgave response body: {}", response.getBody() == null ? null : new String(response.getBody()));
+    }
+
+    private static void stopMockedProviderServers(final Collection<WireMockServer> mockedProviderServers) {
+        mockedProviderServers
+                .stream()
+                .forEach((mockedProviderServer) -> mockedProviderServer.stop());
+    }
+
+    private static IStartableAndStoppable startTestFtpServer(final IOkosynkConfiguration okosynkConfiguration) {
+
+        logger.info("A test FTP server will be started");
+        final IStartableAndStoppable testFtpServerStarter =
+                new TestFtpServerStarter(okosynkConfiguration);
+        testFtpServerStarter.start();
+
+        return testFtpServerStarter;
+    }
+
+    private static void stopTestFtpServer(final IStartableAndStoppable testFtpServerStarter) {
+        if (testFtpServerStarter != null) {
+            testFtpServerStarter.stop();
+        }
+    }
+
+    @Override
+    protected void preRunAllBatches() {
+        super.preRunAllBatches();
+        try {
+            this.mockedProviderServers = CliMainWithTestScope.startMockedProviderServers(getOkosynkConfiguration());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        setTestFtpServerStarter(CliMainWithTestScope.startTestFtpServer(getOkosynkConfiguration()));
+    }
+
+    @Override
+    protected void postRunAllBatches() {
+        CliMainWithTestScope.stopTestFtpServer(this.testFtpServerStarter);
+        CliMainWithTestScope.stopMockedProviderServers(this.mockedProviderServers);
+        super.postRunAllBatches();
+    }
+
+    private void setTestFtpServerStarter(final IStartableAndStoppable testFtpServerStarter) {
+        this.testFtpServerStarter = testFtpServerStarter;
+    }
+}

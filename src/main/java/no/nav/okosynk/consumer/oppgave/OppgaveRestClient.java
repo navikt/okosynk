@@ -2,6 +2,8 @@ package no.nav.okosynk.consumer.oppgave;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Optional.ofNullable;
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
+import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
 import static no.nav.okosynk.consumer.util.ListeOppdeler.delOppListe;
@@ -98,7 +100,7 @@ public class OppgaveRestClient {
   }
 
   private static void addCorrelationIdToRequest(final AbstractHttpMessage request) {
-    request.addHeader("X-Correlation-ID", UUID.randomUUID().toString());
+    request.addHeader(X_CORRELATION_ID_HEADER_KEY, UUID.randomUUID().toString());
   }
 
   private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
@@ -106,7 +108,7 @@ public class OppgaveRestClient {
       final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
       final UsernamePasswordCredentials credentials
   ) {
-    final String oppgaveUrl = okosynkConfiguration.getRequiredString("OPPGAVE_URL");
+    final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
     final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl);
     addCorrelationIdToRequest(request);
     request.addHeader(ACCEPT,APPLICATION_JSON.getMimeType());
@@ -307,7 +309,7 @@ public class OppgaveRestClient {
       final int    offset) {
     final URI uri;
     try {
-      uri = new URIBuilder(getOkosynkConfiguration().getRequiredString("OPPGAVE_URL"))
+      uri = new URIBuilder(getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY))
           .addParameter("opprettetAv", opprettetAv)
           .addParameter("tema", FAGOMRADE_OKONOMI_KODE)
           .addParameter("statuskategori", "AAPEN")

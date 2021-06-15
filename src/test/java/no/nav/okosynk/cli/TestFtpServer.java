@@ -1,5 +1,6 @@
-package no.nav.okosynk.testutil;
+package no.nav.okosynk.cli;
 
+import com.jcraft.jsch.JSch;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;
@@ -11,10 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestFtpServer
-    extends AbstractTestFtpServer {
+        extends AbstractTestFtpServer {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(TestFtpServer.class);
+            LoggerFactory.getLogger(TestFtpServer.class);
 
     private static String FTP_TEST_SERVER_LISTENER_NAME = "default";
 
@@ -25,15 +26,14 @@ public class TestFtpServer
         super();
 
         logger.info(
-            System.lineSeparator()                                                    + System.lineSeparator()
-                + "FTP_TEST_SERVER_LISTENER_NAME : " + FTP_TEST_SERVER_LISTENER_NAME  + System.lineSeparator()
-                + "=================================================================" + System.lineSeparator()
-                + System.lineSeparator()
+                System.lineSeparator() + System.lineSeparator()
+                        + "FTP_TEST_SERVER_LISTENER_NAME : " + FTP_TEST_SERVER_LISTENER_NAME + System.lineSeparator()
+                        + "=================================================================" + System.lineSeparator()
+                        + System.lineSeparator()
         );
 
         try {
-            final PropertiesUserManagerFactory userManagerFactory =
-                new PropertiesUserManagerFactory();
+            final PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
             final UserManager userManager = userManagerFactory.createUserManager();
             final BaseUser testUser = new BaseUser();
             testUser.setName(FTP_TEST_SERVER_USER);
@@ -54,11 +54,11 @@ public class TestFtpServer
             this.ftpTestServer = factory.createServer();
 
             logger.info(
-                  System.lineSeparator()
-                + "Test FTP server successfully created"                              + System.lineSeparator()
-                + "=================================================================" + System.lineSeparator()
-                + this.ftpTestServer.toString()                                       + System.lineSeparator()
-                + System.lineSeparator()
+                    System.lineSeparator()
+                            + "Test FTP server successfully created" + System.lineSeparator()
+                            + "=================================================================" + System.lineSeparator()
+                            + this.ftpTestServer.toString() + System.lineSeparator()
+                            + System.lineSeparator()
             );
         } catch (FtpException e) {
             throw new RuntimeException(e);
@@ -69,6 +69,7 @@ public class TestFtpServer
     public void start() {
         logger.info("Test FTP server about to be started...");
         try {
+            JSch.setLogger(new OkosynkJschLogger());
             this.ftpTestServer.start();
             logger.info("Test FTP server successfully started.");
         } catch (FtpException e) {

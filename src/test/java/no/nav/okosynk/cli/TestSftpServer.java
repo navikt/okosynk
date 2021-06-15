@@ -1,13 +1,8 @@
-package no.nav.okosynk.testutil;
+package no.nav.okosynk.cli;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.server.Command;
-import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuth;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
@@ -19,6 +14,11 @@ import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Refs.:
@@ -34,10 +34,10 @@ import org.slf4j.LoggerFactory;
  * <a href="https://stackoverflow.com/questions/3076443/java-sftp-server-library">Java SFTP server library?</a>
  */
 public class TestSftpServer
-    extends AbstractTestFtpServer {
+        extends AbstractTestFtpServer {
 
     private static final Logger logger =
-        LoggerFactory.getLogger(TestSftpServer.class);
+            LoggerFactory.getLogger(TestSftpServer.class);
 
     private final SshServer sshServer;
 
@@ -46,15 +46,14 @@ public class TestSftpServer
         super();
 
         logger.info(
-            System.lineSeparator()                                                    + System.lineSeparator()
-                + "=================================================================" + System.lineSeparator()
-                + System.lineSeparator()
+                System.lineSeparator() + System.lineSeparator()
+                        + "=================================================================" + System.lineSeparator()
+                        + System.lineSeparator()
         );
 
         try {
             final SshServer sshServer = SshServer.setUpDefaultServer();
             sshServer.setPort(FTP_TEST_SERVER_PORT);
-            //sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("hostkey.ser"));
             sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
             final List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
@@ -64,14 +63,14 @@ public class TestSftpServer
             sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
                 @Override
                 public boolean authenticate(
-                    final String        username,
-                    final String        password,
-                    final ServerSession serverSession) throws PasswordChangeRequiredException {
+                        final String username,
+                        final String password,
+                        final ServerSession serverSession) throws PasswordChangeRequiredException {
 
                     return (
-                        FTP_TEST_SERVER_USER.equals(username)
-                        &&
-                        FTP_TEST_SERVER_PASSWORD.equals(password)
+                            FTP_TEST_SERVER_USER.equals(username)
+                                    &&
+                                    FTP_TEST_SERVER_PASSWORD.equals(password)
                     );
                 }
             });
@@ -89,11 +88,11 @@ public class TestSftpServer
             this.sshServer = sshServer;
 
             logger.info(
-                  System.lineSeparator()
-                + "Test SFTP server successfully created"                              + System.lineSeparator()
-                + "==================================================================" + System.lineSeparator()
-                + this.sshServer.toString()                                            + System.lineSeparator()
-                + System.lineSeparator()
+                    System.lineSeparator()
+                            + "Test SFTP server successfully created" + System.lineSeparator()
+                            + "==================================================================" + System.lineSeparator()
+                            + this.sshServer + System.lineSeparator()
+                            + System.lineSeparator()
             );
 
         } catch (Throwable e) {

@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,7 +37,7 @@ class OppgaveRestClientTest {
 
   @AfterEach
   void afterEach() {
-    System.clearProperty("OPPGAVE_URL");
+    System.clearProperty(OPPGAVE_URL_KEY);
   }
 
   @Test

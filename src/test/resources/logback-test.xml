@@ -4,39 +4,53 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <encoder>
-            <pattern>%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}] ){'- \[, , \] ',''}- %m%n</pattern>
+            <pattern>%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}] ){'- \[, , \] ',''}-
+                %m%n
+            </pattern>
         </encoder>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>DEBUG</level>
         </filter>
 
     </appender>
 
     <appender name="enteringTestHeaderAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <Pattern>%n %n %green(**************************************************************************************************************** %n) %gray(%d{HH:mm:ss.SSS} [%thread]) %green(Entering test: ) %cyan(%C{0} - %M) %green(%n **************************************************************************************************************** %n %n)</Pattern>
+            <Pattern>%n %n
+                %green(****************************************************************************************************************
+                %n) %gray(%d{HH:mm:ss.SSS} [%thread]) %green(Entering test: ) %cyan(%C{0} - %M) %green(%n
+                ****************************************************************************************************************
+                %n %n)
+            </Pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
         </filter>
     </appender>
 
-    <logger name="no.nav.okosynk" level="DEBUG" />
+    <logger name="no.nav.okosynk" level="DEBUG"/>
 
-    <logger name="no.nav.sbl.dialogarena.common.cxf" level="INFO" />
+    <logger name="no.nav.sbl.dialogarena.common.cxf" level="INFO"/>
 
-    <logger name="org.apache.cxf" level="WARN" />
+    <logger name="org.apache.cxf" level="WARN"/>
 
-    <logger name="no.nav.modig.security" level="WARN" />
+    <logger name="no.nav.modig.security" level="WARN"/>
 
-    <logger name="no.nav.modig.security.ws" level="WARN" />
+    <logger name="no.nav.modig.security.ws" level="WARN"/>
 
-    <logger name="org.glassfish.jersey" level="INFO" />
+    <logger name="org.glassfish.jersey" level="INFO"/>
 
-    <logger name="EnteringTestHeader" additivity="false">
-        <level value="DEBUG" />
-        <appender-ref ref="enteringTestHeaderAppender" />
+    <logger name="com.jcraft.jsch" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="org.apache.ftpserver" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <logger name="EnteringTestHeader" additivity="false" level="DEBUG">
+        <appender-ref ref="enteringTestHeaderAppender"/>
     </logger>
 
     <root level="INFO">
