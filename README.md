@@ -217,3 +217,4 @@ Følgene kommando er heller ikke å forakte:<BR/>
   vil ligge i yaml/Kubernetes.
 - OS - srvbokosynk001 - bokosynk001
 - UR - srvbokosynk002 - bokosynk002
+- Kjør `java -jar target/okosynk.jar -h` for å se hvilke kommandolinjeparametre som er tilgjengelige
