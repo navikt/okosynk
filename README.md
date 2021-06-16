@@ -37,6 +37,7 @@ Den kjører på nais-plattformen i to miljøer:
     - ... src/test/resources/application-test.testset_001.properties
     - ... src/test/resources/os.testset_001.input
     - ... src/test/resources/ur.testset_001.input
+
 til ditto ...testset_nnn...
 - Endre innholdet i filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
 - Kjør `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties` i stedet for kommandoen som er angitt ovenfor.
