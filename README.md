@@ -19,7 +19,7 @@ Den kjører på nais-plattformen i to miljøer:
 0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
 0. Fra kommandolinja, kjør:
     1. `mvn clean install -DskipTests=true` (1) (2)
-    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_001.properties``` (3)
+    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_001.properties` (3)
        
 (1) Antar her at applikasjonen er kompilert og testa vellykka med ```mvn clean install```
 
