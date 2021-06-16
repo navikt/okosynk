@@ -97,7 +97,7 @@ Hvis det ligger veldig mange jobber inne i clusteret, kan man f.eks. kjøre
 
 `kubectl get jobs | grep okosynk`
 
-for å kun få okosynk-jobbene. (Det er usikkert hvordan
+for kun å få okosynk-jobbene. (Det er usikkert hvordan
 `grep` vil fungere fra et Windows-image. Antakeligvis har kubectl et kommandolinjeflagg
 for å filtrere jobber.)
 
