@@ -49,7 +49,7 @@ til ditto ...testset_nnn...
 
 ## Utvikling og testing i preprod
 1. Sjekk ftp-adressen til inputfilene i nais/app-preprod.yaml
-0. Legg filene du ønsker å teste der, eller rename en allerede kjørt fil. (Etter en vellykka kjøring blir nemlig input-filene renama med et timestamp)
+0. Legg filene du ønsker å teste der, eller rename en allerede kjørt fil. (Etter en vellykka kjøring blir nemlig inputfilene renama med et timestamp)
 0. Start en kjøring som beskrevet annet sted i denne dokumentasjonen.
 
 # Bygg og deployment
