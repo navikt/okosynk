@@ -184,7 +184,7 @@ Følgene kommando er heller ikke å forakte:<BR/>
     /
     DROP TYPE numbers;
 ```
-# Spesifikke behov i preprod/prod vha. Kubernetes
+# Spesifikke Kubernetes-behov i preprod/prod
 ## Start en batch akkurat nå uavhengig av hva cron schedule tilsier
 
 |                                                              | Preprod              | or   | Prod              |                             | Note |
@@ -201,7 +201,9 @@ Følgene kommando er heller ikke å forakte:<BR/>
 - Which ports are being listened to (e.g. to see whether the SFTP server is running and listening to the expected port)
     - ```sudo lsof -i -P | grep -i "listen"``` (MAC)
     - ```netstat -an -ptcp | grep LISTEN``` (MAC)
-- En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
-- Ved lokal utvikling benyttes `environment-test.properties` for properties som vanligvis vil ligge i yaml/Kubernetes.
+- En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun 
+  ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
+- Ved lokal utvikling benyttes `src/test/resources/application-test.testset_001.properties` for properties som vanligvis 
+  vil ligge i yaml/Kubernetes.
 - OS - srvbokosynk001 - bokosynk001
 - UR - srvbokosynk002 - bokosynk002
