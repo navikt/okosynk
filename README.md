@@ -77,7 +77,7 @@ er hvor lenge det er siden cronjob-en ble deployet i ny versjon.
 
 Så kan man gjøre
 
-`kubectl get jobs`
+`kubectl get jobs`,
 
 og da får man opp noe som ligner på det her:
 
