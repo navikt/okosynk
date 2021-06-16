@@ -13,94 +13,22 @@ Den kjører på nais-plattformen i to miljøer:
 1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
 2) Cluster `prod-fss`, i namespace `oppgavehandtering`
 
-## Lokal testing
-1. Kopiér `web/src/test/resources/environment-test.properties.default` til `environment-test.properties` og editér innholdet i henhold til hva som ønskes testet.
-0. Pakk ut `domain/src/test/resources/os.input.valid.per.2018-05-04.zip` i samme directory. Hvorvidt navnet på fila da er korrekt, avhenger av no.nav.okosynk.OkosynkDomainConstants.OS_FS_INPUT_FILE_NAME i domain-modulen, evt. filnavnet som implisitt er angitt i `osFtpBaseUrl.url`-property'en hvis man skal teste FTP.
-0. Pakk ut `domain/src/test/resources/ur.input.valid.per.2018-05-04.zip` i samme directory. Hvorvidt navnet på fila da er korrekt, avhenger av no.nav.okosynk.OkosynkDomainConstants.UR_FS_INPUT_FILE_NAME i domain-modulen, evt. filnavnet som implisitt er angitt i `urFtpBaseUrl.url`-property'en hvis man skal teste FTP.
-0. Kjør java -jar app.jar
-5. Resultatet kan kontrolleres...
+# Lokal testing
+## Out-of-the-box
+1. Start konsollapplikasjonen (iTerm2 eller DOS-vindu, avhengig av OS)
+0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
+0. Fra kommandolinja, kjør:
+    1. `mvn clean install -DskipTests=true` (1) (2)
+    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.properties``` (3)
+       
+(1) Antar her at applikasjonen er kompilert og testa vellykka med ```mvn clean install```
 
-    1. ... ved å se på loggene. Se særlig etter strengen `STATISTIKK`. Loggen konfigureres i `okosynk/web/src/test/resources/logback-test.xml`.
-    0. ... ved å kjøre SQL mot oppgave-databasen  i det riktige `t`-miljøet, f.eks. `t4`. DataSource finner du i app-preprod.yaml eller app-prod.yaml
-    1. Nyttge SQL-statements:   
-            
-            ```
-            SELECT COUNT(*)
-                FROM t_oppgave o
-                WHERE o.k_fagomrade = 'OKO'
-                    AND o.opprettet_av = 'srvokosynk'
-                    AND o.k_oppgave_t = 'OKO_UR';
-            ```
-            
-            ```
-           SELECT e.NUMMER, o.K_UNDERKATEGORI, COUNT(*) AS antall
-           FROM T_OPPGAVE o, T_ORG_ENHET e
-           WHERE
-               o.K_OPPGAVE_T = 'OKO_OS'
-               AND o.ENDRET_AV = 'srvokosynk'
-               AND o.DATO_ENDRET >= to_timestamp('2017-09-20 0800','YYYY-MM-DD HH24MI')
-               AND o.ORG_ENHET_ID_ANSV = e.ORG_ENHET_ID
-           GROUP BY e.nummer, o.K_UNDERKATEGORI;
-        
-       ```
-        
-       ```
-           CREATE TYPE strings AS TABLE OF VARCHAR2(40);
-           /
-           CREATE TYPE numbers AS TABLE OF NUMBER(10);
-           /
-           SELECT
-               TO_CHAR(dato_endret   , 'YYYY-MM-DD') AS Dato_endret
-             , COUNT(*)                              AS Count
-             , MIN(TO_CHAR(dato_opprettet, 'YYYY-MM-DD HH24:MI:SS')) AS Earliest_insertion
-             , MAX(TO_CHAR(dato_opprettet, 'YYYY-MM-DD HH24:MI:SS')) AS Latest_insertion
-             , MIN(TO_CHAR(dato_endret   , 'YYYY-MM-DD HH24:MI:SS')) AS Earliest_update
-             , MAX(TO_CHAR(dato_endret   , 'YYYY-MM-DD HH24:MI:SS')) AS Latest_update
-             , CAST(COLLECT(DISTINCT k_oppgave_t ) AS strings) AS oppgave_typer
-             , CAST(COLLECT(DISTINCT opprettet_av) AS strings) AS opprettet_av
-             , CAST(COLLECT(DISTINCT endret_av   ) AS strings) AS endret_av
-             , CAST(COLLECT(DISTINCT versjon     ) AS numbers) AS versjoner
-           FROM     t_oppgave
-           GROUP BY TO_CHAR(dato_endret, 'YYYY-MM-DD')
-           ORDER BY 1 DESC
-           /
-           DROP TYPE strings;
-           /
-           DROP TYPE numbers;
-    
-           ```
-            
-           ```
-           CREATE TYPE strings AS TABLE OF VARCHAR2(40);
-           /
-           CREATE TYPE numbers AS TABLE OF NUMBER(10);
-           /
-           SELECT    TO_CHAR(dato_opprettet, 'YYYY-MM-DD') AS Dato_opprettet
-                   , TO_CHAR(dato_endret, 'YYYY-MM-DD') AS Dato_endret
-                   , COUNT(*) AS Count
-                   , MIN(TO_CHAR(dato_opprettet, 'YYYY-MM-DD HH24:MI:SS')) AS Earliest_insertion
-                   , MAX(TO_CHAR(dato_opprettet, 'YYYY-MM-DD HH24:MI:SS')) AS Latest_insertion
-                   , MIN(TO_CHAR(dato_endret   , 'YYYY-MM-DD HH24:MI:SS')) AS Earliest_update
-                   , MAX(TO_CHAR(dato_endret   , 'YYYY-MM-DD HH24:MI:SS')) AS Latest_update
-                   , CAST(COLLECT(DISTINCT k_oppgave_t ) AS strings) AS oppgave_typer
-                   , CAST(COLLECT(DISTINCT opprettet_av) AS strings) AS opprettet_av
-                   , CAST(COLLECT(DISTINCT versjon     ) AS numbers) AS versjoner
-           FROM     t_oppgave
-           GROUP BY TO_CHAR(dato_opprettet, 'YYYY-MM-DD'), TO_CHAR(dato_endret, 'YYYY-MM-DD')
-           ORDER BY 1 DESC, 2 DESC
-           /
-           DROP TYPE strings;
-           /
-           DROP TYPE numbers;
-            
-           ```
-            
-           ```
+(2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
 
-0. Noter
-    1. Okosynk må gå mot oppgave-applikasjonen i et t-miljø, for å ha tilgang til en service gateway som kan oversette sitt
-       SAML-token til en LTPA-token.
-    0. En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
+(3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
+
+## Skreddersøm
+lkjnlkjnklnklnklnkln 
 
 # Bygg og deployment
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
@@ -110,7 +38,7 @@ og
 `<PROJECT ROOT>/.github/workflows/issue-deploy.yml`.
  Hvis dette ikke er ønskelig, bør man vurdere å arbeide på en egen grein.
 
-## Sjekk hvordan det står til i drift
+# Sjekk hvordan det står til i drift
 
 ```
 kubectl config use-context "<riktig cluster>" (enten "preprod-fss" eller "prod-fss")
@@ -165,9 +93,12 @@ I lista over jobber kan man se når alle jobbene sist kjørte, og antall forsøk
 for å være successful - i dette tilfellet var det enkelt, alle jobbene kjørte fint på
 første forsøk.
 
-### Hvordan lese logger fra kjøringene
+# Hvordan gikk kjøringene?
 
-Forhåpentligvis vil loggene ende opp i Kibana (`https://logs.adeo.no`) men man kan også
+## Logging
+Resultatet kan kontrolleres ved å se på loggene i Kibana. Se særlig etter strengen `STATISTIKK`.
+Loggen konfigureres i `src/main/resources/logback.xml`.
+Forhåpentligvis vil loggene ende opp i Kibana (`https://logs.adeo.no`), men man kan også
 lese dem direkte fra Kubernetes. Først må man få en liste av pods tilhørende okosynk:
 
 `kubectl get pods`
@@ -190,12 +121,59 @@ Og for å finne ut hvorvidt jobbene er vellykka fullførte:
 
 `kubectl logs okosynk-1556078400-gfdhr | grep -i fullført`
 
-
 Følgene kommando er heller ikke å forakte:<BR/>
 
 `kubectl describe pod okosynk-1536642000-j6ccz`
+ 
+## SQL
 
-### Start en batch akkurat nå uavhengig av hva cron schedule tilsier
+```
+    SELECT *
+    FROM oppgave_p.oppgave o
+    WHERE    o.opprettet_av IN ('srvbokosynk001', 'srvbokosynk002')
+         AND o.status_id IN (1,2,3)
+         AND o.tema = 'OKO'
+         AND o.oppgavetype IN ('OKO_OS', 'OKO_UR')
+    ORDER BY o.opprettet_tidspunkt DESC;
+```
+
+```
+    SELECT o.tildelt_enhetsnr, o.tema, o.behandlingstype, o.behandlingstema, oppgavetype, COUNT(*) AS antall, MIN(o.endret_tidspunkt), MAX(o.endret_tidspunkt)
+    FROM oppgave_p.oppgave o
+    WHERE
+            o.oppgavetype IN ('OKO_OS', 'OKO_UR')
+        AND o.opprettet_av IN ('srvbokosynk001', 'srvbokosynk002')
+        AND o.opprettet_tidspunkt >= to_timestamp('2021-06-15 0300','YYYY-MM-DD HH24MI')    
+    GROUP BY o.tildelt_enhetsnr, o.tema, o.behandlingstype, o.behandlingstema, o.oppgavetype
+    ORDER BY antall DESC;
+```
+
+```
+    CREATE TYPE strings AS TABLE OF VARCHAR2(40);
+    /
+    CREATE TYPE numbers AS TABLE OF NUMBER(10);
+    /
+    SELECT
+    TO_CHAR(o.endret_tidspunkt, 'YYYY-MM-DD') AS dato_endret
+    , COUNT(*)                              AS Count
+    , MIN(TO_CHAR(o.opprettet_tidspunkt, 'YYYY-MM-DD HH24:MI:SS')) AS earliest_insertion
+    , MAX(TO_CHAR(o.opprettet_tidspunkt, 'YYYY-MM-DD HH24:MI:SS')) AS latest_insertion
+    , MIN(TO_CHAR(o.endret_tidspunkt   , 'YYYY-MM-DD HH24:MI:SS')) AS earliest_update
+    , MAX(TO_CHAR(o.endret_tidspunkt   , 'YYYY-MM-DD HH24:MI:SS')) AS latest_update
+    , CAST(COLLECT(DISTINCT o.oppgavetype ) AS strings) AS oppgave_typer
+    , CAST(COLLECT(DISTINCT o.opprettet_av) AS strings) AS opprettet_av
+    , CAST(COLLECT(DISTINCT o.endret_av   ) AS strings) AS endret_av
+    , CAST(COLLECT(DISTINCT o.versjon     ) AS numbers) AS versjoner
+    FROM oppgave_p.oppgave o
+    GROUP BY TO_CHAR(o.endret_tidspunkt, 'YYYY-MM-DD')
+    ORDER BY 1 DESC
+    /
+    DROP TYPE strings;
+    /
+    DROP TYPE numbers;
+```
+# Spesifikke behov i preprod/prod vha. Kubernetes
+## Start en batch akkurat nå uavhengig av hva cron schedule tilsier
 
 |                                                              | Preprod              | or   | Prod              |                             | Note |
 | :----------------------------------------------------------- | :------------------- | ---- | :---------------- | :-------------------------- | ---- |
@@ -203,21 +181,13 @@ Følgene kommando er heller ikke å forakte:<BR/>
 | ```kubectl config set-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) | ```--namespace="oppgavehandtering"``` |      |
 | ```kubectl create job --from=cronjob/okosynk "oor-manually-started-2019-03-11-13-07"``` |                      |      |                   |                             |      |
 
-### Slett en jobb
+## Slett en jobb
 
 ```kubectl delete job oor-manually-started-2020-01-10-18-18```
 
-### General practical commands
+# General practical commands, hints and tips
 - Which ports are being listened to (e.g. to see whether the SFTP server is running and loistening to the expected port)
-<BR/>
-```sudo lsof -i -P | grep -i "listen"``` (MAC)
-<BR/>
-and
-<BR/>
-```netstat -an -ptcp | grep LISTEN``` (MAC)
-
-### Logging
-Hver batch har sin egen logg-fil, i tillegg logger hver batch alle tjenestekall til sensitiv logg.
-
-### Properties
-Ved lokal utvikling benyttes `environment-test.properties` for properties som vanligvis vil ligge i yaml/Kubernetes.
+    - ```sudo lsof -i -P | grep -i "listen"``` (MAC)
+    - ```netstat -an -ptcp | grep LISTEN``` (MAC)
+- En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
+- Ved lokal utvikling benyttes `environment-test.properties` for properties som vanligvis vil ligge i yaml/Kubernetes.
