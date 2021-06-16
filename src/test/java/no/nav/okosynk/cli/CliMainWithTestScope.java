@@ -110,12 +110,14 @@ public class CliMainWithTestScope extends CliMain {
         final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
         wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logAktoerRegisterRequest);
         wireMockServer.start();
-        CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(wireMockServer);
+        CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(wireMockServer, okosynkConfiguration);
 
         return wireMockServer;
     }
 
-    private static void mockAktoerRegisterProviderAndStartIt(final WireMockServer wireMockServer) {
+    private static void mockAktoerRegisterProviderAndStartIt(final WireMockServer wireMockServer, final IOkosynkConfiguration okosynkConfiguration) {
+
+        final String responseFilename = okosynkConfiguration.getRequiredString("testset_fileName_aktoerRegisterResponseFnrToAktoerId");
         wireMockServer
                 .stubFor(
                         WireMock
@@ -129,7 +131,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .willReturn(
                                         aResponse()
-                                                .withBodyFile("aktoerRegisterResponseFnrToAktoerId.json")
+                                                .withBodyFile(responseFilename)
                                                 .withStatus(200)
                                 )
                 )
@@ -154,12 +156,14 @@ public class CliMainWithTestScope extends CliMain {
         final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
         wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logStsRequest);
         wireMockServer.start();
-        CliMainWithTestScope.mockStsProviderAndStartIt(wireMockServer, "/rest/v1/sts/token?grant_type=client_credentials&scope=openid");
+        CliMainWithTestScope.mockStsProviderAndStartIt(wireMockServer, "/rest/v1/sts/token?grant_type=client_credentials&scope=openid", okosynkConfiguration);
 
         return wireMockServer;
     }
 
-    private static void mockStsProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext) {
+    private static void mockStsProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext, final IOkosynkConfiguration okosynkConfiguration) {
+
+        final String responseFilename = okosynkConfiguration.getRequiredString("testset_fileName_stsResponse");
         wireMockServer
                 .stubFor(
                         WireMock
@@ -170,7 +174,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .willReturn(
                                         aResponse()
-                                                .withBodyFile("stsResponse.json")
+                                                .withBodyFile(responseFilename)
                                                 .withStatus(200)
                                 )
                 )
@@ -194,12 +198,16 @@ public class CliMainWithTestScope extends CliMain {
         final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
         wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logOppgaveRequest);
         wireMockServer.start();
-        CliMainWithTestScope.mockOppgaveProviderAndStartIt(wireMockServer, "/api/v1/oppgaver");
+        CliMainWithTestScope.mockOppgaveProviderAndStartIt(wireMockServer, "/api/v1/oppgaver", okosynkConfiguration);
 
         return wireMockServer;
     }
 
-    private static void mockOppgaveProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext) {
+    private static void mockOppgaveProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext, final IOkosynkConfiguration okosynkConfiguration) {
+
+        final String responseFilename_oppgaveResponseFinnOppgaver = okosynkConfiguration.getRequiredString("testset_fileName_oppgaveResponseFinnOppgaver");
+        final String responseFilename_oppgaveResponseOpprettOppgaver = okosynkConfiguration.getRequiredString("testset_fileName_oppgaveResponseOpprettOppgaver");
+        final String responseFilename_oppgaveResponsePatchOppgaver = okosynkConfiguration.getRequiredString("testset_fileName_oppgaveResponsePatchOppgaver");
 
         wireMockServer
                 .stubFor(
@@ -215,7 +223,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
                                 .willReturn(
                                         aResponse()
-                                                .withBodyFile("oppgaveResponseFinnOppgaver.json")
+                                                .withBodyFile(responseFilename_oppgaveResponseFinnOppgaver)
                                                 .withStatus(200)
                                 )
                 )
@@ -230,7 +238,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
                                 .willReturn(
                                         aResponse()
-                                                .withBodyFile("oppgaveResponseOpprettOppgaver.json")
+                                                .withBodyFile(responseFilename_oppgaveResponseOpprettOppgaver)
                                                 .withStatus(200)
                                 )
                 )
@@ -246,7 +254,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(CONTENT_TYPE,equalTo("application/json; charset=UTF-8"))
                                 .willReturn(
                                         aResponse()
-                                                .withBodyFile("oppgaveResponsePatchOppgaver.json")
+                                                .withBodyFile(responseFilename_oppgaveResponsePatchOppgaver)
                                                 .withStatus(200)
                                 )
                 )

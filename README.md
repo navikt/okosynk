@@ -19,7 +19,7 @@ Den kjører på nais-plattformen i to miljøer:
 0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
 0. Fra kommandolinja, kjør:
     1. `mvn clean install -DskipTests=true` (1) (2)
-    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.properties``` (3)
+    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_001.properties``` (3)
        
 (1) Antar her at applikasjonen er kompilert og testa vellykka med ```mvn clean install```
 
@@ -28,7 +28,18 @@ Den kjører på nais-plattformen i to miljøer:
 (3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
 
 ## Skreddersøm
-lkjnlkjnklnklnklnkln 
+- Kopiér og rename følgende filer...
+... src/test/resources/__files/aktoerRegisterResponseFnrToAktoerId.testset_001.json
+... src/test/resources/__files/stsResponse.testset_001.json
+... src/test/resources/__files/oppgaveResponseFinnOppgaver.testset_001.json
+... src/test/resources/__files/oppgaveResponseOpprettOppgaver.testset_001.json
+... src/test/resources/__files/oppgaveResponsePatchOppgaver.testset_001.json
+... src/test/resources/application-test.testset_001.properties
+... src/test/resources/os.testset_001.input
+... src/test/resources/ur.testset_001.input
+til ditto ...testset_nnn...
+- Endre innholdet i filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
+- Kjør `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties` i stedet for kommandoen som er angitt ovenfor.
 
 # Bygg og deployment
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
