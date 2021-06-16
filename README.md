@@ -48,9 +48,9 @@ til ditto ...testset_nnn...
 - Kjør `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties` i stedet for kommandoen som er angitt ovenfor.
 
 ## Utvikling og testing i preprod
-1. Sjekk ftp-adressen til inputfilene i nais/app-preprod.yaml
-0. Legg filene du ønsker å teste der, eller rename en allerede kjørt fil. (Etter en vellykka kjøring blir nemlig inputfilene renama med et timestamp)
-0. Start en kjøring som beskrevet annet sted i denne dokumentasjonen.
+1. Sjekk adressen(e) til inputfil(ene) i nais/app-preprod.yaml under `OSFTPBASEURL_URL` og/eller `URFTPBASEURL_URL`
+0. Legg filene du ønsker å teste der, eller rename allerede kjørt(e) fil(er). (Etter en vellykka kjøring blir nemlig inputfilene renama med et timestamp)
+0. Start en batchkjøring som beskrevet annet sted i denne dokumentasjonen.
 
 # Bygg og deployment
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
