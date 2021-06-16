@@ -13,8 +13,13 @@ Den kjører på nais-plattformen i to miljøer:
 1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
 2) Cluster `prod-fss`, i namespace `oppgavehandtering`
 
-# Lokal testing
-## Out-of-the-box
+# Utvikling og testing
+## Utvikling og testing lokalt
+Her beskrives den enkle og frittstående varianten hvor aksessen til providerne er mocka. 
+De mocka requestene og responsene blir logga til konsollet. 
+Ved å lage en test-property-fil hvor endepunktene er endra til preprod-endepunktene, kan det hende at det er mulig å 
+teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt. 
+### Out-of-the-box
 1. Start konsollapplikasjonen (iTerm2 eller DOS-vindu, avhengig av OS)
 0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
 0. Fra kommandolinja, kjør:
@@ -27,7 +32,7 @@ Den kjører på nais-plattformen i to miljøer:
 
 (3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
 
-## Skreddersøm
+### Skreddersøm
 - Kopiér og rename følgende filer...
     - ... src/test/resources/__files/aktoerRegisterResponseFnrToAktoerId.testset_001.json
     - ... src/test/resources/__files/stsResponse.testset_001.json
@@ -41,6 +46,11 @@ Den kjører på nais-plattformen i to miljøer:
 til ditto ...testset_nnn...
 - Endre innholdet i filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
 - Kjør `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties` i stedet for kommandoen som er angitt ovenfor.
+
+## Utvikling og testing i preprod
+1. Sjekk ftp-adressen til inputfilene i nais/app-preprod.yaml
+0. Legg filene du ønsker å teste der, eller rename en allerede kjørt fil. (Etter en vellykka kjøring blir nemlig input-filene renama med et timestamp)
+0. Start en kjøring som beskrevet annet sted i denne dokumentasjonen.
 
 # Bygg og deployment
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
