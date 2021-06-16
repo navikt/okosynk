@@ -202,3 +202,5 @@ Følgene kommando er heller ikke å forakte:<BR/>
     - ```netstat -an -ptcp | grep LISTEN``` (MAC)
 - En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
 - Ved lokal utvikling benyttes `environment-test.properties` for properties som vanligvis vil ligge i yaml/Kubernetes.
+- OS - srvbokosynk001 - bokosynk001
+- UR - srvbokosynk002 - bokosynk002
