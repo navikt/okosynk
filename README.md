@@ -197,7 +197,7 @@ Følgene kommando er heller ikke å forakte:<BR/>
 ```kubectl delete job oor-manually-started-2020-01-10-18-18```
 
 # General practical commands, hints and tips
-- Which ports are being listened to (e.g. to see whether the SFTP server is running and loistening to the expected port)
+- Which ports are being listened to (e.g. to see whether the SFTP server is running and listening to the expected port)
     - ```sudo lsof -i -P | grep -i "listen"``` (MAC)
     - ```netstat -an -ptcp | grep LISTEN``` (MAC)
 - En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
