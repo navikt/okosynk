@@ -20,7 +20,7 @@ De mocka requestene og responsene blir logga til konsollet.
 Ved å lage en test-property-fil hvor endepunktene er endra til preprod-endepunktene, kan det hende at det er mulig å 
 teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt. 
 ### Lokal testkjøring av batchen out-of-the-box 
-1. Start konsollapplikasjonen (iTerm2 eller DOS-vindu, avhengig av OS)
+1. Start konsollapplikasjonen (iTerm2 eller DOS-vindu, avhengig av OS) (4)
 0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
 0. Fra kommandolinja, kjør:
     1. `./copyInputFiles.sh` (1) (2)
@@ -31,6 +31,8 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
 (2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
 
 (3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
+
+(4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der.
 
 ### Lokal testkjøring av batchen med skreddersøm
 - Kopiér og rename følgende filer...
