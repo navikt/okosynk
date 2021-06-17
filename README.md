@@ -166,7 +166,13 @@ Følgene kommando er heller ikke å forakte:<BR/>
 ```
 
 ```
-    SELECT o.tildelt_enhetsnr, o.tema, o.behandlingstype, o.behandlingstema, oppgavetype, COUNT(*) AS antall, MIN(o.endret_tidspunkt), MAX(o.endret_tidspunkt)
+    SELECT   o.tildelt_enhetsnr
+           , o.tema, o.behandlingstype
+           , o.behandlingstema
+           , oppgavetype
+           , COUNT(*) AS antall
+           , MIN(o.endret_tidspunkt)
+           , MAX(o.endret_tidspunkt)
     FROM oppgave_p.oppgave o
     WHERE
             o.oppgavetype IN ('OKO_OS', 'OKO_UR')
