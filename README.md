@@ -13,26 +13,26 @@ Den kjører på nais-plattformen i to miljøer:
 1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
 2) Cluster `prod-fss`, i namespace `oppgavehandtering`
 
-# Utvikling og testing
-## Utvikling og testing lokalt
+# Testkjøring av batchen
+## Lokal testkjøring av batchen
 Her beskrives den enkle og frittstående varianten hvor aksessen til providerne er mocka. 
 De mocka requestene og responsene blir logga til konsollet. 
 Ved å lage en test-property-fil hvor endepunktene er endra til preprod-endepunktene, kan det hende at det er mulig å 
 teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt. 
-### Out-of-the-box
+### Lokal testkjøring av batchen out-of-the-box 
 1. Start konsollapplikasjonen (iTerm2 eller DOS-vindu, avhengig av OS)
 0. Gå til prosjektrota (f.eks. /Users/r149852/nav/okosynk)
 0. Fra kommandolinja, kjør:
-    1. `mvn clean install -DskipTests=true` (1) (2)
+    1. `./copyInputFiles.sh` (1) (2)
     0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_001.properties` (3)
        
-(1) Antar her at applikasjonen er kompilert og testa vellykka med ```mvn clean install```
+(1) Antar her at applikasjonen er kompilert og testa vellykka med `mvn clean install` ellser `mvn clean install -DskipTests=true`
 
 (2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
 
 (3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
 
-### Skreddersøm
+### Lokal testkjøring av batchen med skreddersøm
 - Kopiér og rename følgende filer...
     - ... src/test/resources/__files/aktoerRegisterResponseFnrToAktoerId.testset_001.json
     - ... src/test/resources/__files/stsResponse.testset_001.json
@@ -44,15 +44,19 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
     - ... src/test/resources/ur.testset_001.input
 
 til ditto ...testset_nnn...
-- Endre innholdet i filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
-- Kjør `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties` i stedet for kommandoen som er angitt ovenfor.
+1. Endre innholdet i ...testset_nnn...-filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
+0. `./copyInputFiles.sh`
+0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties`
 
-## Utvikling og testing i preprod
+## Testkjøring av batchen i preprod
 1. Sjekk adressen(e) til inputfil(ene) i nais/app-preprod.yaml under `OSFTPBASEURL_URL` og/eller `URFTPBASEURL_URL`
-0. Legg filene du ønsker å teste der, eller rename allerede kjørt(e) fil(er). (Etter en vellykka kjøring blir nemlig inputfilene renama med et timestamp)
+0. Legg filene du ønsker å teste der, eller rename allerede kjørt(e) fil(er). (Etter en vellykka kjøring blir nemlig inputfilene renama med en timestamp)
 0. Start en batchkjøring som beskrevet annet sted i denne dokumentasjonen.
 
 # Bygg og deployment
+## Lokalt
+`mvn clean install`
+## Preprod/Prod
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
 Dette skjer på GitHub vha. action scriptene
 `<PROJECT ROOT>/.github/workflows/deploy-dev-prod.yaml` 
