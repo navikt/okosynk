@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.security.OidcStsClient;
 import org.apache.http.HttpHeaders;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;

@@ -1,4 +1,4 @@
-package no.nav.okosynk.consumer;
+package no.nav.okosynk.consumer.security;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

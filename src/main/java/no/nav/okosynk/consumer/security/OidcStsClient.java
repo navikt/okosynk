@@ -1,4 +1,4 @@
-package no.nav.okosynk.consumer.aktoer;
+package no.nav.okosynk.consumer.security;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
@@ -18,7 +18,7 @@ import java.util.Base64;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.StsOidcResponse;
+import no.nav.okosynk.consumer.aktoer.HttpResponseUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
@@ -32,7 +32,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class OidcStsClient {
+public class OidcStsClient {
 
     private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
 
@@ -42,7 +42,7 @@ class OidcStsClient {
     private final CloseableHttpClient httpClient;
     private String oidcToken;
 
-    OidcStsClient(
+    public OidcStsClient(
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) {
 
@@ -65,7 +65,7 @@ class OidcStsClient {
         this.oidcToken = getTokenFromSts();
     }
 
-    String getOidcToken() {
+    public String getOidcToken() {
 
         if (isExpired(this.oidcToken)) {
             log.info("OIDC Token for {} expired, getting a new one from the STS", this.batchBruker);

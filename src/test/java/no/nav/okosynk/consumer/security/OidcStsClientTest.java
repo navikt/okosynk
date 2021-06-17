@@ -1,4 +1,4 @@
-package no.nav.okosynk.consumer.aktoer;
+package no.nav.okosynk.consumer.security;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -24,7 +24,6 @@ import java.util.Base64;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.StsOidcResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,7 +69,7 @@ public class OidcStsClientTest {
 
   private WireMockServer wireMockServer = null;
 
-  static void setupStubWithOKResponseEntityAndWithAnInterpretableToken(final WireMockServer wireMockServer) throws JsonProcessingException {
+  public static void setupStubWithOKResponseEntityAndWithAnInterpretableToken(final WireMockServer wireMockServer) throws JsonProcessingException {
 
     final StsOidcResponse stsOidcResponse = new StsOidcResponse();
 
@@ -82,7 +81,7 @@ public class OidcStsClientTest {
     OidcStsClientTest.setupStub(wireMockServer, OidcStsClientTest.TEST_CONTEXT_FOR_MATCHING, presumableJsonOfSTSOidcResponse);
   }
 
-  static void configureResourceUrlWithoutParms(
+  public static void configureResourceUrlWithoutParms(
       final String protocol,
       final String server,
       final int    port) {

@@ -1,4 +1,4 @@
-package no.nav.okosynk.consumer;
+package no.nav.okosynk.consumer.security;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;

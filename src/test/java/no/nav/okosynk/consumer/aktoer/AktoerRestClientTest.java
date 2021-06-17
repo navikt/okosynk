@@ -23,6 +23,7 @@ import java.util.List;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.consumer.security.OidcStsClientTest;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.ClientProtocolException;
 import org.junit.jupiter.api.AfterEach;

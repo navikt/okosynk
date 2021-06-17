@@ -1,7 +1,5 @@
 package no.nav.okosynk.cli;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -9,8 +7,6 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
-import no.nav.okosynk.consumer.oppgave.FinnOppgaveResponse;
-import no.nav.okosynk.consumer.oppgave.OppgaveDto;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -20,7 +16,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
@@ -28,9 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
-import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 
 public class CliMainWithTestScope extends CliMain {
 
@@ -251,7 +244,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
                                 .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
-                                .withHeader(CONTENT_TYPE,equalTo("application/json; charset=UTF-8"))
+                                .withHeader(CONTENT_TYPE, equalTo("application/json; charset=UTF-8"))
                                 .willReturn(
                                         aResponse()
                                                 .withBodyFile(responseFilename_oppgaveResponsePatchOppgaver)

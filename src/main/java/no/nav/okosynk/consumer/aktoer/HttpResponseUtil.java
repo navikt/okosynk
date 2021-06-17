@@ -7,9 +7,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
-class HttpResponseUtil {
+public class HttpResponseUtil {
 
-  static String createStringRepresentationOfResponseEntity(final CloseableHttpResponse response) {
+  public static String createStringRepresentationOfResponseEntity(final CloseableHttpResponse response) {
 
     String entityStringRepresentationBody = "";
     try {
