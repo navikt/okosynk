@@ -60,7 +60,7 @@ til ditto ...testset_nnn...
 `mvn clean install`
 ## Preprod/Prod
 Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
-Dette skjer på GitHub vha. action scriptene
+Dette skjer på GitHub vha. action-scriptene
 `<PROJECT ROOT>/.github/workflows/deploy-dev-prod.yaml` 
 og
 `<PROJECT ROOT>/.github/workflows/issue-deploy.yml`.
