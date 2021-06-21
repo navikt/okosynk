@@ -8,6 +8,7 @@ import no.nav.okosynk.cli.testcertificates.TestCertificates;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
+import no.nav.okosynk.consumer.security.AzureAdClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -202,6 +203,9 @@ public class CliMain {
     protected void preRunAllBatches() {
         final String revision = getOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
+
+        final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+        final AzureAdClient azureAdClient = new  AzureAdClient(okosynkConfiguration);
     }
 
     protected void postRunAllBatches() {

@@ -47,8 +47,8 @@ public class OkosynkConfiguration
             logger.info("Fant ikke {}", applicationPropertiesFileName);
         }
 
+        final String pomPropertiesFileName = "properties-from-pom.properties";
         try {
-            final String pomPropertiesFileName = "properties-from-pom.properties";
             this
                     .compositeConfigurationForSecondPriority
                     .addConfiguration(
