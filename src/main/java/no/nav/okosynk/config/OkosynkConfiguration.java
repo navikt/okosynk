@@ -34,21 +34,28 @@ public class OkosynkConfiguration
 
         this.compositeConfigurationForFirstPriority.addConfiguration(new EnvironmentConfiguration());
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
+
         try {
-            final String pomPropertiesFileName = "properties-from-pom.properties";
             this
                     .compositeConfigurationForSecondPriority
                     .addConfiguration(
                             new Configurations()
                                     .properties(new File(applicationPropertiesFileName))
                     );
+            logger.info("Konfigurasjon lastet fra {}", applicationPropertiesFileName);
+        } catch (ConfigurationException e) {
+            logger.info("Fant ikke {}", applicationPropertiesFileName);
+        }
+
+        try {
+            final String pomPropertiesFileName = "properties-from-pom.properties";
             this
                     .compositeConfigurationForSecondPriority
                     .addConfiguration(
                             new Configurations()
                                     .properties(new File(pomPropertiesFileName))
                     );
-            logger.info("Konfigurasjon lastet fra {} og {}", applicationPropertiesFileName, pomPropertiesFileName);
+            logger.info("Konfigurasjon lastet fra {}", pomPropertiesFileName);
         } catch (ConfigurationException e) {
             logger.info("Fant ikke {}", applicationPropertiesFileName);
         }
