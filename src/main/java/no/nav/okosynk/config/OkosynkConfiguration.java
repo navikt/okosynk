@@ -57,7 +57,7 @@ public class OkosynkConfiguration
                     );
             logger.info("Konfigurasjon lastet fra {}", pomPropertiesFileName);
         } catch (ConfigurationException e) {
-            logger.info("Fant ikke {}", applicationPropertiesFileName);
+            logger.info("Fant ikke {}", pomPropertiesFileName);
         }
 
         copySomePropertiesToSystemPropertiesToSatisfyExternalLibraries();
