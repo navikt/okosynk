@@ -200,6 +200,8 @@ public class CliMain {
     }
 
     protected void preRunAllBatches() {
+        final String revision = getOkosynkConfiguration().getString("revision");
+        logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
     }
 
     protected void postRunAllBatches() {
