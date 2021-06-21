@@ -69,8 +69,8 @@ og
 # Sjekk hvordan det står til i drift
 
 ```
-kubectl config use-context "<riktig cluster>" (enten "preprod-fss" eller "prod-fss")
-kubectl config set-context "<riktig cluster>" --namespace="<riktig namespace>" (<riktig namespace> er "oppgavehandtering" uavhengig av om det er preprod eller prod)
+kubectl config use-context <riktig cluster> (enten `preprod-fss` eller `prod-fss`)
+kubectl config set-context <riktig cluster> --namespace=<riktig namespace> (<riktig namespace> er `oppgavehandtering` uavhengig av om det er `preprod` eller `prod`)
 ```
 
 Ved å kjøre
@@ -149,7 +149,7 @@ Og for å finne ut hvorvidt jobbene er vellykka fullførte:
 
 `kubectl logs okosynk-1556078400-gfdhr | grep -i fullført`
 
-Følgene kommando er heller ikke å forakte:<BR/>
+Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljøvariablene + mye mer...):<BR/>
 
 `kubectl describe pod okosynk-1536642000-j6ccz`
  

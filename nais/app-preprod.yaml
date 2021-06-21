@@ -6,6 +6,14 @@ metadata:
   name: okosynk
   namespace: oppgavehandtering
 spec:
+  webproxy: true
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+      claims:
+        extra:
+          - "NAVident"
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
     spec:
