@@ -337,8 +337,6 @@ public class CliMain {
                     env.get(Constants.NAV_TRUSTSTORE_PATH_KEY));
             System.setProperty(Constants.NAV_TRUSTSTORE_PASSWORD_EXT_KEY,
                     env.get(Constants.NAV_TRUSTSTORE_PASSWORD_KEY));
-        } else {
-            //setUpTestCertificates();
         }
 
         logger.info("Certificates successfully set up");
@@ -356,20 +354,5 @@ public class CliMain {
         System.setProperty(Constants.SRVOKOSYNK_PASSWORD_EXT_KEY, keystorePassword);
 
         logger.info("key store successfully set up");
-    }
-
-    private void setUpTestCertificates() {
-
-        logger.info("About to set up test certificates...");
-
-        try {
-            TestCertificates.setupKeyAndTrustStore();
-        } catch (Throwable e) {
-            final String msg = "Exception received when setting up test certificates.";
-            logger.info(msg);
-            throw new RuntimeException(msg, e);
-        }
-
-        logger.info("Test certificates successfully set up.");
     }
 }
