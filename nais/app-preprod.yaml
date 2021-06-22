@@ -15,6 +15,7 @@ spec:
         extra:
           - "NAVident"
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
+  image: {{image}}
   jobTemplate:
     spec:
       ttlSecondsAfterFinished: 172800
