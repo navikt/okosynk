@@ -57,7 +57,7 @@ public class CliMain {
         final IOkosynkConfiguration okosynkConfiguration =
                 getOkosynkConfiguration(applicationPropertiesFileName);
         this.okosynkConfiguration = okosynkConfiguration;
-        setUpCertificates();
+        //setUpCertificates();
     }
 
     @SuppressWarnings("checkstyle:MissingJavadocMethod")
