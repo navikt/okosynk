@@ -36,8 +36,7 @@ public class OkosynkConfiguration
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
 
         try {
-            this
-                    .compositeConfigurationForSecondPriority
+            this.compositeConfigurationForSecondPriority
                     .addConfiguration(
                             new Configurations()
                                     .properties(new File(applicationPropertiesFileName))
@@ -49,8 +48,7 @@ public class OkosynkConfiguration
 
         final String pomPropertiesFileName = "properties-from-pom.properties";
         try {
-            this
-                    .compositeConfigurationForSecondPriority
+            this.compositeConfigurationForSecondPriority
                     .addConfiguration(
                             new Configurations()
                                     .properties(new File(pomPropertiesFileName))

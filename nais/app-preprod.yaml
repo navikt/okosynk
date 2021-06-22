@@ -1,5 +1,5 @@
-apiVersion: batch/v1beta1
-kind: CronJob
+apiVersion: nais.io/v1
+kind: Naisjob
 metadata:
   labels:
     team: oppgavehandtering
