@@ -40,14 +40,6 @@ spec:
               env:
                 - name: OKOSYNK_SHOULD_RUN_DRY
                   value: "false"
-                - name: VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL
-                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgavebehandlingV3
-                  value: https://service-gw-q3.preprod.local
-                - name: VIRKSOMHET_OPPGAVE_V3_ENDPOINTURL
-                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgaveV3
-                  value: https://service-gw-q3.preprod.local
-                - name: SERVICEGATEWAY_URL
-                  value: https://service-gw-q3.preprod.local/
                 - name: OPPGAVE_URL
                   value: https://oppgave.nais.preprod.local/api/v1/oppgaver
                 - name: AKTOERREGISTER_URL
