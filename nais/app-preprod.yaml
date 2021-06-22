@@ -6,7 +6,6 @@ metadata:
   name: okosynk
   namespace: oppgavehandtering
 spec:
-  webproxy: true
   azure:
     application:
       enabled: true
@@ -14,6 +13,7 @@ spec:
       claims:
         extra:
           - "NAVident"
+  webproxy: true
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
     spec:
@@ -80,6 +80,17 @@ spec:
                   value: srvbokosynk
                 - name: SECURITYTOKENSERVICE_URL
                   value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
+
+
+
+
+
+
+
+
+
+
+
 
 
 
