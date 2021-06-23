@@ -46,6 +46,8 @@ spec:
                   value: https://app-q1.adeo.no/aktoerregister/api/v1/identer
                 - name: REST_STS_URL
                   value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
+                - name: SECURITYTOKENSERVICE_URL
+                  value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
                 - name: PUSH_GATEWAY_ADDRESS
                   value: nais-prometheus-pushgateway.nais:9091
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
@@ -78,21 +80,6 @@ spec:
                   value: /var/run/secrets/naisd.io/srvokosynk_keystore
                 - name: SRVBOKOSYNK_USERNAME
                   value: srvbokosynk
-                - name: SECURITYTOKENSERVICE_URL
-                  value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 - name: SRVBOKOSYNK001_PASSWORD
                   valueFrom:

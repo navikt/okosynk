@@ -4,7 +4,6 @@ import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.os.OsService;
 import no.nav.okosynk.batch.ur.UrService;
-import no.nav.okosynk.cli.testcertificates.TestCertificates;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
@@ -205,7 +204,7 @@ public class CliMain {
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-        final AzureAdClient azureAdClient = new  AzureAdClient(okosynkConfiguration);
+        final AzureAdClient azureAdClient = new AzureAdClient(okosynkConfiguration);
     }
 
     protected void postRunAllBatches() {

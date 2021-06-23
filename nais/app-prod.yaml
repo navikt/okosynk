@@ -46,6 +46,8 @@ spec:
                   value: https://app.adeo.no/aktoerregister/api/v1/identer
                 - name: REST_STS_URL
                   value: https://security-token-service.nais.adeo.no/rest/v1/sts/token
+                - name: SECURITYTOKENSERVICE_URL
+                  value: https://sts.adeo.no/SecurityTokenServiceProvider/
                 - name: PUSH_GATEWAY_ADDRESS
                   value: nais-prometheus-pushgateway.nais:9091
                 - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
@@ -78,21 +80,6 @@ spec:
                   value: /var/run/secrets/naisd.io/srvokosynk_keystore
                 - name: SRVBOKOSYNK_USERNAME
                   value: srvbokosynk
-                - name: SECURITYTOKENSERVICE_URL
-                  value: https://sts.adeo.no/SecurityTokenServiceProvider/
-
-
-
-                - name: VIRKSOMHET_OPPGAVEBEHANDLING_V3_ENDPOINTURL
-                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgavebehandlingV3 #talking directly to oppgave endpoint
-                  value: https://service-gw.adeo.no # Talking with oppgave via service gateway
-                - name: VIRKSOMHET_OPPGAVE_V3_ENDPOINTURL
-                  # value: https://wasapp-q3.adeo.no/nav-gsak-ws/OppgaveV3 #talking directly to oppgave endpoint
-                  value: https://service-gw.adeo.no # Talking with oppgave via service gateway
-                - name: SERVICEGATEWAY_URL
-                  value: https://service-gw.adeo.no
-
-
 
                 - name: SRVBOKOSYNK001_PASSWORD
                   valueFrom:
