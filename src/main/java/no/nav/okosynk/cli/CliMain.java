@@ -329,7 +329,7 @@ public class CliMain {
 
         logger.info("About to set up certificates...");
 
-        final Map<String, String> env = System.getenv();
+            final Map<String, String> env = System.getenv();
         setupKeyStore(env);
         if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) {
             System.setProperty(Constants.NAV_TRUSTSTORE_PATH_EXT_KEY,

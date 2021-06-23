@@ -73,9 +73,9 @@ spec:
 # // TODO: MODIG-OPPRYDDING: Remove if working without:
 #                - name: NAV_TRUSTSTORE_KEYSTOREALIAS
 #                  value: na
-# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod:
-#                - name: NAV_TRUSTSTORE_PATH
-#                  value: "/var/run/secrets/naisd.io/nav_truststore_path"
+# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
+                - name: NAV_TRUSTSTORE_PATH
+                  value: "/var/run/secrets/naisd.io/nav_truststore_path"
 # // TODO: MODIG-OPPRYDDING: Remove if working without:
 #                - name: SRVOKOSYNK_KEYSTOREALIAS
 #                  value: app-key
@@ -107,12 +107,12 @@ spec:
                       name: okosynk
                       key: urftpcredentials_password
 
-# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod:
-#                - name: NAV_TRUSTSTORE_PASSWORD
-#                  valueFrom:
-#                    secretKeyRef:
-#                      name: okosynk
-#                      key: nav_truststore_password
+# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
+                - name: NAV_TRUSTSTORE_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: okosynk
+                      key: nav_truststore_password
 
 # // TODO: MODIG-OPPRYDDING: Remove if working without:
 #                - name: SRVOKOSYNK_PASSWORD
