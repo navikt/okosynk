@@ -336,6 +336,10 @@ public class CliMain {
                     env.get(Constants.NAV_TRUSTSTORE_PATH_KEY));
             System.setProperty(Constants.NAV_TRUSTSTORE_PASSWORD_EXT_KEY,
                     env.get(Constants.NAV_TRUSTSTORE_PASSWORD_KEY));
+        } else {
+            final String msg = "The environment variable NAV_TRUSTSTORE_PATH is not set by NAISERATOR";
+            logger.error(msg);
+            //throw new RuntimeException(msg);
         }
 
         logger.info("Certificates successfully set up");
