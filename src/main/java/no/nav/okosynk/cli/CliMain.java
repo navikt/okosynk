@@ -345,12 +345,17 @@ public class CliMain {
 
         logger.info("About to set up key store...");
 
-        final String keystore = env.getOrDefault(Constants.SRVOKOSYNK_KEYSTORE_KEY,
-                Constants.SRVOKOSYNK_KEYSTORE_DEFAULT_VALUE);
-        final String keystorePassword = env.getOrDefault(Constants.SRVOKOSYNK_PASSWORD_KEY,
-                Constants.SRVOKOSYNK_PASSWORD_DEFAULT_VALUE);
-        System.setProperty(Constants.SRVOKOSYNK_KEYSTORE_EXT_KEY, keystore);
-        System.setProperty(Constants.SRVOKOSYNK_PASSWORD_EXT_KEY, keystorePassword);
+        // TODO: MODIG-OPPRYDDING: Remove if working without:
+        //final String keystore = env.getOrDefault(Constants.SRVOKOSYNK_KEYSTORE_KEY,
+        //        Constants.SRVOKOSYNK_KEYSTORE_DEFAULT_VALUE);
+        //final String keystorePassword = env.getOrDefault(Constants.SRVOKOSYNK_PASSWORD_KEY,
+        //        Constants.SRVOKOSYNK_PASSWORD_DEFAULT_VALUE);
+
+        // TODO: MODIG-OPPRYDDING: Remove if working without:
+        //System.setProperty(Constants.SRVOKOSYNK_KEYSTORE_EXT_KEY, keystore);
+
+        // TODO: MODIG-OPPRYDDING: Remove if working without:
+        //System.setProperty(Constants.SRVOKOSYNK_PASSWORD_EXT_KEY, keystorePassword);
 
         logger.info("key store successfully set up");
     }

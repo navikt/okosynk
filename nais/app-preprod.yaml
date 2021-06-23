@@ -70,16 +70,20 @@ spec:
                   value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
                 - name: URFTPCREDENTIALS_USERNAME
                   value: srvokosynksftp
-                - name: NAV_TRUSTSTORE_KEYSTOREALIAS
-                  value: na
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: NAV_TRUSTSTORE_KEYSTOREALIAS
+#                  value: na
                 - name: NAV_TRUSTSTORE_PATH
                   value: "/var/run/secrets/naisd.io/nav_truststore_path"
-                - name: SRVOKOSYNK_KEYSTOREALIAS
-                  value: app-key
-                - name: SRVOKOSYNK_KEYSTORE
-                  value: /var/run/secrets/naisd.io/srvokosynk_keystore
-                - name: SRVBOKOSYNK_USERNAME
-                  value: srvbokosynk
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: SRVOKOSYNK_KEYSTOREALIAS
+#                  value: app-key
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: SRVOKOSYNK_KEYSTORE
+#                  value: /var/run/secrets/naisd.io/srvokosynk_keystore
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: SRVBOKOSYNK_USERNAME
+#                  value: srvbokosynk
 
                 - name: SRVBOKOSYNK001_PASSWORD
                   valueFrom:
@@ -106,16 +110,20 @@ spec:
                     secretKeyRef:
                       name: okosynk
                       key: nav_truststore_password
-                - name: SRVOKOSYNK_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: srvokosynk_password
-                - name: SRVBOKOSYNK_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: srvbokosynk_password
+
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: SRVOKOSYNK_PASSWORD
+#                  valueFrom:
+#                    secretKeyRef:
+#                      name: okosynk
+#                      key: srvokosynk_password
+
+# // TODO: MODIG-OPPRYDDING: Remove if working without:
+#                - name: SRVBOKOSYNK_PASSWORD
+#                  valueFrom:
+#                    secretKeyRef:
+#                      name: okosynk
+#                      key: srvbokosynk_password
 
 
 

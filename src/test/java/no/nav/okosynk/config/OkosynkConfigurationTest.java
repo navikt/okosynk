@@ -28,13 +28,14 @@ public class OkosynkConfigurationTest {
   @BeforeEach
   void setMandatorySystemProperties() {
 
-    if (System.getProperty(Constants.SRVBOKOSYNK_USERNAME_KEY) == null) {
+      // TODO: MODIG-OPPRYDDING: Remove if working without:
+    /*if (System.getProperty(Constants.SRVBOKOSYNK_USERNAME_KEY) == null) {
       System.setProperty(Constants.SRVBOKOSYNK_USERNAME_KEY, "Rubbish-placeholder");
     }
 
     if (System.getProperty(Constants.SRVBOKOSYNK_PASSWORD_KEY) == null) {
       System.setProperty(Constants.SRVBOKOSYNK_PASSWORD_KEY, "Rubbish-placeholder");
-    }
+    }*/
   }
 
   @Test
