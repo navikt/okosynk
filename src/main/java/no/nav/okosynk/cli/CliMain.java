@@ -56,7 +56,7 @@ public class CliMain {
         final IOkosynkConfiguration okosynkConfiguration =
                 getOkosynkConfiguration(applicationPropertiesFileName);
         this.okosynkConfiguration = okosynkConfiguration;
-        setUpCertificates();
+        setUpCertificates(okosynkConfiguration);
     }
 
     @SuppressWarnings("checkstyle:MissingJavadocMethod")
@@ -325,11 +325,12 @@ public class CliMain {
      * javax.net.ssl.trustStore: /var/run/secrets/naisd.io/nav_truststore_path
      * javax.net.ssl.trustStorePassword: 467792be15c4a8807681fd2d5c9c1748
      */
-    private void setUpCertificates() {
+    private void setUpCertificates(final IOkosynkConfiguration okosynkConfiguration) {
 
         logger.info("About to set up certificates...");
+        final Map<String, String> env = System.getenv();
+        /*
 
-            final Map<String, String> env = System.getenv();
         setupKeyStore(env);
         if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) {
             System.setProperty(Constants.NAV_TRUSTSTORE_PATH_EXT_KEY,
@@ -341,8 +342,18 @@ public class CliMain {
             logger.error(msg);
             //throw new RuntimeException(msg);
         }
+        */
 
-        logger.info("Certificates successfully set up");
+        if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) { // If running under NAIS/K8S
+            final String navTrustStorePath = okosynkConfiguration.getRequiredString(Constants.NAV_TRUSTSTORE_PATH_KEY);
+            final String navTrustStorePassword = okosynkConfiguration.getRequiredString(Constants.NAV_TRUSTSTORE_PASSWORD_KEY);
+            System.setProperty(Constants.NAV_TRUSTSTORE_PATH_EXT_KEY, navTrustStorePath);
+            System.setProperty(Constants.NAV_TRUSTSTORE_PASSWORD_EXT_KEY, navTrustStorePassword);
+            logger.info("Certificates successfully set up");
+        } else {
+            // This is OK if running locally in a test environment
+            logger.error("The environment variable {} is not set.", Constants.NAV_TRUSTSTORE_PATH_KEY);
+        }
     }
 
     private void setupKeyStore(Map<String, String> env) {
