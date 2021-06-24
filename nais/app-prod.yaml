@@ -6,13 +6,13 @@ metadata:
   name: okosynk
   namespace: oppgavehandtering
 spec:
-
-
-
-
-
-
-
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+      claims:
+        extra:
+          - "NAVident"
   webproxy: true
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   jobTemplate:
@@ -70,21 +70,10 @@ spec:
                   value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
                 - name: URFTPCREDENTIALS_USERNAME
                   value: srvokosynksftp
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: NAV_TRUSTSTORE_KEYSTOREALIAS
-#                  value: na
+
 # TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
                 - name: NAV_TRUSTSTORE_PATH
                   value: "/var/run/secrets/naisd.io/nav_truststore_path"
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: SRVOKOSYNK_KEYSTOREALIAS
-#                  value: app-key
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: SRVOKOSYNK_KEYSTORE
-#                  value: /var/run/secrets/naisd.io/srvokosynk_keystore
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: SRVBOKOSYNK_USERNAME
-#                  value: srvbokosynk
 
                 - name: SRVBOKOSYNK001_PASSWORD
                   valueFrom:
@@ -113,23 +102,6 @@ spec:
                     secretKeyRef:
                       name: okosynk
                       key: nav_truststore_password
-
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: SRVOKOSYNK_PASSWORD
-#                  valueFrom:
-#                    secretKeyRef:
-#                      name: okosynk
-#                      key: srvokosynk_password
-
-# // TODO: MODIG-OPPRYDDING: Remove if working without:
-#                - name: SRVBOKOSYNK_PASSWORD
-#                  valueFrom:
-#                    secretKeyRef:
-#                      name: okosynk
-#                      key: srvbokosynk_password
-
-
-
 
               volumeMounts:
                 - name: okosynk

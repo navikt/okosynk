@@ -203,15 +203,6 @@ public class OkosynkConfiguration
         // they must have some system properties explicitly set:
         final List<Quintet<String, String, Boolean, String, String>> propertyInfos =
                 new ArrayList<Quintet<String, String, Boolean, String, String>>() {{
-
-                    // TODO: MODIG-OPPRYDDING: Remove if working without:
-                    // add(new Quintet<>(Constants.SRVBOKOSYNK_USERNAME_KEY,
-                    //         Constants.SRVBOKOSYNK_PASSWORD_EXT_KEY, true, null, null));
-
-                    // TODO: MODIG-OPPRYDDING: Remove if working without:
-                    //add(new Quintet<>(Constants.SRVBOKOSYNK_PASSWORD_KEY,
-                    //        Constants.SYSTEM_USER_PASSWORD_EXT_KEY, true, "***********", null));
-
                     add(new Quintet<>(Constants.DISABLE_METRICS_REPORT_KEY,
                             Constants.DISABLE_METRICS_REPORT_EXT_KEY, false, null, null));
                     add(new Quintet<>(Constants.TILLAT_MOCK_PROPERTY_KEY,

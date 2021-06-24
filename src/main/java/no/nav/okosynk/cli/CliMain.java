@@ -203,6 +203,8 @@ public class CliMain {
         final String revision = getOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
+
+        // TODO: Log code during development:
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         final AzureAdClient azureAdClient = new AzureAdClient(okosynkConfiguration);
     }
@@ -319,30 +321,14 @@ public class CliMain {
 
     /**
      * Ends up with having set the following sys props:
-     * no.nav.modig.security.appcert.keystore: /var/run/secrets/naisd.io/srvokosynk_keystore
-     * no.nav.modig.security.appcert.password: ytX7G6r51d
      * <p>
      * javax.net.ssl.trustStore: /var/run/secrets/naisd.io/nav_truststore_path
-     * javax.net.ssl.trustStorePassword: 467792be15c4a8807681fd2d5c9c1748
+     * javax.net.ssl.trustStorePassword: <whatever>
      */
     private void setUpCertificates(final IOkosynkConfiguration okosynkConfiguration) {
 
         logger.info("About to set up certificates...");
         final Map<String, String> env = System.getenv();
-        /*
-
-        setupKeyStore(env);
-        if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) {
-            System.setProperty(Constants.NAV_TRUSTSTORE_PATH_EXT_KEY,
-                    env.get(Constants.NAV_TRUSTSTORE_PATH_KEY));
-            System.setProperty(Constants.NAV_TRUSTSTORE_PASSWORD_EXT_KEY,
-                    env.get(Constants.NAV_TRUSTSTORE_PASSWORD_KEY));
-        } else {
-            final String msg = "The environment variable NAV_TRUSTSTORE_PATH is not set by NAISERATOR";
-            logger.error(msg);
-            //throw new RuntimeException(msg);
-        }
-        */
 
         if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) { // If running under NAIS/K8S
             final String navTrustStorePath = okosynkConfiguration.getRequiredString(Constants.NAV_TRUSTSTORE_PATH_KEY);
@@ -354,24 +340,5 @@ public class CliMain {
             // This is OK if running locally in a test environment
             logger.error("The environment variable {} is not set.", Constants.NAV_TRUSTSTORE_PATH_KEY);
         }
-    }
-
-    private void setupKeyStore(Map<String, String> env) {
-
-        logger.info("About to set up key store...");
-
-        // TODO: MODIG-OPPRYDDING: Remove if working without:
-        //final String keystore = env.getOrDefault(Constants.SRVOKOSYNK_KEYSTORE_KEY,
-        //        Constants.SRVOKOSYNK_KEYSTORE_DEFAULT_VALUE);
-        //final String keystorePassword = env.getOrDefault(Constants.SRVOKOSYNK_PASSWORD_KEY,
-        //        Constants.SRVOKOSYNK_PASSWORD_DEFAULT_VALUE);
-
-        // TODO: MODIG-OPPRYDDING: Remove if working without:
-        //System.setProperty(Constants.SRVOKOSYNK_KEYSTORE_EXT_KEY, keystore);
-
-        // TODO: MODIG-OPPRYDDING: Remove if working without:
-        //System.setProperty(Constants.SRVOKOSYNK_PASSWORD_EXT_KEY, keystorePassword);
-
-        logger.info("key store successfully set up");
     }
 }

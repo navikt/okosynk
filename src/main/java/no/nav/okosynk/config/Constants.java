@@ -6,24 +6,6 @@ public class Constants {
     public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
     public static final String BATCH_RETRY_WAIT_TIME_IN_MS_KEY = "batch.retry.wait.time.in.ms";
     public static final String BATCH_MAX_NUMBER_OF_TRIES_KEY = "batch.max.number.of.tries";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    // public static final String SRVOKOSYNK_KEYSTORE_KEY = "SRVOKOSYNK_KEYSTORE";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    //public static final String SRVOKOSYNK_KEYSTORE_EXT_KEY = "no.nav.modig.security.appcert.keystore";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    // public static final String SRVOKOSYNK_KEYSTORE_DEFAULT_VALUE = "\"keystore.jks\"";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    // public static final String SRVOKOSYNK_PASSWORD_KEY = "SRVOKOSYNK_PASSWORD";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    //public static final String SRVOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.appcert.password";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    // public static final String SRVOKOSYNK_PASSWORD_DEFAULT_VALUE = "X";
     public static final String NAV_TRUSTSTORE_PATH_KEY = "NAV_TRUSTSTORE_PATH";
     public static final String NAV_TRUSTSTORE_PATH_EXT_KEY = "javax.net.ssl.trustStore";
     public static final String NAV_TRUSTSTORE_PASSWORD_KEY = "NAV_TRUSTSTORE_PASSWORD";
@@ -35,19 +17,6 @@ public class Constants {
     public static final String X_CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    //static final String SRVBOKOSYNK_USERNAME_KEY = "SRVBOKOSYNK_USERNAME";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    //static final String SRVBOKOSYNK_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.username";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    //static final String SRVBOKOSYNK_PASSWORD_KEY = "SRVBOKOSYNK_PASSWORD";
-
-    // TODO: MODIG-OPPRYDDING: Remove if working without:
-    // static final String SYSTEM_USER_PASSWORD_EXT_KEY = "no.nav.modig.security.systemuser.password";
-
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
     static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
     // =========================================================================
@@ -74,6 +43,7 @@ public class Constants {
     private static final String UR_FTP_CHARSET_NAME_KEY = "UR_FTP_CHARSET";
     private static final String UR_MAPPING_RULES_PROPERTIES_FILENAME = "ur_mapping_regler.properties";
     private static final String UR_ALERT_COLLECTOR_METRIC_NAME = "okosynk_ur_batch_alert";
+
     public enum BATCH_TYPE {
         OS(
                 OS_BATCH_NAVN,
@@ -188,6 +158,7 @@ public class Constants {
             return mappingRulesPropertiesFileName;
         }
     }
+
     // =========================================================================
     public enum FTP_PROTOCOL {FTP, SFTP}
 }
