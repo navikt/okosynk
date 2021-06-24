@@ -13,30 +13,12 @@ public class ConstantsTest {
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
 
-    private static final Logger logger = LoggerFactory.getLogger(ConstantsTest.class);
-
     private static String hentOsBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
-
-        final String batchBruker =
-                okosynkConfiguration
-                        .getString(
-                                Constants.BATCH_TYPE.OS.getBatchBrukerKey(),
-                                Constants.BATCH_TYPE.OS.getBatchBrukerDefaultValue()
-                        );
-
-        return batchBruker;
+        return okosynkConfiguration.getBatchBruker(Constants.BATCH_TYPE.OS);
     }
 
     private static String hentUrBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
-
-        final String batchBruker =
-                okosynkConfiguration
-                        .getString(
-                                Constants.BATCH_TYPE.UR.getBatchBrukerKey(),
-                                Constants.BATCH_TYPE.UR.getBatchBrukerDefaultValue()
-                        );
-
-        return batchBruker;
+        return okosynkConfiguration.getBatchBruker(Constants.BATCH_TYPE.UR);
     }
 
     @Test

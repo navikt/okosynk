@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class OkosynkConfiguration
-        implements IOkosynkConfiguration {
+        extends AbstractOkosynkConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(OkosynkConfiguration.class);
     private static IOkosynkConfiguration instance = null;

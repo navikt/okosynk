@@ -182,8 +182,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
             throws ConfigureOrInitializeOkosynkIoException {
-        return MeldingLinjeSftpReader.getFtpInputFilePath(
-                okosynkConfiguration.getString(getBatchType().getFtpHostUrlKey())
-        );
+        return MeldingLinjeSftpReader.getFtpInputFilePath(okosynkConfiguration.getFtpHostUrl(getBatchType()));
     }
 }

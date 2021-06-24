@@ -84,8 +84,8 @@ public class MeldingLinjeSftpReader
                             + Constants.FTP_PROTOCOL_DEFAULT_VALUE
                             + " will be used.";
         }
-        final String ftpHostUrl =
-                MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration, getBatchType());
+        final String ftpHostUrl = okosynkConfiguration.getFtpHostUrl(getBatchType());
+
         if (StringUtils.isBlank(ftpHostUrl)) {
             msg = "ftpHostUrl er null eller tom: " + String.valueOf(ftpHostUrl);
             setStatus(IMeldingLinjeFileReader.Status.ERROR);
@@ -97,13 +97,13 @@ public class MeldingLinjeSftpReader
             setStatus(IMeldingLinjeFileReader.Status.ERROR);
             msg += System.lineSeparator() + "Cannot deduce port number from URL: " + ftpHostUrl;
         }
-        final String ftpUser = MeldingLinjeSftpReader.getFtpUser(okosynkConfiguration, getBatchType());
+        final String ftpUser = okosynkConfiguration.getFtpUser(getBatchType());
         if (StringUtils.isBlank(ftpUser)) {
-            msg += System.lineSeparator() + "ftpUser er null eller tom: + " + String.valueOf(ftpUser);
+            msg += System.lineSeparator() + "ftpUser er null eller tom: + " + ftpUser;
             setStatus(IMeldingLinjeFileReader.Status.ERROR);
         }
-        final String ftpPassword =
-                MeldingLinjeSftpReader.getFtpPassword(okosynkConfiguration, getBatchType());
+        final String ftpPassword = okosynkConfiguration.getFtpPassword(getBatchType());
+
         if (StringUtils.isBlank(ftpPassword)) {
             msg += System.lineSeparator() + "ftpPassword er null eller tom";
             setStatus(IMeldingLinjeFileReader.Status.ERROR);
@@ -263,33 +263,7 @@ public class MeldingLinjeSftpReader
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) throws ConfigureOrInitializeOkosynkIoException {
 
-        return MeldingLinjeSftpReader
-                .getFtpInputFilePath(getFtpHostUrl(okosynkConfiguration, batchType));
-    }
-
-    private static String getFtpHostUrl(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-
-        return okosynkConfiguration.getString(batchType.getFtpHostUrlKey());
-    }
-
-    private static String getCharsetName(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-        return okosynkConfiguration.getString(batchType.getFtpCharsetNameKey(), "ISO8859_1");
-    }
-
-    private static String getFtpUser(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-        return okosynkConfiguration.getString(batchType.getFtpUserKey());
-    }
-
-    private static String getFtpPassword(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-        return okosynkConfiguration.getString(batchType.getFtpPasswordKey());
+        return MeldingLinjeSftpReader.getFtpInputFilePath(okosynkConfiguration.getFtpHostUrl(batchType));
     }
 
     public SftpResourceContainer createResourceContainer() {
@@ -382,20 +356,22 @@ public class MeldingLinjeSftpReader
                         + "=======================" + System.lineSeparator()
                         + "ftpHostUrl                 : "
                         + (
-                        MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration, getBatchType()) == null
+                        okosynkConfiguration.getFtpHostUrl(getBatchType()) == null
                                 ?
                                 "null"
                                 :
-                                MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration, getBatchType())
+                                okosynkConfiguration.getFtpHostUrl(getBatchType())
+
+
                 )
                         + System.lineSeparator()
                         + "user                       : "
                         + (
-                        MeldingLinjeSftpReader.getFtpUser(okosynkConfiguration, getBatchType()) == null
+                        okosynkConfiguration.getFtpUser(batchType) == null
                                 ?
                                 "null"
                                 :
-                                MeldingLinjeSftpReader.getFtpUser(okosynkConfiguration, getBatchType())
+                                okosynkConfiguration.getFtpUser(batchType)
                 )
                         + System.lineSeparator()
                         + "fully qualified file name  : "
@@ -432,31 +408,18 @@ public class MeldingLinjeSftpReader
 
     Constants.FTP_PROTOCOL getFtpProtocol(final IOkosynkConfiguration okosynkConfiguration)
             throws ConfigureOrInitializeOkosynkIoException {
-
-        return MeldingLinjeSftpReader
-                .getFtpProtocol(
-                        MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration,
-                                getBatchType()
-                        )
-                );
+        return MeldingLinjeSftpReader.getFtpProtocol(okosynkConfiguration.getFtpHostUrl(getBatchType()));
     }
 
     String getFtpHostServerName(
             final IOkosynkConfiguration okosynkConfiguration) throws ConfigureOrInitializeOkosynkIoException {
-
-        return MeldingLinjeSftpReader
-                .getFtpHostServerName(
-                        MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration, getBatchType()));
+        return MeldingLinjeSftpReader.getFtpHostServerName(okosynkConfiguration.getFtpHostUrl(getBatchType()));
     }
 
     int getFtpHostPort(
             final IOkosynkConfiguration okosynkConfiguration)
             throws ConfigureOrInitializeOkosynkIoException {
-
-        return MeldingLinjeSftpReader
-                .getFtpHostPort(
-                        MeldingLinjeSftpReader.getFtpHostUrl(okosynkConfiguration, getBatchType())
-                );
+        return MeldingLinjeSftpReader.getFtpHostPort(okosynkConfiguration.getFtpHostUrl(getBatchType()));
     }
 
     private BufferedReader lagBufferedReader(
@@ -520,8 +483,7 @@ public class MeldingLinjeSftpReader
 
         final Session sftpSession;
         try {
-            final String sftpUser =
-                    MeldingLinjeSftpReader.getFtpUser(okosynkConfiguration, getBatchType());
+            final String sftpUser = okosynkConfiguration.getFtpUser(batchType);
             final String sftpHostServerName = this.getFtpHostServerName(okosynkConfiguration);
             final int sftpPort = this.getFtpHostPort(okosynkConfiguration);
             sftpSession =
@@ -537,8 +499,7 @@ public class MeldingLinjeSftpReader
         sftpResourceContainer.setSftpSession(sftpSession);
 
         sftpResourceContainer.getSftpSession().setConfig("StrictHostKeyChecking", "no");
-        final String sftpPassword =
-                MeldingLinjeSftpReader.getFtpPassword(okosynkConfiguration, getBatchType());
+        final String sftpPassword = okosynkConfiguration.getFtpPassword(getBatchType());
         sftpResourceContainer.getSftpSession().setPassword(sftpPassword);
         try {
             sftpResourceContainer.getSftpSession().connect();
@@ -634,7 +595,7 @@ public class MeldingLinjeSftpReader
 
         return new InputStreamReader(
                 resourceContainer.getInputStream(),
-                getCharsetName(okosynkConfiguration, getBatchType())
+                okosynkConfiguration.getFtpCharsetName(getBatchType(), "ISO8859_1")
         );
     }
 }

@@ -41,6 +41,10 @@ public interface IOkosynkConfiguration {
     String getPrometheusAddress(final String defaultPrometheusAddress);
 
     String getBatchBruker(final Constants.BATCH_TYPE batchType);
-
     String getBatchBrukerPassword(final Constants.BATCH_TYPE batchType);
+
+    String getFtpHostUrl(final Constants.BATCH_TYPE batchType);
+    String getFtpUser(final Constants.BATCH_TYPE batchType);
+    String getFtpPassword(final Constants.BATCH_TYPE batchType);
+    String getFtpCharsetName(final Constants.BATCH_TYPE batchType, final String ftpCharsetNameDefault);
 }

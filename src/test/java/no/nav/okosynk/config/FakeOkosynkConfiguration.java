@@ -1,7 +1,7 @@
 package no.nav.okosynk.config;
 
 public class FakeOkosynkConfiguration
-        implements IOkosynkConfiguration {
+        extends AbstractOkosynkConfiguration {
 
     @Override
     public boolean getBoolean(final String key, final boolean defaultValue) {

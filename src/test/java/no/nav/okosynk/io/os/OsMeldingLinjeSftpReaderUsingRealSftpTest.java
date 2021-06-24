@@ -1,17 +1,12 @@
 package no.nav.okosynk.io.os;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-
-import java.util.function.Function;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.io.AbstractMeldingLinjeSftpReaderUsingRealSftpTest;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.junit.jupiter.api.BeforeAll;
+
+import java.util.function.Function;
 
 /**
  * Refs.:
@@ -20,11 +15,11 @@ import org.junit.jupiter.api.BeforeAll;
  * <a href="https://stackoverflow.com/questions/12803942/secure-ftp-with-org-apache-commons-net-ftp-ftpclient">Secure FTP with org.apache.commons.net.ftp.FTPClient</a>
  */
 public class OsMeldingLinjeSftpReaderUsingRealSftpTest
-    extends AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
+        extends AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
 
     static {
         AbstractMeldingLinjeSftpReaderUsingRealSftpTest
-            .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.SFTP);
+                .setFtpTestServerFtpProtocol(Constants.FTP_PROTOCOL.SFTP);
     }
 
     @BeforeAll
@@ -55,10 +50,10 @@ public class OsMeldingLinjeSftpReaderUsingRealSftpTest
     @Override
     protected Function<String, IMeldingLinjeFileReader> getMeldingLinjeFileReaderCreator() {
         return (
-            fullyQualifiedInputFileName)
-            ->
-            new MeldingLinjeSftpReader(
-                getOkosynkConfiguration(), Constants.BATCH_TYPE.OS, fullyQualifiedInputFileName
-            );
+                fullyQualifiedInputFileName)
+                ->
+                new MeldingLinjeSftpReader(
+                        getOkosynkConfiguration(), Constants.BATCH_TYPE.OS, fullyQualifiedInputFileName
+                );
     }
 }
