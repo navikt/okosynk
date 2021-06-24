@@ -203,7 +203,6 @@ public class CliMain {
         final String revision = getOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
-
         // TODO: Log code during development:
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
         final AzureAdClient azureAdClient = new AzureAdClient(okosynkConfiguration);
@@ -331,8 +330,8 @@ public class CliMain {
         final Map<String, String> env = System.getenv();
 
         if (env.containsKey(Constants.NAV_TRUSTSTORE_PATH_KEY)) { // If running under NAIS/K8S
-            final String navTrustStorePath = okosynkConfiguration.getRequiredString(Constants.NAV_TRUSTSTORE_PATH_KEY);
-            final String navTrustStorePassword = okosynkConfiguration.getRequiredString(Constants.NAV_TRUSTSTORE_PASSWORD_KEY);
+            final String navTrustStorePath = okosynkConfiguration.getNavTrustStorePath();
+            final String navTrustStorePassword = okosynkConfiguration.getNavTrustStorePassword();
             System.setProperty(Constants.NAV_TRUSTSTORE_PATH_EXT_KEY, navTrustStorePath);
             System.setProperty(Constants.NAV_TRUSTSTORE_PASSWORD_EXT_KEY, navTrustStorePassword);
             logger.info("Certificates successfully set up");

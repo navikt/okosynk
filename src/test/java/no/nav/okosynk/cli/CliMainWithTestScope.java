@@ -53,10 +53,8 @@ public class CliMainWithTestScope extends CliMain {
     private static WireMockServer mockPrometheusProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
 
         final String pushGatewayEndpointNameAndPort =
-                okosynkConfiguration.getString(
-                        Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY,
-                        "http://localhost:5678"
-                );
+                okosynkConfiguration.getPrometheusAddress("http://localhost:5678");
+
         final String urlAsString =
                 (
                         pushGatewayEndpointNameAndPort.startsWith("http://") ||

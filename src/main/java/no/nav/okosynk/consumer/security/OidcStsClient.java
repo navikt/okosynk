@@ -1,21 +1,7 @@
 package no.nav.okosynk.consumer.security;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang3.StringUtils.substringBetween;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.apache.http.entity.ContentType.APPLICATION_JSON;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Base64;
-
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.HttpResponseUtil;
@@ -32,6 +18,19 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Base64;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.substringBetween;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+
 public class OidcStsClient {
 
     private static final Logger log = LoggerFactory.getLogger(OidcStsClient.class);
@@ -46,10 +45,9 @@ public class OidcStsClient {
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) {
 
-        this.batchBruker = okosynkConfiguration
-                .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
-        this.credentials = new UsernamePasswordCredentials(this.batchBruker,
-                okosynkConfiguration.getString(batchType.getBatchBrukerPasswordKey()));
+        this.batchBruker = okosynkConfiguration.getBatchBruker(batchType);
+        final String brukerPassword = okosynkConfiguration.getBatchBrukerPassword(batchType);
+        this.credentials = new UsernamePasswordCredentials(this.batchBruker, brukerPassword);
 
         try {
             this.endpointUri =

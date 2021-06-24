@@ -79,12 +79,6 @@ public class OkosynkConfiguration
         return OkosynkConfiguration.instance;
     }
 
-    @Override
-    public void setBoolean(final String key, final boolean value) {
-
-        compositeConfigurationForSecondPriority.addProperty(key, value);
-    }
-
     // --------- Getters BEGIN: ------------------------------------------------
     //
     @Override
@@ -152,6 +146,7 @@ public class OkosynkConfiguration
 
     @Override
     public int getRequiredInt(final String key) {
+
         final String firstPriorityKey = convertToFirstPriorityKey(key);
         final String secondPriorityKey = key;
         final int value;
@@ -194,6 +189,31 @@ public class OkosynkConfiguration
     private void checkRequired(final String key) {
         Validate.validState(compositeConfigurationForSecondPriority.containsKey(key),
                 "Fant ikke konfigurasjonsnøkkel %s", key);
+    }
+
+    @Override
+    public String getNavTrustStorePath() {
+        return getRequiredString(Constants.NAV_TRUSTSTORE_PATH_KEY);
+    }
+
+    @Override
+    public String getNavTrustStorePassword() {
+        return getRequiredString(Constants.NAV_TRUSTSTORE_PASSWORD_KEY);
+    }
+
+    @Override
+    public String getPrometheusAddress(final String defaultPrometheusAddress) {
+        return getString(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, defaultPrometheusAddress);
+    }
+
+    @Override
+    public String getBatchBruker(final Constants.BATCH_TYPE batchType) {
+        return getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+    }
+
+    @Override
+    public String getBatchBrukerPassword(final Constants.BATCH_TYPE batchType) {
+        return getString(batchType.getBatchBrukerPasswordKey());
     }
 
     private void copySomePropertiesToSystemPropertiesToSatisfyExternalLibraries() {

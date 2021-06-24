@@ -1,6 +1,5 @@
 package no.nav.okosynk.config;
 
-import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,18 +11,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ConstantsTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final Logger logger = LoggerFactory.getLogger(ConstantsTest.class);
 
     private static String hentOsBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
 
         final String batchBruker =
-            okosynkConfiguration
-                .getString(
-                    Constants.BATCH_TYPE.OS.getBatchBrukerKey(),
-                    Constants.BATCH_TYPE.OS.getBatchBrukerDefaultValue()
-                );
+                okosynkConfiguration
+                        .getString(
+                                Constants.BATCH_TYPE.OS.getBatchBrukerKey(),
+                                Constants.BATCH_TYPE.OS.getBatchBrukerDefaultValue()
+                        );
 
         return batchBruker;
     }
@@ -31,11 +30,11 @@ public class ConstantsTest {
     private static String hentUrBatchBruker(final IOkosynkConfiguration okosynkConfiguration) {
 
         final String batchBruker =
-            okosynkConfiguration
-                .getString(
-                    Constants.BATCH_TYPE.UR.getBatchBrukerKey(),
-                    Constants.BATCH_TYPE.UR.getBatchBrukerDefaultValue()
-                );
+                okosynkConfiguration
+                        .getString(
+                                Constants.BATCH_TYPE.UR.getBatchBrukerKey(),
+                                Constants.BATCH_TYPE.UR.getBatchBrukerDefaultValue()
+                        );
 
         return batchBruker;
     }
@@ -113,9 +112,9 @@ public class ConstantsTest {
     private void when_x_the_consumer_statistics_name_should_reflect_it(final BATCH_TYPE batchType) {
 
         final String expectedConsumerStatisticsName =
-            batchType.name() + " - " + batchType.getName();
+                batchType.name() + " - " + batchType.getName();
         final String actualConsumerStatisticsName =
-            batchType.getConsumerStatisticsName();
+                batchType.getConsumerStatisticsName();
 
         System.out.println("actualConsumerStatisticsName: " + actualConsumerStatisticsName);
 

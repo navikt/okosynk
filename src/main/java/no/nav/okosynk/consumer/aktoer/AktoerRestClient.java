@@ -44,9 +44,7 @@ public class AktoerRestClient {
 
         this.okosynkConfiguration = okosynkConfiguration;
         this.batchType = batchType;
-        this.consumerId =
-                okosynkConfiguration
-                        .getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
+        this.consumerId = okosynkConfiguration.getBatchBruker(batchType);
 
         log.info("Aktoerregister REST client bygd opp for {}", this.consumerId);
     }
