@@ -232,3 +232,5 @@ Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljø
 - Kjør `java -jar target/okosynk.jar -h` for å se hvilke kommandolinjeparametre som er tilgjengelige
 - NB! testdatafilene inneholder binære verdier, så de må editeres med omhu! (F.eks. kan OS-testdatafila inneholde et 
   tegn som fortoner seg som en 'æ', men som _IKKE_ er det, det er derimot en HEX E6.)
+- Can some dependencies be updated?
+    - `mvn versions:display-dependency-updates`
