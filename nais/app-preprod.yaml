@@ -65,8 +65,7 @@ spec:
       #     secretKeyRef:
       #       name: okosynk
       #       key: srvbokosynk001_password
-      - format: env
-        kvPath: serviceuser/data/dev/srvbokosynk001/password
+      - kvPath: serviceuser/data/dev/srvbokosynk001/password
         mountPath: /secrets/serviceuser/okosynk/srvbokosynk001/password
 
       #- name: SRVBOKOSYNK002_PASSWORD
@@ -74,8 +73,7 @@ spec:
       #   secretKeyRef:
       #     name: okosynk
       #     key: srvbokosynk002_password
-      - format: env
-        kvPath: serviceuser/data/dev/srvbokosynk002/password
+      - kvPath: serviceuser/data/dev/srvbokosynk002/password
         mountPath: /secrets/serviceuser/okosynk/srvbokosynk002/password
 
       #- name: OSFTPCREDENTIALS_PASSWORD
@@ -89,8 +87,7 @@ spec:
       #     secretKeyRef:
       #       name: okosynk
       #       key: urftpcredentials_password
-      - format: env
-        kvPath: serviceuser/data/dev/srvokosynksftp/password
+      - kvPath: serviceuser/data/dev/srvokosynksftp/password
         mountPath: /secrets/serviceuser/okosynk/srvokosynksftp/password
     sidecar: true
 status: {}
