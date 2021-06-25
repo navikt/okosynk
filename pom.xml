@@ -52,7 +52,7 @@
         <pact.version>4.0.10</pact.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <prometheus.version>0.9.0</prometheus.version>
+        <prometheus.version>0.11.0</prometheus.version>
         <revision>002.005.000</revision>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
         <wiremock.version>2.27.2</wiremock.version>

@@ -60,7 +60,38 @@ spec:
   vault:
     enabled: true
     paths:
+      -
+      #- name: SRVBOKOSYNK001_PASSWORD
+      #  valueFrom:
+      #     secretKeyRef:
+      #       name: okosynk
+      #       key: srvbokosynk001_password
       - format: env
         kvPath: serviceuser/data/dev/srvbokosynk001/password
-        mountPath: /var/run/secrets/nais.io/vault
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk001/password
+
+      #- name: SRVBOKOSYNK002_PASSWORD
+      #  valueFrom:
+      #   secretKeyRef:
+      #     name: okosynk
+      #     key: srvbokosynk002_password
+      - format: env
+        kvPath: serviceuser/data/dev/srvbokosynk002/password
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk002/password
+
+      #- name: OSFTPCREDENTIALS_PASSWORD
+      #  valueFrom:
+      #   secretKeyRef:
+      #     name: okosynk
+      #     key: osftpcredentials_password
+
+      # - name: URFTPCREDENTIALS_PASSWORD
+      #   valueFrom:
+      #     secretKeyRef:
+      #       name: okosynk
+      #       key: urftpcredentials_password
+      - format: env
+        kvPath: serviceuser/data/dev/srvokosynksftp/password
+        mountPath: /secrets/serviceuser/srvokosynksftp
+
     sidecar: true

@@ -1,6 +1,8 @@
 package no.nav.okosynk.config;
 
+import org.apache.commons.configuration2.BaseConfiguration;
 import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.EnvironmentConfiguration;
 import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
@@ -11,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,10 +25,8 @@ public class OkosynkConfiguration
 
     private static final Logger logger = LoggerFactory.getLogger(OkosynkConfiguration.class);
     private static IOkosynkConfiguration singleton = null;
-    private final CompositeConfiguration compositeConfigurationForFirstPriority =
-            new CompositeConfiguration();
-    private final CompositeConfiguration compositeConfigurationForSecondPriority =
-            new CompositeConfiguration();
+    private final CompositeConfiguration compositeConfigurationForFirstPriority = new CompositeConfiguration();
+    private final CompositeConfiguration compositeConfigurationForSecondPriority = new CompositeConfiguration();
     private final SystemConfiguration systemConfiguration;
 
     private OkosynkConfiguration(final String applicationPropertiesFileName) {
@@ -33,6 +36,7 @@ public class OkosynkConfiguration
         this.systemConfiguration = systemConfiguration;
 
         this.compositeConfigurationForFirstPriority.addConfiguration(new EnvironmentConfiguration());
+        //addVaultProperties(compositeConfigurationForFirstPriority);
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
 
         try {
@@ -62,6 +66,31 @@ public class OkosynkConfiguration
 
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
+
+    /*private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
+        Configuration baseConfig = new BaseConfiguration();
+        baseConfig.addProperty("SRVBOKOSYNK001_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/oppgave/username"));
+
+
+        baseConfig.addProperty("SRVOPPGAVE_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/oppgave/password"));
+        baseConfig.addProperty("LDAP_USERNAME", getPropertyValueFromVault("/secrets/serviceuser/ldap/username"));
+        baseConfig.addProperty("LDAP_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/ldap/password"));
+        baseConfig.addProperty("OPPGAVEDS_USERNAME", getPropertyValueFromVault("/secrets/oracle/username"));
+        baseConfig.addProperty("OPPGAVEDS_PASSWORD", getPropertyValueFromVault("/secrets/oracle/password"));
+        baseConfig.addProperty("OPPGAVEDS_URL", getPropertyValueFromVault("/config/oracle/jdbc_url"));
+
+        compositeConfiguration.addConfiguration(baseConfig);
+    }
+
+    private String getPropertyValueFromVault(final String path) {
+        try {
+            return Files.readString(Path.of(path), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            logger.info("Klarte ikke laste property for path {}", path);
+        }
+
+        return null;
+    }*/
 
     /**
      * NB! If this method is called more than once,
