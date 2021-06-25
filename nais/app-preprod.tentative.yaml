@@ -17,6 +17,13 @@ spec:
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   webproxy: true
   ttlSecondsAfterFinished: 172800
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: 250m
+      memory: 1Gi
   env:
     - name: OKOSYNK_SHOULD_RUN_DRY
       value: "false"
@@ -50,7 +57,10 @@ spec:
       value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
     - name: URFTPCREDENTIALS_USERNAME
       value: srvokosynksftp
-
-    # TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
-    - name: NAV_TRUSTSTORE_PATH
-      value: "/var/run/secrets/naisd.io/nav_truststore_path"
+  vault:
+    enabled: true
+    paths:
+      - format: env
+        kvPath: /kv/preprod/fss/application/namespace
+        mountPath: /var/run/secrets/nais.io/vault
+    sidecar: true
