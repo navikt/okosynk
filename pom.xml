@@ -11,6 +11,8 @@
 
     <properties>
 
+        <revision>002.006.001</revision>
+
         <!-- BEGIN: Breaking bumps -->
         <jetty.version>9.4.35.v20201120</jetty.version> <!-- Problematic: 9.4.35.v20201120 -> 11.0.0 -->
         <mockito.version>1.10.19</mockito.version> <!-- Problematic: 1.10.19 -> 3.11.2 -->
@@ -53,7 +55,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <prometheus.version>0.11.0</prometheus.version>
-        <revision>002.006.000</revision>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
         <wiremock.version>2.27.2</wiremock.version>
     </properties>
