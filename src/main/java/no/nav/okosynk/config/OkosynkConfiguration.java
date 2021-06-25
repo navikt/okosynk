@@ -19,7 +19,7 @@ public class OkosynkConfiguration
         extends AbstractOkosynkConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(OkosynkConfiguration.class);
-    private static IOkosynkConfiguration instance = null;
+    private static IOkosynkConfiguration singleton = null;
     private final CompositeConfiguration compositeConfigurationForFirstPriority =
             new CompositeConfiguration();
     private final CompositeConfiguration compositeConfigurationForSecondPriority =
@@ -63,7 +63,16 @@ public class OkosynkConfiguration
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    // TODO: Not very beautiful to parametrize the applicationPropertiesFileName. What if the method is called with another applicationPropertiesFileName parameter?
+    /**
+     * NB! If this method is called more than once,
+     * and the subsequent calls have a different
+     * applicationPropertiesFileName parameter from the first call,
+     * that parameter will be neglected and the instance created
+     * upon the first call will be returned.
+     *
+     * @param applicationPropertiesFileName
+     * @return
+     */
     public static IOkosynkConfiguration getInstance(final String applicationPropertiesFileName) {
 
         if (applicationPropertiesFileName == null) {
@@ -72,11 +81,11 @@ public class OkosynkConfiguration
             throw new NullPointerException(msg);
         }
 
-        if (OkosynkConfiguration.instance == null) {
-            OkosynkConfiguration.instance = new OkosynkConfiguration(applicationPropertiesFileName);
+        if (OkosynkConfiguration.singleton == null) {
+            OkosynkConfiguration.singleton = new OkosynkConfiguration(applicationPropertiesFileName);
         }
 
-        return OkosynkConfiguration.instance;
+        return OkosynkConfiguration.singleton;
     }
 
     // --------- Getters BEGIN: ------------------------------------------------
