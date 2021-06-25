@@ -92,6 +92,6 @@ spec:
       #       key: urftpcredentials_password
       - format: env
         kvPath: serviceuser/data/dev/srvokosynksftp/password
-        mountPath: /secrets/serviceuser/srvokosynksftp
+        mountPath: /secrets/serviceuser/okosynk/srvokosynksftp/password
 
     sidecar: true

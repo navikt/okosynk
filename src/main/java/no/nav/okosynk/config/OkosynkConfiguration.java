@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +36,7 @@ public class OkosynkConfiguration
         this.systemConfiguration = systemConfiguration;
 
         this.compositeConfigurationForFirstPriority.addConfiguration(new EnvironmentConfiguration());
-        //addVaultProperties(compositeConfigurationForFirstPriority);
+        addVaultProperties(compositeConfigurationForFirstPriority);
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
 
         try {
@@ -67,30 +67,37 @@ public class OkosynkConfiguration
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    /*private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
-        Configuration baseConfig = new BaseConfiguration();
-        baseConfig.addProperty("SRVBOKOSYNK001_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/oppgave/username"));
-
-
-        baseConfig.addProperty("SRVOPPGAVE_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/oppgave/password"));
-        baseConfig.addProperty("LDAP_USERNAME", getPropertyValueFromVault("/secrets/serviceuser/ldap/username"));
-        baseConfig.addProperty("LDAP_PASSWORD", getPropertyValueFromVault("/secrets/serviceuser/ldap/password"));
-        baseConfig.addProperty("OPPGAVEDS_USERNAME", getPropertyValueFromVault("/secrets/oracle/username"));
-        baseConfig.addProperty("OPPGAVEDS_PASSWORD", getPropertyValueFromVault("/secrets/oracle/password"));
-        baseConfig.addProperty("OPPGAVEDS_URL", getPropertyValueFromVault("/config/oracle/jdbc_url"));
-
+    private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
+        final Configuration baseConfig = new BaseConfiguration();
+        addVaultProperty(baseConfig, "SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password");
+        addVaultProperty(baseConfig, "SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password");
+        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
+        addVaultProperty(baseConfig, "URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
         compositeConfiguration.addConfiguration(baseConfig);
     }
 
-    private String getPropertyValueFromVault(final String path) {
-        try {
-            return Files.readString(Path.of(path), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            logger.info("Klarte ikke laste property for path {}", path);
-        }
+    private void addVaultProperty(
+            final Configuration baseConfig,
+            final String propertyKey,
+            final String fileName) {
 
-        return null;
-    }*/
+        logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
+        final String propertyValue = readStringFromFile(fileName);
+        baseConfig.addProperty(propertyKey, propertyValue);
+        logger.info("Property " + propertyKey + " now contains the value: " + (propertyValue == null ? null : "***<something>***"));
+    }
+
+    private String readStringFromFile(final String fileName) {
+        String content = null;
+        try {
+            content = new String(Files.readAllBytes(Paths.get(fileName)));
+        } catch (NoSuchFileException e) {
+            logger.error("The file " + fileName + " does not exist");
+        } catch (Throwable e) {
+            logger.error("The file " + fileName + " could not be read", e);
+        }
+        return content;
+    }
 
     /**
      * NB! If this method is called more than once,
