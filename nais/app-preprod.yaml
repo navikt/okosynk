@@ -43,18 +43,10 @@ spec:
       value: "30000"
     - name: BATCH_MAX_NUMBER_OF_TRIES
       value: "3"
-    - name: SRVBOKOSYNK001_USERNAME
-      value: srvbokosynk001
-    - name: SRVBOKOSYNK002_USERNAME
-      value: srvbokosynk002
     - name: OSFTPBASEURL_URL
       value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/os.input
-    - name: OSFTPCREDENTIALS_USERNAME
-      value: srvokosynksftp
     - name: URFTPBASEURL_URL
       value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
-    - name: URFTPCREDENTIALS_USERNAME
-      value: srvokosynksftp
   vault:
     enabled: true
     paths:

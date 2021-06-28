@@ -69,9 +69,13 @@ public class OkosynkConfiguration
 
     private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
         final Configuration baseConfig = new BaseConfiguration();
+        addVaultProperty(baseConfig, "SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username");
         addVaultProperty(baseConfig, "SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password");
+        addVaultProperty(baseConfig, "SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username");
         addVaultProperty(baseConfig, "SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password");
+        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
         addVaultProperty(baseConfig, "OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
+        addVaultProperty(baseConfig, "URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
         addVaultProperty(baseConfig, "URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
         compositeConfiguration.addConfiguration(baseConfig);
     }
@@ -80,11 +84,10 @@ public class OkosynkConfiguration
             final Configuration baseConfig,
             final String propertyKey,
             final String fileName) {
-
         logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
         final String propertyValue = readStringFromFile(fileName);
         baseConfig.addProperty(propertyKey, propertyValue);
-        logger.info("Property " + propertyKey + " now contains the value: " + (propertyValue == null ? null : "***<something>***"));
+        logger.info("Property {} now contains the value: {}", propertyKey, (propertyValue == null ? null : propertyKey.contains("PASSWORD") ? "***<something>***" : propertyValue));
     }
 
     private String readStringFromFile(final String fileName) {
