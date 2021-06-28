@@ -67,41 +67,6 @@ public class OkosynkConfiguration
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
-        final Configuration baseConfig = new BaseConfiguration();
-        addVaultProperty(baseConfig, "SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password");
-        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
-        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
-        addVaultProperty(baseConfig, "URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
-        addVaultProperty(baseConfig, "URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
-        compositeConfiguration.addConfiguration(baseConfig);
-    }
-
-    private void addVaultProperty(
-            final Configuration baseConfig,
-            final String propertyKey,
-            final String fileName) {
-        logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
-        final String propertyValue = readStringFromFile(fileName);
-        baseConfig.addProperty(propertyKey, propertyValue);
-        logger.info("Property {} now contains the value: {}", propertyKey, (propertyValue == null ? null : propertyKey.contains("PASSWORD") ? "***<something>***" : propertyValue));
-    }
-
-    private String readStringFromFile(final String fileName) {
-        String content = null;
-        try {
-            content = new String(Files.readAllBytes(Paths.get(fileName)));
-        } catch (NoSuchFileException e) {
-            logger.error("The file " + fileName + " does not exist");
-        } catch (Throwable e) {
-            logger.error("The file " + fileName + " could not be read", e);
-        }
-        return content;
-    }
-
     /**
      * NB! If this method is called more than once,
      * and the subsequent calls have a different
@@ -127,8 +92,6 @@ public class OkosynkConfiguration
         return OkosynkConfiguration.singleton;
     }
 
-    // --------- Getters BEGIN: ------------------------------------------------
-    //
     @Override
     public String getString(final String key) {
 
@@ -205,23 +168,6 @@ public class OkosynkConfiguration
             value = compositeConfigurationForSecondPriority.getInt(secondPriorityKey);
         }
         return value;
-    }
-    //
-    // --------- Getters END ---------------------------------------------------
-
-    private boolean containsEnvironmentVariableCaseSensitively(
-            final String environmentVariableToFind) {
-
-        final Iterator<String> keyIterator = compositeConfigurationForFirstPriority.getKeys();
-        boolean containsEnvironmentVariableCaseSensitively = false;
-        while (keyIterator.hasNext()) {
-            final String environmentVariable = keyIterator.next();
-            if (environmentVariable.equals(environmentVariableToFind)) {
-                containsEnvironmentVariableCaseSensitively = true;
-                break;
-            }
-        }
-        return containsEnvironmentVariableCaseSensitively;
     }
 
     @Override
@@ -314,6 +260,21 @@ public class OkosynkConfiguration
                 );
     }
 
+    private boolean containsEnvironmentVariableCaseSensitively(
+            final String environmentVariableToFind) {
+
+        final Iterator<String> keyIterator = compositeConfigurationForFirstPriority.getKeys();
+        boolean containsEnvironmentVariableCaseSensitively = false;
+        while (keyIterator.hasNext()) {
+            final String environmentVariable = keyIterator.next();
+            if (environmentVariable.equals(environmentVariableToFind)) {
+                containsEnvironmentVariableCaseSensitively = true;
+                break;
+            }
+        }
+        return containsEnvironmentVariableCaseSensitively;
+    }
+
     /**
      * In a NAIS environment, system properties of the form x.y are all converted to corresponding
      * environment variables X_Y.
@@ -325,5 +286,40 @@ public class OkosynkConfiguration
         final String convertedKey = originalKey.toUpperCase().replace('.', '_');
 
         return convertedKey;
+    }
+
+    private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
+        final Configuration baseConfig = new BaseConfiguration();
+        addVaultProperty(baseConfig, "SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username");
+        addVaultProperty(baseConfig, "SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password");
+        addVaultProperty(baseConfig, "SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username");
+        addVaultProperty(baseConfig, "SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password");
+        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
+        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
+        addVaultProperty(baseConfig, "URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
+        addVaultProperty(baseConfig, "URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
+        compositeConfiguration.addConfiguration(baseConfig);
+    }
+
+    private void addVaultProperty(
+            final Configuration baseConfig,
+            final String propertyKey,
+            final String fileName) {
+        logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
+        final String propertyValue = readStringFromFile(fileName);
+        baseConfig.addProperty(propertyKey, propertyValue);
+        logger.info("Property {} now contains the value: {}", propertyKey, (propertyValue == null ? null : propertyKey.contains("PASSWORD") ? "***<something>***" : propertyValue));
+    }
+
+    private String readStringFromFile(final String fileName) {
+        String content = null;
+        try {
+            content = new String(Files.readAllBytes(Paths.get(fileName)));
+        } catch (NoSuchFileException e) {
+            logger.error("The file " + fileName + " does not exist");
+        } catch (Throwable e) {
+            logger.error("The file " + fileName + " could not be read", e);
+        }
+        return content;
     }
 }
