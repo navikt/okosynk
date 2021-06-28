@@ -142,12 +142,16 @@ Her ser vi at disse podene er "Completed", altså gikk jobben bra. "Age" viser n
 hver pod begynte å kjøre. Hvis vi skal sjekke loggene til den siste pod-en, kan vi
 kjøre
 
-`kubectl logs okosynk-1536642000-j6ccz`
+`kubectl logs okosynk-1536642000-j6ccz okosynk`
+eller
+`kubectl logs okosynk-1536642000-j6ccz vks-sidecar`
+eller
+`kubectl logs okosynk-1536642000-j6ccz vks-init`
 
 og da kommer loggene til pod-en opp i terminalen.<BR/>
 Og for å finne ut hvorvidt jobbene er vellykka fullførte:
 
-`kubectl logs okosynk-1556078400-gfdhr | grep -i fullført`
+`kubectl logs okosynk-1556078400-gfdhr vks-init | grep -i fullført`
 
 Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljøvariablene + mye mer...):<BR/>
 
