@@ -1,5 +1,5 @@
-apiVersion: batch/v1beta1
-kind: CronJob
+apiVersion: nais.io/v1
+kind: Naisjob
 metadata:
   labels:
     team: oppgavehandtering
@@ -13,94 +13,56 @@ spec:
       claims:
         extra:
           - "NAVident"
-  webproxy: true
+  image: {{image}}
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
-  jobTemplate:
-    spec:
-      ttlSecondsAfterFinished: 172800
-      template:
-        spec:
-          imagePullSecrets:
-            - name: gpr-credentials
-          volumes:
-            - name: okosynk
-              secret:
-                secretName: okosynk
-          restartPolicy: Never
-          containers:
-            - name: okosynk
-              image: {{image}}
-              resources:
-                requests:
-                  cpu: 500m
-                  memory: 2Gi
-                limits:
-                  cpu: 500m
-                  memory: 4Gi
-              env:
-                - name: OPPGAVE_URL
-                  value: https://oppgave.nais.adeo.no/api/v1/oppgaver
-                - name: AKTOERREGISTER_URL
-                  value: https://app.adeo.no/aktoerregister/api/v1/identer
-                - name: REST_STS_URL
-                  value: https://security-token-service.nais.adeo.no/rest/v1/sts/token
-                - name: SECURITYTOKENSERVICE_URL
-                  value: https://sts.adeo.no/SecurityTokenServiceProvider/
-                - name: PUSH_GATEWAY_ADDRESS
-                  value: nais-prometheus-pushgateway.nais:9091
-                - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
-                  value: "0"
-                - name: FILE_READER_MAX_NUMBER_OF_TRIES
-                  value: "1"
-                - name: BATCH_RETRY_WAIT_TIME_IN_MS
-                  value: "300000"
-                - name: BATCH_MAX_NUMBER_OF_TRIES
-                  value: "18"
-                - name: SRVBOKOSYNK001_USERNAME
-                  value: srvbokosynk001
-                - name: SRVBOKOSYNK002_USERNAME
-                  value: srvbokosynk002
-                - name: OSFTPBASEURL_URL
-                  value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input
-                - name: OSFTPCREDENTIALS_USERNAME
-                  value: srvokosynksftp
-                - name: URFTPBASEURL_URL
-                  value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
-                - name: URFTPCREDENTIALS_USERNAME
-                  value: srvokosynksftp
-
-# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
-                - name: NAV_TRUSTSTORE_PATH
-                  value: "/var/run/secrets/naisd.io/nav_truststore_path"
-
-                - name: SRVBOKOSYNK001_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: srvbokosynk001_password
-                - name: SRVBOKOSYNK002_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: srvbokosynk002_password
-                - name: OSFTPCREDENTIALS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: osftpcredentials_password
-                - name: URFTPCREDENTIALS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: urftpcredentials_password
-
-# TODO: Automatically added by NAISERATOR. Remove when confirming that it works in prod after conversion to NaisJob:
-                - name: NAV_TRUSTSTORE_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: okosynk
-                      key: nav_truststore_password
-
-              volumeMounts:
-                - name: okosynk
-                  mountPath: "/var/run/secrets/naisd.io/"
+  webproxy: true
+  ttlSecondsAfterFinished: 172800
+  resources:
+    requests:
+      cpu: 500m
+      memory: 2Gi
+    limits:
+      cpu: 500m
+      memory: 4Gi
+  env:
+    - name: OPPGAVE_URL
+      value: https://oppgave.nais.adeo.no/api/v1/oppgaver
+    - name: AKTOERREGISTER_URL
+      value: https://app.adeo.no/aktoerregister/api/v1/identer
+    - name: REST_STS_URL
+      value: https://security-token-service.nais.adeo.no/rest/v1/sts/token
+    - name: SECURITYTOKENSERVICE_URL
+      value: https://sts.adeo.no/SecurityTokenServiceProvider/
+    - name: PUSH_GATEWAY_ADDRESS
+      value: nais-prometheus-pushgateway.nais:9091
+    - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
+      value: "0"
+    - name: FILE_READER_MAX_NUMBER_OF_TRIES
+      value: "1"
+    - name: BATCH_RETRY_WAIT_TIME_IN_MS
+      value: "300000"
+    - name: BATCH_MAX_NUMBER_OF_TRIES
+      value: "18"
+    - name: SRVBOKOSYNK001_USERNAME
+      value: srvbokosynk001
+    - name: SRVBOKOSYNK002_USERNAME
+      value: srvbokosynk002
+    - name: OSFTPBASEURL_URL
+      value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input
+    - name: OSFTPCREDENTIALS_USERNAME
+      value: srvokosynksftp
+    - name: URFTPBASEURL_URL
+      value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
+    - name: URFTPCREDENTIALS_USERNAME
+      value: srvokosynksftp
+  vault:
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/prod/srvbokosynk001
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk001
+      - kvPath: serviceuser/data/prod/srvbokosynk002
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
+      - kvPath: serviceuser/data/prod/srvokosynksftp
+        mountPath: /secrets/serviceuser/okosynk/srvokosynksftp
+    sidecar: true
+status: {}
