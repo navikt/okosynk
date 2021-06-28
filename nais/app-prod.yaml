@@ -38,8 +38,6 @@ spec:
                   cpu: 500m
                   memory: 4Gi
               env:
-                - name: OKOSYNK_SHOULD_RUN_DRY
-                  value: "false"
                 - name: OPPGAVE_URL
                   value: https://oppgave.nais.adeo.no/api/v1/oppgaver
                 - name: AKTOERREGISTER_URL
