@@ -8,6 +8,7 @@ import org.apache.commons.configuration2.SystemConfiguration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.javatuples.Quintet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class OkosynkConfiguration
         extends AbstractOkosynkConfiguration {
@@ -284,20 +286,21 @@ public class OkosynkConfiguration
      */
     private String convertToFirstPriorityKey(final String originalKey) {
         final String convertedKey = originalKey.toUpperCase().replace('.', '_');
-
         return convertedKey;
     }
 
     private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
         final Configuration baseConfig = new BaseConfiguration();
-        addVaultProperty(baseConfig, "SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username");
-        addVaultProperty(baseConfig, "SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password");
-        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
-        addVaultProperty(baseConfig, "OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
-        addVaultProperty(baseConfig, "URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username");
-        addVaultProperty(baseConfig, "URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password");
+        Stream.of(
+                new ImmutablePair<>("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
+                new ImmutablePair<>("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
+                new ImmutablePair<>("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
+                new ImmutablePair<>("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
+                new ImmutablePair<>("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new ImmutablePair<>("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
+                new ImmutablePair<>("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new ImmutablePair<>("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
+        ).forEach(pair -> addVaultProperty(baseConfig, pair.left, pair.right));
         compositeConfiguration.addConfiguration(baseConfig);
     }
 
