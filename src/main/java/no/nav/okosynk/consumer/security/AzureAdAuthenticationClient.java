@@ -67,14 +67,14 @@ public class AzureAdAuthenticationClient {
 
     private void logDevelopmentInfo() {
         // TODO: AZURE: Remove when finished developement
-        logger.info("***** BEGIN Development info (to be removed when in prod: *****");
+        logger.info("***** BEGIN Azure AD Development info (to be removed when in prod: *****");
         logger.info("getAzureAppClientId: {}", getAzureAppClientId(okosynkConfiguration));
         logger.info("getAzureAppScopes: {}", getAzureAppScopes(okosynkConfiguration));
         logger.info("getAzureAppClientSecret: {}", getAzureAppClientSecret(okosynkConfiguration) == null ? null : "***<Something>***");
         logger.info("getAzureAppWellKnownUrl: {}", getAzureAppWellKnownUrl(okosynkConfiguration));
         logger.info("getGrantType: {}", getGrantType());
         logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
-        logger.info("***** END Development info (to be removed when in prod *****");
+        logger.info("***** END Azure AD Development info (to be removed when in prod *****");
     }
 
     public String getToken() {
@@ -82,6 +82,9 @@ public class AzureAdAuthenticationClient {
     }
 
     private String getTokenUsingClientSecret() {
+
+        logger.info("Entering getTokenUsingClientSecret()...");
+
         final String urlString = AzureAdAuthenticationClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
         final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(urlString);
@@ -95,16 +98,20 @@ public class AzureAdAuthenticationClient {
                         .map(pair -> pair.left + "=" + pair.right)
                         .collect(Collectors.joining("\n&"));
 
+        logger.info("getTokenUsingClientSecret(): 100");
+
         final BasicHttpEntity httpEntity = new BasicHttpEntity();
         httpEntity.setContent(new ByteArrayInputStream(parmsBody.getBytes()));
         httpEntityEnclosingRequestBase.setEntity(httpEntity);
         httpEntityEnclosingRequestBase.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
+        logger.info("getTokenUsingClientSecret(): 200");
+
         final CloseableHttpResponse closeableHttpResponse;
         final StatusLine statusLine;
         String azureAdAccessTokenForCurrentServiceUser = null;
         try {
-            logger.debug("About to call Azure Ad provider...");
+            logger.info("About to call Azure Ad provider...");
             closeableHttpResponse = closeableHttpClient.execute(httpEntityEnclosingRequestBase);
             statusLine = closeableHttpResponse.getStatusLine();
             logger.info("statusLine.getStatusCode(): {}", statusLine.getStatusCode());
