@@ -104,9 +104,10 @@ public class AzureAdAuthenticationClient {
         final StatusLine statusLine;
         String azureAdAccessTokenForCurrentServiceUser = null;
         try {
+            logger.debug("About to call Azure Ad provider...");
             closeableHttpResponse = closeableHttpClient.execute(httpEntityEnclosingRequestBase);
             statusLine = closeableHttpResponse.getStatusLine();
-            logger.error("statusLine.getStatusCode(): {}", statusLine.getStatusCode());
+            logger.info("statusLine.getStatusCode(): {}", statusLine.getStatusCode());
             if (statusLine.getStatusCode() == 200) {
                 final HttpEntity responseHttpEntity = closeableHttpResponse.getEntity();
                 azureAdAccessTokenForCurrentServiceUser = new BufferedReader(
@@ -116,7 +117,7 @@ public class AzureAdAuthenticationClient {
                 logger.error("azureAdAccessTokenForCurrentServiceUser {}", azureAdAccessTokenForCurrentServiceUser == null ? null : "***<Something>***");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Exception received when doing HTTP against Azure Ad provider", e);
         }
 
         return azureAdAccessTokenForCurrentServiceUser;
