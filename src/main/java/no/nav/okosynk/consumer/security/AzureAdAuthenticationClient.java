@@ -96,16 +96,12 @@ public class AzureAdAuthenticationClient {
                         ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
                 )
                         .map(pair -> pair.left + "=" + pair.right)
-                        .collect(Collectors.joining("\n&"));
-
-        logger.info("getTokenUsingClientSecret(): 100");
+                        .collect(Collectors.joining("&"));
 
         final BasicHttpEntity httpEntity = new BasicHttpEntity();
         httpEntity.setContent(new ByteArrayInputStream(parmsBody.getBytes()));
         httpEntityEnclosingRequestBase.setEntity(httpEntity);
         httpEntityEnclosingRequestBase.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
-        logger.info("getTokenUsingClientSecret(): 200");
 
         final CloseableHttpResponse closeableHttpResponse;
         final StatusLine statusLine;
