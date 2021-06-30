@@ -69,4 +69,9 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     public String getAzureAppScopes() {
         return Stream.of(getRequiredString("AZURE_APP_SCOPE_OPPGAVE")).collect(Collectors.joining(" "));
     }
+
+    @Override
+    public String getSecureHttpProxyUrl() {
+        return getString("HTTPS_PROXY");
+    }
 }

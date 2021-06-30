@@ -3,6 +3,7 @@ package no.nav.okosynk.consumer.security;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -10,6 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,10 @@ public class AzureAdAuthenticationClient {
         logDevelopmentInfo();
     }
 
+    private static String getSecureHttpProxyUrl(final IOkosynkConfiguration okosynkConfiguration) {
+        return okosynkConfiguration.getSecureHttpProxyUrl();
+    }
+
     private static String getAzureAppClientId(final IOkosynkConfiguration okosynkConfiguration) {
         return okosynkConfiguration.getAzureAppClientId();
     }
@@ -68,10 +74,11 @@ public class AzureAdAuthenticationClient {
     private void logDevelopmentInfo() {
         // TODO: AZURE: Remove when finished developement
         logger.info("***** BEGIN Azure AD Development info (to be removed when in prod: *****");
-        logger.info("getAzureAppClientId: {}", getAzureAppClientId(okosynkConfiguration));
-        logger.info("getAzureAppScopes: {}", getAzureAppScopes(okosynkConfiguration));
-        logger.info("getAzureAppClientSecret: {}", getAzureAppClientSecret(okosynkConfiguration) == null ? null : "***<Something>***");
-        logger.info("getAzureAppWellKnownUrl: {}", getAzureAppWellKnownUrl(okosynkConfiguration));
+        logger.info("getSecureHttpProxyUrl: {}", getSecureHttpProxyUrl(this.okosynkConfiguration));
+        logger.info("getAzureAppClientId: {}", getAzureAppClientId(this.okosynkConfiguration));
+        logger.info("getAzureAppScopes: {}", getAzureAppScopes(this.okosynkConfiguration));
+        logger.info("getAzureAppClientSecret: {}", getAzureAppClientSecret(this.okosynkConfiguration) == null ? null : "***<Something>***");
+        logger.info("getAzureAppWellKnownUrl: {}", getAzureAppWellKnownUrl(this.okosynkConfiguration));
         logger.info("getGrantType: {}", getGrantType());
         logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
         logger.info("***** END Azure AD Development info (to be removed when in prod *****");
@@ -85,8 +92,18 @@ public class AzureAdAuthenticationClient {
 
         logger.info("Entering getTokenUsingClientSecret()...");
 
+        final String secureHttpProxyUrl = getSecureHttpProxyUrl(this.okosynkConfiguration);
+        final CloseableHttpClient closeableHttpClient;
+        if (secureHttpProxyUrl == null) {
+            closeableHttpClient = HttpClients.createDefault();
+        } else {
+            final HttpHost proxy = new HttpHost(secureHttpProxyUrl);
+            final DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
+            closeableHttpClient = HttpClients.custom()
+                    .setRoutePlanner(routePlanner)
+                    .build();
+        }
         final String urlString = AzureAdAuthenticationClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
-        final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(urlString);
         final String parmsBody =
                 Stream.of(

@@ -52,4 +52,5 @@ public interface IOkosynkConfiguration {
     String getAzureAppClientId();
     String getAzureAppClientSecret();
     String getAzureAppScopes();
+    String getSecureHttpProxyUrl();
 }

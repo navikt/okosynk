@@ -238,3 +238,5 @@ Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljø
   tegn som fortoner seg som en 'æ', men som _IKKE_ er det, det er derimot en HEX E6.)
 - Can some dependencies be updated?
     - `mvn versions:display-dependency-updates`
+- Sjekk innholdet i en pod:
+    - `kubectl describe jobs okosynk-oor-manually-started-2021-06-30-12-16-ctm66`
