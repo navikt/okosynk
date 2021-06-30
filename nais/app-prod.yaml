@@ -51,6 +51,8 @@ spec:
       value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input
     - name: URFTPBASEURL_URL
       value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
+    - name: AZURE_APP_SCOPE_OPPGAVE
+      value: api://prod-fss.oppgavehandtering.oppgave/.default
   vault:
     enabled: true
     paths:

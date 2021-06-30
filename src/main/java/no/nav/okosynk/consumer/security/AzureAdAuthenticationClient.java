@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 /**
  * https://doc.nais.io/appendix/zero-trust/index.html
  * https://doc.nais.io/nais-application/application/
@@ -35,24 +34,15 @@ import java.util.stream.Stream;
  * https://security.labs.nais.io/pages/guide/api-kall/maskin_til_maskin_uten_bruker.html
  * https://security.labs.nais.io/pages/idp/azure-ad.html#registrere-din-applikasjon-i-azure-ad
  */
-public class AzureAdClient {
+public class AzureAdAuthenticationClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(AzureAdClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(AzureAdAuthenticationClient.class);
 
     final IOkosynkConfiguration okosynkConfiguration;
 
-    public AzureAdClient(final IOkosynkConfiguration okosynkConfiguration) {
+    public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
-
-        // TODO: AZURE: Remove when finished developement
-        logger.info("***** BEGIN Development info (to be removed when in prod: *****");
-        Stream.of("AZURE_APP_CLIENT_ID", "AZURE_APP_WELL_KNOWN_URL")
-                .forEach(envVar -> logger.info("{}: {}", envVar, okosynkConfiguration.getString(envVar)));
-
-        final String token = getToken();
-        logger.info("Token: {}", token == null ? null : "***<Something>***");
-
-        logger.info("***** END Development info (to be removed when in prod *****");
+        logDevelopmentInfo();
     }
 
     private static String getAzureAppClientId(final IOkosynkConfiguration okosynkConfiguration) {
@@ -75,20 +65,32 @@ public class AzureAdClient {
         return "client_credentials";
     }
 
+    private void logDevelopmentInfo() {
+        // TODO: AZURE: Remove when finished developement
+        logger.info("***** BEGIN Development info (to be removed when in prod: *****");
+        logger.info("getAzureAppClientId: {}", getAzureAppClientId(okosynkConfiguration));
+        logger.info("getAzureAppScopes: {}", getAzureAppScopes(okosynkConfiguration));
+        logger.info("getAzureAppClientSecret: {}", getAzureAppClientSecret(okosynkConfiguration) == null ? null : "***<Something>***");
+        logger.info("getAzureAppWellKnownUrl: {}", getAzureAppWellKnownUrl(okosynkConfiguration));
+        logger.info("getGrantType: {}", getGrantType());
+        logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
+        logger.info("***** END Development info (to be removed when in prod *****");
+    }
+
     public String getToken() {
         return getTokenUsingClientSecret();
     }
 
     private String getTokenUsingClientSecret() {
-        final String urlString = AzureAdClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
+        final String urlString = AzureAdAuthenticationClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
         final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
         final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(urlString);
         final String parmsBody =
                 Stream.of(
-                        ImmutablePair.of("client_id", AzureAdClient.getAzureAppClientId(this.okosynkConfiguration)),
-                        ImmutablePair.of("client_secret", AzureAdClient.getAzureAppClientSecret(this.okosynkConfiguration)),
-                        ImmutablePair.of("scope", AzureAdClient.getAzureAppScopes(okosynkConfiguration)),
-                        ImmutablePair.of("grant_type", AzureAdClient.getGrantType())
+                        ImmutablePair.of("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)),
+                        ImmutablePair.of("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)),
+                        ImmutablePair.of("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)),
+                        ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
                 )
                         .map(pair -> pair.left + "=" + pair.right)
                         .collect(Collectors.joining("\n&"));

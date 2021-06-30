@@ -67,6 +67,6 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     @Override
     public String getAzureAppScopes() {
-        return Stream.of("api://dev-fss.oppgavehandtering.oppgave/.default").collect(Collectors.joining("\n&"));
+        return Stream.of(getRequiredString("AZURE_APP_SCOPE_OPPGAVE")).collect(Collectors.joining(" "));
     }
 }
