@@ -1,5 +1,8 @@
 package no.nav.okosynk.config;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     @Override
@@ -45,5 +48,25 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     @Override
     public String getFtpCharsetName(final Constants.BATCH_TYPE batchType, final String ftpCharsetNameDefault) {
         return getString(batchType.getFtpCharsetNameKey(), ftpCharsetNameDefault);
+    }
+
+    @Override
+    public String getAzureAppWellKnownUrl() {
+        return getRequiredString("AZURE_APP_WELL_KNOWN_URL");
+    }
+
+    @Override
+    public String getAzureAppClientId() {
+        return getRequiredString("AZURE_APP_CLIENT_ID");
+    }
+
+    @Override
+    public String getAzureAppClientSecret() {
+        return getRequiredString("AZURE_APP_CLIENT_SECRET");
+    }
+
+    @Override
+    public String getAzureAppScopes() {
+        return Stream.of("api://dev-fss.oppgavehandtering.oppgave/.default").collect(Collectors.joining("\n&"));
     }
 }

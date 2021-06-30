@@ -203,9 +203,11 @@ public class CliMain {
         final String revision = getOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
-        // TODO: Log code during development:
+        // TODO: AZURE: Log code during development: (Remove when done!)
         final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
-        final AzureAdClient azureAdClient = new AzureAdClient(okosynkConfiguration);
+        if (okosynkConfiguration.getBoolean("SHOULD_LOG_AZURE", false)) {
+            new AzureAdClient(okosynkConfiguration);
+        }
     }
 
     protected void postRunAllBatches() {

@@ -47,4 +47,9 @@ public interface IOkosynkConfiguration {
     String getFtpUser(final Constants.BATCH_TYPE batchType);
     String getFtpPassword(final Constants.BATCH_TYPE batchType);
     String getFtpCharsetName(final Constants.BATCH_TYPE batchType, final String ftpCharsetNameDefault);
+
+    String getAzureAppWellKnownUrl();
+    String getAzureAppClientId();
+    String getAzureAppClientSecret();
+    String getAzureAppScopes();
 }

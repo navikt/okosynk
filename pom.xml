@@ -11,7 +11,7 @@
 
     <properties>
 
-        <revision>002.006.004</revision>
+        <revision>002.006.005</revision>
 
         <!-- BEGIN: Breaking bumps -->
         <jetty.version>9.4.35.v20201120</jetty.version> <!-- Problematic: 9.4.35.v20201120 -> 11.0.0 -->
@@ -51,6 +51,8 @@
         <maven-site-plugin.version>3.8.2</maven-site-plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <mina-core.version>3.0.0-M2</mina-core.version>
+        <nav.security.token-client-core.version>1.3.7</nav.security.token-client-core.version>
+        <!-- <nav.security.token-support.version>1.3.7</nav.security.token-support.version> -->
         <pact.version>4.0.10</pact.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -231,6 +233,19 @@
                 <version>${mina-core.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>no.nav.security</groupId>
+                <artifactId>token-client-core</artifactId>
+                <version>${nav.security.token-client-core.version}</version>
+            </dependency>
+<!--
+            <dependency>
+                <groupId>no.nav.security</groupId>
+                <artifactId>token-support</artifactId>
+                <version>${nav.security.token-support.version}</version>
+            </dependency>
+-->
+
         </dependencies>
     </dependencyManagement>
 
@@ -359,6 +374,11 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>au.com.dius</groupId>
@@ -419,6 +439,17 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-client-core</artifactId>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-support</artifactId>
+        </dependency>
+-->
 
     </dependencies>
 
