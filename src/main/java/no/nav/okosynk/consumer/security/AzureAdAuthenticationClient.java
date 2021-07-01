@@ -10,7 +10,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
@@ -19,16 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * https://doc.nais.io/appendix/zero-trust/index.html
@@ -47,6 +45,8 @@ public class AzureAdAuthenticationClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AzureAdAuthenticationClient.class);
 
+    private final static String GRANT_TYPE = "client_credentials";
+
     final IOkosynkConfiguration okosynkConfiguration;
 
     public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
@@ -54,136 +54,106 @@ public class AzureAdAuthenticationClient {
         logDevelopmentInfo();
     }
 
-    private static String getSecureHttpProxyUrl(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getSecureHttpProxyUrl();
-    }
+    private static String post(
+            final URI httpPostProviderUri,
+            final URL httpPostProxyUrl,
+            final List<Map.Entry<String, String>> httpPostParameters,
+            final List<Map.Entry<String, String>> httpPostHeaders
+    ) {
+        logger.info("Entering post()...");
 
-    private static String getAzureAppClientId(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getAzureAppClientId();
-    }
-
-    private static String getAzureAppScopes(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getAzureAppScopes();
-    }
-
-    private static String getAzureAppClientSecret(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getAzureAppClientSecret();
-    }
-
-    private static String getAzureAppWellKnownUrl(final IOkosynkConfiguration okosynkConfiguration) {
-        return okosynkConfiguration.getAzureAppWellKnownUrl();
-    }
-
-    private static String getGrantType() {
-        return "client_credentials";
-    }
-
-    private void logDevelopmentInfo() {
-        // TODO: AZURE: Remove when finished developement
-        logger.info("***** BEGIN Azure AD Development info (to be removed when in prod: *****");
-        logger.info("getSecureHttpProxyUrl: {}", getSecureHttpProxyUrl(this.okosynkConfiguration));
-        logger.info("getAzureAppClientId: {}", getAzureAppClientId(this.okosynkConfiguration));
-        logger.info("getAzureAppScopes: {}", getAzureAppScopes(this.okosynkConfiguration));
-        logger.info("getAzureAppClientSecret: {}", getAzureAppClientSecret(this.okosynkConfiguration) == null ? null : "***<Something>***");
-        logger.info("getAzureAppWellKnownUrl: {}", getAzureAppWellKnownUrl(this.okosynkConfiguration));
-        logger.info("getGrantType: {}", getGrantType());
-        logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
-        logger.info("***** END Azure AD Development info (to be removed when in prod *****");
-    }
-
-    public String getToken() {
-        return getTokenUsingClientSecret();
-    }
-
-    private String getTokenUsingClientSecret() {
-
-        logger.info("Entering getTokenUsingClientSecret()...");
-
-        String azureAdAccessTokenForCurrentServiceUser = null;
+        String postResponseEntityAsString = null;
         try {
-            final String secureHttpProxyUrlString = getSecureHttpProxyUrl(this.okosynkConfiguration);
+            // ---------------------------------------------------------------------------------------------------------
+            final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(httpPostProviderUri);
+            // ---------------------------------------------------------------------------------------------------------
             final CloseableHttpClient closeableHttpClient;
-            if (secureHttpProxyUrlString == null) {
+            if (httpPostProxyUrl == null) {
                 closeableHttpClient = HttpClients.createDefault();
             } else {
-                final URL proxyUrl = new URL(secureHttpProxyUrlString);
                 final HttpHost proxyHttpHost =
-                        new HttpHost(proxyUrl.getHost(), proxyUrl.getPort(), proxyUrl.getProtocol());
-                logger.info("proxyHttpHost: {}", proxyHttpHost);
+                        new HttpHost(httpPostProxyUrl.getHost(), httpPostProxyUrl.getPort(), httpPostProxyUrl.getProtocol());
                 final DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHttpHost);
-                closeableHttpClient = HttpClients.custom()
-                        .setRoutePlanner(routePlanner)
-                        .build();
+                closeableHttpClient = HttpClients.custom().setRoutePlanner(routePlanner).build();
             }
-            final String urlString = AzureAdAuthenticationClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
-            final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(urlString);
-
-
-
-
-
-
-            if (true) {
-                final List<NameValuePair> params = new ArrayList<>();
-                params.add(new BasicNameValuePair("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)));
-                params.add(new BasicNameValuePair("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)));
-                params.add(new BasicNameValuePair("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)));
-                params.add(new BasicNameValuePair("grant_type", AzureAdAuthenticationClient.getGrantType()));
-                httpEntityEnclosingRequestBase.setEntity(new UrlEncodedFormEntity(params));
-            } else {
-                final String parmsBody =
-                        Stream.of(
-                                ImmutablePair.of("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)),
-                                ImmutablePair.of("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)),
-                                ImmutablePair.of("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)),
-                                ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
-                        )
-                                .map(pair ->
-                                        {
-                                            final String key = pair.left;
-                                            final String value = pair.right;
-                                            final String urlEncodedValue;
-                                            try {
-                                                urlEncodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-                                            } catch (UnsupportedEncodingException e) {
-                                                throw new RuntimeException("Exception when trying to URL encode the parameters for Azure AD authentication", e);
-                                            }
-                                            return ImmutablePair.of(key, urlEncodedValue);
-                                        }
-                                )
-                                .map(pair -> pair.left + "=" + pair.right)
-                                .collect(Collectors.joining("&"));
-
-                final BasicHttpEntity httpEntity = new BasicHttpEntity();
-                httpEntity.setContent(new ByteArrayInputStream(parmsBody.getBytes()));
-                httpEntityEnclosingRequestBase.setEntity(httpEntity);
-            }
-
-
-
-
-
-            httpEntityEnclosingRequestBase.addHeader("Content-Type", "application/x-www-form-urlencoded");
-
+            // ---------------------------------------------------------------------------------------------------------
+            final List<NameValuePair> convertedHttpPostParameters =
+                    httpPostParameters
+                            .stream()
+                            .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
+                            .collect(Collectors.toList());
+            httpEntityEnclosingRequestBase.setEntity(new UrlEncodedFormEntity(convertedHttpPostParameters));
+            httpPostHeaders
+                    .stream()
+                    .forEach(
+                            httpPostHeader ->
+                                    httpEntityEnclosingRequestBase.addHeader(httpPostHeader.getKey(), httpPostHeader.getValue())
+                    );
+            // ---------------------------------------------------------------------------------------------------------
             final CloseableHttpResponse closeableHttpResponse;
             final StatusLine statusLine;
-
-            logger.info("About to call Azure Ad provider...");
+            logger.info("About to POST provider...");
             closeableHttpResponse = closeableHttpClient.execute(httpEntityEnclosingRequestBase);
             statusLine = closeableHttpResponse.getStatusLine();
             logger.info("statusLine.getStatusCode(): {}", statusLine.getStatusCode());
             if (statusLine.getStatusCode() == 200) {
                 final HttpEntity responseHttpEntity = closeableHttpResponse.getEntity();
-                azureAdAccessTokenForCurrentServiceUser = new BufferedReader(
+                postResponseEntityAsString = new BufferedReader(
                         new InputStreamReader(responseHttpEntity.getContent(), StandardCharsets.UTF_8))
                         .lines()
                         .collect(Collectors.joining("\n"));
-                logger.error("azureAdAccessTokenForCurrentServiceUser {}", azureAdAccessTokenForCurrentServiceUser == null ? null : "***<Something>***");
+                logger.error("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
             }
+            // ---------------------------------------------------------------------------------------------------------
         } catch (Throwable e) {
-            logger.error("Exception received when doing HTTP against Azure Ad provider", e);
+            logger.error("Exception received when doing HTTP post", e);
+        } finally {
+            logger.info("Leaving post()");
         }
 
-        return azureAdAccessTokenForCurrentServiceUser;
+        return postResponseEntityAsString;
+    }
+
+    private void logDevelopmentInfo() {
+        // TODO: AZURE: Remove when finished developement
+        logger.info("***** BEGIN Azure AD Development info (to be removed when in prod: *****");
+        logger.info("getSecureHttpProxyUrl: {}", this.okosynkConfiguration.getSecureHttpProxyUrl());
+        logger.info("getAzureAppClientId: {}", this.okosynkConfiguration.getAzureAppClientId());
+        logger.info("getAzureAppScopes: {}", this.okosynkConfiguration.getAzureAppScopes());
+        logger.info("getAzureAppClientSecret: {}", this.okosynkConfiguration.getAzureAppClientSecret() == null ? null : "***<Something>***");
+        logger.info("getAzureAppWellKnownUrl: {}", okosynkConfiguration.getAzureAppWellKnownUrl());
+        logger.info("getGrantType: {}", AzureAdAuthenticationClient.GRANT_TYPE);
+        logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
+        logger.info("***** END Azure AD Development info (to be removed when in prod *****");
+    }
+
+    public String getToken() {
+        // ---------------------------------------------------------------------------------------------------------
+        final String httpPostProviderUriString =
+                this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
+        final URI httpPostProviderUri = URI.create(httpPostProviderUriString);
+        // ---------------------------------------------------------------------------------------------------------
+        final String httpPostProxyUrlString = this.okosynkConfiguration.getSecureHttpProxyUrl();
+        final URL httpPostProxyUrl;
+        try {
+            httpPostProxyUrl = (httpPostProxyUrlString == null ? null : new URL(httpPostProxyUrlString));
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException("Could not convert proxy URL " + httpPostProxyUrlString + " to URL", e);
+        }
+        // ---------------------------------------------------------------------------------------------------------
+        final List<Map.Entry<String, String>> httpPostParameters = new ArrayList<>();
+        httpPostParameters.add(ImmutablePair.of("client_id", okosynkConfiguration.getAzureAppClientId()));
+        httpPostParameters.add(ImmutablePair.of("client_secret", okosynkConfiguration.getAzureAppClientSecret()));
+        httpPostParameters.add(ImmutablePair.of("scope", okosynkConfiguration.getAzureAppScopes()));
+        httpPostParameters.add(ImmutablePair.of("grant_type", AzureAdAuthenticationClient.GRANT_TYPE));
+        // ---------------------------------------------------------------------------------------------------------
+        final List<Map.Entry<String, String>> httpPostHeaders = new ArrayList<Map.Entry<String, String>>() {{
+            add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
+        }};
+        // ---------------------------------------------------------------------------------------------------------
+        final String token =
+                AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
+        logger.info("Værtype = {}", token);
+        return token;
     }
 }
