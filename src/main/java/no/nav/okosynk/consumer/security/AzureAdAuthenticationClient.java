@@ -17,9 +17,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -118,6 +119,19 @@ public class AzureAdAuthenticationClient {
                             ImmutablePair.of("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)),
                             ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
                     )
+                            .map(pair ->
+                                    {
+                                        final String key = pair.left;
+                                        final String value = pair.right;
+                                        final String urlEncodedValue;
+                                        try {
+                                            urlEncodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+                                        } catch (UnsupportedEncodingException e) {
+                                            throw new RuntimeException("Exception when trying to URL encode the parameters for Azure AD authentication", e);
+                                        }
+                                        return ImmutablePair.of(key, urlEncodedValue);
+                                    }
+                            )
                             .map(pair -> pair.left + "=" + pair.right)
                             .collect(Collectors.joining("&"));
 

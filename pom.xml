@@ -11,7 +11,7 @@
 
     <properties>
 
-        <revision>002.006.011</revision>
+        <revision>002.006.012</revision>
 
         <!-- BEGIN: Breaking bumps -->
         <jetty.version>9.4.35.v20201120</jetty.version> <!-- Problematic: 9.4.35.v20201120 -> 11.0.0 -->
