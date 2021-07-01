@@ -102,7 +102,7 @@ public class AzureAdAuthenticationClient {
                         new InputStreamReader(responseHttpEntity.getContent(), StandardCharsets.UTF_8))
                         .lines()
                         .collect(Collectors.joining("\n"));
-                logger.error("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
+                logger.info("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
             }
             // ---------------------------------------------------------------------------------------------------------
         } catch (Throwable e) {
@@ -128,6 +128,7 @@ public class AzureAdAuthenticationClient {
     }
 
     public String getToken() {
+        logger.info("Entering getToken()...");
         // ---------------------------------------------------------------------------------------------------------
         final String httpPostProviderUriString =
                 this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
@@ -154,6 +155,7 @@ public class AzureAdAuthenticationClient {
         final String token =
                 AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
         logger.info("Værtype = {}", token);
+        logger.info("Leaving getToken()");
         return token;
     }
 }
