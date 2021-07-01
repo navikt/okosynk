@@ -4,7 +4,9 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
@@ -12,6 +14,7 @@ import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -112,32 +117,52 @@ public class AzureAdAuthenticationClient {
             }
             final String urlString = AzureAdAuthenticationClient.getAzureAppWellKnownUrl(this.okosynkConfiguration); // Preconfigured by NAIS to include the tenant in GUID format
             final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(urlString);
-            final String parmsBody =
-                    Stream.of(
-                            ImmutablePair.of("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)),
-                            ImmutablePair.of("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)),
-                            ImmutablePair.of("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)),
-                            ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
-                    )
-                            .map(pair ->
-                                    {
-                                        final String key = pair.left;
-                                        final String value = pair.right;
-                                        final String urlEncodedValue;
-                                        try {
-                                            urlEncodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
-                                        } catch (UnsupportedEncodingException e) {
-                                            throw new RuntimeException("Exception when trying to URL encode the parameters for Azure AD authentication", e);
-                                        }
-                                        return ImmutablePair.of(key, urlEncodedValue);
-                                    }
-                            )
-                            .map(pair -> pair.left + "=" + pair.right)
-                            .collect(Collectors.joining("&"));
 
-            final BasicHttpEntity httpEntity = new BasicHttpEntity();
-            httpEntity.setContent(new ByteArrayInputStream(parmsBody.getBytes()));
-            httpEntityEnclosingRequestBase.setEntity(httpEntity);
+
+
+
+
+
+            if (true) {
+                final List<NameValuePair> params = new ArrayList<>();
+                params.add(new BasicNameValuePair("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)));
+                params.add(new BasicNameValuePair("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)));
+                params.add(new BasicNameValuePair("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)));
+                params.add(new BasicNameValuePair("grant_type", AzureAdAuthenticationClient.getGrantType()));
+                httpEntityEnclosingRequestBase.setEntity(new UrlEncodedFormEntity(params));
+            } else {
+                final String parmsBody =
+                        Stream.of(
+                                ImmutablePair.of("client_id", AzureAdAuthenticationClient.getAzureAppClientId(this.okosynkConfiguration)),
+                                ImmutablePair.of("client_secret", AzureAdAuthenticationClient.getAzureAppClientSecret(this.okosynkConfiguration)),
+                                ImmutablePair.of("scope", AzureAdAuthenticationClient.getAzureAppScopes(okosynkConfiguration)),
+                                ImmutablePair.of("grant_type", AzureAdAuthenticationClient.getGrantType())
+                        )
+                                .map(pair ->
+                                        {
+                                            final String key = pair.left;
+                                            final String value = pair.right;
+                                            final String urlEncodedValue;
+                                            try {
+                                                urlEncodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8.toString());
+                                            } catch (UnsupportedEncodingException e) {
+                                                throw new RuntimeException("Exception when trying to URL encode the parameters for Azure AD authentication", e);
+                                            }
+                                            return ImmutablePair.of(key, urlEncodedValue);
+                                        }
+                                )
+                                .map(pair -> pair.left + "=" + pair.right)
+                                .collect(Collectors.joining("&"));
+
+                final BasicHttpEntity httpEntity = new BasicHttpEntity();
+                httpEntity.setContent(new ByteArrayInputStream(parmsBody.getBytes()));
+                httpEntityEnclosingRequestBase.setEntity(httpEntity);
+            }
+
+
+
+
+
             httpEntityEnclosingRequestBase.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
             final CloseableHttpResponse closeableHttpResponse;
