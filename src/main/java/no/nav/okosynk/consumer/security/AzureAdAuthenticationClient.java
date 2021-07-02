@@ -51,7 +51,7 @@ public class AzureAdAuthenticationClient {
 
     public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
-        logDevelopmentInfo();
+        //logDevelopmentInfo();
     }
 
     private static String post(

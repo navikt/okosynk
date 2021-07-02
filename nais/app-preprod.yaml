@@ -54,6 +54,10 @@ spec:
     - name: AZURE_APP_SCOPE_OPPGAVE
       # value: api://dev-fss.oppgavehandtering.oppgave/.default
       value: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
+    - name: SHOULD_RUN_OS
+      value: "true"
+    - name: SHOULD_RUN_UR
+      value: "true"
   vault:
     enabled: true
     paths:

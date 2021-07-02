@@ -31,7 +31,12 @@ public class OkosynkConfiguration
     private final CompositeConfiguration compositeConfigurationForSecondPriority = new CompositeConfiguration();
     private final SystemConfiguration systemConfiguration;
 
-    private OkosynkConfiguration(final String applicationPropertiesFileName) {
+    private OkosynkConfiguration(
+            final String applicationPropertiesFileName,
+            final boolean shouldRunOsCommandLineOverride,
+            final boolean shouldRunUrCommandLineOverride) {
+
+        super(shouldRunOsCommandLineOverride, shouldRunUrCommandLineOverride);
 
         final SystemConfiguration systemConfiguration = new SystemConfiguration();
         this.compositeConfigurationForSecondPriority.addConfiguration(systemConfiguration);
@@ -79,7 +84,10 @@ public class OkosynkConfiguration
      * @param applicationPropertiesFileName
      * @return
      */
-    public static IOkosynkConfiguration getInstance(final String applicationPropertiesFileName) {
+    public static IOkosynkConfiguration getInstance(
+            final String applicationPropertiesFileName,
+            final boolean shouldRunOs,
+            final boolean shouldRunUr) {
 
         if (applicationPropertiesFileName == null) {
             final String msg = "The parameter applicationPropertiesFileName is null";
@@ -88,7 +96,8 @@ public class OkosynkConfiguration
         }
 
         if (OkosynkConfiguration.singleton == null) {
-            OkosynkConfiguration.singleton = new OkosynkConfiguration(applicationPropertiesFileName);
+            OkosynkConfiguration.singleton =
+                    new OkosynkConfiguration(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
         }
 
         return OkosynkConfiguration.singleton;

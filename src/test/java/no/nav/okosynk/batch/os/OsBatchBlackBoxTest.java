@@ -21,26 +21,26 @@ import org.slf4j.LoggerFactory;
 public class OsBatchBlackBoxTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
-    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
     private Batch<OsMelding> batch;
 
     private IMeldingLinjeFileReader meldingReaderMock =
-        mock(IMeldingLinjeFileReader.class);
+            mock(IMeldingLinjeFileReader.class);
 
     @BeforeEach
     void setUp() throws MeldingUnreadableException {
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
         batch =
-            new Batch<OsMelding>(
-                okosynkConfiguration,
-                Constants.BATCH_TYPE.OS,
-                new OsMeldingReader(OsMelding::new),
-                new OsMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS)));
+                new Batch<OsMelding>(
+                        okosynkConfiguration,
+                        Constants.BATCH_TYPE.OS,
+                        new OsMeldingReader(OsMelding::new),
+                        new OsMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.OS)));
         batch.setUspesifikkMeldingLinjeReader(meldingReaderMock);
     }
 

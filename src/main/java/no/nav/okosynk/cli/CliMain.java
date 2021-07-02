@@ -1,5 +1,6 @@
 package no.nav.okosynk.cli;
 
+import io.vavr.Function3;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.os.OsService;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 
 public class CliMain {
 
@@ -50,11 +50,13 @@ public class CliMain {
 
     private final IOkosynkConfiguration okosynkConfiguration;
 
-    public CliMain(final String applicationPropertiesFileName) {
+    public CliMain(final String applicationPropertiesFileName,
+                   final boolean shouldRunOs,
+                   final boolean shouldRunUr) {
 
         // TODO: This instance of IOkosynkConfiguration should maybe be injected around.
         final IOkosynkConfiguration okosynkConfiguration =
-                getOkosynkConfiguration(applicationPropertiesFileName);
+                getOkosynkConfiguration(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
         this.okosynkConfiguration = okosynkConfiguration;
         setUpCertificates(okosynkConfiguration);
     }
@@ -66,15 +68,34 @@ public class CliMain {
 
     protected static void runMain(
             final String[] args,
-            final Function<String, ? extends CliMain> mainClassCreator) throws ParseException {
+            final Function3<String, Boolean, Boolean, ? extends CliMain> mainClassCreator) throws ParseException {
 
         final MainContext mainContext = preMain(args);
         try {
             if (mainContext.shouldRun) {
-                final CliMain cliMain = mainClassCreator.apply(mainContext.applicationPropertiesFileName);
-                cliMain.runAllBatches(
-                        CliMain.shouldOnlyRunOs(mainContext.commandLine),
-                        CliMain.shouldOnlyRunUr(mainContext.commandLine));
+                final boolean shouldOnlyRunOs = CliMain.shouldOnlyRunOs(mainContext.commandLine);
+                final boolean shouldOnlyRunUr = CliMain.shouldOnlyRunUr(mainContext.commandLine);
+                final boolean shouldRunOs;
+                final boolean shouldRunUr;
+                if (shouldOnlyRunOs && !shouldOnlyRunUr) {
+                    shouldRunOs = true;
+                    shouldRunUr = false;
+                } else if (!shouldOnlyRunOs && shouldOnlyRunUr) {
+                    shouldRunOs = false;
+                    shouldRunUr = true;
+                } else if (!shouldOnlyRunOs && !shouldOnlyRunUr) {
+                    shouldRunOs = true;
+                    shouldRunUr = true;
+                } else {
+                    throw new IllegalArgumentException(
+                            "Illegal combination of command line options " +
+                                    CLI_OS_ONLY_LONG_KEY + ": " + shouldOnlyRunOs +
+                                    " and " +
+                                    CLI_UR_ONLY_LONG_KEY + ": " + shouldOnlyRunUr);
+                }
+                final CliMain cliMain =
+                        mainClassCreator.apply(mainContext.applicationPropertiesFileName, shouldRunOs, shouldRunUr);
+                cliMain.runAllBatches();
             }
         } finally {
             CliMain.postMain();
@@ -222,24 +243,24 @@ public class CliMain {
     /**
      * The outcome of the batch jobs is neglected at this level.
      * It has already been taken care of at a deeper lever.
-     *
-     * @param shouldOnlyRunOs Self explanatory
-     * @param shouldOnlyRunUr Self explanatory
      */
-    private void runAllBatches(
-            final boolean shouldOnlyRunOs,
-            final boolean shouldOnlyRunUr) {
+    private void runAllBatches() {
 
         preRunAllBatches();
 
         try {
             final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
             final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
-            if (!shouldOnlyRunUr) {
+
+            if (okosynkConfiguration.shouldRun(Constants.BATCH_TYPE.OS)) {
                 services.add(new OsService(okosynkConfiguration));
+            } else {
+                logger.info("Not running OS");
             }
-            if (!shouldOnlyRunOs) {
+            if (okosynkConfiguration.shouldRun(Constants.BATCH_TYPE.UR)) {
                 services.add(new UrService(okosynkConfiguration));
+            } else {
+                logger.info("Not running UR");
             }
             final int sleepTimeBetweenRunsInMs = CliMain.getRetryWaitTimeInMilliseconds(okosynkConfiguration);
             final int maxNumberOfRuns = CliMain.getMaxNumberOfReadTries(okosynkConfiguration);
@@ -314,10 +335,12 @@ public class CliMain {
     }
 
     private IOkosynkConfiguration getOkosynkConfiguration(
-            final String applicationPropertiesFileName) {
+            final String applicationPropertiesFileName,
+            final boolean shouldRunOs,
+            final boolean shouldRunUr) {
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance(applicationPropertiesFileName);
+                OkosynkConfiguration.getInstance(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
 
         return okosynkConfiguration;
     }

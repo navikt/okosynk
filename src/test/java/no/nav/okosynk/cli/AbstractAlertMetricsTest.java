@@ -27,7 +27,7 @@ public abstract class AbstractAlertMetricsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         assertDoesNotThrow(() -> AlertMetricsFactory.get(okosynkConfiguration, this.batchType));
     }
 
@@ -38,7 +38,7 @@ public abstract class AbstractAlertMetricsTest {
 
         System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
         final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
@@ -55,7 +55,7 @@ public abstract class AbstractAlertMetricsTest {
 
         System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
         final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
@@ -70,7 +70,7 @@ public abstract class AbstractAlertMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
                 () ->
@@ -85,7 +85,7 @@ public abstract class AbstractAlertMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         final AbstractAlertMetrics alertMetrics = AlertMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
                 () ->

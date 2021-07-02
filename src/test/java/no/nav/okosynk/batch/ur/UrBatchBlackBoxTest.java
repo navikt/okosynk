@@ -22,27 +22,27 @@ import org.slf4j.LoggerFactory;
 public class UrBatchBlackBoxTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final long EKSEKVERINGS_ID = 0;
-    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
     private Batch<UrMelding> batch;
     private String inputFilPathMock = "mypath";
 
     private IMeldingLinjeFileReader meldingReaderMock =
-        mock(IMeldingLinjeFileReader.class);
+            mock(IMeldingLinjeFileReader.class);
 
     @BeforeEach
     void setUp() throws MeldingUnreadableException {
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         batch =
-            new Batch<UrMelding>(
-                okosynkConfiguration,
-                Constants.BATCH_TYPE.UR,
-                new UrMeldingReader(UrMelding::new),
-                new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR)));
+                new Batch<UrMelding>(
+                        okosynkConfiguration,
+                        Constants.BATCH_TYPE.UR,
+                        new UrMeldingReader(UrMelding::new),
+                        new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR)));
         batch.setUspesifikkMeldingLinjeReader(meldingReaderMock);
     }
 

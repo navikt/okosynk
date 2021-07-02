@@ -29,7 +29,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         assertThrows(NullPointerException.class,
-                () -> OkosynkConfiguration.getInstance(null));
+                () -> OkosynkConfiguration.getInstance(null, true, true));
     }
 
     @Test
@@ -38,7 +38,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -53,7 +53,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -68,7 +68,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -87,7 +87,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -116,93 +116,93 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final List<Quintet<String, String, String, String, String>> testData =
                 new ArrayList<Quintet<String, String, String, String, String>>() {{
 
-                    add(new Quintet<String, String, String, String, String>("test_env_001",
+                    add(new Quintet<>("test_env_001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("test_env_001",
+                    add(new Quintet<>("test_env_001",
                             "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001",
+                    add(new Quintet<>("TEST_ENV_001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001",
+                    add(new Quintet<>("TEST_ENV_001",
                             "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_001", null,
+                    add(new Quintet<>("test_env_001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001", null,
+                    add(new Quintet<>("TEST_ENV_001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.001",
+                    add(new Quintet<>("test.env.001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("test.env.001",
+                    add(new Quintet<>("test.env.001",
                             "TEST_ENV_001_VALX", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001",
+                    add(new Quintet<>("TEST.ENV.001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001",
+                    add(new Quintet<>("TEST.ENV.001",
                             "TEST_ENV_001_VALX", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.001", null,
+                    add(new Quintet<>("test.env.001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001", null,
+                    add(new Quintet<>("TEST.ENV.001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_002",
+                    add(new Quintet<>("test_env_002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("test_env_002",
+                    add(new Quintet<>("test_env_002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002",
+                    add(new Quintet<>("TEST_ENV_002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002",
+                    add(new Quintet<>("TEST_ENV_002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_002", null,
+                    add(new Quintet<>("test_env_002", null,
                             "test_env_002", "test_env_002_val", "test_env_002_val"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002", null,
+                    add(new Quintet<>("TEST_ENV_002", null,
                             "test_env_002", "test_env_002_val", null));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.002",
+                    add(new Quintet<>("test.env.002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("test.env.002",
+                    add(new Quintet<>("test.env.002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002",
+                    add(new Quintet<>("TEST.ENV.002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002",
+                    add(new Quintet<>("TEST.ENV.002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.002", null,
+                    add(new Quintet<>("test.env.002", null,
                             "test_env_002", "test_env_002_val", null));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002", null,
+                    add(new Quintet<>("TEST.ENV.002", null,
                             "test_env_002", "test_env_002_val", null));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_003",
+                    add(new Quintet<>("test_env_003",
                             "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("test_env_003",
+                    add(new Quintet<>("test_env_003",
                             "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003",
+                    add(new Quintet<>("TEST_ENV_003",
                             "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003",
-                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-
-                    add(new Quintet<String, String, String, String, String>("test_env_003", null, null, null,
-                            null));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003", null, null, null,
-                            null));
-
-                    add(new Quintet<String, String, String, String, String>("test.env.003",
-                            "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("test.env.003",
-                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003",
-                            "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003",
+                    add(new Quintet<>("TEST_ENV_003",
                             "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.003", null, null, null,
+                    add(new Quintet<>("test_env_003", null, null, null,
                             null));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003", null, null, null,
+                    add(new Quintet<>("TEST_ENV_003", null, null, null,
+                            null));
+
+                    add(new Quintet<>("test.env.003",
+                            "test_env_003_valx", null, null, "test_env_003_valx"));
+                    add(new Quintet<>("test.env.003",
+                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
+                    add(new Quintet<>("TEST.ENV.003",
+                            "test_env_003_valx", null, null, "test_env_003_valx"));
+                    add(new Quintet<>("TEST.ENV.003",
+                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
+
+                    add(new Quintet<>("test.env.003", null, null, null,
+                            null));
+                    add(new Quintet<>("TEST.ENV.003", null, null, null,
                             null));
                 }};
 
@@ -257,93 +257,93 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final List<Quintet<String, String, String, String, String>> testData =
                 new ArrayList<Quintet<String, String, String, String, String>>() {{
 
-                    add(new Quintet<String, String, String, String, String>("test_env_001",
+                    add(new Quintet<>("test_env_001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("test_env_001",
+                    add(new Quintet<>("test_env_001",
                             "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001",
+                    add(new Quintet<>("TEST_ENV_001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001",
+                    add(new Quintet<>("TEST_ENV_001",
                             "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_001", null,
+                    add(new Quintet<>("test_env_001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_001", null,
+                    add(new Quintet<>("TEST_ENV_001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.001",
+                    add(new Quintet<>("test.env.001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("test.env.001",
+                    add(new Quintet<>("test.env.001",
                             "TEST_ENV_001_VALX", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001",
+                    add(new Quintet<>("TEST.ENV.001",
                             "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001",
+                    add(new Quintet<>("TEST.ENV.001",
                             "TEST_ENV_001_VALX", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.001", null,
+                    add(new Quintet<>("test.env.001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.001", null,
+                    add(new Quintet<>("TEST.ENV.001", null,
                             "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_002",
+                    add(new Quintet<>("test_env_002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("test_env_002",
+                    add(new Quintet<>("test_env_002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002",
+                    add(new Quintet<>("TEST_ENV_002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002",
+                    add(new Quintet<>("TEST_ENV_002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_002", null,
+                    add(new Quintet<>("test_env_002", null,
                             "test_env_002", "test_env_002_val", "test_env_002_val"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_002", null,
+                    add(new Quintet<>("TEST_ENV_002", null,
                             "test_env_002", "test_env_002_val", null));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.002",
+                    add(new Quintet<>("test.env.002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("test.env.002",
+                    add(new Quintet<>("test.env.002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002",
+                    add(new Quintet<>("TEST.ENV.002",
                             "test_env_002_valx", "test_env_002", "test_env_002_val", "test_env_002_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002",
+                    add(new Quintet<>("TEST.ENV.002",
                             "TEST_ENV_002_VALx", "test_env_002", "test_env_002_val", "TEST_ENV_002_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.002", null,
+                    add(new Quintet<>("test.env.002", null,
                             "test_env_002", "test_env_002_val", null));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.002", null,
+                    add(new Quintet<>("TEST.ENV.002", null,
                             "test_env_002", "test_env_002_val", null));
 
-                    add(new Quintet<String, String, String, String, String>("test_env_003",
+                    add(new Quintet<>("test_env_003",
                             "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("test_env_003",
+                    add(new Quintet<>("test_env_003",
                             "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003",
+                    add(new Quintet<>("TEST_ENV_003",
                             "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003",
-                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-
-                    add(new Quintet<String, String, String, String, String>("test_env_003", null, null, null,
-                            null));
-                    add(new Quintet<String, String, String, String, String>("TEST_ENV_003", null, null, null,
-                            null));
-
-                    add(new Quintet<String, String, String, String, String>("test.env.003",
-                            "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("test.env.003",
-                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003",
-                            "test_env_003_valx", null, null, "test_env_003_valx"));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003",
+                    add(new Quintet<>("TEST_ENV_003",
                             "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
 
-                    add(new Quintet<String, String, String, String, String>("test.env.003", null, null, null,
+                    add(new Quintet<>("test_env_003", null, null, null,
                             null));
-                    add(new Quintet<String, String, String, String, String>("TEST.ENV.003", null, null, null,
+                    add(new Quintet<>("TEST_ENV_003", null, null, null,
+                            null));
+
+                    add(new Quintet<>("test.env.003",
+                            "test_env_003_valx", null, null, "test_env_003_valx"));
+                    add(new Quintet<>("test.env.003",
+                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
+                    add(new Quintet<>("TEST.ENV.003",
+                            "test_env_003_valx", null, null, "test_env_003_valx"));
+                    add(new Quintet<>("TEST.ENV.003",
+                            "TEST_ENV_003_VALx", null, null, "TEST_ENV_003_VALx"));
+
+                    add(new Quintet<>("test.env.003", null, null, null,
+                            null));
+                    add(new Quintet<>("TEST.ENV.003", null, null, null,
                             null));
                 }};
 
@@ -393,7 +393,7 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final List<Quintet<String, String, String, String, Integer>> testData =
                 new ArrayList<Quintet<String, String, String, String, Integer>>() {{
@@ -492,7 +492,7 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    /**
+     /**
      * To make the test pass...
      *
      *  ...the following environment variables must be set:
@@ -507,98 +507,98 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final List<Sextet<String, String, String, String, String, String>> testData =
                 new ArrayList<Sextet<String, String, String, String, String, String>>() {{
 
-                    add(new Sextet<String, String, String, String, String, String>("test_env_001",
+                    add(new Sextet<>("test_env_001",
                             "test_env_001_valx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_001",
+                    add(new Sextet<>("test_env_001",
                             "TEST_ENV_001_VALx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_001",
+                    add(new Sextet<>("TEST_ENV_001",
                             "test_env_001_valx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_001",
+                    add(new Sextet<>("TEST_ENV_001",
                             "TEST_ENV_001_VALx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_001", null,
+                    add(new Sextet<>("test_env_001", null,
                             "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_001", null,
+                    add(new Sextet<>("TEST_ENV_001", null,
                             "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.001",
+                    add(new Sextet<>("test.env.001",
                             "test_env_001_valx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.001",
+                    add(new Sextet<>("test.env.001",
                             "TEST_ENV_001_VALX", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.001",
+                    add(new Sextet<>("TEST.ENV.001",
                             "test_env_001_valx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.001",
+                    add(new Sextet<>("TEST.ENV.001",
                             "TEST_ENV_001_VALX", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL",
                             "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.001", null,
+                    add(new Sextet<>("test.env.001", null,
                             "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.001", null,
+                    add(new Sextet<>("TEST.ENV.001", null,
                             "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_002",
+                    add(new Sextet<>("test_env_002",
                             "test_env_002_valx", "defVal", "test_env_002", "test_env_002_val",
                             "test_env_002_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_002",
+                    add(new Sextet<>("test_env_002",
                             "TEST_ENV_002_VALx", "defVal", "test_env_002", "test_env_002_val",
                             "TEST_ENV_002_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_002",
+                    add(new Sextet<>("TEST_ENV_002",
                             "test_env_002_valx", "defVal", "test_env_002", "test_env_002_val",
                             "test_env_002_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_002",
+                    add(new Sextet<>("TEST_ENV_002",
                             "TEST_ENV_002_VALx", "defVal", "test_env_002", "test_env_002_val",
                             "TEST_ENV_002_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_002", null,
+                    add(new Sextet<>("test_env_002", null,
                             "defVal", "test_env_002", "test_env_002_val", "test_env_002_val"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_002", null,
+                    add(new Sextet<>("TEST_ENV_002", null,
                             "defVal", "test_env_002", "test_env_002_val", "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.002",
+                    add(new Sextet<>("test.env.002",
                             "test_env_002_valx", "defVal", "test_env_002", "test_env_002_val",
                             "test_env_002_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.002",
+                    add(new Sextet<>("test.env.002",
                             "TEST_ENV_002_VALx", "defVal", "test_env_002", "test_env_002_val",
                             "TEST_ENV_002_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.002",
+                    add(new Sextet<>("TEST.ENV.002",
                             "test_env_002_valx", "defVal", "test_env_002", "test_env_002_val",
                             "test_env_002_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.002",
+                    add(new Sextet<>("TEST.ENV.002",
                             "TEST_ENV_002_VALx", "defVal", "test_env_002", "test_env_002_val",
                             "TEST_ENV_002_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.002", null,
+                    add(new Sextet<>("test.env.002", null,
                             "defVal", "test_env_002", "test_env_002_val", "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.002", null,
+                    add(new Sextet<>("TEST.ENV.002", null,
                             "defVal", "test_env_002", "test_env_002_val", "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_003",
+                    add(new Sextet<>("test_env_003",
                             "test_env_003_valx", "defVal", null, null, "test_env_003_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_003",
+                    add(new Sextet<>("test_env_003",
                             "TEST_ENV_003_VALx", "defVal", null, null, "TEST_ENV_003_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_003",
+                    add(new Sextet<>("TEST_ENV_003",
                             "test_env_003_valx", "defVal", null, null, "test_env_003_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_003",
+                    add(new Sextet<>("TEST_ENV_003",
                             "TEST_ENV_003_VALx", "defVal", null, null, "TEST_ENV_003_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("test_env_003", null,
+                    add(new Sextet<>("test_env_003", null,
                             "defVal", null, null, "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST_ENV_003", null,
+                    add(new Sextet<>("TEST_ENV_003", null,
                             "defVal", null, null, "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.003",
+                    add(new Sextet<>("test.env.003",
                             "test_env_003_valx", "defVal", null, null, "test_env_003_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.003",
+                    add(new Sextet<>("test.env.003",
                             "TEST_ENV_003_VALx", "defVal", null, null, "TEST_ENV_003_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.003",
+                    add(new Sextet<>("TEST.ENV.003",
                             "test_env_003_valx", "defVal", null, null, "test_env_003_valx"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.003",
+                    add(new Sextet<>("TEST.ENV.003",
                             "TEST_ENV_003_VALx", "defVal", null, null, "TEST_ENV_003_VALx"));
-                    add(new Sextet<String, String, String, String, String, String>("test.env.003", null,
+                    add(new Sextet<>("test.env.003", null,
                             "defVal", null, null, "defVal"));
-                    add(new Sextet<String, String, String, String, String, String>("TEST.ENV.003", null,
+                    add(new Sextet<>("TEST.ENV.003", null,
                             "defVal", null, null, "defVal"));
                 }};
 
@@ -659,225 +659,225 @@ public class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance("Tullefil");
+                OkosynkConfiguration.getInstance("Tullefil", true, true);
 
         final List<Sextet<String, String, Boolean, String, String, Boolean>> testData =
                 new ArrayList<Sextet<String, String, Boolean, String, String, Boolean>>() {{
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_001",
+                    add(new Sextet<>("TEST_BOOL_ENV_001",
                             "true", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_001",
+                    add(new Sextet<>("TEST_BOOL_ENV_001",
                             "false", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_001",
+                    add(new Sextet<>("TEST_BOOL_ENV_001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_001",
+                    add(new Sextet<>("TEST_BOOL_ENV_001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.001",
+                    add(new Sextet<>("TEST.BOOL.ENV.001",
                             "true", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.001",
+                    add(new Sextet<>("TEST.BOOL.ENV.001",
                             "false", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.001",
+                    add(new Sextet<>("TEST.BOOL.ENV.001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.001",
+                    add(new Sextet<>("TEST.BOOL.ENV.001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_001",
+                    add(new Sextet<>("test_bool_env_001",
                             "true", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_001",
+                    add(new Sextet<>("test_bool_env_001",
                             "false", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_001",
+                    add(new Sextet<>("test_bool_env_001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_001",
+                    add(new Sextet<>("test_bool_env_001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.001",
+                    add(new Sextet<>("test.bool.env.001",
                             "true", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.001",
+                    add(new Sextet<>("test.bool.env.001",
                             "false", false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.001",
+                    add(new Sextet<>("test.bool.env.001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.001",
+                    add(new Sextet<>("test.bool.env.001",
                             null, false, "TEST_BOOL_ENV_001", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_002",
+                    add(new Sextet<>("TEST_BOOL_ENV_002",
                             "true", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_002",
+                    add(new Sextet<>("TEST_BOOL_ENV_002",
                             "false", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_002",
+                    add(new Sextet<>("TEST_BOOL_ENV_002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_002",
+                    add(new Sextet<>("TEST_BOOL_ENV_002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.002",
+                    add(new Sextet<>("TEST.BOOL.ENV.002",
                             "true", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.002",
+                    add(new Sextet<>("TEST.BOOL.ENV.002",
                             "false", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.002",
+                    add(new Sextet<>("TEST.BOOL.ENV.002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.002",
+                    add(new Sextet<>("TEST.BOOL.ENV.002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_002",
+                    add(new Sextet<>("test_bool_env_002",
                             "true", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_002",
+                    add(new Sextet<>("test_bool_env_002",
                             "false", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_002",
+                    add(new Sextet<>("test_bool_env_002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_002",
+                    add(new Sextet<>("test_bool_env_002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.002",
+                    add(new Sextet<>("test.bool.env.002",
                             "true", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.002",
+                    add(new Sextet<>("test.bool.env.002",
                             "false", false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.002",
+                    add(new Sextet<>("test.bool.env.002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.002",
+                    add(new Sextet<>("test.bool.env.002",
                             null, false, "TEST_BOOL_ENV_002", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_003",
+                    add(new Sextet<>("TEST_BOOL_ENV_003",
                             "true", false, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_003",
+                    add(new Sextet<>("TEST_BOOL_ENV_003",
                             "false", false, "test_bool_env_003", "true", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_003",
+                    add(new Sextet<>("TEST_BOOL_ENV_003",
                             null, true, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_003",
+                    add(new Sextet<>("TEST_BOOL_ENV_003",
                             null, false, "test_bool_env_003", "true", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.003",
+                    add(new Sextet<>("TEST.BOOL.ENV.003",
                             "true", false, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.003",
+                    add(new Sextet<>("TEST.BOOL.ENV.003",
                             "false", false, "test_bool_env_003", "true", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.003",
+                    add(new Sextet<>("TEST.BOOL.ENV.003",
                             null, false, "test_bool_env_003", "true", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.003",
+                    add(new Sextet<>("TEST.BOOL.ENV.003",
                             null, true, "test_bool_env_003", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_003",
+                    add(new Sextet<>("test_bool_env_003",
                             "true", false, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_003",
+                    add(new Sextet<>("test_bool_env_003",
                             "false", false, "test_bool_env_003", "true", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_003",
+                    add(new Sextet<>("test_bool_env_003",
                             null, true, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_003",
+                    add(new Sextet<>("test_bool_env_003",
                             null, false, "test_bool_env_003", "true", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.003",
+                    add(new Sextet<>("test.bool.env.003",
                             "true", false, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.003",
+                    add(new Sextet<>("test.bool.env.003",
                             "false", false, "test_bool_env_003", "true", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.003",
+                    add(new Sextet<>("test.bool.env.003",
                             null, true, "test_bool_env_003", "true", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.003",
+                    add(new Sextet<>("test.bool.env.003",
                             null, false, "test_bool_env_003", "true", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_004",
+                    add(new Sextet<>("TEST_BOOL_ENV_004",
                             "true", false, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_004",
+                    add(new Sextet<>("TEST_BOOL_ENV_004",
                             "false", false, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_004",
+                    add(new Sextet<>("TEST_BOOL_ENV_004",
                             null, true, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_004",
+                    add(new Sextet<>("TEST_BOOL_ENV_004",
                             null, false, "test_bool_env_004", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.004",
+                    add(new Sextet<>("TEST.BOOL.ENV.004",
                             "true", false, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.004",
+                    add(new Sextet<>("TEST.BOOL.ENV.004",
                             "false", false, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.004",
+                    add(new Sextet<>("TEST.BOOL.ENV.004",
                             null, false, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.004",
+                    add(new Sextet<>("TEST.BOOL.ENV.004",
                             null, true, "test_bool_env_004", "false", true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_004",
+                    add(new Sextet<>("test_bool_env_004",
                             "true", false, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_004",
+                    add(new Sextet<>("test_bool_env_004",
                             "false", false, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_004",
+                    add(new Sextet<>("test_bool_env_004",
                             null, true, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_004",
+                    add(new Sextet<>("test_bool_env_004",
                             null, false, "test_bool_env_004", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.004",
+                    add(new Sextet<>("test.bool.env.004",
                             "true", false, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.004",
+                    add(new Sextet<>("test.bool.env.004",
                             "false", false, "test_bool_env_004", "false", false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.004",
+                    add(new Sextet<>("test.bool.env.004",
                             null, true, "test_bool_env_004", "false", true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.004",
+                    add(new Sextet<>("test.bool.env.004",
                             null, false, "test_bool_env_004", "false", false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_005",
+                    add(new Sextet<>("TEST_BOOL_ENV_005",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_005",
+                    add(new Sextet<>("TEST_BOOL_ENV_005",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_005",
+                    add(new Sextet<>("TEST_BOOL_ENV_005",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_005",
+                    add(new Sextet<>("TEST_BOOL_ENV_005",
                             null, false, null, null, false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.005",
+                    add(new Sextet<>("TEST.BOOL.ENV.005",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.005",
+                    add(new Sextet<>("TEST.BOOL.ENV.005",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.005",
+                    add(new Sextet<>("TEST.BOOL.ENV.005",
                             null, false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.005",
+                    add(new Sextet<>("TEST.BOOL.ENV.005",
                             null, true, null, null, true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_005",
+                    add(new Sextet<>("test_bool_env_005",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_005",
+                    add(new Sextet<>("test_bool_env_005",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_005",
+                    add(new Sextet<>("test_bool_env_005",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_005",
+                    add(new Sextet<>("test_bool_env_005",
                             null, false, null, null, false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.005",
+                    add(new Sextet<>("test.bool.env.005",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.005",
+                    add(new Sextet<>("test.bool.env.005",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.005",
+                    add(new Sextet<>("test.bool.env.005",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.005",
+                    add(new Sextet<>("test.bool.env.005",
                             null, false, null, null, false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_006",
+                    add(new Sextet<>("TEST_BOOL_ENV_006",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_006",
+                    add(new Sextet<>("TEST_BOOL_ENV_006",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_006",
+                    add(new Sextet<>("TEST_BOOL_ENV_006",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST_BOOL_ENV_006",
+                    add(new Sextet<>("TEST_BOOL_ENV_006",
                             null, false, null, null, false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.006",
+                    add(new Sextet<>("TEST.BOOL.ENV.006",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.006",
+                    add(new Sextet<>("TEST.BOOL.ENV.006",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.006",
+                    add(new Sextet<>("TEST.BOOL.ENV.006",
                             null, false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("TEST.BOOL.ENV.006",
+                    add(new Sextet<>("TEST.BOOL.ENV.006",
                             null, true, null, null, true));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_006",
+                    add(new Sextet<>("test_bool_env_006",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_006",
+                    add(new Sextet<>("test_bool_env_006",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_006",
+                    add(new Sextet<>("test_bool_env_006",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test_bool_env_006",
+                    add(new Sextet<>("test_bool_env_006",
                             null, false, null, null, false));
 
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.006",
+                    add(new Sextet<>("test.bool.env.006",
                             "true", false, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.006",
+                    add(new Sextet<>("test.bool.env.006",
                             "false", false, null, null, false));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.006",
+                    add(new Sextet<>("test.bool.env.006",
                             null, true, null, null, true));
-                    add(new Sextet<String, String, Boolean, String, String, Boolean>("test.bool.env.006",
+                    add(new Sextet<>("test.bool.env.006",
                             null, false, null, null, false));
                 }};
 

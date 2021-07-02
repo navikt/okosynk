@@ -32,8 +32,10 @@ public class CliMainWithTestScope extends CliMain {
     private IStartableAndStoppable testFtpServerStarter = null;
     private Collection<WireMockServer> mockedProviderServers;
 
-    private CliMainWithTestScope(final String applicationPropertiesFileName) {
-        super(applicationPropertiesFileName);
+    private CliMainWithTestScope(final String applicationPropertiesFileName,
+                                 final boolean shouldRunOs,
+                                 final boolean shouldRunUr) {
+        super(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
     }
 
     public static void main(final String[] args) throws Exception {

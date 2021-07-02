@@ -3,6 +3,14 @@ package no.nav.okosynk.config;
 public class FakeOkosynkConfiguration
         extends AbstractOkosynkConfiguration {
 
+    public FakeOkosynkConfiguration() {
+        this(true, true);
+    }
+
+    public FakeOkosynkConfiguration(boolean shouldRunOsCommandLineOverride, boolean shouldRunUrCommandLineOverride) {
+        super(shouldRunOsCommandLineOverride, shouldRunUrCommandLineOverride);
+    }
+
     @Override
     public boolean getBoolean(final String key, final boolean defaultValue) {
 

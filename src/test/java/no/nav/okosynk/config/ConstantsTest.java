@@ -29,7 +29,7 @@ public class ConstantsTest {
 
         final String expectedUser = "srvbokosynk001";
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
         okosynkConfiguration.clearSystemProperty(Constants.BATCH_TYPE.OS.getBatchBrukerKey());
         assertEquals(expectedUser, this.hentOsBatchBruker(okosynkConfiguration));
@@ -41,7 +41,7 @@ public class ConstantsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         final String expectedUser = "Residents";
         okosynkConfiguration.setSystemProperty(Constants.BATCH_TYPE.OS.getBatchBrukerKey(), expectedUser);
 
@@ -54,7 +54,7 @@ public class ConstantsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
         final String expectedUser = "srvbokosynk002";
 
@@ -68,7 +68,7 @@ public class ConstantsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
         final String expectedUser = "JohnCage";
         okosynkConfiguration.setSystemProperty(Constants.BATCH_TYPE.UR.getBatchBrukerKey(), expectedUser);
 

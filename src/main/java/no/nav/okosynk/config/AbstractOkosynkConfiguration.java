@@ -5,6 +5,16 @@ import java.util.stream.Stream;
 
 abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
+    // If false, overrides, othewise not
+    private boolean shouldRunOsCommandLineOverride;
+    // If false, overrides, othewise not
+    private boolean shouldRunUrCommandLineOverride;
+
+    public AbstractOkosynkConfiguration(boolean shouldRunOsCommandLineOverride, boolean shouldRunUrCommandLineOverride) {
+        this.shouldRunOsCommandLineOverride = shouldRunOsCommandLineOverride;
+        this.shouldRunUrCommandLineOverride = shouldRunUrCommandLineOverride;
+    }
+
     @Override
     public String getNavTrustStorePath() {
         return getRequiredString(Constants.NAV_TRUSTSTORE_PATH_KEY);
@@ -18,6 +28,27 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     @Override
     public String getPrometheusAddress(final String defaultPrometheusAddress) {
         return getString(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, defaultPrometheusAddress);
+    }
+
+    @Override
+    public boolean shouldRun(final Constants.BATCH_TYPE batchType) {
+
+        final boolean shouldRunTemp = getBoolean(batchType.getShouldRunKey(), true);
+        final boolean shouldRun;
+        if (Constants.BATCH_TYPE.OS.equals(batchType)) {
+            if (!shouldRunOsCommandLineOverride) {
+                shouldRun = false;
+            } else  {
+                shouldRun = shouldRunTemp;
+            }
+        } else {
+            if (!shouldRunUrCommandLineOverride) {
+                shouldRun = false;
+            } else  {
+                shouldRun = shouldRunTemp;
+            }
+        }
+        return shouldRun;
     }
 
     @Override

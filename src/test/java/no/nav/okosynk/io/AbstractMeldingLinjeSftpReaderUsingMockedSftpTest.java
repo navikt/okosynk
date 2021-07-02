@@ -48,7 +48,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
   private static final String syntacticallyAcceptableFtpPassword = "somePlaceholderPassword";
   private static final String syntacticallyAcceptableFullyQualifiedInputFileName = "/a/somePlaceholderFullyQualifiedInputFileName.txt";
 
-  private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+  private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
 
   protected static void setFtpHostUrlKey(final String ftpHostUrlKey) {
     FTP_HOST_URL_KEY = ftpHostUrlKey;
@@ -689,19 +689,19 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
     final List<Quartet<IOkosynkConfiguration, BATCH_TYPE, String, Boolean>> testData =
         new ArrayList<Quartet<IOkosynkConfiguration, BATCH_TYPE, String, Boolean>> () {{
           add(new Quartet<>(null                          , null          , null , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), null          , null , true ));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), null          , null , true ));
           add(new Quartet<>(null                          , getBatchType(), null , true ));
           add(new Quartet<>(null                          , null          , "x"  , true ));
           add(new Quartet<>(null                          , null          , null , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), getBatchType(), null , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), null          , "x"  , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), null          , null , true ));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), getBatchType(), null , true ));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), null          , "x"  , true ));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), null          , null , true ));
           add(new Quartet<>(null                          , getBatchType(), "x"  , true ));
           add(new Quartet<>(null                          , getBatchType(), null , true ));
           add(new Quartet<>(null                          , null          , "x"  , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), getBatchType(), null , true ));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), getBatchType(), null , true ));
           add(new Quartet<>(null                          , getBatchType(), "x"  , true ));
-          add(new Quartet<>(new FakeOkosynkConfiguration(), getBatchType(), "x"  , false));
+          add(new Quartet<>(new FakeOkosynkConfiguration(true, true), getBatchType(), "x"  , false));
         }};
 
     for (final Quartet<IOkosynkConfiguration, Constants.BATCH_TYPE, String, Boolean> testdatum : testData) {

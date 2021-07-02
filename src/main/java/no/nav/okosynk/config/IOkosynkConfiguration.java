@@ -40,6 +40,7 @@ public interface IOkosynkConfiguration {
      */
     String getPrometheusAddress(final String defaultPrometheusAddress);
 
+    boolean shouldRun(final Constants.BATCH_TYPE batchType);
     String getBatchBruker(final Constants.BATCH_TYPE batchType);
     String getBatchBrukerPassword(final Constants.BATCH_TYPE batchType);
 
