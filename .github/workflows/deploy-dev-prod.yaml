@@ -45,7 +45,7 @@ jobs:
         run: |
           docker push $IMAGE
 
-      # REMOVE WHEN Azure AD authentication is in place:
+      # REMOVE WHEN Azure AD authentication and/or running okosynk as two separate jobs works:
       #- name: deploy OS and UR to q1
       #  uses: nais/deploy/actions/deploy@v1
       #  env:
@@ -66,25 +66,24 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: nais/app-preprod-ur.yaml
 
-      # REMOVE WHEN Azure AD authentication is in place:
-      - uses: nais/deploy/actions/deploy@v1
-        name: deploy OS and UR to prod-fss
+      # REMOVE WHEN Azure AD authentication and/or running okosynk as two separate jobs works:
+      #- name: deploy OS and UR to prod-fss
+      #  uses: nais/deploy/actions/deploy@v1
+      #  env:
+      #    APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+      #    CLUSTER: prod-fss
+      #    RESOURCE: nais/app-prod.yaml
+
+      - name: deploy OS to prod-fss
+        uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
-          RESOURCE: nais/app-prod.yaml
-      # COMMENT OUT WHEN Azure AD authentication is in place:
-      #- uses: nais/deploy/actions/deploy@v1
-      #  name: deploy OS to prod-fss
-      #  env:
-      #    APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-      #    CLUSTER: prod-fss
-      #    RESOURCE: nais/app-prod-os.yaml
+          RESOURCE: nais/app-prod-os.yaml
 
-      # COMMENT OUT WHEN Azure AD authentication is in place:
-      #- uses: nais/deploy/actions/deploy@v1
-      #  name: deploy UR to prod-fss
-      #  env:
-      #    APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-      #    CLUSTER: prod-fss
-      #    RESOURCE: nais/app-prod-ur.yaml
+      - uses: nais/deploy/actions/deploy@v1
+        name: deploy UR to prod-fss
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: nais/app-prod-ur.yaml
