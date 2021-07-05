@@ -5,14 +5,7 @@ import java.util.stream.Stream;
 
 abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
-    // If false, overrides, othewise not
-    private boolean shouldRunOsCommandLineOverride;
-    // If false, overrides, othewise not
-    private boolean shouldRunUrCommandLineOverride;
-
-    public AbstractOkosynkConfiguration(boolean shouldRunOsCommandLineOverride, boolean shouldRunUrCommandLineOverride) {
-        this.shouldRunOsCommandLineOverride = shouldRunOsCommandLineOverride;
-        this.shouldRunUrCommandLineOverride = shouldRunUrCommandLineOverride;
+    public AbstractOkosynkConfiguration() {
     }
 
     @Override
@@ -32,23 +25,7 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     @Override
     public boolean shouldRun(final Constants.BATCH_TYPE batchType) {
-
-        final boolean shouldRunTemp = getBoolean(batchType.getShouldRunKey(), true);
-        final boolean shouldRun;
-        if (Constants.BATCH_TYPE.OS.equals(batchType)) {
-            if (!shouldRunOsCommandLineOverride) {
-                shouldRun = false;
-            } else  {
-                shouldRun = shouldRunTemp;
-            }
-        } else {
-            if (!shouldRunUrCommandLineOverride) {
-                shouldRun = false;
-            } else  {
-                shouldRun = shouldRunTemp;
-            }
-        }
-        return shouldRun;
+        return getBoolean(batchType.getShouldRunKey(), true);
     }
 
     @Override

@@ -143,7 +143,7 @@ public class AktoerRestClientTest {
 
         setupStubWithOkResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -163,7 +163,7 @@ public class AktoerRestClientTest {
 
         setupStubWithRubbishResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
         assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
     }
@@ -176,7 +176,7 @@ public class AktoerRestClientTest {
 
         setupStubWithRubbishResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
         final AktoerRestClient aktoerRestClient =
                 assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
@@ -195,7 +195,7 @@ public class AktoerRestClientTest {
 
         setupStubWithOkResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         // Will provoke an error:
@@ -216,7 +216,7 @@ public class AktoerRestClientTest {
 
         setupStubWithOkResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         // Will provoke an error:
@@ -244,7 +244,7 @@ public class AktoerRestClientTest {
 
         setupStubWithOkResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         // Will provoke an error:
@@ -270,7 +270,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWithFeilmelding();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -291,7 +291,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWithNoIdenter();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -311,7 +311,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWithEmptyIdenter();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -331,7 +331,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWithOneIdentThatIsNotGjeldende();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -351,7 +351,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWithMoreThanOneIdent();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -370,7 +370,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWhichReturnsHttpNotFound();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =
@@ -389,7 +389,7 @@ public class AktoerRestClientTest {
 
         setupStubWithResponseEntityWhichReturnsHttpInternal();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
         final AktoerRestClient aktoerRestClient =

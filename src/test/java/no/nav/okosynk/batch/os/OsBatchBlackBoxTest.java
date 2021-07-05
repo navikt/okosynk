@@ -23,7 +23,7 @@ public class OsBatchBlackBoxTest {
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
 
-    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     private Batch<OsMelding> batch;
 
@@ -33,7 +33,7 @@ public class OsBatchBlackBoxTest {
     @BeforeEach
     void setUp() throws MeldingUnreadableException {
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
         batch =
                 new Batch<OsMelding>(

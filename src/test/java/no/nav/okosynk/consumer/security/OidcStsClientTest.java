@@ -183,7 +183,7 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityAndWithAnInterpretableToken();
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType             = Constants.BATCH_TYPE.UR;
 
         assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
@@ -197,7 +197,7 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityButWithAnUninterpretableToken();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
         final OidcStsClient oidcStsClient                =
                 assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
@@ -217,7 +217,7 @@ public class OidcStsClientTest {
 
         setupStubWithRubbishResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType             = Constants.BATCH_TYPE.UR;
         final IllegalStateException illegalStateException =
                 assertThrows(
@@ -239,7 +239,7 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityAndWithAnInterpretableToken();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
         final OidcStsClient oidcStsClient =
                 assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
@@ -257,7 +257,7 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityAndWithAnInterpretableTokenButWithAnErroneousUrl();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
 
         final IllegalStateException illegalStateException =
@@ -278,7 +278,7 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityAndWithAnInterpretableTokenThatIsFirstExpiredAndThenFresh();
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
 
         final OidcStsClient oidcStsClient =

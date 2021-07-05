@@ -32,11 +32,9 @@ public class OkosynkConfiguration
     private final SystemConfiguration systemConfiguration;
 
     private OkosynkConfiguration(
-            final String applicationPropertiesFileName,
-            final boolean shouldRunOsCommandLineOverride,
-            final boolean shouldRunUrCommandLineOverride) {
+            final String applicationPropertiesFileName) {
 
-        super(shouldRunOsCommandLineOverride, shouldRunUrCommandLineOverride);
+        super();
 
         final SystemConfiguration systemConfiguration = new SystemConfiguration();
         this.compositeConfigurationForSecondPriority.addConfiguration(systemConfiguration);
@@ -74,20 +72,8 @@ public class OkosynkConfiguration
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    /**
-     * NB! If this method is called more than once,
-     * and the subsequent calls have a different
-     * applicationPropertiesFileName parameter from the first call,
-     * that parameter will be neglected and the instance created
-     * upon the first call will be returned.
-     *
-     * @param applicationPropertiesFileName
-     * @return
-     */
-    public static IOkosynkConfiguration getInstance(
-            final String applicationPropertiesFileName,
-            final boolean shouldRunOs,
-            final boolean shouldRunUr) {
+    public static void createAndReplaceSingletonInstance(
+            final String applicationPropertiesFileName) {
 
         if (applicationPropertiesFileName == null) {
             final String msg = "The parameter applicationPropertiesFileName is null";
@@ -95,11 +81,11 @@ public class OkosynkConfiguration
             throw new NullPointerException(msg);
         }
 
-        if (OkosynkConfiguration.singleton == null) {
-            OkosynkConfiguration.singleton =
-                    new OkosynkConfiguration(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
-        }
+        OkosynkConfiguration.singleton =
+                new OkosynkConfiguration(applicationPropertiesFileName);
+    }
 
+    public static IOkosynkConfiguration getSingletonInstance() {
         return OkosynkConfiguration.singleton;
     }
 

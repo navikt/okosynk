@@ -30,7 +30,8 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
 
 (2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
 
-(3) Hvis du bare vil teste én av UR eller OS, så legg til kommandolinjeparameteren --onlyUr resp. --onlyOs
+(3) Hvis du bare vil kjøre én av UR eller OS, så bruk en properties file som setter `SHOULD_RUN_OS=true` eller `false` eller 
+`SHOULD_RUN_UR=true` eller `false`
 
 (4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der.
 

@@ -49,7 +49,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
     private IMeldingMapper<SPESIFIKKMELDINGTYPE> mockedMeldingMapper;
 
-    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     public IOkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;

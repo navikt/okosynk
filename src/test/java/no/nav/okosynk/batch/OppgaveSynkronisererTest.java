@@ -46,7 +46,7 @@ class OppgaveSynkronisererTest {
     private static final String BRUKERID = "06025800174";
 
     private static final IOkosynkConfiguration okosynkConfiguration =
-            new FakeOkosynkConfiguration(true, true);
+            new FakeOkosynkConfiguration();
 
     private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
     private OppgaveRestClient mockedOppgaveRestClient;

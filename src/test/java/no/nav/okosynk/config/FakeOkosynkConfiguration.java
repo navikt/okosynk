@@ -4,11 +4,7 @@ public class FakeOkosynkConfiguration
         extends AbstractOkosynkConfiguration {
 
     public FakeOkosynkConfiguration() {
-        this(true, true);
-    }
-
-    public FakeOkosynkConfiguration(boolean shouldRunOsCommandLineOverride, boolean shouldRunUrCommandLineOverride) {
-        super(shouldRunOsCommandLineOverride, shouldRunUrCommandLineOverride);
+        super();
     }
 
     @Override

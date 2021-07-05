@@ -32,10 +32,8 @@ public class CliMainWithTestScope extends CliMain {
     private IStartableAndStoppable testFtpServerStarter = null;
     private Collection<WireMockServer> mockedProviderServers;
 
-    private CliMainWithTestScope(final String applicationPropertiesFileName,
-                                 final boolean shouldRunOs,
-                                 final boolean shouldRunUr) {
-        super(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
+    private CliMainWithTestScope(final String applicationPropertiesFileName) {
+        super(applicationPropertiesFileName);
     }
 
     public static void main(final String[] args) throws Exception {
@@ -294,11 +292,11 @@ public class CliMainWithTestScope extends CliMain {
     protected void preRunAllBatches() {
         super.preRunAllBatches();
         try {
-            this.mockedProviderServers = CliMainWithTestScope.startMockedProviderServers(getOkosynkConfiguration());
+            this.mockedProviderServers = CliMainWithTestScope.startMockedProviderServers(createOkosynkConfiguration());
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
-        setTestFtpServerStarter(CliMainWithTestScope.startTestFtpServer(getOkosynkConfiguration()));
+        setTestFtpServerStarter(CliMainWithTestScope.startTestFtpServer(createOkosynkConfiguration()));
     }
 
     @Override

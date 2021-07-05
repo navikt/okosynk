@@ -1,6 +1,6 @@
 package no.nav.okosynk.cli;
 
-import io.vavr.Function3;
+import io.vavr.Function1;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.batch.os.OsService;
@@ -40,23 +40,13 @@ public class CliMain {
     private static final String CLI_HELP_LONG_KEY = "help";
     private static final String CLI_HELP_DESCRIPTION = "Print this message";
 
-    private static final String CLI_OS_ONLY_KEY = "o";
-    private static final String CLI_OS_ONLY_LONG_KEY = "onlyOs";
-    private static final String CLI_OS_ONLY_DESCRIPTION = "Only run os batch";
-
-    private static final String CLI_UR_ONLY_KEY = "u";
-    private static final String CLI_UR_ONLY_LONG_KEY = "onlyUr";
-    private static final String CLI_UR_ONLY_DESCRIPTION = "Only run ur batch";
-
     private final IOkosynkConfiguration okosynkConfiguration;
 
-    public CliMain(final String applicationPropertiesFileName,
-                   final boolean shouldRunOs,
-                   final boolean shouldRunUr) {
+    public CliMain(final String applicationPropertiesFileName) {
 
         // TODO: This instance of IOkosynkConfiguration should maybe be injected around.
         final IOkosynkConfiguration okosynkConfiguration =
-                getOkosynkConfiguration(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
+                createOkosynkConfiguration(applicationPropertiesFileName);
         this.okosynkConfiguration = okosynkConfiguration;
         setUpCertificates(okosynkConfiguration);
     }
@@ -68,33 +58,13 @@ public class CliMain {
 
     protected static void runMain(
             final String[] args,
-            final Function3<String, Boolean, Boolean, ? extends CliMain> mainClassCreator) throws ParseException {
+            final Function1<String, ? extends CliMain> mainClassCreator) throws ParseException {
 
         final MainContext mainContext = preMain(args);
         try {
             if (mainContext.shouldRun) {
-                final boolean shouldOnlyRunOs = CliMain.shouldOnlyRunOs(mainContext.commandLine);
-                final boolean shouldOnlyRunUr = CliMain.shouldOnlyRunUr(mainContext.commandLine);
-                final boolean shouldRunOs;
-                final boolean shouldRunUr;
-                if (shouldOnlyRunOs && !shouldOnlyRunUr) {
-                    shouldRunOs = true;
-                    shouldRunUr = false;
-                } else if (!shouldOnlyRunOs && shouldOnlyRunUr) {
-                    shouldRunOs = false;
-                    shouldRunUr = true;
-                } else if (!shouldOnlyRunOs && !shouldOnlyRunUr) {
-                    shouldRunOs = true;
-                    shouldRunUr = true;
-                } else {
-                    throw new IllegalArgumentException(
-                            "Illegal combination of command line options " +
-                                    CLI_OS_ONLY_LONG_KEY + ": " + shouldOnlyRunOs +
-                                    " and " +
-                                    CLI_UR_ONLY_LONG_KEY + ": " + shouldOnlyRunUr);
-                }
                 final CliMain cliMain =
-                        mainClassCreator.apply(mainContext.applicationPropertiesFileName, shouldRunOs, shouldRunUr);
+                        mainClassCreator.apply(mainContext.applicationPropertiesFileName);
                 cliMain.runAllBatches();
             }
         } finally {
@@ -148,14 +118,6 @@ public class CliMain {
         return commandLine.hasOption(CLI_APPLICATION_PROPERTIES_FILENAME_KEY);
     }
 
-    private static boolean shouldOnlyRunOs(final CommandLine commandLine) {
-        return commandLine.hasOption(CLI_OS_ONLY_KEY);
-    }
-
-    private static boolean shouldOnlyRunUr(final CommandLine commandLine) {
-        return commandLine.hasOption(CLI_UR_ONLY_KEY);
-    }
-
     private static CommandLine treatCommandLineArgs(final String[] args) throws ParseException {
 
         final Option helpOption =
@@ -163,24 +125,6 @@ public class CliMain {
                         .builder(CLI_HELP_KEY)
                         .longOpt(CLI_HELP_LONG_KEY)
                         .desc(CLI_HELP_DESCRIPTION)
-                        .required(false)
-                        .hasArg(false)
-                        .build();
-
-        final Option osOption =
-                Option
-                        .builder(CLI_OS_ONLY_KEY)
-                        .longOpt(CLI_OS_ONLY_LONG_KEY)
-                        .desc(CLI_OS_ONLY_DESCRIPTION)
-                        .required(false)
-                        .hasArg(false)
-                        .build();
-
-        final Option urOption =
-                Option
-                        .builder(CLI_UR_ONLY_KEY)
-                        .longOpt(CLI_UR_ONLY_LONG_KEY)
-                        .desc(CLI_UR_ONLY_DESCRIPTION)
                         .required(false)
                         .hasArg(false)
                         .build();
@@ -199,8 +143,6 @@ public class CliMain {
 
         final Options options = new Options();
         options.addOption(helpOption);
-        options.addOption(osOption);
-        options.addOption(urOption);
         options.addOption(applicationPropertiesFileNameOption);
 
         final CommandLineParser commandLineParser = new DefaultParser();
@@ -221,11 +163,11 @@ public class CliMain {
     }
 
     protected void preRunAllBatches() {
-        final String revision = getOkosynkConfiguration().getString("revision");
+        final String revision = createOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
         // TODO: AZURE: Log code during development: (Remove when done!)
-        final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+        final IOkosynkConfiguration okosynkConfiguration = createOkosynkConfiguration();
         if (okosynkConfiguration.getBoolean("SHOULD_LOG_AZURE", false)) {
             new AzureAdAuthenticationClient(okosynkConfiguration);
         } else {
@@ -236,7 +178,7 @@ public class CliMain {
     protected void postRunAllBatches() {
     }
 
-    protected IOkosynkConfiguration getOkosynkConfiguration() {
+    protected IOkosynkConfiguration createOkosynkConfiguration() {
         return okosynkConfiguration;
     }
 
@@ -249,7 +191,7 @@ public class CliMain {
         preRunAllBatches();
 
         try {
-            final IOkosynkConfiguration okosynkConfiguration = getOkosynkConfiguration();
+            final IOkosynkConfiguration okosynkConfiguration = createOkosynkConfiguration();
             final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
 
             if (okosynkConfiguration.shouldRun(Constants.BATCH_TYPE.OS)) {
@@ -334,13 +276,11 @@ public class CliMain {
         logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
     }
 
-    private IOkosynkConfiguration getOkosynkConfiguration(
-            final String applicationPropertiesFileName,
-            final boolean shouldRunOs,
-            final boolean shouldRunUr) {
+    private IOkosynkConfiguration createOkosynkConfiguration(
+            final String applicationPropertiesFileName) {
 
-        final IOkosynkConfiguration okosynkConfiguration =
-                OkosynkConfiguration.getInstance(applicationPropertiesFileName, shouldRunOs, shouldRunUr);
+        OkosynkConfiguration.createAndReplaceSingletonInstance(applicationPropertiesFileName);
+        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         return okosynkConfiguration;
     }

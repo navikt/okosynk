@@ -106,7 +106,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingRealSftpTest {
     void setup() throws IOException, URISyntaxException {
 
         final IOkosynkConfiguration okosynkConfiguration =
-                new FakeOkosynkConfiguration(true, true);
+                new FakeOkosynkConfiguration();
 
         try {
             setWorkingSystemProperties(okosynkConfiguration);

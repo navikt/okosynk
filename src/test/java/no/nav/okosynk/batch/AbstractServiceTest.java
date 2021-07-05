@@ -68,7 +68,7 @@ public abstract class AbstractServiceTest {
     }
 
     protected void commonBeforeEach() {
-        this.okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        this.okosynkConfiguration = new FakeOkosynkConfiguration();
     }
 
     protected AbstractService<? extends AbstractMelding> getService() {

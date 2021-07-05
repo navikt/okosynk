@@ -25,7 +25,7 @@ public class UrBatchBlackBoxTest {
             LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final long EKSEKVERINGS_ID = 0;
-    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     private Batch<UrMelding> batch;
     private String inputFilPathMock = "mypath";
@@ -36,7 +36,7 @@ public class UrBatchBlackBoxTest {
     @BeforeEach
     void setUp() throws MeldingUnreadableException {
 
-        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         batch =
                 new Batch<UrMelding>(
                         okosynkConfiguration,

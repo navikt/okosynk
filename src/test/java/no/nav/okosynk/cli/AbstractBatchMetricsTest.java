@@ -26,7 +26,7 @@ public abstract class AbstractBatchMetricsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         assertDoesNotThrow(() -> BatchMetricsFactory.get(okosynkConfiguration, this.batchType));
     }
 
@@ -37,7 +37,7 @@ public abstract class AbstractBatchMetricsTest {
 
         System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
 
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
@@ -52,7 +52,7 @@ public abstract class AbstractBatchMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
                 () ->
@@ -66,7 +66,7 @@ public abstract class AbstractBatchMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
                 () -> batchMetrics.setUnsuccessfulMetrics()
@@ -79,7 +79,7 @@ public abstract class AbstractBatchMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         assertDoesNotThrow(
                 () -> batchMetrics.setUnsuccessfulMetrics()
@@ -92,7 +92,7 @@ public abstract class AbstractBatchMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.clearProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY);
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         batchMetrics.setUnsuccessfulMetrics();
         assertDoesNotThrow(
@@ -106,7 +106,7 @@ public abstract class AbstractBatchMetricsTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, "abc:9012");
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration(true, true);
+        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(okosynkConfiguration, this.batchType);
         batchMetrics.setUnsuccessfulMetrics();
         assertDoesNotThrow(
