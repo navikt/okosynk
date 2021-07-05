@@ -9,6 +9,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.domain.Oppgave;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
@@ -18,6 +19,7 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
@@ -85,7 +87,7 @@ public class OppgaveRestClient {
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
             final IOkosynkConfiguration okosynkConfiguration,
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
-            final UsernamePasswordCredentials credentials
+            final UsernamePasswordCredentials usernamePasswordCredentials
     ) {
         final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
         final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl);
@@ -93,10 +95,7 @@ public class OppgaveRestClient {
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
         try {
-            request.addHeader(
-                    new BasicScheme(UTF_8)
-                            .authenticate(credentials, request, null)
-            );
+            OppgaveRestClient.addAuthenticationHeader(request, usernamePasswordCredentials, okosynkConfiguration);
         } catch (AuthenticationException e) {
             throw new IllegalStateException(e);
         }
@@ -111,6 +110,18 @@ public class OppgaveRestClient {
                 .mapToInt(function)
                 .reduce(Integer::sum)
                 .orElse(0);
+    }
+
+    // TODO: Implement Azure AD
+    private static void addAuthenticationHeader(
+            final HttpRequestBase request,
+            final UsernamePasswordCredentials usernamePasswordCredentials,
+            final IOkosynkConfiguration okosynkConfiguration) throws AuthenticationException {
+        if (okosynkConfiguration.shouldAuthenticateUsingAzureAD()) {
+            throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
+        } else {
+            request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
+        }
     }
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
@@ -301,9 +312,7 @@ public class OppgaveRestClient {
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         try {
-            request.addHeader(
-                    new BasicScheme(UTF_8).authenticate(getUsernamePasswordCredentials(), request, null)
-            );
+            OppgaveRestClient.addAuthenticationHeader(request, getUsernamePasswordCredentials(), getOkosynkConfiguration());
         } catch (AuthenticationException e) {
             throw new IllegalStateException(e);
         }

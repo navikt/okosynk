@@ -20,6 +20,7 @@ public class Constants {
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
+    static final String NAIS_APP_NAME_KEY = "NAIS_APP_NAME";
     // =========================================================================
     private static final String OS_ALERT_COLLECTOR_METRIC_NAME = "okosynk_os_batch_alert";
     private static final String OS_BATCH_BRUKER_DEFAULT_VALUE = "srvbokosynk001";

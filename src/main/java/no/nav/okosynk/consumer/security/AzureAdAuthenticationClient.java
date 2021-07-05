@@ -51,7 +51,7 @@ public class AzureAdAuthenticationClient {
 
     public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
-        //logDevelopmentInfo();
+        logDevelopmentInfo();
     }
 
     private static String post(
@@ -124,6 +124,7 @@ public class AzureAdAuthenticationClient {
         logger.info("getAzureAppWellKnownUrl: {}", okosynkConfiguration.getAzureAppWellKnownUrl());
         logger.info("getGrantType: {}", AzureAdAuthenticationClient.GRANT_TYPE);
         logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
+        logger.info("getNaisAppName(): {}", okosynkConfiguration.getNaisAppName() == null ? null : okosynkConfiguration.getNaisAppName());
         logger.info("***** END Azure AD Development info (to be removed when in prod *****");
     }
 

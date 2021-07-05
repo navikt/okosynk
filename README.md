@@ -214,15 +214,35 @@ Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljø
 # Spesifikke Kubernetes-behov i preprod/prod
 ## Start en batch akkurat nå uavhengig av hva cron schedule tilsier
 
-|                                                              | Preprod              | or   | Prod              |                             | Note |
-| :----------------------------------------------------------- | :------------------- | ---- | :---------------- | :-------------------------- | ---- |
-| ```kubectl config use-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) |                             |      |
-| ```kubectl config set-context```                             | ```preprod-fss``` 3) | or   | ```prod-fss``` 3) | ```--namespace="oppgavehandtering"``` |      |
-| ```kubectl create job --from=cronjob/okosynk "oor-manually-started-2019-03-11-13-07"``` |                      |      |                   |                             |      |
+- Preprod
+
+```
+kubectl config use-context preprod-fss
+kubectl config set-context preprod-fss --namespace="oppgavehandtering"
+kubectl create job --from=cronjob/okosynkos "<okosynk-os-oor-manually-started-2021-07-05-12-21>"
+kubectl create job --from=cronjob/okosynkur "<okosynk-ur-oor-manually-started-2021-07-05-12-21>"
+```
+
+- Prod
+
+```
+kubectl config use-context prod-fss
+kubectl config set-context prod-fss --namespace="oppgavehandtering"
+kubectl create job --from=cronjob/okosynkos "<okosynk-os-oor-manually-started-2021-07-05-12-21>"
+kubectl create job --from=cronjob/okosynkur "<okosynk-ur-oor-manually-started-2021-07-05-12-21>"
+```
 
 ## Slett en jobb
 
 ```kubectl delete job oor-manually-started-2020-01-10-18-18```
+
+## Slett en cronjob slik at det ikke dannes nye batch-jobber til konfigurert tid
+
+```kubectl delete cronjob okosynkos```
+
+eller
+
+```kubectl delete cronjob okosynkur```
 
 # General practical commands, hints and tips
 - Which ports are being listened to (e.g. to see whether the SFTP server is running and listening to the expected port)

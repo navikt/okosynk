@@ -34,6 +34,16 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     }
 
     @Override
+    public boolean shouldAuthenticateUsingAzureAD() {
+        return false;
+    }
+
+    @Override
+    public String getNaisAppName() {
+        return getRequiredString(Constants.NAIS_APP_NAME_KEY);
+    }
+
+    @Override
     public String getBatchBruker(final Constants.BATCH_TYPE batchType) {
         return getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
     }
