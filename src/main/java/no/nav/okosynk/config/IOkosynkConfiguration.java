@@ -42,6 +42,11 @@ public interface IOkosynkConfiguration {
 
     boolean shouldRun(final Constants.BATCH_TYPE batchType);
 
+    /**
+     * @return Verdien som oppgavefeltet opprettet_av blir utstyrt med for oppgaver opprettet av okosynk.
+     */
+    String getOpprettetAvValue(final Constants.BATCH_TYPE batchType);
+
     String getBatchBruker(final Constants.BATCH_TYPE batchType);
 
     String getBatchBrukerPassword(final Constants.BATCH_TYPE batchType);

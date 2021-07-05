@@ -1,0 +1,71 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  labels:
+    team: oppgavehandtering
+  name: okosynkos
+  namespace: oppgavehandtering
+spec:
+  azure:
+    application:
+      enabled: true
+      tenant: trygdeetaten.no
+      claims:
+        extra:
+          - "NAVident"
+  image: {{image}}
+  schedule: "0 4 * * *" # Every morning at 04:00 UTC
+  webproxy: true
+  ttlSecondsAfterFinished: 172800
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: 250m
+      memory: 1Gi
+  env:
+    # TODO: AZURE: Remove when done:
+    - name: SHOULD_LOG_AZURE
+      value: "true"
+
+    - name: OPPGAVE_URL
+      value: https://oppgave.nais.preprod.local/api/v1/oppgaver
+    - name: AKTOERREGISTER_URL
+      value: https://app-q1.adeo.no/aktoerregister/api/v1/identer
+    - name: REST_STS_URL
+      value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
+    - name: SECURITYTOKENSERVICE_URL
+      value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
+    - name: PUSH_GATEWAY_ADDRESS
+      value: nais-prometheus-pushgateway.nais:9091
+    - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
+      value: "0"
+    - name: FILE_READER_MAX_NUMBER_OF_TRIES
+      value: "1"
+    - name: BATCH_RETRY_WAIT_TIME_IN_MS
+      value: "30000"
+    - name: BATCH_MAX_NUMBER_OF_TRIES
+      value: "3"
+    - name: OSFTPBASEURL_URL
+      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/os.input
+    - name: URFTPBASEURL_URL
+      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
+    - name: AZURE_APP_SCOPE_OPPGAVE
+      # value: api://dev-fss.oppgavehandtering.oppgave/.default
+      value: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
+    - name: SHOULD_RUN_OS
+      value: "true"
+    - name: SHOULD_RUN_UR
+      value: "false"
+  vault:
+    enabled: true
+    paths:
+      - kvPath: serviceuser/data/dev/srvbokosynk001
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk001
+      - kvPath: serviceuser/data/dev/srvbokosynk002
+        mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
+      - kvPath: serviceuser/data/dev/srvokosynksftp
+        mountPath: /secrets/serviceuser/okosynk/srvokosynksftp
+    sidecar: true
+status: {}

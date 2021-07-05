@@ -235,7 +235,7 @@ public class OppgaveRestClient {
 
     public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaver) {
 
-        final String opprettetAv = getOkosynkConfiguration().getBatchBruker(getBatchType());
+        final String opprettetAv = getOkosynkConfiguration().getOpprettetAvValue(getBatchType());
         final int bulkSize = 50;
         int offset = 0;
         log.info("Starter søk i og evt. inkrementell henting av oppgaver fra oppgave-servicen...");

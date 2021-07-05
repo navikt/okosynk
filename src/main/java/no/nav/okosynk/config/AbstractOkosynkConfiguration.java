@@ -29,6 +29,11 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     }
 
     @Override
+    public String getOpprettetAvValue(final Constants.BATCH_TYPE batchType) {
+        return getBatchBruker(batchType);
+    }
+
+    @Override
     public String getBatchBruker(final Constants.BATCH_TYPE batchType) {
         return getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
     }

@@ -121,17 +121,51 @@ jobs:
         if: env.IMAGE_TAG_USED == ''
         run: |
           docker push $IMAGE
-      - name: deploy to q1
+
+      # REMOVE WHEN Azure AD authentication is in place:
+      - name: deploy OS and UR to q1
         if: success() && contains(env.DEPLOY_TAG, 'q1')
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
           CLUSTER: dev-fss
           RESOURCE: nais/app-preprod.yaml
-      - name: deploy to prod
+
+      - name: deploy OS to q1
+        if: success() && contains(env.DEPLOY_TAG, 'q1')
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: dev-fss
+          RESOURCE: nais/app-preprod-os.yaml
+      - name: deploy UR to q1
+        if: success() && contains(env.DEPLOY_TAG, 'q1')
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: dev-fss
+          RESOURCE: nais/app-preprod-ur.yaml
+      # REMOVE WHEN Azure AD authentication is in place:
+      - name: deploy OS and UR to prod
         if: success() && contains(env.DEPLOY_TAG, 'prod')
         uses: nais/deploy/actions/deploy@v1
         env:
           APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
           CLUSTER: prod-fss
           RESOURCE: nais/app-prod.yaml
+      # COMMENT OUT WHEN Azure AD authentication is in place:
+      #- name: deploy OS to prod
+      #  if: success() && contains(env.DEPLOY_TAG, 'prod')
+      #  uses: nais/deploy/actions/deploy@v1
+      #  env:
+      #    APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+      #    CLUSTER: prod-fss
+      #    RESOURCE: nais/app-prod-os.yaml
+      # COMMENT OUT WHEN Azure AD authentication is in place:
+      #- name: deploy UR to prod
+      #  if: success() && contains(env.DEPLOY_TAG, 'prod')
+      #  uses: nais/deploy/actions/deploy@v1
+      #  env:
+      #    APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+      #    CLUSTER: prod-fss
+      #    RESOURCE: nais/app-prod-ur.yaml

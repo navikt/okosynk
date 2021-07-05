@@ -232,8 +232,8 @@ Følgene kommando er heller ikke å forakte (her får du f.eks. lista opp miljø
   ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
 - Ved lokal utvikling benyttes `src/test/resources/application-test.testset_001.properties` for properties som vanligvis 
   vil ligge i yaml/Kubernetes.
-- OS - srvbokosynk001 - bokosynk001
-- UR - srvbokosynk002 - bokosynk002
+- OS - service user srvbokosynk001
+- UR - service user srvbokosynk002
 - Kjør `java -jar target/okosynk.jar -h` for å se hvilke kommandolinjeparametre som er tilgjengelige
 - NB! testdatafilene inneholder binære verdier, så de må editeres med omhu! (F.eks. kan OS-testdatafila inneholde et 
   tegn som fortoner seg som en 'æ', men som _IKKE_ er det, det er derimot en HEX E6.)
