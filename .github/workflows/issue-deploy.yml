@@ -123,13 +123,13 @@ jobs:
           docker push $IMAGE
 
       # REMOVE WHEN Azure AD authentication is in place:
-      - name: deploy OS and UR to q1
-        if: success() && contains(env.DEPLOY_TAG, 'q1')
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
-          CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod.yaml
+      #- name: deploy OS and UR to q1
+      #  if: success() && contains(env.DEPLOY_TAG, 'q1')
+      #  uses: nais/deploy/actions/deploy@v1
+      #  env:
+      #    APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+      #    CLUSTER: dev-fss
+      #    RESOURCE: nais/app-preprod.yaml
 
       - name: deploy OS to q1
         if: success() && contains(env.DEPLOY_TAG, 'q1')
