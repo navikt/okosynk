@@ -100,14 +100,12 @@ public class AzureAdAuthenticationClient {
             closeableHttpResponse = closeableHttpClient.execute(httpEntityEnclosingRequestBase);
             statusLine = closeableHttpResponse.getStatusLine();
             logger.info("statusLine.getStatusCode(): {}", statusLine.getStatusCode());
-            if (statusLine.getStatusCode() == 200) {
-                final HttpEntity responseHttpEntity = closeableHttpResponse.getEntity();
-                postResponseEntityAsString = new BufferedReader(
-                        new InputStreamReader(responseHttpEntity.getContent(), StandardCharsets.UTF_8))
-                        .lines()
-                        .collect(Collectors.joining("\n"));
-                logger.info("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
-            }
+            final HttpEntity responseHttpEntity = closeableHttpResponse.getEntity();
+            postResponseEntityAsString = new BufferedReader(
+                    new InputStreamReader(responseHttpEntity.getContent(), StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+            logger.info("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
             // ---------------------------------------------------------------------------------------------------------
         } catch (Throwable e) {
             logger.error("Exception received when doing HTTP post", e);
