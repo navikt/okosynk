@@ -118,7 +118,17 @@ public class OppgaveRestClient {
             final UsernamePasswordCredentials usernamePasswordCredentials,
             final IOkosynkConfiguration okosynkConfiguration) throws AuthenticationException {
         if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
-            throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
+
+
+
+
+
+
+            //throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
+
+
+
+
         } else {
             request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
         }

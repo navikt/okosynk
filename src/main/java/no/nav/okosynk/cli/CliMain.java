@@ -195,11 +195,13 @@ public class CliMain {
             final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
 
             if (okosynkConfiguration.shouldRun(Constants.BATCH_TYPE.OS)) {
+                logger.info("Running OS");
                 services.add(new OsService(okosynkConfiguration));
             } else {
                 logger.info("Not running OS");
             }
             if (okosynkConfiguration.shouldRun(Constants.BATCH_TYPE.UR)) {
+                logger.info("Running UR");
                 services.add(new UrService(okosynkConfiguration));
             } else {
                 logger.info("Not running UR");
