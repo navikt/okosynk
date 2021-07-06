@@ -75,7 +75,7 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     @Override
     public String getAzureAppTokenUrl() {
-        return getRequiredString("https://login.microsoftonline.com/" + getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token");
+        return "https://login.microsoftonline.com/" + getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token";
     }
 
     @Override
