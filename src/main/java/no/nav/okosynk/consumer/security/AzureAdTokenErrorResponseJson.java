@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.jackson.Jacksonized;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 
 @Jacksonized
@@ -20,7 +21,7 @@ public class AzureAdTokenErrorResponseJson {
     @JsonProperty("error_codes")
     private final Collection<Integer> errorCodes;
     @JsonProperty("timestamp")
-    private final String timestamp;
+    private final ZonedDateTime timestamp;
     @JsonProperty("trace_id")
     private final String traceId;
     @JsonProperty("correlation_id")
