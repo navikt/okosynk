@@ -1,6 +1,5 @@
 package no.nav.okosynk.consumer.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.okosynk.config.IOkosynkConfiguration;
@@ -61,7 +60,7 @@ public class AzureAdAuthenticationClient {
         logDevelopmentInfo();
     }
 
-    private static Map.Entry<Integer, String> post(
+    private static Map.Entry<Integer, String> httpPost(
             final URI httpPostProviderUri,
             final URL httpPostProxyUrl,
             final List<Map.Entry<String, String>> httpPostParameters,
@@ -123,10 +122,10 @@ public class AzureAdAuthenticationClient {
             logger.info("getAzureAppClientSecret: {}", this.okosynkConfiguration.getAzureAppClientSecret() == null ? null : "***<Something>***");
             logger.info("getAzureAppTokenUrl: {}", okosynkConfiguration.getAzureAppTokenUrl());
             logger.info("getGrantType: {}", AzureAdAuthenticationClient.GRANT_TYPE);
-            logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
             logger.info("getNaisAppName(): {}", okosynkConfiguration.getNaisAppName() == null ? null : okosynkConfiguration.getNaisAppName());
-        } catch (Exception e) {
-            logger.error("Something strange and interesting happened when querying the Azure AD accessz token");
+            logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
+        } catch (Throwable e) {
+            logger.error("Something strange and interesting happened when querying the Azure AD access token", e);
         } finally {
             logger.info("***** END Azure AD Development info (to be removed when in prod *****");
         }
@@ -157,7 +156,7 @@ public class AzureAdAuthenticationClient {
         }};
         // ---------------------------------------------------------------------------------------------------------
         final Map.Entry<Integer, String> postResult =
-                AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
+                AzureAdAuthenticationClient.httpPost(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
         logger.info("postResult = {}", postResult);
         // ---------------------------------------------------------------------------------------------------------
         final String token;
@@ -199,6 +198,7 @@ public class AzureAdAuthenticationClient {
             try {
                 azureAdTokenErrorResponseJson =
                         objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
+                logger.error("azureAdTokenErrorResponseJson: {}", azureAdTokenErrorResponseJson);
             } catch (Throwable e) {
                 throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
             }
