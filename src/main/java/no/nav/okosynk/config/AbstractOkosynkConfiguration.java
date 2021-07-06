@@ -34,8 +34,8 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     }
 
     @Override
-    public boolean shouldAuthenticateUsingAzureAD() {
-        return false;
+    public boolean shouldAuthenticateUsingAzureADAgainstOppgave() {
+        return getBoolean(Constants.SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE_KEY, false);
     }
 
     @Override

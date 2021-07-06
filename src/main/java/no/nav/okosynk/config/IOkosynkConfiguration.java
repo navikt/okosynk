@@ -47,7 +47,7 @@ public interface IOkosynkConfiguration {
      */
     String getOpprettetAvValue(final Constants.BATCH_TYPE batchType);
 
-    boolean shouldAuthenticateUsingAzureAD();
+    boolean shouldAuthenticateUsingAzureADAgainstOppgave();
 
     String getNaisAppName();
 

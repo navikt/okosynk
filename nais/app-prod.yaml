@@ -58,6 +58,8 @@ spec:
       value: "true"
     - name: SHOULD_RUN_UR
       value: "true"
+    - name: SHOULD_AUTHENTICATE_USING_AZURE_AD
+      value: "false"
   vault:
     enabled: true
     paths:
