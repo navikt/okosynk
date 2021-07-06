@@ -172,6 +172,7 @@ public class AzureAdAuthenticationClient {
         String token = null;
         if (postResult != null) {
             final String postResponseEntityAsString = postResult.getValue();
+            logger.info("postResponseEntityAsString = {}", postResponseEntityAsString);
             final ObjectMapper objectMapper = new ObjectMapper();
             if ("200".equals(postResult.getKey())) {
                 final Random random = new Random(10293847);

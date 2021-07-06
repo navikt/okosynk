@@ -25,4 +25,6 @@ public class AzureAdTokenErrorResponseJson {
     private final String traceId;
     @JsonProperty("correlation_id")
     private final String correlationId;
+    @JsonProperty("error_uri")
+    private final String errorUri;
 }
