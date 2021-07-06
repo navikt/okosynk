@@ -127,7 +127,7 @@ public class OppgaveRestClient {
 
 
 
-            //throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
+            throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
 
 
 

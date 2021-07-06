@@ -135,8 +135,14 @@ public class AzureAdAuthenticationClient {
     public String getToken() {
         logger.info("Entering getToken()...");
         // ---------------------------------------------------------------------------------------------------------
+
+        // AZURE_OPENID_CONFIG_TOKEN_ENDPOINT:  https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
+
         final String httpPostProviderUriString =
                 this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
+
+        logger.info("httpPostProviderUriString = {}", httpPostProviderUriString);
+
         final URI httpPostProviderUri = URI.create(httpPostProviderUriString);
         // ---------------------------------------------------------------------------------------------------------
         final String httpPostProxyUrlString = this.okosynkConfiguration.getSecureHttpProxyUrl();
@@ -157,31 +163,44 @@ public class AzureAdAuthenticationClient {
             add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
         }};
         // ---------------------------------------------------------------------------------------------------------
-        final String token =
+        final String postResponseEntityAsString =
                 AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
-        logger.info("Værtype = {}", token);
+        logger.info("postResponseEntityAsString = {}", postResponseEntityAsString);
+
+
+
 
         final Random random = new Random(10293847);
-        final int l = token.length();
+        final int l = postResponseEntityAsString.length();
         final int start = random.nextInt(l);
         final int end = random.nextInt(l - start) + start;
 
-        final String tokenPart = token.substring(start, end);
-        logger.info("Part = {}", tokenPart);
-        logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}", token.substring(0, 10), l, start, end, token.contains("access_token"));
+        final String postResponseEntityAsStringPart = postResponseEntityAsString.substring(start, end);
+        logger.info("postResponseEntityAsStringPart = {}", postResponseEntityAsStringPart);
+        logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}",
+                postResponseEntityAsString.substring(0, 10),
+                l,
+                start,
+                end,
+                postResponseEntityAsString.contains("access_token"));
+
+
 
 
 
         final ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode;
+        String token = null;
         try {
-            jsonNode = objectMapper.readTree(token);
-            final String theRealToken = jsonNode.get("access_token").asText();
-            logger.info("theRealToken: {}", theRealToken == null ? null : "***<Something wanted, I guess>***");
+            jsonNode = objectMapper.readTree(postResponseEntityAsString);
+            token = jsonNode.get("access_token").asText();
+            logger.info("theRealToken: {}", token == null ? null : "***<Something wanted, I guess>***");
         } catch (JsonProcessingException e) {
             logger.error("Could not parse token", e);
         } catch (Throwable e) {
             logger.error("Something strange happened when trying to parse the token", e);
+        } finally {
+
         }
 
 
