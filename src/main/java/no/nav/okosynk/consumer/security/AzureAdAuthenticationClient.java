@@ -2,6 +2,7 @@ package no.nav.okosynk.consumer.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.HttpEntity;
@@ -174,6 +175,7 @@ public class AzureAdAuthenticationClient {
             final String postResponseEntityAsString = postResult.getValue();
             logger.info("postResponseEntityAsString = {}", postResponseEntityAsString);
             final ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             if ("200".equals(postResult.getKey())) {
                 final Random random = new Random(10293847);
                 final int l = postResult.getValue().length();
