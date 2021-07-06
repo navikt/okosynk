@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -156,6 +157,16 @@ public class AzureAdAuthenticationClient {
         final String token =
                 AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
         logger.info("Værtype = {}", token);
+
+        final Random random = new Random(10293847);
+        final int l = token.length();
+        final int start = random.nextInt(l);
+        final int end = random.nextInt(l - start) + start;
+
+        final String tokenPart = token.substring(start, end);
+        logger.info("Part = {}", tokenPart);
+        logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}", token.substring(0, 10), l, start, end, token.contains("access_token"));
+
         logger.info("Leaving getToken()");
         return token;
     }

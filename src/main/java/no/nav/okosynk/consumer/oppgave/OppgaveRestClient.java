@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpEntity;
@@ -119,7 +120,9 @@ public class OppgaveRestClient {
             final IOkosynkConfiguration okosynkConfiguration) throws AuthenticationException {
         if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
 
-
+            final AzureAdAuthenticationClient azureAdAuthenticationClient =
+                    new AzureAdAuthenticationClient(okosynkConfiguration);
+            final String token = azureAdAuthenticationClient.getToken();
 
 
 
