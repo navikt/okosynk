@@ -1,7 +1,6 @@
 package no.nav.okosynk.consumer.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -58,7 +57,7 @@ public class AzureAdAuthenticationClient {
         logDevelopmentInfo();
     }
 
-    private static String post(
+    private static Map.Entry<Integer, String> post(
             final URI httpPostProviderUri,
             final URL httpPostProxyUrl,
             final List<Map.Entry<String, String>> httpPostParameters,
@@ -66,7 +65,8 @@ public class AzureAdAuthenticationClient {
     ) {
         logger.info("Entering post()...");
 
-        String postResponseEntityAsString = null;
+        Map.Entry<Integer, String> postResult = null;
+        String postResponseEntityAsString;
         try {
             // ---------------------------------------------------------------------------------------------------------
             final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(httpPostProviderUri);
@@ -107,13 +107,15 @@ public class AzureAdAuthenticationClient {
                     .collect(Collectors.joining("\n"));
             logger.info("postResponseEntityAsString {}", postResponseEntityAsString == null ? null : "***<Something>***");
             // ---------------------------------------------------------------------------------------------------------
+
+            postResult = ImmutablePair.of(statusLine.getStatusCode(), postResponseEntityAsString);
         } catch (Throwable e) {
             logger.error("Exception received when doing HTTP post", e);
         } finally {
             logger.info("Leaving post()");
         }
 
-        return postResponseEntityAsString;
+        return postResult;
     }
 
     private void logDevelopmentInfo() {
@@ -138,9 +140,8 @@ public class AzureAdAuthenticationClient {
         // https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/v2.0/.well-known/openid-configuration
 
 
-
         final String httpPostProviderUriString = "https://login.microsoftonline.com/" + okosynkConfiguration.getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token";
-                // this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
+        // this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
 
         logger.info("httpPostProviderUriString = {}", httpPostProviderUriString);
 
@@ -164,47 +165,52 @@ public class AzureAdAuthenticationClient {
             add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
         }};
         // ---------------------------------------------------------------------------------------------------------
-        final String postResponseEntityAsString =
+        final Map.Entry<Integer, String> postResult =
                 AzureAdAuthenticationClient.post(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
-        logger.info("postResponseEntityAsString = {}", postResponseEntityAsString);
+        logger.info("postResult = {}", postResult);
 
-
-
-
-        final Random random = new Random(10293847);
-        final int l = postResponseEntityAsString.length();
-        final int start = random.nextInt(l);
-        final int end = random.nextInt(l - start) + start;
-
-        final String postResponseEntityAsStringPart = postResponseEntityAsString.substring(start, end);
-        logger.info("postResponseEntityAsStringPart = {}", postResponseEntityAsStringPart);
-        logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}",
-                postResponseEntityAsString.substring(0, 10),
-                l,
-                start,
-                end,
-                postResponseEntityAsString.contains("access_token"));
-
-
-
-
-
-        final ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode;
         String token = null;
-        try {
-            jsonNode = objectMapper.readTree(postResponseEntityAsString);
-            token = jsonNode.get("access_token").asText();
-            logger.info("theRealToken: {}", token == null ? null : "***<Something wanted, I guess>***");
-        } catch (JsonProcessingException e) {
-            logger.error("Could not parse token", e);
-        } catch (Throwable e) {
-            logger.error("Something strange happened when trying to parse the token", e);
-        } finally {
+        if (postResult != null) {
+            final String postResponseEntityAsString = postResult.getValue();
+            final ObjectMapper objectMapper = new ObjectMapper();
+            if ("200".equals(postResult.getKey())) {
+                final Random random = new Random(10293847);
+                final int l = postResult.getValue().length();
+                final int start = random.nextInt(l);
+                final int end = random.nextInt(l - start) + start;
 
+                final String postResponseEntityAsStringPart = postResponseEntityAsString.substring(start, end);
+                logger.info("postResponseEntityAsStringPart = {}", postResponseEntityAsStringPart);
+                logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}",
+                        postResponseEntityAsString.substring(0, 10),
+                        l,
+                        start,
+                        end,
+                        postResponseEntityAsString.contains("access_token"));
+                try {
+                    final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson =
+                            objectMapper.readValue(postResponseEntityAsString, AzureAdTokenSuccessResponseJson.class);
+                    logger.info("azureAdTokenSuccessResponseJson: {}", azureAdTokenSuccessResponseJson);
+                    token = azureAdTokenSuccessResponseJson.getAccessToken();
+                } catch (JsonProcessingException e) {
+                    logger.error("Could not parse token", e);
+                } catch (Throwable e) {
+                    logger.error("Something strange happened when trying to parse the token", e);
+                } finally {
+                }
+            } else {
+                try {
+                    final AzureAdTokenErrorResponseJson azureAdTokenErrorResponseJson =
+                            objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
+                    logger.info("azureAdTokenErrorResponseJson: {}", azureAdTokenErrorResponseJson);
+                } catch (JsonProcessingException e) {
+                    logger.error("Could not parse error", e);
+                } catch (Throwable e) {
+                    logger.error("Something strange happened when trying to parse the token", e);
+                } finally {
+                }
+            }
         }
-
-
 
         logger.info("Leaving getToken()");
         return token;
