@@ -1,5 +1,8 @@
 package no.nav.okosynk.consumer.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.http.HttpEntity;
@@ -166,6 +169,22 @@ public class AzureAdAuthenticationClient {
         final String tokenPart = token.substring(start, end);
         logger.info("Part = {}", tokenPart);
         logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}", token.substring(0, 10), l, start, end, token.contains("access_token"));
+
+
+
+        final ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(token);
+            final String theRealToken = jsonNode.get("access_token").asText();
+            logger.info("theRealToken: {}", theRealToken == null ? null : "***<Something wanted, I guess>***");
+        } catch (JsonProcessingException e) {
+            logger.error("Could not parse token", e);
+        } catch (Throwable e) {
+            logger.error("Something strange happened when trying to parse the token", e);
+        }
+
+
 
         logger.info("Leaving getToken()");
         return token;
