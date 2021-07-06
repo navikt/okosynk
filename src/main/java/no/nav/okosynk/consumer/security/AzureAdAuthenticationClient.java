@@ -137,9 +137,12 @@ public class AzureAdAuthenticationClient {
         // ---------------------------------------------------------------------------------------------------------
 
         // AZURE_OPENID_CONFIG_TOKEN_ENDPOINT:  https://login.microsoftonline.com/${AZURE_APP_TENANT_ID}/oauth2/v2.0/token
+        // https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/v2.0/.well-known/openid-configuration
 
-        final String httpPostProviderUriString =
-                this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
+
+
+        final String httpPostProviderUriString = "https://login.microsoftonline.com/" + okosynkConfiguration.getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token";
+                // this.okosynkConfiguration.getAzureAppWellKnownUrl(); // Preconfigured by NAIS to include the tenant in GUID format
 
         logger.info("httpPostProviderUriString = {}", httpPostProviderUriString);
 
