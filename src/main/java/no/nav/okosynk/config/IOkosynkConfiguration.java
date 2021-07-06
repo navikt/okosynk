@@ -63,7 +63,7 @@ public interface IOkosynkConfiguration {
 
     String getFtpCharsetName(final Constants.BATCH_TYPE batchType, final String ftpCharsetNameDefault);
 
-    String getAzureAppWellKnownUrl();
+    String getAzureAppTokenUrl();
 
     String getAzureAppClientId();
 

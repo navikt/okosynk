@@ -12,6 +12,7 @@ import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -165,7 +166,7 @@ public class OppgaveRestClient {
 
             try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
                 final StatusLine statusLine = response.getStatusLine();
-                if (statusLine.getStatusCode() >= 400) {
+                if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
                     ErrorResponse errorResponse = null;
                     try {
                         errorResponse =
@@ -332,7 +333,7 @@ public class OppgaveRestClient {
 
         try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
             final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() >= 400) {
+            if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
                 try {
                     final ErrorResponse errorResponse = new ObjectMapper()
                             .readValue(response.getEntity().getContent(), ErrorResponse.class);
@@ -368,7 +369,7 @@ public class OppgaveRestClient {
 
         try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
             final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() >= 400) {
+            if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
                 try {
                     final ErrorResponse errorResponse =
                             new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
