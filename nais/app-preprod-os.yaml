@@ -52,8 +52,8 @@ spec:
     - name: URFTPBASEURL_URL
       value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
     - name: AZURE_APP_SCOPE_OPPGAVE
-      # value: api://dev-fss.oppgavehandtering.oppgave/.default
-      value: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
+      value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
+      # value: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
     - name: SHOULD_RUN_OS
       value: "false"
     - name: SHOULD_RUN_UR
