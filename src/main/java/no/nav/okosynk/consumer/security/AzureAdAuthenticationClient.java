@@ -164,27 +164,6 @@ public class AzureAdAuthenticationClient {
         final String postResponseEntityAsString = postResult.getValue();
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         if (HttpStatus.SC_OK== httpStatusCode) {
-
-
-
-
-            final Random random = new Random(10293847);
-            final int l = postResult.getValue().length();
-            final int start = random.nextInt(l);
-            final int end = random.nextInt(l - start) + start;
-
-            final String postResponseEntityAsStringPart = postResponseEntityAsString.substring(start, end);
-            logger.info("postResponseEntityAsStringPart = {}", postResponseEntityAsStringPart);
-            logger.info("first = {}, l = {}, start = {}, end = {}, the expected string  is present: {}",
-                    postResponseEntityAsString.substring(0, 10),
-                    l,
-                    start,
-                    end,
-                    postResponseEntityAsString.contains("access_token"));
-
-
-
-
             final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson;
             try {
                 azureAdTokenSuccessResponseJson =
@@ -198,7 +177,6 @@ public class AzureAdAuthenticationClient {
             try {
                 azureAdTokenErrorResponseJson =
                         objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
-                logger.error("azureAdTokenErrorResponseJson: {}", azureAdTokenErrorResponseJson);
             } catch (Throwable e) {
                 throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
             }
