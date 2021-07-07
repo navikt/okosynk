@@ -41,6 +41,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -144,11 +145,15 @@ public class OppgaveRestClient {
 
     private static void addAzureAdAuthenticationHeader(
             final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
+        log.info("Authenticating using Azure AD...");
         final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
         request.addHeader("Authorization", "Bearer " + azureAdAuthenticationToken);
     }
 
-    private static void addBasicAuthenticationHeader(final HttpRequestBase request, final UsernamePasswordCredentials usernamePasswordCredentials) throws AuthenticationException {
+    private static void addBasicAuthenticationHeader(
+            final HttpRequestBase request,
+            final UsernamePasswordCredentials usernamePasswordCredentials) throws AuthenticationException {
+        log.info("Authenticating using Basic...");
         request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
     }
 
@@ -275,31 +280,38 @@ public class OppgaveRestClient {
     }
 
     public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaver) {
-
-        final String opprettetAv = getOkosynkConfiguration().getOpprettetAvValue(getBatchType());
         final int bulkSize = 50;
-        int offset = 0;
-        log.info("Starter søk i og evt. inkrementell henting av oppgaver fra oppgave-servicen...");
-        FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(opprettetAv, bulkSize, offset);
-        log.info(
-                "Estimat: Vi kommer totalt til å hente {} oppgaver",
-                finnOppgaveResponse.getAntallTreffTotalt()
-        );
-        while (!finnOppgaveResponse.getOppgaver().isEmpty()) {
-            log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
-            oppgaver.addAll(finnOppgaveResponse.getOppgaver()
-                    .stream()
-                    .map(this::tilOppgave)
-                    .collect(Collectors.toList()));
-            if (finnOppgaveResponse.getOppgaver().size() < bulkSize) {
-                break;
-            } else {
-                offset += bulkSize;
-                finnOppgaveResponse = this.finnOppgaver(opprettetAv, bulkSize, offset);
-            }
-        }
-        log.info("Hentet totalt {} unike oppgaver fra Oppgave", oppgaver.size());
-
+        final Collection<String> oppprettetAvValuesForFinn = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
+        final AtomicInteger atomicInteger = new AtomicInteger(oppgaver.size());
+        oppprettetAvValuesForFinn
+                .stream()
+                .forEach(oppprettetAvValueForFinn ->
+                        {
+                            int offset = 0;
+                            log.info("Starter søk i og evt. inkrementell henting av oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\" fra oppgave-servicen...");
+                            FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
+                            log.info(
+                                    "Estimat: Vi kommer totalt til å hente {} oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\"",
+                                    finnOppgaveResponse.getAntallTreffTotalt()
+                            );
+                            while (!finnOppgaveResponse.getOppgaver().isEmpty()) {
+                                log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
+                                oppgaver.addAll(finnOppgaveResponse.getOppgaver()
+                                        .stream()
+                                        .map(this::tilOppgave)
+                                        .collect(Collectors.toList()));
+                                if (finnOppgaveResponse.getOppgaver().size() < bulkSize) {
+                                    break;
+                                } else {
+                                    offset += bulkSize;
+                                    finnOppgaveResponse = this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
+                                }
+                            }
+                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaver.size() - atomicInteger.get());
+                            atomicInteger.addAndGet(oppgaver.size());
+                        }
+                );
+        log.info("Hentet totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaver.size());
         return ConsumerStatistics
                 .builder(getBatchType())
                 .antallOppgaverSomErHentetFraDatabasen(oppgaver.size())

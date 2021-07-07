@@ -12,6 +12,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import static no.nav.okosynk.config.Constants.NAIS_APP_NAME_KEY;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,9 +39,15 @@ class OppgaveRestClientTest {
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
 
+    @BeforeEach
+    void beforeEach() {
+        System.setProperty(NAIS_APP_NAME_KEY, "okosynkur");
+    }
+
     @AfterEach
     void afterEach() {
         System.clearProperty(OPPGAVE_URL_KEY);
+        System.clearProperty(NAIS_APP_NAME_KEY);
     }
 
     @Test

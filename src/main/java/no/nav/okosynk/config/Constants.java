@@ -6,6 +6,7 @@ public class Constants {
     public static final String BATCH_RETRY_WAIT_TIME_IN_MS_KEY = "batch.retry.wait.time.in.ms";
     public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
     public static final FTP_PROTOCOL FTP_PROTOCOL_DEFAULT_VALUE = FTP_PROTOCOL.SFTP;
+    public static final String NAIS_APP_NAME_KEY = "NAIS_APP_NAME";
     public static final String NAV_TRUSTSTORE_PASSWORD_EXT_KEY = "javax.net.ssl.trustStorePassword";
     public static final String NAV_TRUSTSTORE_PASSWORD_KEY = "NAV_TRUSTSTORE_PASSWORD";
     public static final String NAV_TRUSTSTORE_PATH_EXT_KEY = "javax.net.ssl.trustStore";
@@ -20,7 +21,6 @@ public class Constants {
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
-    static final String NAIS_APP_NAME_KEY = "NAIS_APP_NAME";
 
     static final String SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE_KEY = "SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE";
     // =========================================================================

@@ -1,5 +1,10 @@
 package no.nav.okosynk.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,8 +34,13 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     }
 
     @Override
-    public String getOpprettetAvValue(final Constants.BATCH_TYPE batchType) {
-        return getBatchBruker(batchType);
+    public Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType) {
+        final Collection<String> opprettetAvValuesForFinn =
+                new ArrayList<String>() {{
+                    add(getBatchBruker(batchType));
+                    add(getNaisAppName());
+                }};
+        return Collections.unmodifiableCollection(opprettetAvValuesForFinn);
     }
 
     @Override
@@ -74,8 +84,25 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     }
 
     @Override
+    public String getAzureAppWellKnownUrl() {
+        return getRequiredString("AZURE_APP_WELL_KNOWN_URL");
+    }
+
+    @Override
+    public String getAzureAppTenantId() {
+        return getRequiredString("AZURE_APP_TENANT_ID");
+    }
+
+    @Override
     public String getAzureAppTokenUrl() {
-        return "https://login.microsoftonline.com/" + getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token";
+        final String azureAppWellKnownUrl = getAzureAppWellKnownUrl();
+        try {
+            final URL azureAppTokenUrl = new URL(azureAppWellKnownUrl);
+            final String azureAppTokenUrlString = azureAppTokenUrl.getProtocol() + "://" + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/" + getAzureAppTenantId() + "/oauth2/v2.0/token";
+            return azureAppTokenUrlString;
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Exception received when trying to calculate the azureAppTokenUrl");
+        }
     }
 
     @Override

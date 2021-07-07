@@ -1,5 +1,7 @@
 package no.nav.okosynk.config;
 
+import java.util.Collection;
+
 public interface IOkosynkConfiguration {
 
     boolean getBoolean(final String key, final boolean defaultValue);
@@ -45,7 +47,7 @@ public interface IOkosynkConfiguration {
     /**
      * @return Verdien som oppgavefeltet opprettet_av blir utstyrt med for oppgaver opprettet av okosynk.
      */
-    String getOpprettetAvValue(final Constants.BATCH_TYPE batchType);
+    Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType);
 
     boolean shouldAuthenticateUsingAzureADAgainstOppgave();
 
@@ -54,6 +56,10 @@ public interface IOkosynkConfiguration {
     String getBatchBruker(final Constants.BATCH_TYPE batchType);
 
     String getBatchBrukerPassword(final Constants.BATCH_TYPE batchType);
+
+    String getAzureAppWellKnownUrl();
+
+    String getAzureAppTenantId();
 
     String getFtpHostUrl(final Constants.BATCH_TYPE batchType);
 

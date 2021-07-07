@@ -45,6 +45,7 @@ public class CliMainWithTestScope extends CliMain {
         mockedProviderServers.add(CliMainWithTestScope.mockPrometheusProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockStsProviderAndStartIt(okosynkConfiguration));
+        mockedProviderServers.add(CliMainWithTestScope.mockAzureAdProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockOppgaveProviderAndStartIt(okosynkConfiguration));
 
         return mockedProviderServers;
@@ -180,6 +181,43 @@ public class CliMainWithTestScope extends CliMain {
         logger.info("*** Mocked *** Sts response body: {}", new String(response.getBody()));
     }
 
+    private static WireMockServer mockAzureAdProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
+         final String azureAdUrl = okosynkConfiguration.getAzureAppTokenUrl();
+        final URL url = new URL(azureAdUrl);
+        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
+        wireMockConfiguration.port(url.getPort());
+        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
+        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logAzureAdRequest);
+        wireMockServer.start();
+        CliMainWithTestScope.mockAzureAdProviderAndStartIt(wireMockServer, "/" + okosynkConfiguration.getRequiredString("AZURE_APP_TENANT_ID") + "/oauth2/v2.0/token", okosynkConfiguration);
+
+        return wireMockServer;
+    }
+
+    private static void mockAzureAdProviderAndStartIt(final WireMockServer wireMockServer, final String urlContext, final IOkosynkConfiguration okosynkConfiguration) {
+
+        final String responseFilename = okosynkConfiguration.getRequiredString("testset_fileName_azureAdResponse");
+        wireMockServer
+                .stubFor(
+                        WireMock
+                                .post(WireMock.urlEqualTo(urlContext))
+                                .withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))
+                                .willReturn(
+                                        aResponse()
+                                                .withBodyFile(responseFilename)
+                                                .withStatus(200)
+                                )
+                )
+        ;
+    }
+
+    private static void logAzureAdRequest(
+            final com.github.tomakehurst.wiremock.http.Request request,
+            final com.github.tomakehurst.wiremock.http.Response response) {
+        logger.info("*** Mocked *** AzureAd body: {}", new String(request.getBody()));
+        logger.info("*** Mocked *** AzureAd response body: {}", new String(response.getBody()));
+    }
+
     private static WireMockServer mockOppgaveProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
         final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
         final URL url = new URL(oppgaveUrl);
@@ -204,14 +242,14 @@ public class CliMainWithTestScope extends CliMain {
                 .stubFor(
                         WireMock
                                 .get(WireMock.urlMatching(urlContext + "\\?opprettetAv=.*&tema=.*&statuskategori=.*&limit=.*&offset=.*"))
-                                .withQueryParam("opprettetAv", matching("srvbokosynk00[12]"))
+                                .withQueryParam("opprettetAv", matching("srvbokosynk00[12]|okosynk|okosynkos|okosynkur"))
                                 .withQueryParam("tema", matching("OKO"))
                                 .withQueryParam("statuskategori", matching("AAPEN"))
                                 .withQueryParam("limit", matching(".*"))
                                 .withQueryParam("offset", matching(".*"))
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .withHeader(HttpHeaders.AUTHORIZATION, matching("Basic .*|Bearer .*"))
                                 .willReturn(
                                         aResponse()
                                                 .withBodyFile(responseFilename_oppgaveResponseFinnOppgaver)
@@ -226,7 +264,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .post(WireMock.urlEqualTo(urlContext))
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .withHeader(HttpHeaders.AUTHORIZATION, matching("Basic .*|Bearer .*"))
                                 .willReturn(
                                         aResponse()
                                                 .withBodyFile(responseFilename_oppgaveResponseOpprettOppgaver)
@@ -241,7 +279,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .patch(WireMock.urlEqualTo(urlContext))
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
                                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Basic "))
+                                .withHeader(HttpHeaders.AUTHORIZATION, matching("Basic .*|Bearer .*"))
                                 .withHeader(CONTENT_TYPE, equalTo("application/json; charset=UTF-8"))
                                 .willReturn(
                                         aResponse()

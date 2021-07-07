@@ -3,7 +3,7 @@ kind: Naisjob
 metadata:
   labels:
     team: oppgavehandtering
-  name: okosynkos
+  name: okosynkur
   namespace: oppgavehandtering
 spec:
   azure:
@@ -51,9 +51,9 @@ spec:
       # value: api://dev-fss.oppgavehandtering.oppgave/.default
       value: api://41ca50ba-e44f-4bc8-9e31-b745a0041926/.default
     - name: SHOULD_RUN_OS
-      value: "true"
-    - name: SHOULD_RUN_UR
       value: "false"
+    - name: SHOULD_RUN_UR
+      value: "true"
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
       value: "false"
   vault:
