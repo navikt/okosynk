@@ -1,6 +1,7 @@
-    package no.nav.okosynk.consumer.security;
+package no.nav.okosynk.consumer.security;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.extern.jackson.Jacksonized;
 @Getter
 @ToString
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AzureAdTokenSuccessResponseJson {
     @JsonProperty("token_type")
     private final String tokenType;

@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import java.util.Collection;
 @Getter
 @ToString
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AzureAdTokenErrorResponseJson {
     @JsonProperty("error")
     private final String error;
