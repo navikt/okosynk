@@ -5,6 +5,7 @@ import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.Oppgave.OppgaveBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -49,7 +50,10 @@ class OppgaveRestClientTest {
         final IOkosynkConfiguration expectedOkosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE expectedBatchType = Constants.BATCH_TYPE.UR;
         final OppgaveRestClient oppgaveRestClient =
-                new OppgaveRestClient(expectedOkosynkConfiguration, expectedBatchType);
+                new OppgaveRestClient(
+                        expectedOkosynkConfiguration,
+                        expectedBatchType,
+                        new AzureAdAuthenticationClient(expectedOkosynkConfiguration));
 
         assertNotNull(oppgaveRestClient.getOkosynkConfiguration());
         assertEquals(expectedOkosynkConfiguration, oppgaveRestClient.getOkosynkConfiguration());

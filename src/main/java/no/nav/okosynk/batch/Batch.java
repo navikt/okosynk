@@ -6,6 +6,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
+import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
@@ -66,7 +67,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                 new OppgaveSynkroniserer(
                         okosynkConfiguration,
                         this::getBatchStatus,
-                        new OppgaveRestClient(okosynkConfiguration, batchType)
+                        new OppgaveRestClient(okosynkConfiguration, batchType, new AzureAdAuthenticationClient(okosynkConfiguration))
                 );
         this.spesifikkMapper = spesifikkMapper;
 
