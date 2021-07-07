@@ -10,7 +10,6 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -127,13 +126,30 @@ public class OppgaveRestClient {
             final IOkosynkConfiguration okosynkConfiguration,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) throws AuthenticationException {
+
+        boolean shouldDoBasicAuthentication = true;
         if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
-            final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
-            // TODO: Implement Azure AD
-            throw new NotImplementedException("Authentication using Azure AD is not yet implemented");
-        } else {
-            request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
+            try {
+                addAzureAdAuthenticationHeader(request, azureAdAuthenticationClient);
+                shouldDoBasicAuthentication = false;
+            } catch (Throwable e) {
+                log.error("Exception received when trying Azure AD authentication", e);
+                log.warn("Falling back on basic authentication");
+            }
         }
+        if (shouldDoBasicAuthentication) {
+            addBasicAuthenticationHeader(request, usernamePasswordCredentials);
+        }
+    }
+
+    private static void addAzureAdAuthenticationHeader(
+            final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
+        final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
+        request.addHeader("Authorization", "Bearer " + azureAdAuthenticationToken);
+    }
+
+    private static void addBasicAuthenticationHeader(final HttpRequestBase request, final UsernamePasswordCredentials usernamePasswordCredentials) throws AuthenticationException {
+        request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
     }
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
