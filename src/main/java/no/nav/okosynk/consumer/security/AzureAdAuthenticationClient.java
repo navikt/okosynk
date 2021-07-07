@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -55,9 +54,6 @@ public class AzureAdAuthenticationClient {
 
     public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
-
-        // TODO: AZURE: Remove when finished developement
-        logDevelopmentInfo();
     }
 
     private static Map.Entry<Integer, String> httpPost(
@@ -108,31 +104,10 @@ public class AzureAdAuthenticationClient {
         } catch (Throwable e) {
             throw new IllegalStateException("Exception received when doing HTTP post", e);
         }
-
         return postResult;
     }
 
-    // TODO: AZURE AD: Remove when finished developement
-    private void logDevelopmentInfo() {
-        try {
-            logger.info("***** BEGIN Azure AD Development info (to be removed when in prod: *****");
-            logger.info("getSecureHttpProxyUrl: {}", this.okosynkConfiguration.getSecureHttpProxyUrl());
-            logger.info("getAzureAppClientId: {}", this.okosynkConfiguration.getAzureAppClientId());
-            logger.info("getAzureAppScopes: {}", this.okosynkConfiguration.getAzureAppScopes());
-            logger.info("getAzureAppClientSecret: {}", this.okosynkConfiguration.getAzureAppClientSecret() == null ? null : "***<Something>***");
-            logger.info("getAzureAppTokenUrl: {}", okosynkConfiguration.getAzureAppTokenUrl());
-            logger.info("getGrantType: {}", AzureAdAuthenticationClient.GRANT_TYPE);
-            logger.info("getNaisAppName(): {}", okosynkConfiguration.getNaisAppName() == null ? null : okosynkConfiguration.getNaisAppName());
-            logger.info("getToken(): {}", getToken() == null ? null : "***<Something>***");
-        } catch (Throwable e) {
-            logger.error("Something strange and interesting happened when querying the Azure AD access token", e);
-        } finally {
-            logger.info("***** END Azure AD Development info (to be removed when in prod *****");
-        }
-    }
-
     public String getToken() {
-        logger.info("Entering getToken()...");
         // ---------------------------------------------------------------------------------------------------------
         final String httpPostProviderUriString = this.okosynkConfiguration.getAzureAppTokenUrl();
         final URI httpPostProviderUri = URI.create(httpPostProviderUriString);
@@ -157,13 +132,12 @@ public class AzureAdAuthenticationClient {
         // ---------------------------------------------------------------------------------------------------------
         final Map.Entry<Integer, String> postResult =
                 AzureAdAuthenticationClient.httpPost(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
-        logger.info("postResult = {}", postResult);
         // ---------------------------------------------------------------------------------------------------------
         final String token;
         final int httpStatusCode = postResult.getKey();
         final String postResponseEntityAsString = postResult.getValue();
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        if (HttpStatus.SC_OK== httpStatusCode) {
+        if (HttpStatus.SC_OK == httpStatusCode) {
             final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson;
             try {
                 azureAdTokenSuccessResponseJson =

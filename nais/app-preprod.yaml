@@ -25,10 +25,6 @@ spec:
       cpu: 250m
       memory: 1Gi
   env:
-    # TODO: AZURE: Remove when done:
-    - name: SHOULD_LOG_AZURE
-      value: "true"
-
     - name: OPPGAVE_URL
       value: https://oppgave.nais.preprod.local/api/v1/oppgaver
     - name: AKTOERREGISTER_URL

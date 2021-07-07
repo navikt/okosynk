@@ -63,10 +63,9 @@ public class OppgaveRestClient {
     private static final Logger log = LoggerFactory.getLogger(OppgaveRestClient.class);
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
     private static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
-
+    final AzureAdAuthenticationClient azureAdAuthenticationClient;
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
-    final AzureAdAuthenticationClient azureAdAuthenticationClient;
     private final CloseableHttpClient httpClient;
     private final UsernamePasswordCredentials credentials;
 
@@ -127,7 +126,7 @@ public class OppgaveRestClient {
             final UsernamePasswordCredentials usernamePasswordCredentials,
             final IOkosynkConfiguration okosynkConfiguration,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
-            ) throws AuthenticationException {
+    ) throws AuthenticationException {
         if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
             final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
             // TODO: Implement Azure AD

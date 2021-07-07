@@ -67,7 +67,11 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                 new OppgaveSynkroniserer(
                         okosynkConfiguration,
                         this::getBatchStatus,
-                        new OppgaveRestClient(okosynkConfiguration, batchType, new AzureAdAuthenticationClient(okosynkConfiguration))
+                        new OppgaveRestClient(
+                                okosynkConfiguration,
+                                batchType,
+                                new AzureAdAuthenticationClient(okosynkConfiguration)
+                        )
                 );
         this.spesifikkMapper = spesifikkMapper;
 

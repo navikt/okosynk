@@ -165,14 +165,6 @@ public class CliMain {
     protected void preRunAllBatches() {
         final String revision = createOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
-
-        // TODO: AZURE: Log code during development: (Remove when done!)
-        final IOkosynkConfiguration okosynkConfiguration = createOkosynkConfiguration();
-        if (okosynkConfiguration.getBoolean("SHOULD_LOG_AZURE", false)) {
-            new AzureAdAuthenticationClient(okosynkConfiguration);
-        } else {
-            logger.info("Not logging AzureAdAuthenticationClient actions");
-        }
     }
 
     protected void postRunAllBatches() {
