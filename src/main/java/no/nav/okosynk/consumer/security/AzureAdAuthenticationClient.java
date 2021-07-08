@@ -52,6 +52,9 @@ public class AzureAdAuthenticationClient {
 
     final IOkosynkConfiguration okosynkConfiguration;
 
+    AzureAdTokenSuccessResponseJson lastAzureAdTokenSuccessResponseJson = null;
+    long lastAzureAdTokenSuccessResponseTimestampInMs = Long.MIN_VALUE;
+
     public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
     }
@@ -108,54 +111,79 @@ public class AzureAdAuthenticationClient {
     }
 
     public String getToken() {
-        // ---------------------------------------------------------------------------------------------------------
-        final String httpPostProviderUriString = this.okosynkConfiguration.getAzureAppTokenUrl();
-        final URI httpPostProviderUri = URI.create(httpPostProviderUriString);
-        // ---------------------------------------------------------------------------------------------------------
-        final String httpPostProxyUrlString = this.okosynkConfiguration.getSecureHttpProxyUrl();
-        final URL httpPostProxyUrl;
-        try {
-            httpPostProxyUrl = (httpPostProxyUrlString == null ? null : new URL(httpPostProxyUrlString));
-        } catch (MalformedURLException e) {
-            throw new IllegalStateException("Could not convert proxy URL " + httpPostProxyUrlString + " to URL", e);
-        }
-        // ---------------------------------------------------------------------------------------------------------
-        final List<Map.Entry<String, String>> httpPostParameters = new ArrayList<>();
-        httpPostParameters.add(ImmutablePair.of("client_id", okosynkConfiguration.getAzureAppClientId()));
-        httpPostParameters.add(ImmutablePair.of("client_secret", okosynkConfiguration.getAzureAppClientSecret()));
-        httpPostParameters.add(ImmutablePair.of("scope", okosynkConfiguration.getAzureAppScopes()));
-        httpPostParameters.add(ImmutablePair.of("grant_type", AzureAdAuthenticationClient.GRANT_TYPE));
-        // ---------------------------------------------------------------------------------------------------------
-        final List<Map.Entry<String, String>> httpPostHeaders = new ArrayList<Map.Entry<String, String>>() {{
-            add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
-        }};
-        // ---------------------------------------------------------------------------------------------------------
-        final Map.Entry<Integer, String> postResult =
-                AzureAdAuthenticationClient.httpPost(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
-        // ---------------------------------------------------------------------------------------------------------
+
         final String token;
-        final int httpStatusCode = postResult.getKey();
-        final String postResponseEntityAsString = postResult.getValue();
-        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        if (HttpStatus.SC_OK == httpStatusCode) {
-            final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson;
+        if (isLastAzureAdTokenExpired()) {
+            // ---------------------------------------------------------------------------------------------------------
+            final String httpPostProviderUriString = this.okosynkConfiguration.getAzureAppTokenUrl();
+            final URI httpPostProviderUri = URI.create(httpPostProviderUriString);
+            // ---------------------------------------------------------------------------------------------------------
+            final String httpPostProxyUrlString = this.okosynkConfiguration.getSecureHttpProxyUrl();
+            final URL httpPostProxyUrl;
             try {
-                azureAdTokenSuccessResponseJson =
-                        objectMapper.readValue(postResponseEntityAsString, AzureAdTokenSuccessResponseJson.class);
-                token = azureAdTokenSuccessResponseJson.getAccessToken();
-            } catch (Throwable e) {
-                throw new IllegalStateException("Could not parse token", e);
+                httpPostProxyUrl = (httpPostProxyUrlString == null ? null : new URL(httpPostProxyUrlString));
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException("Could not convert proxy URL " + httpPostProxyUrlString + " to URL", e);
+            }
+            // ---------------------------------------------------------------------------------------------------------
+            final List<Map.Entry<String, String>> httpPostParameters = new ArrayList<>();
+            httpPostParameters.add(ImmutablePair.of("client_id", okosynkConfiguration.getAzureAppClientId()));
+            httpPostParameters.add(ImmutablePair.of("client_secret", okosynkConfiguration.getAzureAppClientSecret()));
+            httpPostParameters.add(ImmutablePair.of("scope", okosynkConfiguration.getAzureAppScopes()));
+            httpPostParameters.add(ImmutablePair.of("grant_type", AzureAdAuthenticationClient.GRANT_TYPE));
+            // ---------------------------------------------------------------------------------------------------------
+            final List<Map.Entry<String, String>> httpPostHeaders = new ArrayList<Map.Entry<String, String>>() {{
+                add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
+            }};
+            // ---------------------------------------------------------------------------------------------------------
+            logger.info("About to acquire an Azure AD access token...");
+            final Map.Entry<Integer, String> postResult =
+                    AzureAdAuthenticationClient.httpPost(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
+            // ---------------------------------------------------------------------------------------------------------
+            final int httpStatusCode = postResult.getKey();
+            final String postResponseEntityAsString = postResult.getValue();
+            final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+            if (HttpStatus.SC_OK == httpStatusCode) {
+                final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson;
+                try {
+                    azureAdTokenSuccessResponseJson =
+                            objectMapper.readValue(postResponseEntityAsString, AzureAdTokenSuccessResponseJson.class);
+                    setLastAzureAdTokenSuccessResponseJson(azureAdTokenSuccessResponseJson);
+                    token = azureAdTokenSuccessResponseJson.getAccessToken();
+                    logger.info("An Azure AD access token successfully acquired");
+                } catch (Throwable e) {
+                    throw new IllegalStateException("Could not parse token", e);
+                }
+            } else {
+                final AzureAdTokenErrorResponseJson azureAdTokenErrorResponseJson;
+                try {
+                    azureAdTokenErrorResponseJson =
+                            objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
+                } catch (Throwable e) {
+                    throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
+                }
+                throw new IllegalStateException("The Azure AD token provider returned an error" + azureAdTokenErrorResponseJson);
             }
         } else {
-            final AzureAdTokenErrorResponseJson azureAdTokenErrorResponseJson;
-            try {
-                azureAdTokenErrorResponseJson =
-                        objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
-            } catch (Throwable e) {
-                throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
-            }
-            throw new IllegalStateException("The Azure AD token provider returned an error" + azureAdTokenErrorResponseJson);
+            token = this.lastAzureAdTokenSuccessResponseJson.getAccessToken();
         }
         return token;
+    }
+
+    private void setLastAzureAdTokenSuccessResponseJson(final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson) {
+        this.lastAzureAdTokenSuccessResponseJson = azureAdTokenSuccessResponseJson;
+        this.lastAzureAdTokenSuccessResponseTimestampInMs = System.currentTimeMillis();
+    }
+
+    private boolean isLastAzureAdTokenExpired() {
+        final long marginInMs = 30000L;
+        final boolean isExpired =
+                (this.lastAzureAdTokenSuccessResponseJson == null)
+                        ||
+                        (
+                                ((System.currentTimeMillis() - this.lastAzureAdTokenSuccessResponseTimestampInMs + marginInMs) / 1000) >
+                                        this.lastAzureAdTokenSuccessResponseJson.getExtExpiresIn()
+                        );
+        return isExpired;
     }
 }

@@ -145,7 +145,6 @@ public class OppgaveRestClient {
 
     private static void addAzureAdAuthenticationHeader(
             final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
-        log.info("Authenticating using Azure AD...");
         final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
         request.addHeader("Authorization", "Bearer " + azureAdAuthenticationToken);
     }
@@ -153,7 +152,6 @@ public class OppgaveRestClient {
     private static void addBasicAuthenticationHeader(
             final HttpRequestBase request,
             final UsernamePasswordCredentials usernamePasswordCredentials) throws AuthenticationException {
-        log.info("Authenticating using Basic...");
         request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
     }
 
