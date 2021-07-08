@@ -128,17 +128,17 @@ public class OppgaveRestClient {
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) throws AuthenticationException {
 
-        boolean shouldDoBasicAuthentication = true;
+        boolean shouldAuthenticateUsingBasicAgainstOppgave = true;
         if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
             try {
                 addAzureAdAuthenticationHeader(request, azureAdAuthenticationClient);
-                shouldDoBasicAuthentication = false;
+                shouldAuthenticateUsingBasicAgainstOppgave = false;
             } catch (Throwable e) {
                 log.error("Exception received when trying Azure AD authentication", e);
                 log.warn("Falling back on basic authentication");
             }
         }
-        if (shouldDoBasicAuthentication) {
+        if (shouldAuthenticateUsingBasicAgainstOppgave) {
             addBasicAuthenticationHeader(request, usernamePasswordCredentials);
         }
     }
@@ -390,7 +390,7 @@ public class OppgaveRestClient {
             final boolean ferdigstill,
             final HttpEntityEnclosingRequestBase request) {
         try {
-            final ObjectNode patchJson = createPatchrequest(oppgaver, ferdigstill);
+            final ObjectNode patchJson = createPatchJson(oppgaver, ferdigstill);
             final String jsonString = new ObjectMapper().writeValueAsString(patchJson);
             request.setEntity(new StringEntity(jsonString, "UTF-8"));
         } catch (JsonProcessingException e) {
@@ -427,7 +427,7 @@ public class OppgaveRestClient {
         throw new IllegalStateException("Feilet under parsing av oppgave error response");
     }
 
-    private ObjectNode createPatchrequest(
+    private ObjectNode createPatchJson(
             final List<Oppgave> oppgaver,
             final boolean ferdigstill
     ) {
