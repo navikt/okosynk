@@ -54,7 +54,7 @@ spec:
     - name: SHOULD_RUN_UR
       value: "true"
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
-      value: "false"
+      value: "true"
   vault:
     enabled: true
     paths:
