@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
+public abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
+
+    public static final String AZURE_APP_CLIENT_ID_KEY = "AZURE_APP_CLIENT_ID";
 
     public AbstractOkosynkConfiguration() {
     }
@@ -111,7 +113,7 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     @Override
     public String getAzureAppClientId() {
-        return getRequiredString("AZURE_APP_CLIENT_ID");
+        return getRequiredString(AZURE_APP_CLIENT_ID_KEY);
     }
 
     @Override

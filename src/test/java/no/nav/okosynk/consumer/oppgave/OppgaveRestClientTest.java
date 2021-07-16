@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import no.nav.okosynk.config.AbstractOkosynkConfiguration;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -42,12 +43,14 @@ class OppgaveRestClientTest {
     @BeforeEach
     void beforeEach() {
         System.setProperty(NAIS_APP_NAME_KEY, "okosynkur");
+        System.setProperty(AbstractOkosynkConfiguration.AZURE_APP_CLIENT_ID_KEY, "nisdn-hvh7-eds-hv7-eh7--v-10ab-ghv87g-h-e87v-87eg8");
     }
 
     @AfterEach
     void afterEach() {
-        System.clearProperty(OPPGAVE_URL_KEY);
+        System.clearProperty(AbstractOkosynkConfiguration.AZURE_APP_CLIENT_ID_KEY);
         System.clearProperty(NAIS_APP_NAME_KEY);
+        System.clearProperty(OPPGAVE_URL_KEY);
     }
 
     @Test
