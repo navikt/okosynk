@@ -37,8 +37,12 @@ abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
     public Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType) {
         final Collection<String> opprettetAvValuesForFinn =
                 new ArrayList<String>() {{
+                    // TODO: Just in case. When the facts are clear, then remove some of them again.
                     add(getBatchBruker(batchType));
                     add(getNaisAppName());
+                    add(getAzureAppClientId());
+                    add("prod-fss:oppgavehandtering:" + getNaisAppName());
+                    add("dev-fss:oppgavehandtering:" + getNaisAppName());
                 }};
         return Collections.unmodifiableCollection(opprettetAvValuesForFinn);
     }
