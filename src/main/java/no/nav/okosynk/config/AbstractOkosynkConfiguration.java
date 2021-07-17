@@ -42,9 +42,6 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
                     // TODO: Just in case. When the facts are clear, then remove some of them again.
                     add(getBatchBruker(batchType));
                     add(getNaisAppName());
-                    add(getAzureAppClientId());
-                    add("prod-fss:oppgavehandtering:" + getNaisAppName());
-                    add("dev-fss:oppgavehandtering:" + getNaisAppName());
                 }};
         return Collections.unmodifiableCollection(opprettetAvValuesForFinn);
     }
