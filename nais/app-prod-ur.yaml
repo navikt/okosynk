@@ -49,10 +49,8 @@ spec:
       value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
     - name: AZURE_APP_SCOPE_OPPGAVE
       value: api://prod-fss.oppgavehandtering.oppgave/.default
-    - name: SHOULD_RUN_OS
-      value: "false"
-    - name: SHOULD_RUN_UR
-      value: "true"
+    - name: SHOULD_RUN_OS_OR_UR
+      value: UR
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
       value: "true"
   vault:

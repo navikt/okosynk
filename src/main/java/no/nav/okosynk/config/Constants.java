@@ -22,6 +22,8 @@ public class Constants {
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
 
+    static final String SHOULD_RUN_OS_OR_UR_KEY = "SHOULD_RUN_OS_OR_UR";
+
     static final String SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE_KEY = "SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE";
     // =========================================================================
     private static final String OS_ALERT_COLLECTOR_METRIC_NAME = "okosynk_os_batch_alert";
@@ -35,7 +37,6 @@ public class Constants {
     private static final String OS_FTP_USER_KEY = "OSFTPCREDENTIALS_USERNAME";
     private static final String OS_MAPPING_RULES_PROPERTIES_FILENAME = "os_mapping_regler.properties";
     private static final String OS_OPPGAVE_TYPE = "OKO_OS";
-    private static final String UR_SHOULD_RUN_KEY = "SHOULD_RUN_UR";
     // -------------------------------------------------------------------------
     private static final String UR_ALERT_COLLECTOR_METRIC_NAME = "okosynk_ur_batch_alert";
     private static final String UR_BATCH_BRUKER_DEFAULT_VALUE = "srvbokosynk002";
@@ -48,7 +49,6 @@ public class Constants {
     private static final String UR_FTP_USER_KEY = "URFTPCREDENTIALS_USERNAME";
     private static final String UR_MAPPING_RULES_PROPERTIES_FILENAME = "ur_mapping_regler.properties";
     private static final String UR_OPPGAVE_TYPE = "OKO_UR";
-    private static final String OS_SHOULD_RUN_KEY = "SHOULD_RUN_OS";
 
     public enum BATCH_TYPE {
         OS(
@@ -62,8 +62,7 @@ public class Constants {
                 OS_FTP_CHARSET_NAME_KEY,
                 OS_MAPPING_RULES_PROPERTIES_FILENAME,
                 OS_BATCH_BRUKER_PASSWORD_KEY,
-                OS_ALERT_COLLECTOR_METRIC_NAME,
-                OS_SHOULD_RUN_KEY
+                OS_ALERT_COLLECTOR_METRIC_NAME
         ),
         UR(
                 UR_BATCH_NAVN,
@@ -76,8 +75,7 @@ public class Constants {
                 UR_FTP_CHARSET_NAME_KEY,
                 UR_MAPPING_RULES_PROPERTIES_FILENAME,
                 UR_BATCH_BRUKER_PASSWORD_KEY,
-                UR_ALERT_COLLECTOR_METRIC_NAME,
-                UR_SHOULD_RUN_KEY
+                UR_ALERT_COLLECTOR_METRIC_NAME
         );
 
         private final String name;
@@ -91,7 +89,6 @@ public class Constants {
         private final String mappingRulesPropertiesFileName;
         private final String batchBrukerPasswordKey;
         private final String alertCollectorMetricName;
-        private final String shouldRunKey;
 
         BATCH_TYPE(
                 final String name,
@@ -104,8 +101,7 @@ public class Constants {
                 final String ftpCharsetNameKey,
                 final String mappingRulesPropertiesFileName,
                 final String batchBrukerPasswordKey,
-                final String alertCollectorMetricName,
-                final String shouldRunKey
+                final String alertCollectorMetricName
         ) {
             this.name = name;
             this.batchBrukerKey = batchBrukerKey;
@@ -118,7 +114,6 @@ public class Constants {
             this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
             this.batchBrukerPasswordKey = batchBrukerPasswordKey;
             this.alertCollectorMetricName = alertCollectorMetricName;
-            this.shouldRunKey = shouldRunKey;
         }
 
         public String getConsumerStatisticsName() {
@@ -167,10 +162,6 @@ public class Constants {
 
         String getBatchBrukerPasswordKey() {
             return batchBrukerPasswordKey;
-        }
-
-        String getShouldRunKey() {
-            return shouldRunKey;
         }
     }
 

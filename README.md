@@ -13,6 +13,10 @@ Den kjører på nais-plattformen i to miljøer:
 1) Cluster `preprod-fss`, i namespace `oppgavehandtering`
 2) Cluster `prod-fss`, i namespace `oppgavehandtering`
 
+Okosynk kjøres som to applikasjoner, og de heter hhv. okosynkos og okosynkur (nais name). Det er samme koden som kjører, 
+men de er konfigurert forskjellig. 
+Miljø-variabelen SHOULD_RUN_OS_OR_UR styrer dette, og den kan ha verdiene "OS" eller "UR".
+
 # Testkjøring av batchen
 ## Lokal testkjøring av batchen
 Her beskrives den enkle og frittstående varianten hvor aksessen til providerne er mocka. 
@@ -30,8 +34,7 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
 
 (2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
 
-(3) Hvis du bare vil kjøre én av UR eller OS, så bruk en properties file som setter `SHOULD_RUN_OS=true` eller `false` eller 
-`SHOULD_RUN_UR=true` eller `false`
+(3) Den varianten du ønsker å kjøre avgjøres av innholdet i miljø-variabelen SHOULD_RUN_OS_OR_UR, som kan ha verdiene OS eller UR 
 
 (4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der.
 
@@ -96,13 +99,12 @@ Så kan man gjøre
 
 `kubectl get jobs`,
 
-og da får man opp noe som ligner på det her:
+og da får man opp noe som kan ligne på det følgende:
 
 ```
-NAME                 DESIRED   SUCCESSFUL   AGE
-okosynk-1536469200   1         1            2d
-okosynk-1536555600   1         1            1d
-okosynk-1536642000   1         1            4h
+NAME                                               COMPLETIONS   DURATION   AGE
+okosynkos-1626667200                               0/1           4h55m      4h55m
+okosynkur-1626667200                               0/1           4h55m      4h55m
 ```
 
 En cronjob i Kubernetes vil opprette en ny `job` for hver kjøring. Standard oppførsel
@@ -133,21 +135,20 @@ lese dem direkte fra Kubernetes. Først må man få en liste av pods tilhørende
 `kubectl get pods`
 
 ```
-NAME                       READY     STATUS      RESTARTS   AGE
-okosynk-1536469200-qz4qq   0/1       Completed   0          2d
-okosynk-1536555600-fwg6m   0/1       Completed   0          1d
-okosynk-1536642000-j6ccz   0/1       Completed   0          4h
+NAME                                                     READY   STATUS     RESTARTS   AGE
+okosynkos-1626667200-4rgvn                               1/2     NotReady   0          4h57m
+okosynkur-1626667200-htp4t                               1/2     NotReady   0          4h57m
 ```
 
-Her ser vi at disse podene er "Completed", altså gikk jobben bra. "Age" viser når
+Når status er "Completed", gikk jobben bra. "Age" viser når
 hver pod begynte å kjøre. Hvis vi skal sjekke loggene til den siste pod-en, kan vi
 kjøre
 
-`kubectl logs okosynk-1536642000-j6ccz okosynk`
+`kubectl logs okosynkos-1626667200-4rgvn okosynk`
 eller
-`kubectl logs okosynk-1536642000-j6ccz vks-sidecar`
+`kubectl logs okosynkos-1626667200-4rgvn vks-sidecar`
 eller
-`kubectl logs okosynk-1536642000-j6ccz vks-init`
+`kubectl logs okosynkos-1626667200-4rgvn vks-init`
 
 og da kommer loggene til pod-en opp i terminalen.<BR/>
 Og for å finne ut hvorvidt jobbene er vellykka fullførte:

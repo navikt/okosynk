@@ -32,7 +32,7 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
 
     @Override
     public boolean shouldRun(final Constants.BATCH_TYPE batchType) {
-        return getBoolean(batchType.getShouldRunKey(), true);
+        return getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY).equals(batchType.name());
     }
 
     @Override
