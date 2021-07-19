@@ -19,17 +19,18 @@
         <sshd.version>1.7.0</sshd.version> <!-- Problematic: 1.7.0 -> 2.7.0 -->
         <!-- END: Breaking bumps -->
 
+        <!-- <nav.security.token-support.version>1.3.7</nav.security.token-support.version> -->
         <apache.ftpserver.version>1.1.1</apache.ftpserver.version>
         <bcel.version>6.5.0</bcel.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-cli.version>1.4</commons-cli.version>
         <commons-codec.version>1.15</commons-codec.version>
         <commons-configuration2.version>2.7</commons-configuration2.version>
-        <commons-io.version>2.10.0</commons-io.version>
+        <commons-io.version>2.11.0</commons-io.version>
         <commons-lang.version>3.12.0</commons-lang.version>
         <commons-logging.version>1.2</commons-logging.version>
         <commons-net.version>3.8.0</commons-net.version>
-        <fasterxml.jackson.version>2.12.3</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.13.0-rc1</fasterxml.jackson.version>
         <guava.version>30.1.1-jre</guava.version>
         <hamcrest.version>1.3</hamcrest.version>
         <httpclient.version>4.5.13</httpclient.version>
@@ -40,7 +41,7 @@
         <java.compilation.target.version>1.8</java.compilation.target.version>
         <javatuples.version>1.2</javatuples.version>
         <jsch.version>0.1.55</jsch.version>
-        <jsoup.version>1.13.1</jsoup.version>
+        <jsoup.version>1.14.1</jsoup.version>
         <junit-jupiter.version>5.8.0-M1</junit-jupiter.version>
         <logback.version>1.3.0-alpha5</logback.version>
         <logstash.encoder.version>6.6</logstash.encoder.version>
@@ -51,14 +52,13 @@
         <maven-site-plugin.version>3.8.2</maven-site-plugin.version>
         <maven.surefire.plugin.version>2.22.2</maven.surefire.plugin.version>
         <mina-core.version>3.0.0-M2</mina-core.version>
-        <nav.security.token-client-core.version>1.3.7</nav.security.token-client-core.version>
-        <!-- <nav.security.token-support.version>1.3.7</nav.security.token-support.version> -->
+        <nav.security.token-client-core.version>1.3.8</nav.security.token-client-core.version>
         <pact.version>4.0.10</pact.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <prometheus.version>0.11.0</prometheus.version>
-        <slf4j.version>2.0.0-alpha1</slf4j.version>
-        <vavr.version>0.10.3</vavr.version>
+        <slf4j.version>2.0.0-alpha2</slf4j.version>
+        <vavr.version>1.0.0-alpha-3</vavr.version>
         <wiremock.version>2.27.2</wiremock.version>
     </properties>
 
