@@ -121,16 +121,6 @@ jobs:
         if: env.IMAGE_TAG_USED == ''
         run: |
           docker push $IMAGE
-
-      # REMOVE WHEN Azure AD authentication is in place:
-      #- name: deploy OS and UR to q1
-      #  if: success() && contains(env.DEPLOY_TAG, 'q1')
-      #  uses: nais/deploy/actions/deploy@v1
-      #  env:
-      #    APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
-      #    CLUSTER: dev-fss
-      #    RESOURCE: nais/app-preprod.yaml
-
       - name: deploy OS to q1
         if: success() && contains(env.DEPLOY_TAG, 'q1')
         uses: nais/deploy/actions/deploy@v1
@@ -145,15 +135,6 @@ jobs:
           APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
           CLUSTER: dev-fss
           RESOURCE: nais/app-preprod-ur.yaml
-
-      # REMOVE WHEN Azure AD authentication is in place:
-      #- name: deploy OS and UR to prod
-      #  if: success() && contains(env.DEPLOY_TAG, 'prod')
-      #  uses: nais/deploy/actions/deploy@v1
-      #  env:
-      #    APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
-      #    CLUSTER: prod-fss
-      #    RESOURCE: nais/app-prod.yaml
       - name: deploy OS to prod
         if: success() && contains(env.DEPLOY_TAG, 'prod')
         uses: nais/deploy/actions/deploy@v1
