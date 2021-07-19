@@ -81,7 +81,7 @@ public class OppgaveRestClient {
         final String brukerPassword = okosynkConfiguration.getBatchBrukerPassword(batchType);
         this.credentials = new UsernamePasswordCredentials(bruker, brukerPassword);
         this.httpClient = HttpClients.createDefault();
-        log.info("OppgaveRestClient konfigurert for {} og bruker {}", batchType, bruker);
+        log.info("OppgaveRestClient konfigurert for {}", batchType);
     }
 
     private static void addCorrelationIdToRequest(final AbstractHttpMessage request) {
