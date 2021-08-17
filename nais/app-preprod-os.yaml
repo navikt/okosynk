@@ -17,6 +17,8 @@ spec:
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   webproxy: true
   ttlSecondsAfterFinished: 172800
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
   resources:
     requests:
       cpu: 250m
