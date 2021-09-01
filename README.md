@@ -36,7 +36,7 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
 
 (3) Den varianten du ønsker å kjøre avgjøres av innholdet i miljø-variabelen SHOULD_RUN_OS_OR_UR, som kan ha verdiene OS eller UR 
 
-(4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der.
+(4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der. I så fall, kjør run eller debug på no.nav.okosynk.cli.CliMainWithTestScope. Regenerering av input-filer som nevnt ovenfor gjelder selvsagt også før kjøring i IDE-en.
 
 ### Lokal testkjøring av batchen med skreddersøm
 - Kopiér og rename følgende filer...
