@@ -65,7 +65,8 @@ class OppgaveRestClientTestUtils {
                 }
 
                 @Override
-                public void close() {}
+                public void close() {
+                }
             };
 
     static OppgaveRestClient prepareAMockedOppgaveRestClientThatSucceedsInCreatingZeroOppgaver()
@@ -75,7 +76,8 @@ class OppgaveRestClientTestUtils {
                 new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
 
                     @Override
-                    public void close() {}
+                    public void close() {
+                    }
 
                     @Override
                     public StatusLine getStatusLine() {
@@ -118,7 +120,8 @@ class OppgaveRestClientTestUtils {
                 new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
 
                     @Override
-                    public void close() {}
+                    public void close() {
+                    }
 
                     @Override
                     public StatusLine getStatusLine() {
@@ -478,7 +481,8 @@ class OppgaveRestClientTestUtils {
                 new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
 
                     @Override
-                    public void close() {}
+                    public void close() {
+                    }
 
                     @Override
                     public StatusLine getStatusLine() {
@@ -521,7 +525,8 @@ class OppgaveRestClientTestUtils {
                 new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
 
                     @Override
-                    public void close() {}
+                    public void close() {
+                    }
 
                     @Override
                     public StatusLine getStatusLine() {

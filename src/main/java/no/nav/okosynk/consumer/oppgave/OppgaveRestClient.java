@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,13 +45,10 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Optional.ofNullable;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
-import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.OPPRETTET;
 import static no.nav.okosynk.consumer.util.ListeOppdeler.delOppListe;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -304,7 +300,7 @@ public class OppgaveRestClient {
                                 log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
                                 oppgaver.addAll(finnOppgaveResponse.getOppgaver()
                                         .stream()
-                                        .map(this::tilOppgave)
+                                        .map(OppgaveMapper::map)
                                         .collect(Collectors.toList()));
                                 if (finnOppgaveResponse.getOppgaver().size() < bulkSize) {
                                     break;
@@ -463,33 +459,5 @@ public class OppgaveRestClient {
     ) {
         return new IllegalStateException(
                 errorResponse.getFeilmelding() + " uuid: " + errorResponse.getUuid());
-    }
-
-    private Oppgave tilOppgave(final OppgaveDto oppgaveDto) {
-        return new Oppgave.OppgaveBuilder()
-                .withOppgaveId(oppgaveDto.getId())
-                .withAktoerId(oppgaveDto.getAktoerId())
-                .withSamhandlernr(oppgaveDto.getSamhandlernr())
-                .withOrgnr(oppgaveDto.getOrgnr())
-                .withBnr(oppgaveDto.getBnr())
-                .withOppgavetypeKode(oppgaveDto.getOppgavetype())
-                .withFagomradeKode(oppgaveDto.getTema())
-                .withBehandlingstema(oppgaveDto.getBehandlingstema())
-                .withBehandlingstype(oppgaveDto.getBehandlingstype())
-                .withPrioritetKode(oppgaveDto.getPrioritet())
-                .withBeskrivelse(oppgaveDto.getBeskrivelse())
-                .withAktivFra(
-                        isNotBlank(oppgaveDto.getAktivDato()) ? LocalDate.parse(oppgaveDto.getAktivDato())
-                                : null)
-                .withAktivTil(isNotBlank(oppgaveDto.getFristFerdigstillelse()) ? LocalDate
-                        .parse(oppgaveDto.getFristFerdigstillelse()) : null)
-                .withAnsvarligEnhetId(oppgaveDto.getTildeltEnhetsnr())
-                .withLest(oppgaveDto.getStatus() != OPPRETTET)
-                .withVersjon(oppgaveDto.getVersjon())
-                .withSistEndret(
-                        ofNullable(oppgaveDto.getEndretTidspunkt()).orElse(oppgaveDto.getOpprettetTidspunkt()))
-                .withMappeId(oppgaveDto.getMappeId())
-                .withAnsvarligSaksbehandlerIdent(oppgaveDto.getTilordnetRessurs())
-                .build();
     }
 }

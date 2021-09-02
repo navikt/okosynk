@@ -13,4 +13,8 @@ public class RandUt {
         }
         return randomAlphaNumStringBuffer.toString();
     }
+
+    public static boolean generateRandomBoolean(final Random random) {
+        return random.nextInt(2) == 0;
+    }
 }

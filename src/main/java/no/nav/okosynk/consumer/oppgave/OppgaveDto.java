@@ -274,7 +274,7 @@ public class OppgaveDto {
   }
 
   public void setOpprettetTidspunkt(final String opprettetTidspunkt) {
-    this.opprettetTidspunkt = ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
+    this.opprettetTidspunkt = opprettetTidspunkt == null ? null : ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
   }
 
   @JsonIgnore
@@ -305,7 +305,7 @@ public class OppgaveDto {
   }
 
   public void setEndretTidspunkt(final String endretTidspunkt) {
-    this.endretTidspunkt = ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
+    this.endretTidspunkt = endretTidspunkt == null ? null : ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
   }
 
   @JsonIgnore

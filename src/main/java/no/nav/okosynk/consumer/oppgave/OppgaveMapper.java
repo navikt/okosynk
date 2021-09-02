@@ -2,8 +2,12 @@ package no.nav.okosynk.consumer.oppgave;
 
 import no.nav.okosynk.domain.Oppgave;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
+
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class OppgaveMapper {
 
@@ -42,5 +46,33 @@ public class OppgaveMapper {
         }
 
         return oppgaveDto;
+    }
+
+    static Oppgave map(final OppgaveDto oppgaveDto) {
+        return new Oppgave.OppgaveBuilder()
+                .withOppgaveId(oppgaveDto.getId())
+                .withAktoerId(oppgaveDto.getAktoerId())
+                .withSamhandlernr(oppgaveDto.getSamhandlernr())
+                .withOrgnr(oppgaveDto.getOrgnr())
+                .withBnr(oppgaveDto.getBnr())
+                .withOppgavetypeKode(oppgaveDto.getOppgavetype())
+                .withFagomradeKode(oppgaveDto.getTema())
+                .withBehandlingstema(oppgaveDto.getBehandlingstema())
+                .withBehandlingstype(oppgaveDto.getBehandlingstype())
+                .withPrioritetKode(oppgaveDto.getPrioritet())
+                .withBeskrivelse(oppgaveDto.getBeskrivelse())
+                .withAktivFra(
+                        isNotBlank(oppgaveDto.getAktivDato()) ? LocalDate.parse(oppgaveDto.getAktivDato())
+                                : null)
+                .withAktivTil(isNotBlank(oppgaveDto.getFristFerdigstillelse()) ? LocalDate
+                        .parse(oppgaveDto.getFristFerdigstillelse()) : null)
+                .withAnsvarligEnhetId(oppgaveDto.getTildeltEnhetsnr())
+                .withLest(oppgaveDto.getStatus() != OppgaveStatus.OPPRETTET)
+                .withVersjon(oppgaveDto.getVersjon())
+                .withSistEndret(
+                        ofNullable(oppgaveDto.getEndretTidspunkt()).orElse(oppgaveDto.getOpprettetTidspunkt()))
+                .withMappeId(oppgaveDto.getMappeId())
+                .withAnsvarligSaksbehandlerIdent(oppgaveDto.getTilordnetRessurs())
+                .build();
     }
 }
