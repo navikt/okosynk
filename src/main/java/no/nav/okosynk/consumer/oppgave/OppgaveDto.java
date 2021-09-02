@@ -14,37 +14,38 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 public class OppgaveDto {
 
-  Map<String, String> metadata;
-  private String id;
-  private String aktoerId;
-  private String orgnr;
-  private String tema;
-  private String journalpostId;
-  private String saksreferanse;
-  private String temagruppe;
-  private String behandlingstema;
-  private String oppgavetype;
-  private String behandlingstype;
   private String aktivDato;
-  private String fristFerdigstillelse;
-  private String prioritet;
-  private String tildeltEnhetsnr;
-  private String endretAvEnhetsnr;
-  private String opprettetAvEnhetsnr;
-  private String tilordnetRessurs;
-  private String mappeId;
-  private OppgaveStatus status;
-  private String opprettetAv;
+  private String aktoerId;
+  private String behandlesAvApplikasjon;
+  private String behandlingstema;
+  private String behandlingstype;
+  private String beskrivelse;
+  private String bnr;
   private String endretAv;
-  private LocalDateTime opprettetTidspunkt;
+  private String endretAvEnhetsnr;
   private LocalDateTime endretTidspunkt;
   private LocalDateTime ferdigstiltTidspunkt;
-  private String beskrivelse;
-  private Integer versjon;
+  private String fristFerdigstillelse;
+  private String id;
+  private String journalpostId;
   private String journalpostkilde;
-  private String behandlesAvApplikasjon;
-  private String bnr;
+  private String mappeId;
+  Map<String, String> metadata;
+  private String navPersonIdent;
+  private String oppgavetype;
+  private String opprettetAv;
+  private String opprettetAvEnhetsnr;
+  private LocalDateTime opprettetTidspunkt;
+  private String orgnr;
+  private String prioritet;
+  private String saksreferanse;
   private String samhandlernr;
+  private OppgaveStatus status;
+  private String tema;
+  private String temagruppe;
+  private String tildeltEnhetsnr;
+  private String tilordnetRessurs;
+  private Integer versjon;
 
   public OppgaveDto() {
   }
@@ -55,7 +56,7 @@ public class OppgaveDto {
     return id;
   }
 
-  public void setId(String id) {
+  public void setId(final String id) {
     this.id = id;
   }
 
@@ -65,7 +66,7 @@ public class OppgaveDto {
     return endretAvEnhetsnr;
   }
 
-  public void setEndretAvEnhetsnr(String endretAvEnhetsnr) {
+  public void setEndretAvEnhetsnr(final String endretAvEnhetsnr) {
     this.endretAvEnhetsnr = endretAvEnhetsnr;
   }
 
@@ -73,7 +74,7 @@ public class OppgaveDto {
     return opprettetAvEnhetsnr;
   }
 
-  public void setOpprettetAvEnhetsnr(String opprettetAvEnhetsnr) {
+  public void setOpprettetAvEnhetsnr(final String opprettetAvEnhetsnr) {
     this.opprettetAvEnhetsnr = opprettetAvEnhetsnr;
   }
 
@@ -81,7 +82,7 @@ public class OppgaveDto {
     return bnr;
   }
 
-  public void setBnr(String bnr) {
+  public void setBnr(final String bnr) {
     this.bnr = bnr;
   }
 
@@ -89,7 +90,7 @@ public class OppgaveDto {
     return samhandlernr;
   }
 
-  public void setSamhandlernr(String samhandlernr) {
+  public void setSamhandlernr(final String samhandlernr) {
     this.samhandlernr = samhandlernr;
   }
 
@@ -97,47 +98,55 @@ public class OppgaveDto {
     return aktoerId;
   }
 
-  public void setAktoerId(String aktoerId) {
+  public void setAktoerId(final String aktoerId) {
     this.aktoerId = aktoerId;
   }
 
-  public String getBeskrivelse() {
-    return beskrivelse;
+  public String getNavPersonIdent() {
+    return this.navPersonIdent;
   }
 
-  public void setBeskrivelse(String beskrivelse) {
+  public void setNavPersonIdent(final String navPersonIdent) {
+    this.navPersonIdent = navPersonIdent;
+  }
+
+  public String getBeskrivelse() {
+    return this.beskrivelse;
+  }
+
+  public void setBeskrivelse(final String beskrivelse) {
     this.beskrivelse = beskrivelse;
   }
 
   public String getJournalpostkilde() {
-    return journalpostkilde;
+    return this.journalpostkilde;
   }
 
-  public void setJournalpostkilde(String journalpostkilde) {
+  public void setJournalpostkilde(final String journalpostkilde) {
     this.journalpostkilde = journalpostkilde;
   }
 
   public String getBehandlesAvApplikasjon() {
-    return behandlesAvApplikasjon;
+    return this.behandlesAvApplikasjon;
   }
 
-  public void setBehandlesAvApplikasjon(String behandlesAvApplikasjon) {
+  public void setBehandlesAvApplikasjon(final String behandlesAvApplikasjon) {
     this.behandlesAvApplikasjon = behandlesAvApplikasjon;
   }
 
   public String getTema() {
-    return tema;
+    return this.tema;
   }
 
-  public void setTema(String tema) {
+  public void setTema(final String tema) {
     this.tema = tema;
   }
 
   public String getJournalpostId() {
-    return journalpostId;
+    return this.journalpostId;
   }
 
-  public void setJournalpostId(String journalpostId) {
+  public void setJournalpostId(final String journalpostId) {
     this.journalpostId = journalpostId;
   }
 
@@ -145,7 +154,7 @@ public class OppgaveDto {
     return saksreferanse;
   }
 
-  public void setSaksreferanse(String saksreferanse) {
+  public void setSaksreferanse(final String saksreferanse) {
     this.saksreferanse = saksreferanse;
   }
 
@@ -153,107 +162,107 @@ public class OppgaveDto {
     return orgnr;
   }
 
-  public void setOrgnr(String orgnr) {
+  public void setOrgnr(final String orgnr) {
     this.orgnr = orgnr;
   }
 
   public String getTemagruppe() {
-    return temagruppe;
+    return this.temagruppe;
   }
 
-  public void setTemagruppe(String temagruppe) {
+  public void setTemagruppe(final String temagruppe) {
     this.temagruppe = temagruppe;
   }
 
   public String getBehandlingstema() {
-    return behandlingstema;
+    return this.behandlingstema;
   }
 
-  public void setBehandlingstema(String behandlingstema) {
+  public void setBehandlingstema(final String behandlingstema) {
     this.behandlingstema = behandlingstema;
   }
 
   public String getOppgavetype() {
-    return oppgavetype;
+    return this.oppgavetype;
   }
 
-  public void setOppgavetype(String oppgavetype) {
+  public void setOppgavetype(final String oppgavetype) {
     this.oppgavetype = oppgavetype;
   }
 
   public String getBehandlingstype() {
-    return behandlingstype;
+    return this.behandlingstype;
   }
 
-  public void setBehandlingstype(String behandlingstype) {
+  public void setBehandlingstype(final String behandlingstype) {
     this.behandlingstype = behandlingstype;
   }
 
   public String getAktivDato() {
-    return aktivDato;
+    return this.aktivDato;
   }
 
-  public void setAktivDato(String aktivDato) {
+  public void setAktivDato(final String aktivDato) {
     this.aktivDato = aktivDato;
   }
 
   public String getFristFerdigstillelse() {
-    return fristFerdigstillelse;
+    return this.fristFerdigstillelse;
   }
 
-  public void setFristFerdigstillelse(String fristFerdigstillelse) {
+  public void setFristFerdigstillelse(final String fristFerdigstillelse) {
     this.fristFerdigstillelse = fristFerdigstillelse;
   }
 
   public String getPrioritet() {
-    return prioritet;
+    return this.prioritet;
   }
 
-  public void setPrioritet(String prioritet) {
+  public void setPrioritet(final String prioritet) {
     this.prioritet = prioritet;
   }
 
   public String getTildeltEnhetsnr() {
-    return tildeltEnhetsnr;
+    return this.tildeltEnhetsnr;
   }
 
-  public void setTildeltEnhetsnr(String tildeltEnhetsnr) {
+  public void setTildeltEnhetsnr(final String tildeltEnhetsnr) {
     this.tildeltEnhetsnr = tildeltEnhetsnr;
   }
 
   public String getTilordnetRessurs() {
-    return tilordnetRessurs;
+    return this.tilordnetRessurs;
   }
 
-  public void setTilordnetRessurs(String tilordnetRessurs) {
+  public void setTilordnetRessurs(final String tilordnetRessurs) {
     this.tilordnetRessurs = tilordnetRessurs;
   }
 
   public String getMappeId() {
-    return mappeId;
+    return this.mappeId;
   }
 
-  public void setMappeId(String mappeId) {
+  public void setMappeId(final String mappeId) {
     this.mappeId = mappeId;
   }
 
   @JsonIgnore
   @JsonProperty("status")
   public OppgaveStatus getStatus() {
-    return status;
+    return this.status;
   }
 
-  public void setStatus(OppgaveStatus status) {
+  public void setStatus(final OppgaveStatus status) {
     this.status = status;
   }
 
   @JsonIgnore
   @JsonProperty("opprettetAv")
   public String getOpprettetAv() {
-    return opprettetAv;
+    return this.opprettetAv;
   }
 
-  public void setOpprettetAv(String opprettetAv) {
+  public void setOpprettetAv(final String opprettetAv) {
     this.opprettetAv = opprettetAv;
   }
 
@@ -261,30 +270,30 @@ public class OppgaveDto {
   @JsonProperty("opprettetTidspunkt")
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getOpprettetTidspunkt() {
-    return opprettetTidspunkt;
+    return this.opprettetTidspunkt;
   }
 
-  public void setOpprettetTidspunkt(String opprettetTidspunkt) {
+  public void setOpprettetTidspunkt(final String opprettetTidspunkt) {
     this.opprettetTidspunkt = ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
   }
 
   @JsonIgnore
   @JsonProperty("versjon")
   public Integer getVersjon() {
-    return versjon;
+    return this.versjon;
   }
 
-  public void setVersjon(Integer versjon) {
+  public void setVersjon(final Integer versjon) {
     this.versjon = versjon;
   }
 
   @JsonIgnore
   @JsonProperty("endretAv")
   public String getEndretAv() {
-    return endretAv;
+    return this.endretAv;
   }
 
-  public void setEndretAv(String endretAv) {
+  public void setEndretAv(final String endretAv) {
     this.endretAv = endretAv;
   }
 
@@ -292,10 +301,10 @@ public class OppgaveDto {
   @JsonProperty("endretTidspunkt")
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getEndretTidspunkt() {
-    return endretTidspunkt;
+    return this.endretTidspunkt;
   }
 
-  public void setEndretTidspunkt(String endretTidspunkt) {
+  public void setEndretTidspunkt(final String endretTidspunkt) {
     this.endretTidspunkt = ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
   }
 
@@ -303,23 +312,23 @@ public class OppgaveDto {
   @JsonProperty("ferdigstiltTidspunkt")
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   public LocalDateTime getFerdigstiltTidspunkt() {
-    return ferdigstiltTidspunkt;
+    return this.ferdigstiltTidspunkt;
   }
 
-  public void setFerdigstiltTidspunkt(String ferdigstiltTidspunkt) {
+  public void setFerdigstiltTidspunkt(final String ferdigstiltTidspunkt) {
     this.ferdigstiltTidspunkt = ZonedDateTime.parse(ferdigstiltTidspunkt).toLocalDateTime();
   }
 
   public Map<String, String> getMetadata() {
-    return metadata;
+    return this.metadata;
   }
 
-  public void setMetadata(Map<String, String> metadata) {
+  public void setMetadata(final Map<String, String> metadata) {
     this.metadata = metadata;
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) {
       return true;
     }
@@ -328,39 +337,40 @@ public class OppgaveDto {
       return false;
     }
 
-    OppgaveDto oppgaveDTO = (OppgaveDto) o;
+    final OppgaveDto oppgaveDTO = (OppgaveDto) o;
 
     return new EqualsBuilder()
-        .append(id, oppgaveDTO.id)
-        .append(tema, oppgaveDTO.tema)
-        .append(aktoerId, oppgaveDTO.aktoerId)
-        .append(orgnr, oppgaveDTO.orgnr)
-        .append(bnr, oppgaveDTO.bnr)
-        .append(samhandlernr, oppgaveDTO.samhandlernr)
-        .append(journalpostId, oppgaveDTO.journalpostId)
-        .append(saksreferanse, oppgaveDTO.saksreferanse)
-        .append(temagruppe, oppgaveDTO.temagruppe)
-        .append(behandlingstema, oppgaveDTO.behandlingstema)
-        .append(oppgavetype, oppgaveDTO.oppgavetype)
-        .append(behandlingstype, oppgaveDTO.behandlingstype)
-        .append(aktivDato, oppgaveDTO.aktivDato)
-        .append(fristFerdigstillelse, oppgaveDTO.fristFerdigstillelse)
-        .append(prioritet, oppgaveDTO.prioritet)
-        .append(tildeltEnhetsnr, oppgaveDTO.tildeltEnhetsnr)
-        .append(opprettetAvEnhetsnr, oppgaveDTO.opprettetAvEnhetsnr)
-        .append(endretAvEnhetsnr, oppgaveDTO.endretAvEnhetsnr)
-        .append(tilordnetRessurs, oppgaveDTO.tilordnetRessurs)
-        .append(mappeId, oppgaveDTO.mappeId)
-        .append(status, oppgaveDTO.status)
-        .append(versjon, oppgaveDTO.versjon)
-        .append(opprettetAv, oppgaveDTO.opprettetAv)
-        .append(endretAv, oppgaveDTO.endretAv)
-        .append(opprettetTidspunkt, oppgaveDTO.opprettetTidspunkt)
-        .append(endretTidspunkt, oppgaveDTO.endretTidspunkt)
-        .append(beskrivelse, oppgaveDTO.getBeskrivelse())
-        .append(journalpostkilde, oppgaveDTO.getJournalpostkilde())
-        .append(behandlesAvApplikasjon, oppgaveDTO.getBehandlesAvApplikasjon())
-        .append(metadata, oppgaveDTO.metadata)
+        .append(this.id, oppgaveDTO.id)
+        .append(this.tema, oppgaveDTO.tema)
+        .append(this.aktoerId, oppgaveDTO.aktoerId)
+        .append(this.navPersonIdent, oppgaveDTO.navPersonIdent)
+        .append(this.orgnr, oppgaveDTO.orgnr)
+        .append(this.bnr, oppgaveDTO.bnr)
+        .append(this.samhandlernr, oppgaveDTO.samhandlernr)
+        .append(this.journalpostId, oppgaveDTO.journalpostId)
+        .append(this.saksreferanse, oppgaveDTO.saksreferanse)
+        .append(this.temagruppe, oppgaveDTO.temagruppe)
+        .append(this.behandlingstema, oppgaveDTO.behandlingstema)
+        .append(this.oppgavetype, oppgaveDTO.oppgavetype)
+        .append(this.behandlingstype, oppgaveDTO.behandlingstype)
+        .append(this.aktivDato, oppgaveDTO.aktivDato)
+        .append(this.fristFerdigstillelse, oppgaveDTO.fristFerdigstillelse)
+        .append(this.prioritet, oppgaveDTO.prioritet)
+        .append(this.tildeltEnhetsnr, oppgaveDTO.tildeltEnhetsnr)
+        .append(this.opprettetAvEnhetsnr, oppgaveDTO.opprettetAvEnhetsnr)
+        .append(this.endretAvEnhetsnr, oppgaveDTO.endretAvEnhetsnr)
+        .append(this.tilordnetRessurs, oppgaveDTO.tilordnetRessurs)
+        .append(this.mappeId, oppgaveDTO.mappeId)
+        .append(this.status, oppgaveDTO.status)
+        .append(this.versjon, oppgaveDTO.versjon)
+        .append(this.opprettetAv, oppgaveDTO.opprettetAv)
+        .append(this.endretAv, oppgaveDTO.endretAv)
+        .append(this.opprettetTidspunkt, oppgaveDTO.opprettetTidspunkt)
+        .append(this.endretTidspunkt, oppgaveDTO.endretTidspunkt)
+        .append(this.beskrivelse, oppgaveDTO.getBeskrivelse())
+        .append(this.journalpostkilde, oppgaveDTO.getJournalpostkilde())
+        .append(this.behandlesAvApplikasjon, oppgaveDTO.getBehandlesAvApplikasjon())
+        .append(this.metadata, oppgaveDTO.metadata)
         .isEquals();
   }
 
@@ -370,6 +380,7 @@ public class OppgaveDto {
         .append(id)
         .append(tema)
         .append(aktoerId)
+        .append(navPersonIdent)
         .append(orgnr)
         .append(bnr)
         .append(samhandlernr)
@@ -403,37 +414,37 @@ public class OppgaveDto {
   @Override
   public String toString() {
     return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
-        .append("id", id)
-        .append("tema", tema)
-        .append("aktoerId", aktoerId)
-        .append("orgnr", orgnr)
-        .append("bnr", bnr)
-        .append("samhandlernr", samhandlernr)
-        .append("journalpostId", journalpostId)
-        .append("saksreferanse", saksreferanse)
-        .append("temagruppe", temagruppe)
-        .append("behandlingstema", behandlingstema)
-        .append("oppgavetype", oppgavetype)
-        .append("behandlingstype", behandlingstype)
-        .append("aktivDato", aktivDato)
-        .append("fristFerdigstillelse", fristFerdigstillelse)
-        .append("prioritet", prioritet)
-        .append("tildeltEnhetsnr", tildeltEnhetsnr)
-        .append("opprettetAvEnhetsnr", opprettetAvEnhetsnr)
-        .append("endretAvEnhetsnr", endretAvEnhetsnr)
-        .append("tilordnetRessurs", tilordnetRessurs)
-        .append("mappeId", mappeId)
-        .append("status", status)
-        .append("versjon", versjon)
-        .append("opprettetAv", opprettetAv)
-        .append("endretAv", endretAv)
-        .append("opprettetTidspunkt", opprettetTidspunkt)
-        .append("endretTidspunkt", endretTidspunkt)
+        .append("id", this.id)
+        .append("tema", this.tema)
+        .append("aktoerId", this.aktoerId)
+        .append("navPersonIdent", this.navPersonIdent)
+        .append("orgnr", this.orgnr)
+        .append("bnr", this.bnr)
+        .append("samhandlernr", this.samhandlernr)
+        .append("journalpostId", this.journalpostId)
+        .append("saksreferanse", this.saksreferanse)
+        .append("temagruppe", this.temagruppe)
+        .append("behandlingstema", this.behandlingstema)
+        .append("oppgavetype", this.oppgavetype)
+        .append("behandlingstype", this.behandlingstype)
+        .append("aktivDato", this.aktivDato)
+        .append("fristFerdigstillelse", this.fristFerdigstillelse)
+        .append("prioritet", this.prioritet)
+        .append("tildeltEnhetsnr", this.tildeltEnhetsnr)
+        .append("opprettetAvEnhetsnr", this.opprettetAvEnhetsnr)
+        .append("endretAvEnhetsnr", this.endretAvEnhetsnr)
+        .append("tilordnetRessurs", this.tilordnetRessurs)
+        .append("mappeId", this.mappeId)
+        .append("status", this.status)
+        .append("versjon", this.versjon)
+        .append("opprettetAv", this.opprettetAv)
+        .append("endretAv", this.endretAv)
+        .append("opprettetTidspunkt", this.opprettetTidspunkt)
+        .append("endretTidspunkt", this.endretTidspunkt)
         .append("beskrivelse", "******")
-        .append("journalpostkilde", journalpostkilde)
-        .append("behandlesAvApplikasjon", behandlesAvApplikasjon)
-        .append("metadata", metadata)
+        .append("journalpostkilde", this.journalpostkilde)
+        .append("behandlesAvApplikasjon", this.behandlesAvApplikasjon)
+        .append("metadata", this.metadata)
         .toString();
   }
-
 }

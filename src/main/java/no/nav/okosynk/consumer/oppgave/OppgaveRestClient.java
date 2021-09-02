@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,7 +61,6 @@ public class OppgaveRestClient {
 
     private static final Logger log = LoggerFactory.getLogger(OppgaveRestClient.class);
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
-    private static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
     final AzureAdAuthenticationClient azureAdAuthenticationClient;
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
@@ -170,8 +168,18 @@ public class OppgaveRestClient {
         final List<OppgaveDto> oppgaverSomIkkeErOpprettet = new ArrayList<>();
         final List<OppgaveDto> oppgaveDtos =
                 oppgaver.stream()
-                        .map(this::oversettOppgave)
+                        .map(
+                                (oppgave) ->
+                                {
+                                    try {
+                                        return OppgaveMapper.map(oppgave);
+                                    } catch (OppgaveMapperException_MoreThanOneActorType | OppgaveMapperException_AktivTilFraNull e) {
+                                        throw new IllegalStateException("Feil i input date", e);
+                                    }
+                                }
+                        )
                         .collect(Collectors.toList());
+
         oppgaveDtos.forEach(dto -> {
             final String dtoAsJsonString;
             try {
@@ -433,7 +441,7 @@ public class OppgaveRestClient {
     ) {
         final ObjectMapper mapper = new ObjectMapper();
         final ObjectNode patchJson = mapper.createObjectNode();
-        patchJson.put("endretAvEnhetsnr", ENHET_ID_FOR_ANDRE_EKSTERNE);
+        patchJson.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
         if (ferdigstill) {
             patchJson.put("status", FERDIGSTILT.name());
         }
@@ -483,28 +491,5 @@ public class OppgaveRestClient {
                 .withMappeId(oppgaveDto.getMappeId())
                 .withAnsvarligSaksbehandlerIdent(oppgaveDto.getTilordnetRessurs())
                 .build();
-    }
-
-    private OppgaveDto oversettOppgave(final Oppgave oppgave) {
-
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        OppgaveDto oppgaveDto = new OppgaveDto();
-        oppgaveDto.setAktoerId(oppgave.aktoerId);
-        oppgaveDto.setSamhandlernr(oppgave.samhandlernr);
-        oppgaveDto.setOrgnr(oppgave.orgnr);
-        oppgaveDto.setBnr(oppgave.bnr);
-        oppgaveDto.setOppgavetype(oppgave.oppgavetypeKode);
-        oppgaveDto.setTema(oppgave.fagomradeKode);
-        oppgaveDto.setBehandlingstema(oppgave.behandlingstema);
-        oppgaveDto.setBehandlingstype(oppgave.behandlingstype);
-        oppgaveDto.setPrioritet(oppgave.prioritetKode);
-        oppgaveDto.setBeskrivelse(oppgave.beskrivelse);
-        oppgaveDto.setAktivDato(oppgave.aktivFra.format(formatter));
-        oppgaveDto.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
-        oppgaveDto.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
-        oppgaveDto.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
-
-        return oppgaveDto;
     }
 }

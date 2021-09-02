@@ -39,7 +39,7 @@ class OppgaveTest {
   }
 
   @Test
-  void when_two_emopty_oppgaver_are_compared_then_it_should_equal() {
+  void when_two_empty_oppgaver_are_compared_then_it_should_equal() {
 
     enteringTestHeaderLogger.debug(null);
 
@@ -157,6 +157,24 @@ class OppgaveTest {
   }
 
   @Test
+  void when_two_oppgaver_with_differing_navPersonIdent_are_compared_then_they_should_differ() {
+
+    enteringTestHeaderLogger.debug(null);
+
+    final Oppgave oppgave1 =
+            new Oppgave.OppgaveBuilder()
+                    .withNavPersonIdent("17023410293")
+                    .build();
+
+    final Oppgave oppgave2 =
+            new Oppgave.OppgaveBuilder()
+                    .withNavPersonIdent("17023410292")
+                    .build();
+
+    assertFalse(oppgave1.equals(oppgave2));
+  }
+
+  @Test
   void when_two_oppgaver_with_differing_samhandlernr_are_compared_then_they_should_differ() {
 
     enteringTestHeaderLogger.debug(null);
@@ -200,6 +218,7 @@ class OppgaveTest {
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withAktoerId("X")
+            .withNavPersonIdent("10293847563")
             .withSamhandlernr("456")
             .withOrgnr("890456")
             .withBnr("0890456")
@@ -211,6 +230,7 @@ class OppgaveTest {
     final Oppgave oppgave2 =
         new Oppgave.OppgaveBuilder()
             .withAktoerId("X")
+            .withNavPersonIdent("10293847563")
             .withSamhandlernr("456")
             .withOrgnr("890456")
             .withBnr("0890456")
@@ -230,12 +250,14 @@ class OppgaveTest {
     final Oppgave oppgave1 =
         new Oppgave.OppgaveBuilder()
             .withAktoerId("X")
+            .withNavPersonIdent("10293847563")
             .withSamhandlernr("456")
             .withOrgnr("890456")
             .withBnr("0890456")
             .withBehandlingstema("YESSSSSS")
             .withBehandlingstype("nopnopnop")
             .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
+
             .withOppgavetypeKode("GHHGHGHGHGHGHG")
             .withBeskrivelse("ABC")
             .withAktivFra(LocalDate.now())
@@ -246,12 +268,14 @@ class OppgaveTest {
     final Oppgave oppgave2 =
         new Oppgave.OppgaveBuilder()
             .withAktoerId("X")
+            .withNavPersonIdent("10293847563")
             .withSamhandlernr("456")
             .withOrgnr("890456")
             .withBnr("0890456")
             .withBehandlingstema("YESSSSSS")
             .withBehandlingstype("nopnopnop")
             .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
+
             .withOppgavetypeKode("8g876g87g87g87g87g")
             .withBeskrivelse("DEF")
             .withAktivFra(LocalDate.now().plusDays(1))
@@ -323,6 +347,7 @@ class OppgaveTest {
     final String expectedAnsvarligEnhetId = "lisdnjhpqr";
     final String expectedOppgaveId = "ABC";
     final String expectedAktoerId = "192837465";
+    final String expectedNavPersonIdent = "10293847563";
     final String expectedSamhandlernr = "XYZabx999";
     final String expectedOrgnr = "111166666222234444";
     final String expectedBnr = "10102929383847475656";
@@ -336,6 +361,7 @@ class OppgaveTest {
             .withOppgavetypeKode(expectedOppgavetypeKode)
             .withAnsvarligEnhetId(expectedAnsvarligEnhetId)
             .withOppgaveId(expectedOppgaveId)
+            .withNavPersonIdent(expectedNavPersonIdent)
             .withAktoerId(expectedAktoerId)
             .withSamhandlernr(expectedSamhandlernr)
             .withOrgnr(expectedOrgnr)
@@ -352,6 +378,7 @@ class OppgaveTest {
     assertTrue(presentationString.contains(expectedAnsvarligEnhetId));
     assertTrue(presentationString.contains(expectedOppgaveId));
     assertTrue(presentationString.contains(expectedAktoerId));
+    assertTrue(presentationString.contains(expectedNavPersonIdent));
     assertTrue(presentationString.contains(expectedSamhandlernr));
     assertTrue(presentationString.contains(expectedOrgnr));
     assertTrue(presentationString.contains(expectedBnr));
