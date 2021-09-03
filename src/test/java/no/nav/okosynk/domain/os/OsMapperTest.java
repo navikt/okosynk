@@ -1,20 +1,32 @@
 package no.nav.okosynk.domain.os;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.*;
-
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class OsMapperTest {
 
@@ -26,7 +38,9 @@ class OsMapperTest {
     private static final String ANNEN_OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING = "06128012345009543471 2008-10-102008-10-10NEG K231B2962008-11-012008-11-30000000008820å 4151         GS      06128012345            ";
     private static final String OS_MELDING_ORGANISASJON = "00990000000251889728 2017-01-232017-01-24AVVEK231B2622016-09-012016-09-30000000000003E 8020         KTPOST  00994932691            ";
     private static final String OS_MELDING_EFOG =
-        "01017812345333374207 2019-02-132019-02-14AVVMK231B26E2018-10-012019-02-28000000090040æ 8020         EFOG    01017812345            ";
+            "01017812345333374207 2019-02-132019-02-14AVVMK231B26E2018-10-012019-02-28000000090040æ 8020         EFOG    01017812345            ";
+
+    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     private OsMapper osMapper;
     private OsMelding osMeldingSomSkalBliTilOppgave;
@@ -34,36 +48,66 @@ class OsMapperTest {
     private OsMelding osMeldingSomIkkeHarMapping;
     private OsMelding osMeldingEFOG;
     private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private boolean shouldConvertNavPersonIdentToAktoerId_saved = true;
 
     @BeforeEach
     void setUp() {
-        osMapper = new OsMapper(aktoerRestClient);
+        osMapper = new OsMapper(this.aktoerRestClient, this.okosynkConfiguration);
         osMeldingSomSkalBliTilOppgave = new OsMelding(OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         annenOsMeldingSomSkalBliTilOppgave = new OsMelding(ANNEN_OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         osMeldingSomIkkeHarMapping = new OsMelding(OS_MELDING_SOM_IKKE_HAR_MAPPING);
         osMeldingEFOG = new OsMelding(OS_MELDING_EFOG);
     }
 
-    @Test
+    @BeforeEach
+    void beforeEach() {
+        this.shouldConvertNavPersonIdentToAktoerId_saved = this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId();
+        setShouldConvertNavPersonIdentToAktoerId(true);
+    }
+
+    @AfterEach
+    void afterEach() {
+        setShouldConvertNavPersonIdentToAktoerId(this.shouldConvertNavPersonIdentToAktoerId_saved);
+    }
+
+    private void setShouldConvertNavPersonIdentToAktoerId(final boolean shouldConvertNavPersonIdentToAktoerId) {
+        System.setProperty(
+                Constants.SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY,
+                Boolean.valueOf(shouldConvertNavPersonIdentToAktoerId).toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med faggruppe \"EFOG\" som skal bli til oppgave.")
-    void lagUrOppgaveMedFaggruppeEFOG() {
+    void lagUrOppgaveMedFaggruppeEFOG(final boolean shouldConvertNavPersonIdentToAktoerId) {
 
         enteringTestHeaderLogger.debug(null);
 
+        setShouldConvertNavPersonIdentToAktoerId(shouldConvertNavPersonIdentToAktoerId);
+
         Mockito.reset(aktoerRestClient);
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("01017812345")).thenReturn(AktoerRespons.ok("123"));
+        final String expectedNavPersonIdent = "01017812345";
+        final String expectedAktoerId = "123";
+        when(aktoerRestClient.hentGjeldendeAktoerId(expectedNavPersonIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
 
         final List<Oppgave> oppgaver =
-            osMapper
-                .lagOppgaver(lagMeldinglisteMedEttElement(osMeldingEFOG));
+                osMapper
+                        .lagOppgaver(lagMeldinglisteMedEttElement(osMeldingEFOG));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
         assertEquals("ab0272", oppgaver.get(0).behandlingstema);
         assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
-        assertEquals(oppgaver.get(0).aktoerId, "123");
+
+        if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+            assertEquals(null, oppgaver.get(0).navPersonIdent);
+        } else {
+            assertEquals(null, oppgaver.get(0).aktoerId);
+            assertEquals(expectedNavPersonIdent, oppgaver.get(0).navPersonIdent);
+        }
     }
 
     @Test
@@ -81,26 +125,38 @@ class OsMapperTest {
 
         assertNotNull(oppgaver);
         assertEquals(2, oppgaver.size());
-        assertEquals(oppgaver.get(0).aktoerId, "1234");
-        assertEquals(oppgaver.get(1).aktoerId, "123");
+        assertEquals("1234", oppgaver.get(0).aktoerId);
+        assertEquals("123", oppgaver.get(1).aktoerId);
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
-    void lagOsOppgaverFraOsMeldingListeReturnererEnOppgave() {
-        Mockito.reset(aktoerRestClient);
+    void lagOsOppgaverFraOsMeldingListeReturnererEnOppgave(final boolean shouldConvertNavPersonIdentToAktoerId) {
 
         enteringTestHeaderLogger.debug(null);
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("07063012345")).thenReturn(AktoerRespons.ok("123"));
-        List<Oppgave> oppgaver = osMapper
+        setShouldConvertNavPersonIdentToAktoerId(shouldConvertNavPersonIdentToAktoerId);
+
+        Mockito.reset(aktoerRestClient);
+
+        final String expectedNavPersonIdent = "07063012345";
+        final String expectedAktoerId = "123";
+
+        when(aktoerRestClient.hentGjeldendeAktoerId(expectedNavPersonIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
+        final List<Oppgave> oppgaver = osMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
-        assertEquals(oppgaver.get(0).aktoerId, "123");
+        if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+            assertEquals(null, oppgaver.get(0).navPersonIdent);
+        } else {
+            assertEquals(null, oppgaver.get(0).aktoerId);
+            assertEquals(expectedNavPersonIdent, oppgaver.get(0).navPersonIdent);
+        }
     }
-
 
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med to OS-meldinger hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")

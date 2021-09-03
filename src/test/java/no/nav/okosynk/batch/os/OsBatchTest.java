@@ -36,7 +36,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(mock(AktoerRestClient.class))
+                new OsMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -52,7 +52,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
                 null,
                 Constants.BATCH_TYPE.OS,
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(mock(AktoerRestClient.class))
+                new OsMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -66,7 +66,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
             this.getOkosynkConfiguration(),
             null,
             new OsMeldingReader(OsMelding::new),
-            new OsMapper(mock(AktoerRestClient.class))
+            new OsMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
         ));
     }
 
@@ -79,7 +79,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
             this.getOkosynkConfiguration(),
             Constants.BATCH_TYPE.OS,
             null,
-            new OsMapper(mock(AktoerRestClient.class))
+            new OsMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
         ));
     }
 
@@ -112,7 +112,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.OS,
                 new OsMeldingReader(OsMelding::new),
-                new OsMapper(mock(AktoerRestClient.class))
+                new OsMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             );
 
         assertDoesNotThrow(() -> { batch.run(); });

@@ -36,7 +36,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class))
+                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -52,7 +52,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 null,
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class))
+                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -68,7 +68,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 null,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class))
+                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -84,7 +84,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 null,
-                new UrMapper(mock(AktoerRestClient.class))
+                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -118,7 +118,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class))
+                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
             );
 
         assertDoesNotThrow(() -> { batch.run(); });

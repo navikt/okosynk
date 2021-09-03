@@ -110,7 +110,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final AktoerRestClient aktoerRestClient);
 
-    private IOkosynkConfiguration getOkosynkConfiguration() {
+    protected IOkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;
     }
 

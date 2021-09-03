@@ -50,6 +50,7 @@ public interface IOkosynkConfiguration {
     Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType);
 
     boolean shouldAuthenticateUsingAzureADAgainstOppgave();
+    boolean shouldConvertNavPersonIdentToAktoerId();
 
     String getNaisAppName();
 

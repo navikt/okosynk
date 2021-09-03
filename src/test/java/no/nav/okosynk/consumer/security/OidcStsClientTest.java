@@ -106,7 +106,7 @@ public class OidcStsClientTest {
                 .stubFor(
                         get(urlEqualTo(urlIncludingParms))
                                 .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*=="))
+                                .withHeader("Authorization", matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
@@ -132,7 +132,7 @@ public class OidcStsClientTest {
                                 .whenScenarioStateIs(STARTED)
                                 .willSetStateTo("2")
                                 .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*=="))
+                                .withHeader("Authorization", matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
@@ -148,7 +148,7 @@ public class OidcStsClientTest {
                                 .inScenario(scenarioName)
                                 .whenScenarioStateIs("2")
                                 .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*=="))
+                                .withHeader("Authorization", matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(

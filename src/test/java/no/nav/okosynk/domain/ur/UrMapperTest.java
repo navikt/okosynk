@@ -6,12 +6,16 @@ import static org.mockito.Mockito.when;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.domain.Oppgave;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,41 +37,71 @@ class UrMapperTest {
     private static final String UR_MELDING_EFOG =
         "02029512345PERSON      2019-02-14T21:13:5525          00000000080610æ8020EFOG   UR2302019-02-12600767010Stoppet utbetaling                                02029530095";
 
+    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
     private UrMapper urMapper;
     private UrMelding urMeldingSomSkalBliTilOppgave;
     private UrMelding annenUrMeldingSomSkalBliTilOppgave;
     private UrMelding urMeldingUtenMappingRegel;
     private UrMelding urMeldingEFOG;
     private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private boolean shouldConvertNavPersonIdentToAktoerId_saved = true;
 
     @BeforeEach
     void setUp() {
-        urMapper = new UrMapper(aktoerRestClient);
+        urMapper = new UrMapper(this.aktoerRestClient, this.okosynkConfiguration);
         urMeldingSomSkalBliTilOppgave = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         annenUrMeldingSomSkalBliTilOppgave = new UrMelding(ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         urMeldingUtenMappingRegel = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);
         urMeldingEFOG = new UrMelding(UR_MELDING_EFOG);
     }
 
-    @Test
+    @BeforeEach
+    void beforeEach() {
+        this.shouldConvertNavPersonIdentToAktoerId_saved = this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId();
+        setShouldConvertNavPersonIdentToAktoerId(true);
+    }
+
+    @AfterEach
+    void afterEach() {
+        setShouldConvertNavPersonIdentToAktoerId(this.shouldConvertNavPersonIdentToAktoerId_saved);
+    }
+
+    private void setShouldConvertNavPersonIdentToAktoerId(final boolean shouldConvertNavPersonIdentToAktoerId) {
+        System.setProperty(
+                Constants.SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY,
+                Boolean.valueOf(shouldConvertNavPersonIdentToAktoerId).toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med oppdragsKode \"EFOG\" som skal bli til oppgave.")
-    void lagUrOppgaveMedOppdragsKodeEFOG() {
+    void lagUrOppgaveMedOppdragsKodeEFOG(final boolean shouldConvertNavPersonIdentToAktoerId) {
 
         enteringTestHeaderLogger.debug(null);
 
+        setShouldConvertNavPersonIdentToAktoerId(shouldConvertNavPersonIdentToAktoerId);
+
         Mockito.reset(aktoerRestClient);
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("02029512345")).thenReturn(AktoerRespons.ok("123"));
+        final String expectedNavPersonIdent = "02029512345";
+        final String expectedAktoerId = "123";
+        when(aktoerRestClient.hentGjeldendeAktoerId(expectedNavPersonIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final List<Oppgave> oppgaver =
-            urMapper
-                .lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
+            urMapper.lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
         assertEquals("ab0272", oppgaver.get(0).behandlingstema);
         assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
-        assertEquals(oppgaver.get(0).aktoerId, "123");
+
+        if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+            assertEquals(null, oppgaver.get(0).navPersonIdent);
+        } else {
+            assertEquals(null, oppgaver.get(0).aktoerId);
+            assertEquals(expectedNavPersonIdent, oppgaver.get(0).navPersonIdent);
+        }
     }
 
     @Test
@@ -85,8 +119,8 @@ class UrMapperTest {
 
         assertNotNull(oppgaver);
         assertEquals(2, oppgaver.size());
-        assertEquals(oppgaver.get(0).aktoerId, "1234");
-        assertEquals(oppgaver.get(1).aktoerId, "123");
+        assertEquals("1234", oppgaver.get(0).aktoerId);
+        assertEquals("123", oppgaver.get(1).aktoerId);
     }
 
     @Test
@@ -99,14 +133,13 @@ class UrMapperTest {
 
         when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
 
-        List<Oppgave> oppgaver = urMapper
-                .lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
+        List<Oppgave> oppgaver =
+                urMapper.lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
-        assertEquals(oppgaver.get(0).aktoerId, "123");
+        assertEquals("123", oppgaver.get(0).aktoerId);
     }
-
 
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med to UR-meldinger hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
@@ -190,9 +223,10 @@ class UrMapperTest {
     }
 
     private List<UrMelding> lagMeldinglisteMedToElementer(UrMelding melding1, UrMelding melding2) {
-        List<UrMelding> urmeldinger = new ArrayList<>();
+        final List<UrMelding> urmeldinger = new ArrayList<>();
         urmeldinger.add(melding1);
         urmeldinger.add(melding2);
+
         return urmeldinger;
     }
 

@@ -52,6 +52,11 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     }
 
     @Override
+    public boolean shouldConvertNavPersonIdentToAktoerId() {
+        return getBoolean(Constants.SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY, false);
+    }
+
+    @Override
     public String getNaisAppName() {
         return getRequiredString(Constants.NAIS_APP_NAME_KEY);
     }
