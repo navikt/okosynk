@@ -105,9 +105,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                         } else {
 
 
-
-
                                             if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+                                                log.info("About to convert navPersonIdent to aktoerId...");
                                                 try {
                                                     final AktoerRespons aktoerRespons =
                                                             this.aktoerRestClient.hentGjeldendeAktoerId(gjelderId);
@@ -124,7 +123,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                     return null;
                                                 }
                                             } else {
-                                              builder.withNavPersonIdent(gjelderId);
+                                                log.info("Using navPersonIdent as is");
+                                                builder.withNavPersonIdent(gjelderId);
                                             }
 
 
