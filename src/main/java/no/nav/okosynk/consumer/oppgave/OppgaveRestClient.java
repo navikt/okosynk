@@ -79,7 +79,9 @@ public class OppgaveRestClient {
     }
 
     private static void addCorrelationIdToRequest(final AbstractHttpMessage request) {
-        request.addHeader(X_CORRELATION_ID_HEADER_KEY, UUID.randomUUID().toString());
+        final String correlationIdString = UUID.randomUUID().toString();
+        request.addHeader(X_CORRELATION_ID_HEADER_KEY, correlationIdString);
+        log.info("Added " + X_CORRELATION_ID_HEADER_KEY + " to request: " + correlationIdString);
     }
 
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
