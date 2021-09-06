@@ -16,31 +16,27 @@ public class Oppgave {
     public final LocalDate aktivTil;
     public final int antallMeldinger;
     public final LocalDateTime sistEndret;
-    public final String aktoerId;
     public final String ansvarligEnhetId;
     public final String ansvarligSaksbehandlerIdent;
     public final String behandlingstema;
     public final String behandlingstype;
     public final String beskrivelse;
-    public final String bnr;
     public final String fagomradeKode;
     public final boolean lest;
     public final String mappeId;
-    public final String navPersonIdent;
     public final String oppgaveId;
     public final String oppgavetypeKode;
-    public final String orgnr;
     public final String prioritetKode;
-    public final String samhandlernr;
     public final int versjon;
+
+    public final String aktoerId;
+    public final String navPersonIdent;
+    public final String bnr;
+    public final String orgnr;
+    public final String samhandlernr;
 
     private Oppgave(OppgaveBuilder oppgaveBuilder) {
         this.oppgaveId = oppgaveBuilder.oppgaveId;
-        this.aktoerId = oppgaveBuilder.aktoerId;
-        this.navPersonIdent = oppgaveBuilder.navPersonIdent;
-        this.samhandlernr = oppgaveBuilder.samhandlernr;
-        this.orgnr = oppgaveBuilder.orgnr;
-        this.bnr = oppgaveBuilder.bnr;
         this.oppgavetypeKode = oppgaveBuilder.oppgavetypeKode;
         this.fagomradeKode = oppgaveBuilder.fagomradeKode;
         this.behandlingstema = oppgaveBuilder.behandlingstema;
@@ -56,6 +52,12 @@ public class Oppgave {
         this.antallMeldinger = oppgaveBuilder.antallMeldinger;
         this.mappeId = oppgaveBuilder.mappeId;
         this.ansvarligSaksbehandlerIdent = oppgaveBuilder.saksbehandlerIdent;
+
+        this.aktoerId = oppgaveBuilder.aktoerId;
+        this.navPersonIdent = oppgaveBuilder.navPersonIdent;
+        this.orgnr = oppgaveBuilder.orgnr;
+        this.samhandlernr = oppgaveBuilder.samhandlernr;
+        this.bnr = oppgaveBuilder.bnr;
     }
 
     @Override

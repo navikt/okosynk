@@ -37,6 +37,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -382,9 +383,20 @@ public class OppgaveRestClient {
 
             final ObjectMapper objectMapper = new ObjectMapper();
             final HttpEntity httpEntity = response.getEntity();
-            final FinnOppgaveResponse finnOppgaveResponse =
-                    objectMapper.readValue(httpEntity.getContent(), FinnOppgaveResponse.class);
 
+            final FinnOppgaveResponse finnOppgaveResponse;
+            if (true) {
+                final Scanner scanner = new Scanner(httpEntity.getContent()).useDelimiter(System.lineSeparator());
+                final String entityAsString = scanner.hasNext() ? scanner.next() : "";
+                // Do some random logging of the response entity as a string:
+                finnOppgaveResponse = objectMapper.readValue(entityAsString, FinnOppgaveResponse.class);
+                if (offset < 100) {
+                    // Do some "random" logging to see the response entity:
+                    log.info("finn oppgaver response entityAsString fra oppgave: {}", entityAsString);
+                }
+            } else {
+                finnOppgaveResponse = objectMapper.readValue(httpEntity.getContent(), FinnOppgaveResponse.class);
+            }
             return finnOppgaveResponse;
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);

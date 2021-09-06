@@ -99,8 +99,7 @@ public class OppgaveSynkroniserer {
 
         final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
         final ConsumerStatistics consumerStatistics_finn =
-                getOppgaveRestClient()
-                        .finnOppgaver(oppgaverLestFraDatabasen);
+                getOppgaveRestClient().finnOppgaver(oppgaverLestFraDatabasen);
 
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(
                 alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);

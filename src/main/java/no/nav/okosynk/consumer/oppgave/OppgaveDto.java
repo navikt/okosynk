@@ -15,12 +15,10 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class OppgaveDto {
 
   private String aktivDato;
-  private String aktoerId;
   private String behandlesAvApplikasjon;
   private String behandlingstema;
   private String behandlingstype;
   private String beskrivelse;
-  private String bnr;
   private String endretAv;
   private String endretAvEnhetsnr;
   private LocalDateTime endretTidspunkt;
@@ -31,21 +29,24 @@ public class OppgaveDto {
   private String journalpostkilde;
   private String mappeId;
   Map<String, String> metadata;
-  private String navPersonIdent;
   private String oppgavetype;
   private String opprettetAv;
   private String opprettetAvEnhetsnr;
   private LocalDateTime opprettetTidspunkt;
-  private String orgnr;
   private String prioritet;
   private String saksreferanse;
-  private String samhandlernr;
   private OppgaveStatus status;
   private String tema;
   private String temagruppe;
   private String tildeltEnhetsnr;
   private String tilordnetRessurs;
   private Integer versjon;
+
+  private String aktoerId;
+  private String navPersonIdent;
+  private String bnr;
+  private String orgnr;
+  private String samhandlernr;
 
   public OppgaveDto() {
   }
@@ -342,11 +343,13 @@ public class OppgaveDto {
     return new EqualsBuilder()
         .append(this.id, oppgaveDTO.id)
         .append(this.tema, oppgaveDTO.tema)
+
         .append(this.aktoerId, oppgaveDTO.aktoerId)
         .append(this.navPersonIdent, oppgaveDTO.navPersonIdent)
         .append(this.orgnr, oppgaveDTO.orgnr)
         .append(this.bnr, oppgaveDTO.bnr)
         .append(this.samhandlernr, oppgaveDTO.samhandlernr)
+
         .append(this.journalpostId, oppgaveDTO.journalpostId)
         .append(this.saksreferanse, oppgaveDTO.saksreferanse)
         .append(this.temagruppe, oppgaveDTO.temagruppe)
@@ -416,11 +419,13 @@ public class OppgaveDto {
     return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
         .append("id", this.id)
         .append("tema", this.tema)
+
         .append("aktoerId", this.aktoerId)
         .append("navPersonIdent", this.navPersonIdent)
         .append("orgnr", this.orgnr)
         .append("bnr", this.bnr)
         .append("samhandlernr", this.samhandlernr)
+
         .append("journalpostId", this.journalpostId)
         .append("saksreferanse", this.saksreferanse)
         .append("temagruppe", this.temagruppe)
