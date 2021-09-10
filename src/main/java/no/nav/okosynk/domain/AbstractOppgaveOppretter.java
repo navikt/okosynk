@@ -106,7 +106,6 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
 
 
                                             if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
-                                                log.debug("About to convert navPersonIdent to aktoerId...");
                                                 try {
                                                     final AktoerRespons aktoerRespons =
                                                             this.aktoerRestClient.hentGjeldendeAktoerId(gjelderId);
