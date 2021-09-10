@@ -1,11 +1,11 @@
-package no.nav.okosynk.consumer.oppgave;
+package no.nav.okosynk.consumer.oppgave.json;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.List;
 
-public class PatchOppgaverRequest {
+public class PatchOppgaverRequestJson {
 
   private final Long mappeId;
   private final String tilordnetRessurs;
@@ -13,9 +13,9 @@ public class PatchOppgaverRequest {
   private String endretAvEnhetsnr;
   private final String behandlingstema;
   private final String behandlingstype;
-  private final List<PatchOppgave> oppgaver;
+  private final List<PatchOppgaveRequestJson> oppgaver;
 
-  public PatchOppgaverRequest(Builder builder) {
+  public PatchOppgaverRequestJson(Builder builder) {
     this.mappeId = builder.mappeId;
     this.tilordnetRessurs = builder.tilordnetRessurs;
     this.endretAvEnhetsnr = builder.endretAvEnhetsnr;
@@ -49,7 +49,7 @@ public class PatchOppgaverRequest {
     return endretAvEnhetsnr;
   }
 
-  public List<PatchOppgave> getOppgaver() {
+  public List<PatchOppgaveRequestJson> getOppgaver() {
     return oppgaver;
   }
 
@@ -74,7 +74,7 @@ public class PatchOppgaverRequest {
     String behandlingstema;
     String endretAvEnhetsnr;
     String behandlingstype;
-    List<PatchOppgave> oppgaver;
+    List<PatchOppgaveRequestJson> oppgaver;
 
     public Builder withMappeId(Long mappeId) {
       this.mappeId = mappeId;
@@ -106,13 +106,13 @@ public class PatchOppgaverRequest {
       return this;
     }
 
-    public Builder withOppgaver(List<PatchOppgave> oppgaver) {
+    public Builder withOppgaver(List<PatchOppgaveRequestJson> oppgaver) {
       this.oppgaver = oppgaver;
       return this;
     }
 
-    public PatchOppgaverRequest build() {
-      return new PatchOppgaverRequest(this);
+    public PatchOppgaverRequestJson build() {
+      return new PatchOppgaverRequestJson(this);
     }
   }
 }

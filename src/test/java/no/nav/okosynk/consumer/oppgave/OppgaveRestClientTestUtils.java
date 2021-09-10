@@ -4,6 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.consumer.oppgave.json.FinnOppgaveResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.FinnOppgaverResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.IdentGruppeV2;
+import no.nav.okosynk.consumer.oppgave.json.IdentJson;
+import no.nav.okosynk.consumer.oppgave.json.PatchOppgaverResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;
@@ -18,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -141,19 +149,19 @@ class OppgaveRestClientTestUtils {
                                 final ObjectMapper objectMapper = new ObjectMapper();
                                 objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
 
-                                final OppgaveDto oppgaveDto = new OppgaveDto();
+                                final PostOppgaveResponseJson postOppgaveResponseJson = new PostOppgaveResponseJson();
                                 final Random random = new Random();
-                                oppgaveDto.setOpprettetTidspunkt(
+                                postOppgaveResponseJson.setOpprettetTidspunkt(
                                         OppgaveRestClientTestUtils.createRandomDateTimeWithZone(random));
-                                oppgaveDto.setEndretTidspunkt(
+                                postOppgaveResponseJson.setEndretTidspunkt(
                                         OppgaveRestClientTestUtils.createRandomDateTimeWithZone(random));
-                                oppgaveDto.setFerdigstiltTidspunkt(
+                                postOppgaveResponseJson.setFerdigstiltTidspunkt(
                                         OppgaveRestClientTestUtils.createRandomDateTimeWithZone(random));
 
-                                final String oppgaveDtoAsJsonString =
-                                        objectMapper.writeValueAsString(oppgaveDto);
+                                final String postOppgaveResponseJsonString =
+                                        objectMapper.writeValueAsString(postOppgaveResponseJson);
                                 final InputStream oppgaveDtoAsJsonStringInputStream =
-                                        IOUtils.toInputStream(oppgaveDtoAsJsonString, Charset.defaultCharset());
+                                        IOUtils.toInputStream(postOppgaveResponseJsonString, Charset.defaultCharset());
 
                                 return oppgaveDtoAsJsonStringInputStream;
                             }
@@ -365,32 +373,52 @@ class OppgaveRestClientTestUtils {
         return randomDateTimeWithZone;
     }
 
-    private static OppgaveDto createOneOppgaveDto(final Random random) {
-        final OppgaveDto oppgaveDto = new OppgaveDto();
+    private static FinnOppgaveResponseJson createOneOppgaveDto(final Random random) {
 
-        oppgaveDto.setAktivDato(createRandomDate(random, true));
-        oppgaveDto.setVersjon(1 + random.nextInt(319));
-        oppgaveDto.setAktoerId(RandomStringUtils.randomAlphanumeric(7));
-        oppgaveDto.setStatus(OppgaveStatus.values()[random.nextInt(OppgaveStatus.values().length)]);
-        oppgaveDto.setOpprettetTidspunkt(createRandomDateTimeWithZone(random));
-        oppgaveDto.setEndretTidspunkt(createRandomDateTimeWithZone(random));
-        oppgaveDto.setFerdigstiltTidspunkt(createRandomDateTimeWithZone(random));
-        oppgaveDto.setId(RandomStringUtils.randomNumeric(7, 17));
-        oppgaveDto.setSamhandlernr(RandomStringUtils.randomAlphanumeric(23));
-        oppgaveDto.setOrgnr(RandomStringUtils.randomAlphanumeric(13));
-        oppgaveDto.setBnr(RandomStringUtils.randomAlphanumeric(11));
-        oppgaveDto.setOppgavetype(RandomStringUtils.randomAlphanumeric(11));
-        oppgaveDto.setTema(RandomStringUtils.randomAlphanumeric(11));
-        oppgaveDto.setBehandlingstema(RandomStringUtils.randomAlphanumeric(17));
-        oppgaveDto.setBehandlingstype(RandomStringUtils.randomAlphanumeric(12));
-        oppgaveDto.setPrioritet(RandomStringUtils.randomAlphanumeric(19));
-        oppgaveDto.setBeskrivelse(RandomStringUtils.randomAlphanumeric(319));
-        oppgaveDto.setFristFerdigstillelse(createRandomDate(random, true));
-        oppgaveDto.setTildeltEnhetsnr(RandomStringUtils.randomAlphanumeric(7));
-        oppgaveDto.setMappeId(RandomStringUtils.randomAlphanumeric(21));
-        oppgaveDto.setTilordnetRessurs(RandomStringUtils.randomAlphanumeric(14));
+        final FinnOppgaveResponseJson finnOppgaveResponseJson = new FinnOppgaveResponseJson();
 
-        return oppgaveDto;
+        final Collection<IdentJson> identer = new HashSet<>();
+        {
+            final String ident_FOLKEREGISTERIDENT = RandomStringUtils.randomNumeric(11, 11);
+            final IdentJson identJson_FOLKEREGISTERIDENT = new IdentJson();
+            final IdentGruppeV2 identGruppeV2_FOLKEREGISTERIDENT = IdentGruppeV2.FOLKEREGISTERIDENT;
+            identJson_FOLKEREGISTERIDENT.setIdent(ident_FOLKEREGISTERIDENT);
+            identJson_FOLKEREGISTERIDENT.setGruppe(identGruppeV2_FOLKEREGISTERIDENT);
+            identer.add(identJson_FOLKEREGISTERIDENT);
+        }
+        {
+            final String ident_AKTOERID = RandomStringUtils.randomAlphanumeric(7);
+            final IdentJson identJson_AKTOERID = new IdentJson();
+            final IdentGruppeV2 identGruppeV2_AKTOERID = IdentGruppeV2.AKTOERID;
+            identJson_AKTOERID.setIdent(ident_AKTOERID);
+            identJson_AKTOERID.setGruppe(identGruppeV2_AKTOERID);
+            identer.add(identJson_AKTOERID);
+            finnOppgaveResponseJson.setAktoerId(ident_AKTOERID);
+        }
+        finnOppgaveResponseJson.setIdenter(identer);
+        finnOppgaveResponseJson.setBnr(RandomStringUtils.randomAlphanumeric(11));
+        finnOppgaveResponseJson.setOrgnr(RandomStringUtils.randomAlphanumeric(13));
+        finnOppgaveResponseJson.setSamhandlernr(RandomStringUtils.randomAlphanumeric(23));
+
+        finnOppgaveResponseJson.setAktivDato(createRandomDate(random, true));
+        finnOppgaveResponseJson.setStatus(OppgaveStatus.values()[random.nextInt(OppgaveStatus.values().length)]);
+        finnOppgaveResponseJson.setOpprettetTidspunkt(createRandomDateTimeWithZone(random));
+        finnOppgaveResponseJson.setEndretTidspunkt(createRandomDateTimeWithZone(random));
+        finnOppgaveResponseJson.setFerdigstiltTidspunkt(createRandomDateTimeWithZone(random));
+        finnOppgaveResponseJson.setId(RandomStringUtils.randomNumeric(7, 17));
+        finnOppgaveResponseJson.setOppgavetype(RandomStringUtils.randomAlphanumeric(11));
+        finnOppgaveResponseJson.setTema(RandomStringUtils.randomAlphanumeric(11));
+        finnOppgaveResponseJson.setBehandlingstema(RandomStringUtils.randomAlphanumeric(17));
+        finnOppgaveResponseJson.setBehandlingstype(RandomStringUtils.randomAlphanumeric(12));
+        finnOppgaveResponseJson.setPrioritet(RandomStringUtils.randomAlphanumeric(19));
+        finnOppgaveResponseJson.setBeskrivelse(RandomStringUtils.randomAlphanumeric(319));
+        finnOppgaveResponseJson.setFristFerdigstillelse(createRandomDate(random, true));
+        finnOppgaveResponseJson.setTildeltEnhetsnr(RandomStringUtils.randomAlphanumeric(7));
+        finnOppgaveResponseJson.setMappeId(RandomStringUtils.randomAlphanumeric(21));
+        finnOppgaveResponseJson.setTilordnetRessurs(RandomStringUtils.randomAlphanumeric(14));
+        finnOppgaveResponseJson.setVersjon(1 + random.nextInt(319));
+
+        return finnOppgaveResponseJson;
     }
 
     private static CloseableHttpResponse createTestResponseWithNOppgaver(final int noOppgaver) {
@@ -412,29 +440,29 @@ class OppgaveRestClientTestUtils {
                         @Override
                         public InputStream getContent() throws IOException, UnsupportedOperationException {
 
-                            final FinnOppgaveResponse finnOppgaveResponse =
-                                    new FinnOppgaveResponse() {
+                            final FinnOppgaverResponseJson finnOppgaverResponseJson =
+                                    new FinnOppgaverResponseJson() {
 
                                         @Override
-                                        public List<OppgaveDto> getOppgaver() {
+                                        public List<FinnOppgaveResponseJson> getFinnOppgaveResponseJsons() {
 
-                                            if (super.getOppgaver() == null) {
-                                                final List<OppgaveDto> oppgaver = new ArrayList<>();
+                                            if (super.getFinnOppgaveResponseJsons() == null) {
+                                                final List<FinnOppgaveResponseJson> oppgaver = new ArrayList<>();
                                                 int counter = 0;
                                                 final Random random = new Random(889735);
 
                                                 while (counter++ < noOppgaverWanted) {
                                                     oppgaver.add(createOneOppgaveDto(random));
                                                 }
-                                                super.setOppgaver(oppgaver);
+                                                super.setFinnOppgaveResponseJsons(oppgaver);
                                                 super.setAntallTreffTotalt(oppgaver.size());
                                             }
-                                            return super.getOppgaver();
+                                            return super.getFinnOppgaveResponseJsons();
                                         }
 
                                         @Override
                                         public int getAntallTreffTotalt() {
-                                            this.getOppgaver(); // Guarantee that the oppgaver have been created
+                                            this.getFinnOppgaveResponseJsons(); // Guarantee that the oppgaver have been created
                                             return super.getAntallTreffTotalt();
                                         }
                                     };
@@ -443,7 +471,7 @@ class OppgaveRestClientTestUtils {
                             objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
 
                             final String oppgaveAsJsonString =
-                                    objectMapper.writeValueAsString(finnOppgaveResponse);
+                                    objectMapper.writeValueAsString(finnOppgaverResponseJson);
                             final InputStream oppgaveAsJsonStringInputStream =
                                     IOUtils.toInputStream(oppgaveAsJsonString, Charset.defaultCharset());
 
@@ -546,14 +574,14 @@ class OppgaveRestClientTestUtils {
                                 final ObjectMapper objectMapper = new ObjectMapper();
                                 objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
 
-                                final PatchOppgaverResponse patchOppgaverResponse = new PatchOppgaverResponse();
+                                final PatchOppgaverResponseJson patchOppgaverResponseJson = new PatchOppgaverResponseJson();
 
-                                patchOppgaverResponse.setFeilet(0);
-                                patchOppgaverResponse.setSuksess(1);
-                                patchOppgaverResponse.setTotalt(1);
+                                patchOppgaverResponseJson.setFeilet(0);
+                                patchOppgaverResponseJson.setSuksess(1);
+                                patchOppgaverResponseJson.setTotalt(1);
 
                                 final String patchOppgaverResponseAsJsonString =
-                                        objectMapper.writeValueAsString(patchOppgaverResponse);
+                                        objectMapper.writeValueAsString(patchOppgaverResponseJson);
                                 final InputStream patchOppgaverResponseAsJsonStringInputStream =
                                         IOUtils.toInputStream(patchOppgaverResponseAsJsonString, Charset.defaultCharset());
 

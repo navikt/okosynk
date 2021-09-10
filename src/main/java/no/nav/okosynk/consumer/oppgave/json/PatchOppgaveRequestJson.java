@@ -1,14 +1,14 @@
-package no.nav.okosynk.consumer.oppgave;
+package no.nav.okosynk.consumer.oppgave.json;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class PatchOppgave {
+public class PatchOppgaveRequestJson {
     private final Long id;
     private final Integer versjon;
     private final String beskrivelse;
 
-    public PatchOppgave(Integer versjon, Long id, String beskrivelse) {
+    public PatchOppgaveRequestJson(Integer versjon, Long id, String beskrivelse) {
         this.versjon = versjon;
         this.id = id;
         this.beskrivelse = beskrivelse;

@@ -43,6 +43,12 @@ public class OppgaveSynkroniserer {
         this.oppgaveRestClient = oppgaveRestClient;
     }
 
+    /**
+     * Extracts for creation oppgaver read frm the batch file that are not in the database
+     * @param alleOppgaverLestFraBatchen
+     * @param oppgaverLestFraDatabasen
+     * @return
+     */
     static Set<Oppgave> finnOppgaverSomSkalOpprettes(
             final Set<Oppgave> alleOppgaverLestFraBatchen,
             final Set<Oppgave> oppgaverLestFraDatabasen) {
@@ -53,6 +59,9 @@ public class OppgaveSynkroniserer {
         return oppgaverSomSkalOpprettes;
     }
 
+    /**
+     * Ekstraherer for ferdigstilling de som finnes i basen, men som ikke finnes i batchfila
+     */
     static Set<Oppgave> finnOppgaverSomSkalFerdigstilles(
             final Set<Oppgave> alleOppgaverLestFraBatchen,
             final Set<Oppgave> oppgaverLestFraDatabasen) {
@@ -63,6 +72,9 @@ public class OppgaveSynkroniserer {
         return oppgaverSomSkalFerdigstilles;
     }
 
+    /**
+     * Ekstraherer for oppdatering de som er lest fra batchfila og som også finnes i databasen
+     */
     static Set<OppgaveOppdatering> finnOppgaverSomSkalOppdateres(
             final Set<Oppgave> alleOppgaverLestFraBatchen,
             final Set<Oppgave> oppgaverLestFraDatabasen) {
@@ -77,10 +89,11 @@ public class OppgaveSynkroniserer {
         return alleOppgaverLestFraBatchen
                 .stream()
                 .filter(oppgaverLestFraDatabasenMap::containsKey)
-                .map(oppgaveLestFraBatchen ->
+                .map(oppgaveLestFraBatchenOgSomFinnesIDatabasesn ->
                         new OppgaveOppdatering(
-                                oppgaveLestFraBatchen,
-                                oppgaverLestFraDatabasenMap.get(oppgaveLestFraBatchen)
+                                oppgaveLestFraBatchenOgSomFinnesIDatabasesn,
+                                oppgaverLestFraDatabasenMap
+                                        .get(oppgaveLestFraBatchenOgSomFinnesIDatabasesn)
                         )
                 )
                 .collect(Collectors.toSet());

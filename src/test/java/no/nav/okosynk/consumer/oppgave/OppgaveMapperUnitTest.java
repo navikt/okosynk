@@ -1,5 +1,9 @@
 package no.nav.okosynk.consumer.oppgave;
 
+import no.nav.okosynk.consumer.oppgave.json.FinnOppgaveResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.IdentGruppeV2;
+import no.nav.okosynk.consumer.oppgave.json.IdentJson;
+import no.nav.okosynk.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.testutils.RandUt;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,12 +19,15 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class OppgaveMapperUnitTest {
@@ -159,7 +166,7 @@ public class OppgaveMapperUnitTest {
         return LocalDate.of(1970 + random.nextInt(52), 1 + random.nextInt(12), 1 + random.nextInt(28));
     }
 
-    private static String generateAktivDatoSAstring() {
+    private static String generateAktivDatoAstring() {
         final LocalDate aktivDato = generateAktivDato();
         return aktivDato.format(OppgaveMapperUnitTest.dateFormatter);
     }
@@ -193,9 +200,119 @@ public class OppgaveMapperUnitTest {
         );
     }
 
+    private static Stream<Arguments> provideDifferentCombinationsOfAktoerIdAndIdenter() {
+
+        final String expectedAktoerId1 = null;
+        final String expectedAktoerId2 = generateRandomAktoerId();
+        final Collection<IdentJson> identer1 = null;
+        final Collection<IdentJson> identer2;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, expectedAktoerId2 + "xxx");
+            identer.add(identJson1);
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, expectedAktoerId2 + "kjnbkjnbjkbjk");
+            identer.add(identJson2);
+            identer2 = identer;
+        }
+        final Collection<IdentJson> identer3;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, expectedAktoerId2 + "xxx");
+            identer.add(identJson1);
+            identer3 = identer;
+        }
+        final Collection<IdentJson> identer4;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, expectedAktoerId2 + "kjnbkjnbjkbjk");
+            identer.add(identJson2);
+            identer4 = identer;
+        }
+        final Collection<IdentJson> identer5;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, null);
+            identer.add(identJson1);
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, null);
+            identer.add(identJson2);
+            identer5 = identer;
+        }
+        final Collection<IdentJson> identer6;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, null);
+            identer.add(identJson1);
+            identer6 = identer;
+        }
+        final Collection<IdentJson> identer7;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, null);
+            identer.add(identJson2);
+            identer7 = identer;
+        }
+        final Collection<IdentJson> identer8;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            identer8 = identer;
+        }
+        final Collection<IdentJson> identer9;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, null);
+            identer.add(identJson1);
+            final IdentJson identJson2 = null;
+            identer.add(identJson2);
+            identer9 = identer;
+        }
+        final Collection<IdentJson> identer10;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = null;
+            identer.add(identJson1);
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, null);
+            identer.add(identJson2);
+            identer10 = identer;
+        }
+        final Collection<IdentJson> identer11;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, null);
+            identer.add(identJson1);
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, expectedAktoerId2 + "kjnbkjnbjkbjk");
+            identer.add(identJson2);
+            identer11 = identer;
+        }
+        final Collection<IdentJson> identer12;
+        {
+            final Collection<IdentJson> identer = new ArrayList<>();
+            final IdentJson identJson1 = new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, expectedAktoerId2 + "xyz");
+            identer.add(identJson1);
+            final IdentJson identJson2 = new IdentJson(IdentGruppeV2.AKTOERID, null);
+            identer.add(identJson2);
+            identer12 = identer;
+        }
+
+        return Stream.of(
+                Arguments.of(expectedAktoerId1, identer1, expectedAktoerId1, identer1),
+                Arguments.of(expectedAktoerId2, identer1, expectedAktoerId2, identer1),
+                Arguments.of(expectedAktoerId2, identer2, expectedAktoerId2, expectedAktoerId2 + "xxx"),
+                Arguments.of(expectedAktoerId2, identer3, expectedAktoerId2, expectedAktoerId2 + "xxx"),
+                Arguments.of(expectedAktoerId2, identer4, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer5, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer6, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer7, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer8, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer9, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer10, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer11, expectedAktoerId2, null),
+                Arguments.of(expectedAktoerId2, identer12, expectedAktoerId2, expectedAktoerId2 + "xyz")
+        );
+    }
+
     @ParameterizedTest
     @ValueSource(chars = {'A', 'B', 'N', 'O', 'S'})
-    void when_mapping_from_oppgave_to_oppgaveDto_then_all_fields_should_have_expected_values(final char aktorType) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
+    void when_mapping_from_oppgave_to_PostOppgaveRequestJson_then_all_fields_should_have_expected_values(final char aktorType) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -224,40 +341,40 @@ public class OppgaveMapperUnitTest {
                         .withVersjon(OppgaveMapperUnitTest.generateRandomVersjon())
                         .build();
 
-        final OppgaveDto actualOppgaveDto = OppgaveMapper.map(expectedOppgave);
+        final PostOppgaveRequestJson actualPostOppgaveRequestJson = OppgaveMapper.map(expectedOppgave);
 
-        assertEquals(OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE, actualOppgaveDto.getOpprettetAvEnhetsnr(), "opprettetAvEnhetsnr");
-        assertEquals(expectedOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), actualOppgaveDto.getAktivDato(), "aktivFra");
-        assertEquals(expectedOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter), actualOppgaveDto.getFristFerdigstillelse(), "fristFerdigstillelse");
-        assertEquals(expectedOppgave.aktoerId, actualOppgaveDto.getAktoerId(), "aktoerId");
-        assertEquals(expectedOppgave.ansvarligEnhetId, actualOppgaveDto.getTildeltEnhetsnr(), "tildeltEnhetsnr");
-        assertEquals(expectedOppgave.behandlingstema, actualOppgaveDto.getBehandlingstema(), "behandlingstema");
-        assertEquals(expectedOppgave.behandlingstype, actualOppgaveDto.getBehandlingstype(), "behandlingstype");
-        assertEquals(expectedOppgave.beskrivelse, actualOppgaveDto.getBeskrivelse(), "beskrivelse");
-        assertEquals(expectedOppgave.bnr, actualOppgaveDto.getBnr(), "bnr");
-        assertEquals(expectedOppgave.navPersonIdent, actualOppgaveDto.getNavPersonIdent(), "navPersonIdent");
-        assertEquals(expectedOppgave.oppgavetypeKode, actualOppgaveDto.getOppgavetype(), "oppgavetypeKode");
-        assertEquals(expectedOppgave.orgnr, actualOppgaveDto.getOrgnr(), "orgnr");
-        assertEquals(expectedOppgave.prioritetKode, actualOppgaveDto.getPrioritet(), "prioritetKode");
-        assertEquals(expectedOppgave.samhandlernr, actualOppgaveDto.getSamhandlernr(), "samhandlernr");
+        assertEquals(OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE, actualPostOppgaveRequestJson.getOpprettetAvEnhetsnr(), "opprettetAvEnhetsnr");
+        assertEquals(expectedOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), actualPostOppgaveRequestJson.getAktivDato(), "aktivFra");
+        assertEquals(expectedOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter), actualPostOppgaveRequestJson.getFristFerdigstillelse(), "fristFerdigstillelse");
+        assertEquals(expectedOppgave.aktoerId, actualPostOppgaveRequestJson.getAktoerId(), "aktoerId");
+        assertEquals(expectedOppgave.ansvarligEnhetId, actualPostOppgaveRequestJson.getTildeltEnhetsnr(), "tildeltEnhetsnr");
+        assertEquals(expectedOppgave.behandlingstema, actualPostOppgaveRequestJson.getBehandlingstema(), "behandlingstema");
+        assertEquals(expectedOppgave.behandlingstype, actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
+        assertEquals(expectedOppgave.beskrivelse, actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
+        assertEquals(expectedOppgave.bnr, actualPostOppgaveRequestJson.getBnr(), "bnr");
+        assertEquals(expectedOppgave.navPersonIdent, actualPostOppgaveRequestJson.getNavPersonIdent(), "navPersonIdent");
+        assertEquals(expectedOppgave.oppgavetypeKode, actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
+        assertEquals(expectedOppgave.orgnr, actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
+        assertEquals(expectedOppgave.prioritetKode, actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");
+        assertEquals(expectedOppgave.samhandlernr, actualPostOppgaveRequestJson.getSamhandlernr(), "samhandlernr");
 
-        assertEquals(null, actualOppgaveDto.getBehandlesAvApplikasjon(), "behandlesAvApplikasjon");
-        assertEquals(null, actualOppgaveDto.getEndretAv(), "endretAv");
-        assertEquals(null, actualOppgaveDto.getEndretAvEnhetsnr(), "endretAvEnhetsnr");
-        assertEquals(null, actualOppgaveDto.getEndretTidspunkt(), "endretTidspunkt");
-        assertEquals(null, actualOppgaveDto.getFerdigstiltTidspunkt(), "ferdigstiltTidspunkt");
-        assertEquals(null, actualOppgaveDto.getId(), "id");
-        assertEquals(null, actualOppgaveDto.getJournalpostId(), "journalpostId");
-        assertEquals(null, actualOppgaveDto.getJournalpostkilde(), "journalpostkilde");
-        assertEquals(null, actualOppgaveDto.getMappeId(), "mappeId");
-        assertEquals(null, actualOppgaveDto.getMetadata(), "metadata");
-        assertEquals(null, actualOppgaveDto.getOpprettetAv(), "opprettetAv");
-        assertEquals(null, actualOppgaveDto.getOpprettetTidspunkt(), "opprettetTidspunkt");
-        assertEquals(null, actualOppgaveDto.getSaksreferanse(), "saksreferanse");
-        assertEquals(null, actualOppgaveDto.getStatus(), "status");
-        assertEquals(null, actualOppgaveDto.getStatus(), "status");
-        assertEquals(null, actualOppgaveDto.getTilordnetRessurs(), "tilordnetRessurs");
-        assertEquals(null, actualOppgaveDto.getVersjon(), "versjon");
+        assertEquals(null, actualPostOppgaveRequestJson.getBehandlesAvApplikasjon(), "behandlesAvApplikasjon");
+        assertEquals(null, actualPostOppgaveRequestJson.getEndretAv(), "endretAv");
+        assertEquals(null, actualPostOppgaveRequestJson.getEndretAvEnhetsnr(), "endretAvEnhetsnr");
+        assertEquals(null, actualPostOppgaveRequestJson.getEndretTidspunkt(), "endretTidspunkt");
+        assertEquals(null, actualPostOppgaveRequestJson.getFerdigstiltTidspunkt(), "ferdigstiltTidspunkt");
+        assertEquals(null, actualPostOppgaveRequestJson.getId(), "id");
+        assertEquals(null, actualPostOppgaveRequestJson.getJournalpostId(), "journalpostId");
+        assertEquals(null, actualPostOppgaveRequestJson.getJournalpostkilde(), "journalpostkilde");
+        assertEquals(null, actualPostOppgaveRequestJson.getMappeId(), "mappeId");
+        assertEquals(null, actualPostOppgaveRequestJson.getMetadata(), "metadata");
+        assertEquals(null, actualPostOppgaveRequestJson.getOpprettetAv(), "opprettetAv");
+        assertEquals(null, actualPostOppgaveRequestJson.getOpprettetTidspunkt(), "opprettetTidspunkt");
+        assertEquals(null, actualPostOppgaveRequestJson.getSaksreferanse(), "saksreferanse");
+        assertEquals(null, actualPostOppgaveRequestJson.getStatus(), "status");
+        assertEquals(null, actualPostOppgaveRequestJson.getStatus(), "status");
+        assertEquals(null, actualPostOppgaveRequestJson.getTilordnetRessurs(), "tilordnetRessurs");
+        assertEquals(null, actualPostOppgaveRequestJson.getVersjon(), "versjon");
     }
 
     @ParameterizedTest
@@ -297,7 +414,7 @@ public class OppgaveMapperUnitTest {
 
     @ParameterizedTest
     @MethodSource("provideOppgaveDtoToOppgaveParms")
-    void when_mapping_from_oppgaveDto_to_oppgave_then_all_fields_should_have_expected_values(
+    void when_mapping_from_FinnOppgaveResponseJson_to_oppgave_then_all_fields_should_have_expected_values(
             final OppgaveStatus oppgaveStatus,
             final LocalDateTime opprettetTidspunkt,
             final LocalDateTime endretTidspunkt
@@ -305,49 +422,74 @@ public class OppgaveMapperUnitTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final OppgaveDto expectedOppgaveDto = new OppgaveDto();
+        final FinnOppgaveResponseJson expectedFinnOppgaveResponseJson = new FinnOppgaveResponseJson();
 
-        expectedOppgaveDto.setAktivDato(OppgaveMapperUnitTest.generateAktivDatoSAstring());
-        expectedOppgaveDto.setAktoerId(OppgaveMapperUnitTest.generateRandomAktoerId());
-        expectedOppgaveDto.setBehandlingstema(OppgaveMapperUnitTest.generateRandomBehandlingstema());
-        expectedOppgaveDto.setBehandlingstype(OppgaveMapperUnitTest.generateRandomBehandlingstype());
-        expectedOppgaveDto.setBeskrivelse(OppgaveMapperUnitTest.generateRandomBeskrivelse());
-        expectedOppgaveDto.setBnr(OppgaveMapperUnitTest.generateRandomBnr());
-        expectedOppgaveDto.setEndretTidspunkt(OppgaveMapperUnitTest.convertLocalDateTimeToZonedDateTime(endretTidspunkt));
-        expectedOppgaveDto.setFristFerdigstillelse(OppgaveMapperUnitTest.generateAktivTilDatoAstring());
-        expectedOppgaveDto.setId(OppgaveMapperUnitTest.generateRandomId());
-        expectedOppgaveDto.setMappeId(OppgaveMapperUnitTest.generateRandomMappeId());
-        expectedOppgaveDto.setOppgavetype(OppgaveMapperUnitTest.generateRandomOppgavetype());
-        expectedOppgaveDto.setOpprettetTidspunkt(OppgaveMapperUnitTest.convertLocalDateTimeToZonedDateTime(opprettetTidspunkt));
-        expectedOppgaveDto.setOrgnr(OppgaveMapperUnitTest.generateRandomOrgnr());
-        expectedOppgaveDto.setPrioritet(OppgaveMapperUnitTest.generateRandomPrioritet());
-        expectedOppgaveDto.setSamhandlernr(OppgaveMapperUnitTest.generateRandomSamhandlernr());
-        expectedOppgaveDto.setStatus(oppgaveStatus);
-        expectedOppgaveDto.setTema(OppgaveMapperUnitTest.generateRandomTema());
-        expectedOppgaveDto.setTildeltEnhetsnr(OppgaveMapperUnitTest.generateRandomTildeltEnhetsnr());
-        expectedOppgaveDto.setTilordnetRessurs(OppgaveMapperUnitTest.generateRandomTilordnetRessurs());
-        expectedOppgaveDto.setVersjon(OppgaveMapperUnitTest.generateRandomVersjon());
+        expectedFinnOppgaveResponseJson.setAktivDato(OppgaveMapperUnitTest.generateAktivDatoAstring());
+        expectedFinnOppgaveResponseJson.setBehandlingstema(OppgaveMapperUnitTest.generateRandomBehandlingstema());
+        expectedFinnOppgaveResponseJson.setBehandlingstype(OppgaveMapperUnitTest.generateRandomBehandlingstype());
+        expectedFinnOppgaveResponseJson.setBeskrivelse(OppgaveMapperUnitTest.generateRandomBeskrivelse());
+        expectedFinnOppgaveResponseJson.setEndretTidspunkt(OppgaveMapperUnitTest.convertLocalDateTimeToZonedDateTime(endretTidspunkt));
+        expectedFinnOppgaveResponseJson.setFristFerdigstillelse(OppgaveMapperUnitTest.generateAktivTilDatoAstring());
+        expectedFinnOppgaveResponseJson.setId(OppgaveMapperUnitTest.generateRandomId());
+        expectedFinnOppgaveResponseJson.setMappeId(OppgaveMapperUnitTest.generateRandomMappeId());
+        expectedFinnOppgaveResponseJson.setOppgavetype(OppgaveMapperUnitTest.generateRandomOppgavetype());
+        expectedFinnOppgaveResponseJson.setOpprettetTidspunkt(OppgaveMapperUnitTest.convertLocalDateTimeToZonedDateTime(opprettetTidspunkt));
+        expectedFinnOppgaveResponseJson.setPrioritet(OppgaveMapperUnitTest.generateRandomPrioritet());
+        ;
+        expectedFinnOppgaveResponseJson.setStatus(oppgaveStatus);
+        expectedFinnOppgaveResponseJson.setTema(OppgaveMapperUnitTest.generateRandomTema());
+        expectedFinnOppgaveResponseJson.setTildeltEnhetsnr(OppgaveMapperUnitTest.generateRandomTildeltEnhetsnr());
+        expectedFinnOppgaveResponseJson.setTilordnetRessurs(OppgaveMapperUnitTest.generateRandomTilordnetRessurs());
+        expectedFinnOppgaveResponseJson.setVersjon(OppgaveMapperUnitTest.generateRandomVersjon());
 
-        final Oppgave actualOppgave = OppgaveMapper.map(expectedOppgaveDto);
+        expectedFinnOppgaveResponseJson.setIdenter(null);
+        expectedFinnOppgaveResponseJson.setAktoerId(OppgaveMapperUnitTest.generateRandomAktoerId());
+        expectedFinnOppgaveResponseJson.setBnr(OppgaveMapperUnitTest.generateRandomBnr());
+        expectedFinnOppgaveResponseJson.setOrgnr(OppgaveMapperUnitTest.generateRandomOrgnr());
+        expectedFinnOppgaveResponseJson.setSamhandlernr(OppgaveMapperUnitTest.generateRandomSamhandlernr());
 
-        assertEquals(expectedOppgaveDto.getAktivDato(), actualOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), "aktivDato");
-        assertEquals(expectedOppgaveDto.getAktoerId(), actualOppgave.aktoerId, "aktoerId");
-        assertEquals(expectedOppgaveDto.getBehandlingstema(), actualOppgave.behandlingstema, "behandlingstema");
-        assertEquals(expectedOppgaveDto.getBehandlingstype(), actualOppgave.behandlingstype, "behandlingstype");
-        assertEquals(expectedOppgaveDto.getBeskrivelse(), actualOppgave.beskrivelse, "beskrivelse");
-        assertEquals(expectedOppgaveDto.getBnr(), actualOppgave.bnr, "bnr");
-        assertEquals(expectedOppgaveDto.getEndretTidspunkt() == null ? expectedOppgaveDto.getOpprettetTidspunkt() : expectedOppgaveDto.getEndretTidspunkt(), actualOppgave.sistEndret, "sistEndret - endretTidspunkt");
-        assertEquals(expectedOppgaveDto.getFristFerdigstillelse(), actualOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter), "fristFerdigstillelse");
-        assertEquals(expectedOppgaveDto.getId(), actualOppgave.oppgaveId, "oppgaveId");
-        assertEquals(expectedOppgaveDto.getMappeId(), actualOppgave.mappeId, "mappeId");
-        assertEquals(expectedOppgaveDto.getOppgavetype(), actualOppgave.oppgavetypeKode, "oppgavetype");
-        assertEquals(expectedOppgaveDto.getOrgnr(), actualOppgave.orgnr, "orgnr");
-        assertEquals(expectedOppgaveDto.getPrioritet(), actualOppgave.prioritetKode, "prioritetKode");
-        assertEquals(expectedOppgaveDto.getSamhandlernr(), actualOppgave.samhandlernr, "samhandlernr");
-        assertEquals(expectedOppgaveDto.getStatus() != OppgaveStatus.OPPRETTET, actualOppgave.lest, "lest");
-        assertEquals(expectedOppgaveDto.getTema(), actualOppgave.fagomradeKode, "tema - fagomradeKode");
-        assertEquals(expectedOppgaveDto.getTildeltEnhetsnr(), actualOppgave.ansvarligEnhetId, "ansvarligEnhetId");
-        assertEquals(expectedOppgaveDto.getTilordnetRessurs(), actualOppgave.ansvarligSaksbehandlerIdent, "ansvarligSaksbehandlerIdent");
-        assertEquals(expectedOppgaveDto.getVersjon(), actualOppgave.versjon, "versjon");
+        final Oppgave actualOppgave = OppgaveMapper.map(expectedFinnOppgaveResponseJson);
+
+        assertEquals(expectedFinnOppgaveResponseJson.getAktivDato(), actualOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), "aktivDato");
+        assertEquals(expectedFinnOppgaveResponseJson.getBehandlingstema(), actualOppgave.behandlingstema, "behandlingstema");
+        assertEquals(expectedFinnOppgaveResponseJson.getBehandlingstype(), actualOppgave.behandlingstype, "behandlingstype");
+        assertEquals(expectedFinnOppgaveResponseJson.getBeskrivelse(), actualOppgave.beskrivelse, "beskrivelse");
+        assertEquals(expectedFinnOppgaveResponseJson.getEndretTidspunkt() == null ? expectedFinnOppgaveResponseJson.getOpprettetTidspunkt() : expectedFinnOppgaveResponseJson.getEndretTidspunkt(), actualOppgave.sistEndret, "sistEndret - endretTidspunkt");
+        assertEquals(expectedFinnOppgaveResponseJson.getFristFerdigstillelse(), actualOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter), "fristFerdigstillelse");
+        assertEquals(expectedFinnOppgaveResponseJson.getId(), actualOppgave.oppgaveId, "oppgaveId");
+        assertEquals(expectedFinnOppgaveResponseJson.getMappeId(), actualOppgave.mappeId, "mappeId");
+        assertEquals(expectedFinnOppgaveResponseJson.getOppgavetype(), actualOppgave.oppgavetypeKode, "oppgavetype");
+        assertEquals(expectedFinnOppgaveResponseJson.getPrioritet(), actualOppgave.prioritetKode, "prioritetKode");
+        assertEquals(expectedFinnOppgaveResponseJson.getStatus() != OppgaveStatus.OPPRETTET, actualOppgave.lest, "lest");
+        assertEquals(expectedFinnOppgaveResponseJson.getTema(), actualOppgave.fagomradeKode, "tema - fagomradeKode");
+        assertEquals(expectedFinnOppgaveResponseJson.getTildeltEnhetsnr(), actualOppgave.ansvarligEnhetId, "ansvarligEnhetId");
+        assertEquals(expectedFinnOppgaveResponseJson.getTilordnetRessurs(), actualOppgave.ansvarligSaksbehandlerIdent, "ansvarligSaksbehandlerIdent");
+        assertEquals(expectedFinnOppgaveResponseJson.getVersjon(), actualOppgave.versjon, "versjon");
+
+        assertNull(actualOppgave.navPersonIdent, "navPersonIdent");
+        assertEquals(expectedFinnOppgaveResponseJson.getAktoerId(), actualOppgave.aktoerId, "aktoerId");
+        assertEquals(expectedFinnOppgaveResponseJson.getBnr(), actualOppgave.bnr, "bnr");
+        assertEquals(expectedFinnOppgaveResponseJson.getOrgnr(), actualOppgave.orgnr, "orgnr");
+        assertEquals(expectedFinnOppgaveResponseJson.getSamhandlernr(), actualOppgave.samhandlernr, "samhandlernr");
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDifferentCombinationsOfAktoerIdAndIdenter")
+    void when_FinnOppgaveResponseJson_contains_different_values_for_aktoerId_and_identer_then_the_mapping_should_set_or_not_set_the_navPersonIdent_accordingly(
+            final String aktoerId,
+            final Collection<IdentJson> identer,
+            final String expectedAktoerId,
+            final String expectedNavPersonIdent
+    ) {
+        final FinnOppgaveResponseJson expectedFinnOppgaveResponseJson = new FinnOppgaveResponseJson();
+        expectedFinnOppgaveResponseJson.setVersjon(131); // Integer/int type of problem, although it is irrelevant for this test
+
+        expectedFinnOppgaveResponseJson.setAktoerId(aktoerId);
+        expectedFinnOppgaveResponseJson.setIdenter(identer);
+
+        final Oppgave actualOppgave = OppgaveMapper.map(expectedFinnOppgaveResponseJson);
+
+        assertEquals(expectedAktoerId, actualOppgave.aktoerId, "aktoerId");
+        assertEquals(expectedNavPersonIdent, actualOppgave.navPersonIdent, "navPersonIdent");
     }
 }

@@ -6,8 +6,12 @@ import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.Oppgave;
+import no.nav.okosynk.domain.OppgaveTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -19,7 +23,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -39,6 +45,9 @@ class OppgaveSynkronisererTest {
             LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
+
+    private static final Random random = new Random(18766876876L);
+
     private static final Constants.BATCH_TYPE BATCH_TYPE = Constants.BATCH_TYPE.OS;
     private static final String OPPGAVEID_GSAK = "185587300";
     private static final String OPPGAVEID = "185587998";
@@ -51,6 +60,12 @@ class OppgaveSynkronisererTest {
     private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
     private OppgaveRestClient mockedOppgaveRestClient;
     private BatchStatus batchStatus;
+
+    private static Stream<Arguments> provideEqualsRelatedValuesForOppgave() {
+        return OppgaveTest.provideEqualsRelatedValuesForOppgave();
+    }
+
+    // =========================================================================
 
     @BeforeEach
     void setUp() {
@@ -124,8 +139,6 @@ class OppgaveSynkronisererTest {
 //
 //        // =====================================================================
     }
-
-    // =========================================================================
 
     @Test
     void when_the_batch_is_started_when_synchronize_is_called_then_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() {
@@ -359,7 +372,185 @@ class OppgaveSynkronisererTest {
         verify(this.mockedOppgaveRestClient, times(1)).patchOppgaver(anySet(), anyBoolean());
     }
 
-    // =========================================================================
+    @ParameterizedTest
+    @MethodSource("provideEqualsRelatedValuesForOppgave")
+    void when_finnOppgaverSomSkalFerdigstilles_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(
+            final String behandlingstema_batch,
+            final String behandlingstype_batch,
+            final String ansvarligEnhetId_batch,
+            final String aktoerId_batch,
+            final String navPersonIdent_batch,
+            final String bnr_batch,
+            final String orgnr_batch,
+            final String samhandlernr_batch,
+
+            final String behandlingstema_db,
+            final String behandlingstype_db,
+            final String ansvarligEnhetId_db,
+            final String aktoerId_db,
+            final String navPersonIdent_db,
+            final String bnr_db,
+            final String orgnr_db,
+            final String samhandlernr_db,
+
+            final boolean shouldEqual
+    ) {
+        final int expectedNumberOfOppgaverSomSkalFerdigStilles = (shouldEqual ? 0 : 1);
+
+        final Oppgave oppgaveLestFraBatchen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_batch)
+                        .withBehandlingstype(behandlingstype_batch)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_batch)
+                        .withAktoerId(aktoerId_batch)
+                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withBnr(bnr_batch)
+                        .withOrgnr(orgnr_batch)
+                        .withSamhandlernr(samhandlernr_batch)
+                        .build();
+        final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
+        alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
+
+        final Oppgave oppgaveLestFraDatabasen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_db)
+                        .withBehandlingstype(behandlingstype_db)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_db)
+                        .withAktoerId(aktoerId_db)
+                        .withNavPersonIdent(navPersonIdent_db)
+                        .withBnr(bnr_db)
+                        .withOrgnr(orgnr_db)
+                        .withSamhandlernr(samhandlernr_db)
+                        .build();
+        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+        oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
+
+        final Set<Oppgave> oppgaverSomSkalFerdigstilles =
+                OppgaveSynkroniserer
+                        .finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+
+        assertEquals(expectedNumberOfOppgaverSomSkalFerdigStilles, oppgaverSomSkalFerdigstilles.size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEqualsRelatedValuesForOppgave")
+    void when_finnOppgaverSomSkalOppdateres_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(
+            final String behandlingstema_batch,
+            final String behandlingstype_batch,
+            final String ansvarligEnhetId_batch,
+            final String aktoerId_batch,
+            final String navPersonIdent_batch,
+            final String bnr_batch,
+            final String orgnr_batch,
+            final String samhandlernr_batch,
+
+            final String behandlingstema_db,
+            final String behandlingstype_db,
+            final String ansvarligEnhetId_db,
+            final String aktoerId_db,
+            final String navPersonIdent_db,
+            final String bnr_db,
+            final String orgnr_db,
+            final String samhandlernr_db,
+
+            final boolean shouldEqual
+    ) {
+        final int expectedNumberOfOppgaverSomSkalOppdateres = (shouldEqual ? 1 : 0);
+
+        final Oppgave oppgaveLestFraBatchen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_batch)
+                        .withBehandlingstype(behandlingstype_batch)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_batch)
+                        .withAktoerId(aktoerId_batch)
+                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withBnr(bnr_batch)
+                        .withOrgnr(orgnr_batch)
+                        .withSamhandlernr(samhandlernr_batch)
+                        .build();
+        final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
+        alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
+
+        final Oppgave oppgaveLestFraDatabasen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_db)
+                        .withBehandlingstype(behandlingstype_db)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_db)
+                        .withAktoerId(aktoerId_db)
+                        .withNavPersonIdent(navPersonIdent_db)
+                        .withBnr(bnr_db)
+                        .withOrgnr(orgnr_db)
+                        .withSamhandlernr(samhandlernr_db)
+                        .build();
+        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+        oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
+
+        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaverSomSkalOppdateres =
+                OppgaveSynkroniserer
+                        .finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+
+        assertEquals(expectedNumberOfOppgaverSomSkalOppdateres, oppgaverSomSkalOppdateres.size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEqualsRelatedValuesForOppgave")
+    void when_finnOppgaverSomSkalOpprettes_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(
+            final String behandlingstema_batch,
+            final String behandlingstype_batch,
+            final String ansvarligEnhetId_batch,
+            final String aktoerId_batch,
+            final String navPersonIdent_batch,
+            final String bnr_batch,
+            final String orgnr_batch,
+            final String samhandlernr_batch,
+
+            final String behandlingstema_db,
+            final String behandlingstype_db,
+            final String ansvarligEnhetId_db,
+            final String aktoerId_db,
+            final String navPersonIdent_db,
+            final String bnr_db,
+            final String orgnr_db,
+            final String samhandlernr_db,
+
+            final boolean shouldEqual
+    ) {
+        final int expectedNumberOfOppgaverSomSkalOppdateres = (shouldEqual ? 0 : 1);
+
+        final Oppgave oppgaveLestFraBatchen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_batch)
+                        .withBehandlingstype(behandlingstype_batch)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_batch)
+                        .withAktoerId(aktoerId_batch)
+                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withBnr(bnr_batch)
+                        .withOrgnr(orgnr_batch)
+                        .withSamhandlernr(samhandlernr_batch)
+                        .build();
+        final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
+        alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
+
+        final Oppgave oppgaveLestFraDatabasen =
+                OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                        .withBehandlingstema(behandlingstema_db)
+                        .withBehandlingstype(behandlingstype_db)
+                        .withAnsvarligEnhetId(ansvarligEnhetId_db)
+                        .withAktoerId(aktoerId_db)
+                        .withNavPersonIdent(navPersonIdent_db)
+                        .withBnr(bnr_db)
+                        .withOrgnr(orgnr_db)
+                        .withSamhandlernr(samhandlernr_db)
+                        .build();
+        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+        oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
+
+        final Set<Oppgave> oppgaverSomSkalOpprettes =
+                OppgaveSynkroniserer
+                        .finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+
+        assertEquals(expectedNumberOfOppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes.size());
+    }
 
     BatchStatus getBatchStatus() {
         return this.batchStatus;

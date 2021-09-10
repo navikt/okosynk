@@ -1,4 +1,4 @@
-package no.nav.okosynk.consumer.oppgave;
+package no.nav.okosynk.consumer.oppgave.json;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -6,13 +6,13 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.util.List;
 import java.util.Map;
 
-public class PatchOppgaverResponse {
+public class    PatchOppgaverResponseJson {
     private Integer feilet;
     private Integer suksess;
     private Integer totalt;
     private Map<String, List<Long>> data;
 
-    public PatchOppgaverResponse() {
+    public PatchOppgaverResponseJson() {
         //JAX-RS
     }
 

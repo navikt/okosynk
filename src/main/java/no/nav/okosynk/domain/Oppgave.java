@@ -69,27 +69,57 @@ public class Oppgave {
             return false;
         }
         Oppgave other = (Oppgave) o;
-        return Objects.equals(this.aktoerId, other.aktoerId)
-                &&
-                Objects.equals(this.navPersonIdent, other.navPersonIdent)
-                &&
-                Objects.equals(this.samhandlernr, other.samhandlernr)
-                &&
-                Objects.equals(this.orgnr, other.orgnr)
-                &&
-                Objects.equals(this.bnr, other.bnr)
-                &&
-                Objects.equals(this.behandlingstema, other.behandlingstema)
+        return Objects.equals(this.behandlingstema, other.behandlingstema)
                 &&
                 Objects.equals(this.behandlingstype, other.behandlingstype)
                 &&
-                Objects.equals(this.ansvarligEnhetId, other.ansvarligEnhetId);
+                Objects.equals(this.ansvarligEnhetId, other.ansvarligEnhetId)
+                &&
+                (
+                        (
+                                this.aktoerId == null && other.aktoerId == null
+                                &&
+                                Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                        )
+                        ||
+                        (
+                                Objects.equals(this.aktoerId, other.aktoerId)
+                                &&
+                                this.navPersonIdent == null && other.navPersonIdent == null
+                        )
+                        ||
+                        (
+
+                                !(this.aktoerId == null && other.aktoerId == null)
+                                &&
+                                !(this.navPersonIdent == null && other.navPersonIdent == null)
+                                &&
+                                (
+                                        Objects.equals(this.aktoerId, other.aktoerId)
+                                        ||
+                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                )
+                        )
+                )
+                &&
+                Objects.equals(this.bnr, other.bnr)
+                &&
+                Objects.equals(this.orgnr, other.orgnr)
+                &&
+                Objects.equals(this.samhandlernr, other.samhandlernr)
+                ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(aktoerId, samhandlernr, orgnr, bnr, behandlingstema, behandlingstype,
-                ansvarligEnhetId);
+        return Objects.hash(
+                behandlingstema,
+                behandlingstype,
+                ansvarligEnhetId,
+                bnr,
+                orgnr,
+                samhandlernr
+        );
     }
 
     @Override

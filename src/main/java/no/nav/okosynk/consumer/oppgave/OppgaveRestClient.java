@@ -2,12 +2,17 @@ package no.nav.okosynk.consumer.oppgave;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.oppgave.json.FinnOppgaverResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.PatchOppgaverResponseJson;
+import no.nav.okosynk.consumer.oppgave.json.PostOppgaveRequestJson;
+import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
 import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.apache.http.HttpEntity;
@@ -82,7 +87,7 @@ public class OppgaveRestClient {
     private static void addCorrelationIdToRequest(final AbstractHttpMessage request) {
         final String correlationIdString = UUID.randomUUID().toString();
         request.addHeader(X_CORRELATION_ID_HEADER_KEY, correlationIdString);
-        log.info("Added " + X_CORRELATION_ID_HEADER_KEY + " to request: " + correlationIdString);
+        log.debug("Added " + X_CORRELATION_ID_HEADER_KEY + " to request: " + correlationIdString);
     }
 
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
@@ -110,8 +115,8 @@ public class OppgaveRestClient {
     }
 
     private static int summerAntallFraResponse(
-            final List<PatchOppgaverResponse> responses,
-            final ToIntFunction<PatchOppgaverResponse> function) {
+            final List<PatchOppgaverResponseJson> responses,
+            final ToIntFunction<PatchOppgaverResponseJson> function) {
         return responses.stream()
                 .mapToInt(function)
                 .reduce(Integer::sum)
@@ -163,9 +168,9 @@ public class OppgaveRestClient {
                 );
 
         final ObjectMapper objectMapper = new ObjectMapper();
-        final List<OppgaveDto> oppgaverSomErOpprettet = new ArrayList<>();
-        final List<OppgaveDto> oppgaverSomIkkeErOpprettet = new ArrayList<>();
-        final List<OppgaveDto> oppgaveDtos =
+        final List<PostOppgaveResponseJson> oppgaverSomErOpprettet = new ArrayList<>();
+        final List<PostOppgaveRequestJson> oppgaverSomIkkeErOpprettet = new ArrayList<>();
+        final List<PostOppgaveRequestJson> postOppgaveRequestJsons =
                 oppgaver.stream()
                         .map(
                                 (oppgave) ->
@@ -179,15 +184,15 @@ public class OppgaveRestClient {
                         )
                         .collect(Collectors.toList());
 
-        oppgaveDtos.forEach(dto -> {
-            final String dtoAsJsonString;
+        postOppgaveRequestJsons.forEach(postOppgaveRequestJson -> {
+            final String oppgaveJsonString;
             try {
-                dtoAsJsonString = objectMapper.writeValueAsString(dto);
+                oppgaveJsonString = objectMapper.writeValueAsString(postOppgaveRequestJson);
             } catch (JsonProcessingException e) {
                 throw new IllegalStateException(
                         "Klarte ikke serialisere oppgave i forkant av POST mot Oppgave", e);
             }
-            request.setEntity(new StringEntity(dtoAsJsonString, "UTF-8"));
+            request.setEntity(new StringEntity(oppgaveJsonString, "UTF-8"));
 
             try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
                 final StatusLine statusLine = response.getStatusLine();
@@ -198,14 +203,14 @@ public class OppgaveRestClient {
                                 objectMapper
                                         .readValue(response.getEntity().getContent(), ErrorResponse.class);
                     } catch (JsonParseException jpe) {
-                        parseRawError(response);
+                        parseRawErrorAndThrow(response);
                     }
-                    log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}", dto,
+                    log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}", postOppgaveRequestJson,
                             errorResponse);
-                    oppgaverSomIkkeErOpprettet.add(dto);
+                    oppgaverSomIkkeErOpprettet.add(postOppgaveRequestJson);
                 } else {
                     oppgaverSomErOpprettet.add(
-                            objectMapper.readValue(response.getEntity().getContent(), OppgaveDto.class));
+                            objectMapper.readValue(response.getEntity().getContent(), PostOppgaveResponseJson.class));
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
@@ -248,22 +253,22 @@ public class OppgaveRestClient {
                         getUsernamePasswordCredentials(),
                         this.azureAdAuthenticationClient);
 
-        final List<List<Oppgave>> oppgaverLister =
+        final List<List<Oppgave>> oppgaveLister =
                 delOppListe(new ArrayList<>(oppgaver), 500);
 
         log.info(
                 "Starter patching av oppgaver, sublistestørrelse: "
                         + "{}, antall sublister {}, antall oppgaver totalt: {}",
-                500, oppgaverLister.size(), oppgaver.size());
-        final List<PatchOppgaverResponse> responses =
-                oppgaverLister.stream()
-                        .map(list -> patchOppgaver(list, ferdigstill, request))
+                500, oppgaveLister.size(), oppgaver.size());
+        final List<PatchOppgaverResponseJson> responses =
+                oppgaveLister.stream()
+                        .map(oppgaveListe -> patchOppgaver(oppgaveListe, ferdigstill, request))
                         .collect(Collectors.toList());
 
         final int suksess =
-                summerAntallFraResponse(responses, PatchOppgaverResponse::getSuksess);
+                summerAntallFraResponse(responses, PatchOppgaverResponseJson::getSuksess);
         final int feilet =
-                summerAntallFraResponse(responses, PatchOppgaverResponse::getFeilet);
+                summerAntallFraResponse(responses, PatchOppgaverResponseJson::getFeilet);
 
         if (ferdigstill) {
             return ConsumerStatistics
@@ -294,22 +299,24 @@ public class OppgaveRestClient {
                         {
                             int offset = 0;
                             log.info("Starter søk i og evt. inkrementell henting av oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\" fra oppgave-servicen...");
-                            FinnOppgaveResponse finnOppgaveResponse = this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
+                            FinnOppgaverResponseJson finnOppgaverResponseJson =
+                                    this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
                             log.info(
                                     "Estimat: Vi kommer totalt til å hente {} oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\"",
-                                    finnOppgaveResponse.getAntallTreffTotalt()
+                                    finnOppgaverResponseJson.getAntallTreffTotalt()
                             );
-                            while (!finnOppgaveResponse.getOppgaver().isEmpty()) {
-                                log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaveResponse.getOppgaver().size());
-                                oppgaver.addAll(finnOppgaveResponse.getOppgaver()
+                            while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
+                                log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
+                                oppgaver.addAll(finnOppgaverResponseJson.getFinnOppgaveResponseJsons()
                                         .stream()
                                         .map(OppgaveMapper::map)
                                         .collect(Collectors.toList()));
-                                if (finnOppgaveResponse.getOppgaver().size() < bulkSize) {
+                                if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
                                     break;
                                 } else {
                                     offset += bulkSize;
-                                    finnOppgaveResponse = this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
+                                    finnOppgaverResponseJson =
+                                            this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
                                 }
                             }
                             log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaver.size() - atomicInteger.get());
@@ -338,7 +345,7 @@ public class OppgaveRestClient {
         return this.credentials;
     }
 
-    private FinnOppgaveResponse finnOppgaver(
+    private FinnOppgaverResponseJson finnOppgaver(
             final String opprettetAv,
             final int bulkSize,
             final int offset) {
@@ -377,38 +384,34 @@ public class OppgaveRestClient {
                     log.error("Feil oppsto under henting av oppgaver: {}", errorResponse);
                     throw illegalStateExceptionFrom(errorResponse);
                 } catch (JsonParseException jpe) {
-                    parseRawError(response);
+                    parseRawErrorAndThrow(response);
                 }
             }
 
-            final ObjectMapper objectMapper = new ObjectMapper();
+            final ObjectMapper objectMapper =
+                    new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             final HttpEntity httpEntity = response.getEntity();
-
-            final FinnOppgaveResponse finnOppgaveResponse;
-            if (true) {
-                final Scanner scanner = new Scanner(httpEntity.getContent()).useDelimiter(System.lineSeparator());
-                final String entityAsString = scanner.hasNext() ? scanner.next() : "";
-                // Do some random logging of the response entity as a string:
-                finnOppgaveResponse = objectMapper.readValue(entityAsString, FinnOppgaveResponse.class);
-                if (offset < 100) {
-                    // Do some "random" logging to see the response entity:
-                    log.info("finn oppgaver response entityAsString fra oppgave: {}", entityAsString);
-                }
-            } else {
-                finnOppgaveResponse = objectMapper.readValue(httpEntity.getContent(), FinnOppgaveResponse.class);
+            final Scanner scanner = new Scanner(httpEntity.getContent()).useDelimiter(System.lineSeparator());
+            final String entityAsString = scanner.hasNext() ? scanner.next() : "";
+            final FinnOppgaverResponseJson finnOppgaverResponseJson =
+                    objectMapper.readValue(entityAsString, FinnOppgaverResponseJson.class);
+            // Do some random logging of the response entity as a string:
+            if (offset < 100) {
+                // Do some "random" logging to see some random response entities:
+                log.debug("finn oppgaver response entityAsString fra oppgave: {}", entityAsString);
             }
-            return finnOppgaveResponse;
+            return finnOppgaverResponseJson;
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
     }
 
-    private PatchOppgaverResponse patchOppgaver(
-            final List<Oppgave> oppgaver,
+    private PatchOppgaverResponseJson patchOppgaver(
+            final List<Oppgave> oppgaveListe,
             final boolean ferdigstill,
             final HttpEntityEnclosingRequestBase request) {
         try {
-            final ObjectNode patchJson = createPatchJson(oppgaver, ferdigstill);
+            final ObjectNode patchJson = createPatchJson(oppgaveListe, ferdigstill);
             final String jsonString = new ObjectMapper().writeValueAsString(patchJson);
             request.setEntity(new StringEntity(jsonString, "UTF-8"));
         } catch (JsonProcessingException e) {
@@ -424,18 +427,18 @@ public class OppgaveRestClient {
                     log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
                     throw illegalStateExceptionFrom(errorResponse);
                 } catch (JsonParseException jpe) {
-                    parseRawError(response);
+                    parseRawErrorAndThrow(response);
                 }
             }
 
             return new ObjectMapper()
-                    .readValue(response.getEntity().getContent(), PatchOppgaverResponse.class);
+                    .readValue(response.getEntity().getContent(), PatchOppgaverResponseJson.class);
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
     }
 
-    private PatchOppgaverResponse parseRawError(
+    private PatchOppgaverResponseJson parseRawErrorAndThrow(
             final CloseableHttpResponse response
     ) throws IOException {
 
