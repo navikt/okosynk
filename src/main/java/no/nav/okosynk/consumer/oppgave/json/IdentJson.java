@@ -4,8 +4,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.util.Comparator;
-
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class IdentJson {
@@ -49,6 +47,7 @@ public class IdentJson {
 
     @Override
     public boolean equals(final Object other) {
+
         if (this == other) {
             return true;
         }

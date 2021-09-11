@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import java.util.List;
 import java.util.Map;
 
-public class    PatchOppgaverResponseJson {
+public class PatchOppgaverResponseJson {
     private Integer feilet;
     private Integer suksess;
     private Integer totalt;
@@ -44,7 +44,7 @@ public class    PatchOppgaverResponseJson {
         return data;
     }
 
-    public void setData(Map<String, List<Long>> data) {
+    public void setData(final Map<String, List<Long>> data) {
         this.data = data;
     }
 
