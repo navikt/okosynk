@@ -47,8 +47,6 @@ public class IdentJson {
         this.gruppe = gruppe;
     }
 
-
-
     @Override
     public boolean equals(final Object other) {
         if (this == other) {
