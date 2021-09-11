@@ -167,7 +167,8 @@ public class OppgaveRestClient {
                         this.azureAdAuthenticationClient
                 );
 
-        final ObjectMapper objectMapper = new ObjectMapper();
+        final ObjectMapper objectMapper =
+                new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
         final List<PostOppgaveResponseJson> oppgaverSomErOpprettet = new ArrayList<>();
         final List<PostOppgaveRequestJson> oppgaverSomIkkeErOpprettet = new ArrayList<>();
         final List<PostOppgaveRequestJson> postOppgaveRequestJsons =
@@ -215,7 +216,6 @@ public class OppgaveRestClient {
             } catch (IOException e) {
                 throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
             }
-
         });
 
         return ConsumerStatistics

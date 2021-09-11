@@ -19,7 +19,7 @@
 
     <logger name="no.nav.okosynk" level="INFO" />
 
-    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="debug" />
+    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="DEBUG" />
 
     <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
