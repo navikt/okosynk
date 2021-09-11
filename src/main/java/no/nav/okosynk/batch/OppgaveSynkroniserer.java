@@ -45,6 +45,7 @@ public class OppgaveSynkroniserer {
 
     /**
      * Extracts for creation oppgaver read frm the batch file that are not in the database
+     *
      * @param alleOppgaverLestFraBatchen
      * @param oppgaverLestFraDatabasen
      * @return
@@ -114,12 +115,12 @@ public class OppgaveSynkroniserer {
         final ConsumerStatistics consumerStatistics_finn =
                 getOppgaveRestClient().finnOppgaver(oppgaverLestFraDatabasen);
 
-        final Set<Oppgave> oppgaverSomSkalFerdigstilles = finnOppgaverSomSkalFerdigstilles(
-                alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-        final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres = finnOppgaverSomSkalOppdateres(
-                alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-        final Set<Oppgave> oppgaverSomSkalOpprettes = finnOppgaverSomSkalOpprettes(
-                alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<Oppgave> oppgaverSomSkalFerdigstilles =
+                OppgaveSynkroniserer.finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres =
+                OppgaveSynkroniserer.finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        final Set<Oppgave> oppgaverSomSkalOpprettes =
+                OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
 
         final ConsumerStatistics consumerStatistics_ferdigstill =
                 ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
@@ -185,14 +186,13 @@ public class OppgaveSynkroniserer {
                     bruker);
             consumerStatistics = ConsumerStatistics.zero(consumerStatisticsName);
         } else {
-            logger
-                    .info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
-            final Set<Oppgave> oppdaterteOppgaver =
+            logger.info("Bruker {} forsøker å oppdatere {} oppgaver.", bruker, oppgaveOppdateringer.size());
+            final Set<Oppgave> oppgaverToBePatched =
                     oppgaveOppdateringer
                             .stream()
-                            .map(OppgaveOppdatering::oppdater)
+                            .map(OppgaveOppdatering::createOppgaveToBePatched)
                             .collect(Collectors.toSet());
-            consumerStatistics = getOppgaveRestClient().patchOppgaver(oppdaterteOppgaver, false);
+            consumerStatistics = getOppgaveRestClient().patchOppgaver(oppgaverToBePatched, false);
             logger.info("Bruker {} har oppdatert {} oppgaver", bruker,
                     consumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert());
         }
@@ -269,20 +269,15 @@ public class OppgaveSynkroniserer {
             this.oppgaveLestFraDatabasen = oppgaveLestFraDatabasen;
         }
 
-        Oppgave oppdater() {
-            return new Oppgave
-                    .OppgaveBuilder()
-                    .withSameValuesAs(oppgaveLestFraDatabasen)
-                    .withBeskrivelse(oppdaterBeskrivelse())
-                    .build();
-        }
-
-        private String oppdaterBeskrivelse() {
+        private static String createNewBeskrivelseFromOppgaveLestFraBatchenUpdatedWithAValueExtractedFromTheBeskrivelseOfOppgaveLestFraDatabasen(
+                final String beskrivelseFromOppgaveLestFraBatchen,
+                final String beskrivelseFromOppgaveLestFraDatabasen
+        ) {
             // Ta vare på ti tegn av oppgavebeskrivelsen
             // lagt til av brukere fra Pesys. De 10 tegnene brukes til koder
             // som sier hvorfor de ikke har lukket oppgaven enda.
             final String[] beskrivelseFelter =
-                    oppgaveLestFraDatabasen.beskrivelse.split(";");
+                    beskrivelseFromOppgaveLestFraDatabasen.split(";");
             final String kode =
                     beskrivelseFelter.length > 2
                             ?
@@ -290,7 +285,20 @@ public class OppgaveSynkroniserer {
                             :
                             "";
 
-            return oppgaveLestFraBatchen.beskrivelse.replaceFirst(";;", ";" + kode + ";");
+            return beskrivelseFromOppgaveLestFraBatchen.replaceFirst(";;", ";" + kode + ";");
+        }
+
+        Oppgave createOppgaveToBePatched() {
+            return new Oppgave
+                    .OppgaveBuilder()
+                    .withSameValuesAs(oppgaveLestFraDatabasen)
+                    .withBeskrivelse(
+                            createNewBeskrivelseFromOppgaveLestFraBatchenUpdatedWithAValueExtractedFromTheBeskrivelseOfOppgaveLestFraDatabasen(
+                                    oppgaveLestFraBatchen.beskrivelse,
+                                    oppgaveLestFraDatabasen.beskrivelse
+                            )
+                    )
+                    .build();
         }
     }
 }

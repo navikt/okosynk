@@ -283,27 +283,28 @@ public class Oppgave {
             return this;
         }
 
-        public OppgaveBuilder withSameValuesAs(final Oppgave oppgave) {
-            this.oppgaveId = oppgave.oppgaveId;
-            this.aktoerId = oppgave.aktoerId;
-            this.samhandlernr = oppgave.samhandlernr;
-            this.orgnr = oppgave.orgnr;
-            this.bnr = oppgave.bnr;
-            this.oppgavetypeKode = oppgave.oppgavetypeKode;
-            this.fagomradeKode = oppgave.fagomradeKode;
-            this.behandlingstema = oppgave.behandlingstema;
-            this.behandlingstype = oppgave.behandlingstype;
-            this.prioritetKode = oppgave.prioritetKode;
-            this.beskrivelse = oppgave.beskrivelse;
-            this.aktivFra = oppgave.aktivFra;
-            this.aktivTil = oppgave.aktivTil;
-            this.ansvarligEnhetId = oppgave.ansvarligEnhetId;
-            this.lest = oppgave.lest;
-            this.mappeId = oppgave.mappeId;
-            this.saksbehandlerIdent = oppgave.ansvarligSaksbehandlerIdent;
+        public OppgaveBuilder withSameValuesAs(final Oppgave otherOppgave) {
+            this.oppgaveId = otherOppgave.oppgaveId;
+            this.navPersonIdent = otherOppgave.navPersonIdent;
+            this.aktoerId = otherOppgave.aktoerId;
+            this.samhandlernr = otherOppgave.samhandlernr;
+            this.orgnr = otherOppgave.orgnr;
+            this.bnr = otherOppgave.bnr;
+            this.oppgavetypeKode = otherOppgave.oppgavetypeKode;
+            this.fagomradeKode = otherOppgave.fagomradeKode;
+            this.behandlingstema = otherOppgave.behandlingstema;
+            this.behandlingstype = otherOppgave.behandlingstype;
+            this.prioritetKode = otherOppgave.prioritetKode;
+            this.beskrivelse = otherOppgave.beskrivelse;
+            this.aktivFra = otherOppgave.aktivFra;
+            this.aktivTil = otherOppgave.aktivTil;
+            this.ansvarligEnhetId = otherOppgave.ansvarligEnhetId;
+            this.lest = otherOppgave.lest;
+            this.mappeId = otherOppgave.mappeId;
+            this.saksbehandlerIdent = otherOppgave.ansvarligSaksbehandlerIdent;
 
-            this.versjon = oppgave.versjon;
-            this.sistEndret = oppgave.sistEndret;
+            this.versjon = otherOppgave.versjon;
+            this.sistEndret = otherOppgave.sistEndret;
             return this;
         }
 

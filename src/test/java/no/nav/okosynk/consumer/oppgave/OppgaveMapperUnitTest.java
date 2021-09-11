@@ -341,7 +341,7 @@ public class OppgaveMapperUnitTest {
                         .withVersjon(OppgaveMapperUnitTest.generateRandomVersjon())
                         .build();
 
-        final PostOppgaveRequestJson actualPostOppgaveRequestJson = OppgaveMapper.map(expectedOppgave);
+        final PostOppgaveRequestJson actualPostOppgaveRequestJson = OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedOppgave);
 
         assertEquals(OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE, actualPostOppgaveRequestJson.getOpprettetAvEnhetsnr(), "opprettetAvEnhetsnr");
         assertEquals(expectedOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), actualPostOppgaveRequestJson.getAktivDato(), "aktivFra");
@@ -394,7 +394,7 @@ public class OppgaveMapperUnitTest {
                         .withSamhandlernr(actorTypes.contains('S') ? RandUt.constructRandomAlphaNumString(random.nextInt(61), OppgaveMapperUnitTest.random) : null)
                         .build();
 
-        assertThrows(OppgaveMapperException_MoreThanOneActorType.class, () -> OppgaveMapper.map(expectedOppgave));
+        assertThrows(OppgaveMapperException_MoreThanOneActorType.class, () -> OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedOppgave));
     }
 
     @ParameterizedTest
@@ -409,7 +409,7 @@ public class OppgaveMapperUnitTest {
                         .withAktivTil(fieldIndicator == 'T' || fieldIndicator == 'B' ? null : LocalDate.of(1970 + random.nextInt(52), 1 + random.nextInt(12), 1 + random.nextInt(28)))
                         .build();
 
-        assertThrows(OppgaveMapperException_AktivTilFraNull.class, () -> OppgaveMapper.map(expectedOppgave));
+        assertThrows(OppgaveMapperException_AktivTilFraNull.class, () -> OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedOppgave));
     }
 
     @ParameterizedTest
@@ -448,7 +448,7 @@ public class OppgaveMapperUnitTest {
         expectedFinnOppgaveResponseJson.setOrgnr(OppgaveMapperUnitTest.generateRandomOrgnr());
         expectedFinnOppgaveResponseJson.setSamhandlernr(OppgaveMapperUnitTest.generateRandomSamhandlernr());
 
-        final Oppgave actualOppgave = OppgaveMapper.map(expectedFinnOppgaveResponseJson);
+        final Oppgave actualOppgave = OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedFinnOppgaveResponseJson);
 
         assertEquals(expectedFinnOppgaveResponseJson.getAktivDato(), actualOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), "aktivDato");
         assertEquals(expectedFinnOppgaveResponseJson.getBehandlingstema(), actualOppgave.behandlingstema, "behandlingstema");
@@ -487,7 +487,7 @@ public class OppgaveMapperUnitTest {
         expectedFinnOppgaveResponseJson.setAktoerId(aktoerId);
         expectedFinnOppgaveResponseJson.setIdenter(identer);
 
-        final Oppgave actualOppgave = OppgaveMapper.map(expectedFinnOppgaveResponseJson);
+        final Oppgave actualOppgave = OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedFinnOppgaveResponseJson);
 
         assertEquals(expectedAktoerId, actualOppgave.aktoerId, "aktoerId");
         assertEquals(expectedNavPersonIdent, actualOppgave.navPersonIdent, "navPersonIdent");

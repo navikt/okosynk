@@ -50,7 +50,7 @@ public class FinnOppgaveResponseJson extends AbstractOppgaveJson {
                                 .toArray();
 
         final Object[] otherIdentArray =
-                otherFinnOppgaveResponseJson.getIdenter() == null
+                   otherFinnOppgaveResponseJson.getIdenter() == null
                         ?
                         new IdentJson[0]
                         :

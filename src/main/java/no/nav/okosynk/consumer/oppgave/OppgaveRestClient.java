@@ -168,7 +168,8 @@ public class OppgaveRestClient {
                 );
 
         final ObjectMapper objectMapper =
-                new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);;
+                new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        ;
         final List<PostOppgaveResponseJson> oppgaverSomErOpprettet = new ArrayList<>();
         final List<PostOppgaveRequestJson> oppgaverSomIkkeErOpprettet = new ArrayList<>();
         final List<PostOppgaveRequestJson> postOppgaveRequestJsons =
@@ -177,7 +178,7 @@ public class OppgaveRestClient {
                                 (oppgave) ->
                                 {
                                     try {
-                                        return OppgaveMapper.map(oppgave);
+                                        return OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(oppgave);
                                     } catch (OppgaveMapperException_MoreThanOneActorType | OppgaveMapperException_AktivTilFraNull e) {
                                         throw new IllegalStateException("Feil i input date", e);
                                     }
@@ -229,20 +230,20 @@ public class OppgaveRestClient {
      * Update a collection of oppgaver by
      * calling the Oppgave application's REST interface.
      *
-     * @param oppgaver    The oppgaver to be updated.
-     * @param ferdigstill If <code>false</code>, the update changes
-     *                    a few selected fields (typically beskrivelse),
-     *                    but the oppgave status is kept as is. <BR/>
-     *                    If <code>true</code>, the update behaves
-     *                    as if it were <code>false</code>,
-     *                    but the oppgave status is set to ferdigstilt.
+     * @param oppgaverToBePatched The oppgaver to be updated.
+     * @param ferdigstill         If <code>false</code>, the update changes
+     *                            a few selected fields (typically beskrivelse),
+     *                            but the oppgave status is kept as is. <BR/>
+     *                            If <code>true</code>, the update behaves
+     *                            as if it were <code>false</code>,
+     *                            but the oppgave status is set to ferdigstilt.
      * @return The metrics of the update.
      */
     public ConsumerStatistics patchOppgaver(
-            final Collection<Oppgave> oppgaver,
+            final Collection<Oppgave> oppgaverToBePatched,
             final boolean ferdigstill) {
 
-        if (oppgaver == null || oppgaver.isEmpty()) {
+        if (oppgaverToBePatched == null || oppgaverToBePatched.isEmpty()) {
             return ConsumerStatistics.zero(getBatchType());
         }
 
@@ -253,16 +254,16 @@ public class OppgaveRestClient {
                         getUsernamePasswordCredentials(),
                         this.azureAdAuthenticationClient);
 
-        final List<List<Oppgave>> oppgaveLister =
-                delOppListe(new ArrayList<>(oppgaver), 500);
+        final List<List<Oppgave>> listOfListsOfOppgaverToBePatched =
+                delOppListe(new ArrayList<>(oppgaverToBePatched), 500);
 
         log.info(
                 "Starter patching av oppgaver, sublistestørrelse: "
                         + "{}, antall sublister {}, antall oppgaver totalt: {}",
-                500, oppgaveLister.size(), oppgaver.size());
+                500, listOfListsOfOppgaverToBePatched.size(), oppgaverToBePatched.size());
         final List<PatchOppgaverResponseJson> responses =
-                oppgaveLister.stream()
-                        .map(oppgaveListe -> patchOppgaver(oppgaveListe, ferdigstill, request))
+                listOfListsOfOppgaverToBePatched.stream()
+                        .map(listOfOppgaverToBePatched -> patchOppgaver(listOfOppgaverToBePatched, ferdigstill, request))
                         .collect(Collectors.toList());
 
         final int suksess =
@@ -289,10 +290,10 @@ public class OppgaveRestClient {
         return this.batchType;
     }
 
-    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaver) {
+    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverFound) {
         final int bulkSize = 50;
         final Collection<String> oppprettetAvValuesForFinn = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
-        final AtomicInteger atomicInteger = new AtomicInteger(oppgaver.size());
+        final AtomicInteger atomicInteger = new AtomicInteger(oppgaverFound.size());
         oppprettetAvValuesForFinn
                 .stream()
                 .forEach(oppprettetAvValueForFinn ->
@@ -307,10 +308,13 @@ public class OppgaveRestClient {
                             );
                             while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
                                 log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
-                                oppgaver.addAll(finnOppgaverResponseJson.getFinnOppgaveResponseJsons()
-                                        .stream()
-                                        .map(OppgaveMapper::map)
-                                        .collect(Collectors.toList()));
+                                oppgaverFound.addAll(
+                                        finnOppgaverResponseJson
+                                                .getFinnOppgaveResponseJsons()
+                                                .stream()
+                                                .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
+                                                .collect(Collectors.toList())
+                                );
                                 if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
                                     break;
                                 } else {
@@ -319,14 +323,21 @@ public class OppgaveRestClient {
                                             this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
                                 }
                             }
-                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaver.size() - atomicInteger.get());
-                            atomicInteger.addAndGet(oppgaver.size());
+                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaverFound.size() - atomicInteger.get());
+                            atomicInteger.addAndGet(oppgaverFound.size());
                         }
                 );
-        log.info("Hentet totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaver.size());
+
+        try {
+            log.debug("A random found oppgave: " + oppgaverFound.stream().findAny().get());
+        } catch (Exception e) {
+            log.warn("Exception when logging a random found oppgave", e);
+        }
+
+        log.info("Hentet totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverFound.size());
         return ConsumerStatistics
                 .builder(getBatchType())
-                .antallOppgaverSomErHentetFraDatabasen(oppgaver.size())
+                .antallOppgaverSomErHentetFraDatabasen(oppgaverFound.size())
                 .build();
     }
 
@@ -392,13 +403,18 @@ public class OppgaveRestClient {
                     new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             final HttpEntity httpEntity = response.getEntity();
             final Scanner scanner = new Scanner(httpEntity.getContent()).useDelimiter(System.lineSeparator());
-            final String entityAsString = scanner.hasNext() ? scanner.next() : "";
+            final String finnOppgaverResponseJsonEntityAsString = scanner.hasNext() ? scanner.next() : "";
             final FinnOppgaverResponseJson finnOppgaverResponseJson =
-                    objectMapper.readValue(entityAsString, FinnOppgaverResponseJson.class);
-            // Do some random logging of the response entity as a string:
-            if (offset < 100) {
-                // Do some "random" logging to see some random response entities:
-                log.debug("finn oppgaver response entityAsString fra oppgave: {}", entityAsString);
+                    objectMapper.readValue(finnOppgaverResponseJsonEntityAsString, FinnOppgaverResponseJson.class);
+            try {
+                // Do some random logging of the response entity as a string:
+                if (offset < 100) {
+                    // Do some "random" logging to see some random response entities:
+                    log.debug("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
+                }
+                log.debug("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
+            } catch (Exception e) {
+                log.warn("Exception when logging random oppgave info", e);
             }
             return finnOppgaverResponseJson;
         } catch (IOException e) {
@@ -411,8 +427,8 @@ public class OppgaveRestClient {
             final boolean ferdigstill,
             final HttpEntityEnclosingRequestBase request) {
         try {
-            final ObjectNode patchJson = createPatchJson(oppgaveListe, ferdigstill);
-            final String jsonString = new ObjectMapper().writeValueAsString(patchJson);
+            final ObjectNode patchOppgaverObjectNode = createPatchOppgaverObjectNode(oppgaveListe, ferdigstill);
+            final String jsonString = new ObjectMapper().writeValueAsString(patchOppgaverObjectNode);
             request.setEntity(new StringEntity(jsonString, "UTF-8"));
         } catch (JsonProcessingException e) {
             throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
@@ -448,27 +464,27 @@ public class OppgaveRestClient {
         throw new IllegalStateException("Feilet under parsing av oppgave error response");
     }
 
-    private ObjectNode createPatchJson(
-            final List<Oppgave> oppgaver,
+    private ObjectNode createPatchOppgaverObjectNode(
+            final List<Oppgave> oppgaverToBePatched,
             final boolean ferdigstill
     ) {
-        final ObjectMapper mapper = new ObjectMapper();
-        final ObjectNode patchJson = mapper.createObjectNode();
-        patchJson.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final ObjectNode patchOppgaverObjectNode = objectMapper.createObjectNode();
+        patchOppgaverObjectNode.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
         if (ferdigstill) {
-            patchJson.put("status", FERDIGSTILT.name());
+            patchOppgaverObjectNode.put("status", FERDIGSTILT.name());
         }
-        final ArrayNode patchJsonOppgaver = patchJson.putArray("oppgaver");
+        final ArrayNode patchOppgaverArrayNode = patchOppgaverObjectNode.putArray("oppgaver");
 
-        oppgaver.forEach(o -> {
-            final ObjectNode node = mapper.createObjectNode();
-            node.put("id", o.oppgaveId);
-            node.put("versjon", o.versjon);
-            node.put("beskrivelse", o.beskrivelse);
-            patchJsonOppgaver.add(node);
+        oppgaverToBePatched.forEach(oppgaveToBePatched -> {
+            final ObjectNode oppgaveToBePatchedObjectNnode = objectMapper.createObjectNode();
+            oppgaveToBePatchedObjectNnode.put("id", oppgaveToBePatched.oppgaveId);
+            oppgaveToBePatchedObjectNnode.put("versjon", oppgaveToBePatched.versjon);
+            oppgaveToBePatchedObjectNnode.put("beskrivelse", oppgaveToBePatched.beskrivelse);
+            patchOppgaverArrayNode.add(oppgaveToBePatchedObjectNnode);
         });
 
-        return patchJson;
+        return patchOppgaverObjectNode;
     }
 
     private IllegalStateException illegalStateExceptionFrom(

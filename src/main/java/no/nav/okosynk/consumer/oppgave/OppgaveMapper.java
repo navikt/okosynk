@@ -18,7 +18,7 @@ public class OppgaveMapper {
 
     static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
 
-    static PostOppgaveRequestJson map(final Oppgave oppgave) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
+    static PostOppgaveRequestJson mapFromFinnOppgaveResponseJsonToOppgave(final Oppgave oppgave) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
 
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -53,7 +53,7 @@ public class OppgaveMapper {
         return postOppgaveRequestJson;
     }
 
-    static Oppgave map(final FinnOppgaveResponseJson finnOppgaveResponseJson) {
+    static Oppgave mapFromFinnOppgaveResponseJsonToOppgave(final FinnOppgaveResponseJson finnOppgaveResponseJson) {
 
         final Collection<IdentJson> identer = finnOppgaveResponseJson.getIdenter();
         final String navPersonIdent =
