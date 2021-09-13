@@ -56,7 +56,7 @@ spec:
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
       value: "true"
     - name: SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID
-      value: "true"
+      value: "false"
 
   vault:
     enabled: true

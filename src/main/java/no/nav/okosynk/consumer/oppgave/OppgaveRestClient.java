@@ -330,29 +330,9 @@ public class OppgaveRestClient {
 
         try {
             final Oppgave aRandomFoundOppgave = oppgaverFound.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
-
             log.debug("A random found oppgave: " + aRandomFoundOppgave);
-            log.info("A random found oppgave: " + aRandomFoundOppgave);
-
-
-
-
             log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
-            log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
-
-            log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
-            log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
-
-
-
             log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
-            log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
-
-            log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
-            log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
-
-
-
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
@@ -433,11 +413,11 @@ public class OppgaveRestClient {
                 // Do some random logging of the response entity as a string:
                 if (offset < 100) {
                     // Do some "random" logging to see some random response entities:
-                    log.info("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
+                    log.debug("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
                 }
-                log.info("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
+                log.debug("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
             } catch (Exception e) {
-                log.warn("Exception when logging random oppgave info", e);
+                log.debug("Exception when logging random oppgave info", e);
             }
             return finnOppgaverResponseJson;
         } catch (IOException e) {
