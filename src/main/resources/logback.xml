@@ -4,7 +4,9 @@
     <appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
 
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <pattern>%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}] ){'- \[, , \] ',''}- %m%n</pattern>
+            <pattern>%d [%-5level] [%thread] %logger{5} %replace(- [%X{consumerId}, %X{callId}] ){'- \[, , \] ',''}-
+                %m%n
+            </pattern>
         </encoder>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -13,13 +15,21 @@
 
     </appender>
 
-    <logger name="org.apache.cxf" level="WARN" />
+    <logger name="org.apache.cxf" level="WARN">
+        <appender-ref ref="STDOUT_JSON"/>
+    </logger>
 
-    <logger name="org.glassfish.jersey" level="INFO" />
+    <logger name="org.glassfish.jersey" level="INFO">
+        <appender-ref ref="STDOUT_JSON"/>
+    </logger>
 
-    <logger name="no.nav.okosynk" level="INFO" />
+    <logger name="no.nav.okosynk" level="INFO">
+        <appender-ref ref="STDOUT_JSON"/>
+    </logger>
 
-    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="DEBUG" />
+    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="DEBUG">
+        <appender-ref ref="STDOUT_JSON"/>
+    </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
