@@ -329,8 +329,13 @@ public class OppgaveRestClient {
                 );
 
         try {
-            final Oppgave aRandomFoundOppgave = oppgaverFound.stream().findAny().get();
+            final Oppgave aRandomFoundOppgave = oppgaverFound.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
+
+            log.debug("A random found oppgave: " + aRandomFoundOppgave);
             log.info("A random found oppgave: " + aRandomFoundOppgave);
+
+
+
 
             log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
             log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
@@ -338,16 +343,21 @@ public class OppgaveRestClient {
             log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
             log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
 
+
+
             log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
             log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
 
             log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
             log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
+
+
+
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
 
-        log.info("Hentet totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverFound.size());
+        log.info("Hentet fra databasen totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverFound.size());
         return ConsumerStatistics
                 .builder(getBatchType())
                 .antallOppgaverSomErHentetFraDatabasen(oppgaverFound.size())
