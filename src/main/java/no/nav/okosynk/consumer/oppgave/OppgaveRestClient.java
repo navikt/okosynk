@@ -329,7 +329,7 @@ public class OppgaveRestClient {
                 );
 
         try {
-            log.debug("A random found oppgave: " + oppgaverFound.stream().findAny().get());
+            log.info("A random found oppgave: " + oppgaverFound.stream().findAny().get());
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
@@ -410,9 +410,9 @@ public class OppgaveRestClient {
                 // Do some random logging of the response entity as a string:
                 if (offset < 100) {
                     // Do some "random" logging to see some random response entities:
-                    log.debug("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
+                    log.info("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
                 }
-                log.debug("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
+                log.info("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
             } catch (Exception e) {
                 log.warn("Exception when logging random oppgave info", e);
             }
