@@ -329,7 +329,20 @@ public class OppgaveRestClient {
                 );
 
         try {
-            log.info("A random found oppgave: " + oppgaverFound.stream().findAny().get());
+            final Oppgave aRandomFoundOppgave = oppgaverFound.stream().findAny().get();
+            log.info("A random found oppgave: " + aRandomFoundOppgave);
+
+            log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
+            log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
+
+            log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
+            log.info("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId != null ? "<something>" : null);
+
+            log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
+            log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
+
+            log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
+            log.info("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent != null ? "<something>" : null);
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
