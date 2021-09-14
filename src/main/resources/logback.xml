@@ -23,7 +23,7 @@
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
 
-    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="DEBUG">
+    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
     </logger>
 

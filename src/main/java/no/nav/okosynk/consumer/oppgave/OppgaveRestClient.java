@@ -331,8 +331,6 @@ public class OppgaveRestClient {
         try {
             final Oppgave aRandomFoundOppgave = oppgaverFound.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
             log.debug("A random found oppgave: " + aRandomFoundOppgave);
-            log.debug("aRandomFoundOppgave.aktoerId: " + aRandomFoundOppgave.aktoerId);
-            log.debug("aRandomFoundOppgave.navPersonIdent: " + aRandomFoundOppgave.navPersonIdent);
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
