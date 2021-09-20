@@ -163,9 +163,12 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                     actualnumberOfOppgaverRetrievedFromBatchInput,
                     UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT);
         }
+        logger.info("linjerMedUspesifikkeMeldinger.size(): {}", linjerMedUspesifikkeMeldinger.size());
         final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger =
                 opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
+        logger.info("spesifikkeMeldinger.size(): {}", spesifikkeMeldinger.size());
         final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
+        logger.info("batchOppgaver.size(): {}", batchOppgaver.size());
         logger.debug("About to normally leave Batch.hentBatchOppgaver");
 
         return batchOppgaver;
@@ -224,10 +227,12 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
         final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger;
         try {
+            logger.info("linjerMedUspesifikkeMeldinger.size(): {}", linjerMedUspesifikkeMeldinger.size());
             spesifikkeMeldinger =
                     getSpesifikkMeldingReader()
                             .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
                                     linjerMedUspesifikkeMeldinger.stream());
+            logger.info("spesifikkeMeldinger.size(): {}", spesifikkeMeldinger.size());
         } catch (MeldingUnreadableException e) {
             logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
                     e);

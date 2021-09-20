@@ -98,13 +98,11 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                 final String gjelderId = melding.gjelderId;
 
                                 if (isNotBlank(gjelderId)) {
-                                    String type = melding.utledGjelderIdType();
+                                    final String type = melding.utledGjelderIdType();
                                     if (Objects.equals(type, PERSON)) {
                                         if (isBnr(gjelderId)) {
                                             builder.withBnr(gjelderId);
                                         } else {
-
-
                                             if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
                                                 try {
                                                     final AktoerRespons aktoerRespons =
@@ -122,11 +120,9 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                     return null;
                                                 }
                                             } else {
-                                                log.info("Using navPersonIdent as is");
+                                                log.debug("Using navPersonIdent as is");
                                                 builder.withNavPersonIdent(gjelderId);
                                             }
-
-
                                         }
                                     } else if (Objects.equals(type, SAMHANDLER)) {
                                         builder.withSamhandlernr(gjelderId);

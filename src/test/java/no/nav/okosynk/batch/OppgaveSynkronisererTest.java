@@ -5,8 +5,14 @@ import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
+import no.nav.okosynk.domain.IMeldingMapper;
+import no.nav.okosynk.domain.IMeldingReader;
+import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.OppgaveTest;
+import no.nav.okosynk.domain.os.OsMapper;
+import no.nav.okosynk.domain.os.OsMelding;
+import no.nav.okosynk.domain.os.OsMeldingReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -602,5 +608,44 @@ class OppgaveSynkronisererTest {
                         .build();
 
         return oppgave;
+    }
+
+    @Test
+    void when_simulating_OS_batch_file_line_to_oppgave_that_is_to_be_opprettet_then_no_oppgaver_should_be_found() throws MeldingUnreadableException {
+
+        final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
+        when(mockedOkosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()).thenReturn(false);
+
+        // From Steinar originally. EBCDIC? final String linjeMedUspesifikkMelding = "14067823770422070401    2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ  8020         REFARBG 00981002431";
+        // Funker i en annen test:               "00123456789055209429 2010-12-222010-12-30RETUK231B3502010-12-012010-12-31000001456070H 8020         REFARBG 80000510102            "
+        final String linjeMedUspesifikkMelding = "14067823770422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170H 8020         REFARBG 00981002431            ";
+        final IMeldingReader<OsMelding> meldingReader = new OsMeldingReader(OsMelding::new);
+        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
+                meldingReader
+                        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
+                                new HashSet<String>() {{
+                                    add(linjeMedUspesifikkMelding);
+                                }}
+                                        .stream()
+                        );
+        final IMeldingMapper<OsMelding> spesifikkMapper = new OsMapper(null, mockedOkosynkConfiguration);
+        final Set<Oppgave> batchOppgaver = new HashSet<>(spesifikkMapper.lagOppgaver(spesifikkMeldingFraLinjeMedUspesifikkMelding));
+
+        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+        oppgaverLestFraDatabasen
+                .add(new Oppgave.OppgaveBuilder()
+                        .withBehandlingstema(null)
+                        .withBehandlingstype("ae0215")
+                        .withAnsvarligEnhetId("4151")
+                        .withAktoerId("1933942921119")
+                        .withNavPersonIdent("14067823770")
+                        .withBnr(null)
+                        .withOrgnr(null)
+                        .withSamhandlernr(null)
+                        .build());
+
+        final Collection<Oppgave> oppgaverSomSkalOpprettes =
+                OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(batchOppgaver, oppgaverLestFraDatabasen);
+        assertEquals(0, oppgaverSomSkalOpprettes.size());
     }
 }
