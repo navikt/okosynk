@@ -12,6 +12,7 @@ import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
 import no.nav.okosynk.domain.MeldingUnreadableException;
 import no.nav.okosynk.domain.Oppgave;
+import no.nav.okosynk.domain.util.AktoerUt;
 import no.nav.okosynk.io.AuthenticationOkosynkIoException;
 import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.EncodingOkosynkIoException;
@@ -168,6 +169,14 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                 opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
         logger.info("spesifikkeMeldinger.size(): {}", spesifikkeMeldinger.size());
         final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
+
+        batchOppgaver
+                .stream()
+                .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.navPersonIdent))
+                .forEach(batchOppgave ->
+                        logger.info("dnr found in the batch file: {}", batchOppgave.navPersonIdent.substring(0, 6) + "*****")
+                );
+
         logger.info("batchOppgaver.size(): {}", batchOppgaver.size());
         logger.debug("About to normally leave Batch.hentBatchOppgaver");
 

@@ -290,10 +290,10 @@ public class OppgaveRestClient {
         return this.batchType;
     }
 
-    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverFound) {
+    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) {
         final int bulkSize = 50;
         final Collection<String> oppprettetAvValuesForFinn = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
-        final AtomicInteger atomicInteger = new AtomicInteger(oppgaverFound.size());
+        final AtomicInteger atomicInteger = new AtomicInteger(oppgaverAccumulated.size());
         oppprettetAvValuesForFinn
                 .stream()
                 .forEach(oppprettetAvValueForFinn ->
@@ -308,13 +308,35 @@ public class OppgaveRestClient {
                             );
                             while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
                                 log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
-                                oppgaverFound.addAll(
+
+                                final List<Oppgave> oppgaverReadFromTheDatabase =
                                         finnOppgaverResponseJson
                                                 .getFinnOppgaveResponseJsons()
                                                 .stream()
                                                 .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
-                                                .collect(Collectors.toList())
-                                );
+                                                .collect(Collectors.toList());
+
+                                final int sizeOfOppgaverReadBeforeAccumulation = oppgaverReadFromTheDatabase.size();
+                                final int sizeOfOppgaverAccumulatedBeforeAccumulation = oppgaverAccumulated.size();
+                                oppgaverAccumulated.addAll(oppgaverReadFromTheDatabase);
+                                final int sizeOfOppgaverAccumulatedAfterAccumulation = oppgaverAccumulated.size();
+                                final int discrepancyBetweenReadAndAccumulated =
+                                        sizeOfOppgaverAccumulatedAfterAccumulation -
+                                                (sizeOfOppgaverReadBeforeAccumulation + sizeOfOppgaverAccumulatedBeforeAccumulation);
+                                if (discrepancyBetweenReadAndAccumulated != 0) {
+                                    log.warn(
+                                            "Noen oppgaver lest fra databasen har blitt ansett som duplikater. " +
+                                                    "discrepancyBetweenReadAndAccumulated: {}" +
+                                                    "sizeOfOppgaverReadBeforeAccumulation: {}" +
+                                                    "sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
+                                                    "sizeOfOppgaverAccumulatedAfterAccumulation: {}",
+                                            discrepancyBetweenReadAndAccumulated,
+                                            sizeOfOppgaverReadBeforeAccumulation,
+                                            sizeOfOppgaverAccumulatedBeforeAccumulation,
+                                            sizeOfOppgaverAccumulatedAfterAccumulation
+                                    );
+                                }
+
                                 if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
                                     break;
                                 } else {
@@ -323,22 +345,21 @@ public class OppgaveRestClient {
                                             this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
                                 }
                             }
-                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaverFound.size() - atomicInteger.get());
-                            atomicInteger.addAndGet(oppgaverFound.size());
+                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaverAccumulated.size() - atomicInteger.get());
+                            atomicInteger.addAndGet(oppgaverAccumulated.size());
                         }
                 );
-
         try {
-            final Oppgave aRandomFoundOppgave = oppgaverFound.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
+            final Oppgave aRandomFoundOppgave = oppgaverAccumulated.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
             log.debug("A random found oppgave: " + aRandomFoundOppgave);
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);
         }
 
-        log.info("Hentet fra databasen totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverFound.size());
+        log.info("Hentet fra databasen totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverAccumulated.size());
         return ConsumerStatistics
                 .builder(getBatchType())
-                .antallOppgaverSomErHentetFraDatabasen(oppgaverFound.size())
+                .antallOppgaverSomErHentetFraDatabasen(oppgaverAccumulated.size())
                 .build();
     }
 

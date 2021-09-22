@@ -28,7 +28,7 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
     @Override
     public List<Oppgave> lagOppgaver(final List<OsMelding> meldinger) {
 
-        return hentMeldingerSomSkalBliOppgaver(meldinger)
+        return groupMeldingerSomSkalBliOppgaver(meldinger)
                 .stream()
                 .map(this.osOppgaveOppretter)
                 .filter(Optional::isPresent)
@@ -40,7 +40,7 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
         return osMelding -> osMappingRegelRepository.finnRegel(osMelding).isPresent();
     }
 
-    Collection<List<OsMelding>> hentMeldingerSomSkalBliOppgaver(
+    Collection<List<OsMelding>> groupMeldingerSomSkalBliOppgaver(
             final List<OsMelding> ufiltrerteOsMeldinger) {
 
         return ufiltrerteOsMeldinger

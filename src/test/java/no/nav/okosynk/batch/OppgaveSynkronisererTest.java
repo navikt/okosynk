@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySet;
@@ -611,7 +613,7 @@ class OppgaveSynkronisererTest {
     }
 
     @Test
-    void when_simulating_OS_batch_file_line_to_oppgave_that_is_to_be_opprettet_then_no_oppgaver_should_be_found() throws MeldingUnreadableException {
+    void when_simulating_OS_batch_file_line_to_oppgave_then_no_oppgave_should_be_found_for_opprett() throws MeldingUnreadableException {
 
         final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
         when(mockedOkosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()).thenReturn(false);
@@ -643,6 +645,8 @@ class OppgaveSynkronisererTest {
                         .withOrgnr(null)
                         .withSamhandlernr(null)
                         .build());
+        assertTrue(batchOppgaver.containsAll(oppgaverLestFraDatabasen));
+        assertTrue(oppgaverLestFraDatabasen.containsAll(batchOppgaver));
 
         final Collection<Oppgave> oppgaverSomSkalOpprettes =
                 OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(batchOppgaver, oppgaverLestFraDatabasen);

@@ -148,7 +148,7 @@ class UrMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(2, filtrerteMeldinger.size());
@@ -161,7 +161,7 @@ class UrMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingUtenMappingRegel));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingUtenMappingRegel));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(1, filtrerteMeldinger.size());
@@ -174,7 +174,7 @@ class UrMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(1, filtrerteMeldinger.size());

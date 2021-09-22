@@ -89,7 +89,6 @@ public class Oppgave {
                         )
                         ||
                         (
-
                                 !(this.aktoerId == null && other.aktoerId == null)
                                 &&
                                 !(this.navPersonIdent == null && other.navPersonIdent == null)

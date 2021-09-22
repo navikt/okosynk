@@ -165,7 +165,7 @@ class OsMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, annenOsMeldingSomSkalBliTilOppgave));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, annenOsMeldingSomSkalBliTilOppgave));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(2, filtrerteMeldinger.size());
@@ -178,7 +178,7 @@ class OsMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomIkkeHarMapping));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomIkkeHarMapping));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(1, filtrerteMeldinger.size());
@@ -191,7 +191,7 @@ class OsMapperTest {
         enteringTestHeaderLogger.debug(null);
 
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
-                .hentMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
+                .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
 
         assertNotNull(filtrerteMeldinger);
         assertEquals(1, filtrerteMeldinger.size());

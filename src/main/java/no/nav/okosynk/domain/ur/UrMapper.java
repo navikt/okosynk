@@ -28,7 +28,7 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
     @Override
     public List<Oppgave> lagOppgaver(final List<UrMelding> meldinger) {
 
-        return hentMeldingerSomSkalBliOppgaver(meldinger)
+        return groupMeldingerSomSkalBliOppgaver(meldinger)
                 .stream()
                 .map(this.urOppgaveOppretter)
                 .filter(Optional::isPresent)
@@ -40,7 +40,7 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
         return urMelding -> urMappingRegelRepository.finnRegel(urMelding).isPresent();
     }
 
-    Collection<List<UrMelding>> hentMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {
+    Collection<List<UrMelding>> groupMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {
 
         final List<UrMelding> meldingerMedMappingRegel =
                 ufiltrerteUrMeldinger
