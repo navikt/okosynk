@@ -75,37 +75,63 @@ public class Oppgave {
                 &&
                 Objects.equals(this.ansvarligEnhetId, other.ansvarligEnhetId)
                 &&
-                (
-                        (
-                                this.aktoerId == null && other.aktoerId == null
-                                &&
-                                Objects.equals(this.navPersonIdent, other.navPersonIdent)
-                        )
-                        ||
-                        (
-                                Objects.equals(this.aktoerId, other.aktoerId)
-                                &&
-                                this.navPersonIdent == null && other.navPersonIdent == null
-                        )
-                        ||
-                        (
-                                !(this.aktoerId == null && other.aktoerId == null)
-                                &&
-                                !(this.navPersonIdent == null && other.navPersonIdent == null)
-                                &&
-                                (
-                                        Objects.equals(this.aktoerId, other.aktoerId)
-                                        ||
-                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
-                                )
-                        )
-                )
-                &&
                 Objects.equals(this.bnr, other.bnr)
                 &&
                 Objects.equals(this.orgnr, other.orgnr)
                 &&
                 Objects.equals(this.samhandlernr, other.samhandlernr)
+                &&
+                (
+                        (
+                                this.aktoerId == null && other.aktoerId == null
+                                        &&
+                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                        )
+                                ||
+                                (
+                                        Objects.equals(this.aktoerId, other.aktoerId)
+                                                &&
+                                                this.navPersonIdent == null && other.navPersonIdent == null
+                                )
+                                ||
+                                (
+                                        !(this.aktoerId == null && other.aktoerId == null)
+                                                &&
+                                                !(this.navPersonIdent == null && other.navPersonIdent == null)
+                                                &&
+                                                (
+                                                        (
+                                                                this.aktoerId != null && other.aktoerId != null
+                                                                        &&
+                                                                        this.navPersonIdent != null && other.navPersonIdent != null
+                                                                        &&
+                                                                        Objects.equals(this.aktoerId, other.aktoerId)
+                                                                        &&
+                                                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                                        )
+                                                                ||
+                                                                (
+                                                                        (
+                                                                                this.aktoerId == null && other.aktoerId != null
+                                                                                        ||
+                                                                                        this.aktoerId != null && other.aktoerId == null
+                                                                        )
+                                                                                &&
+                                                                                Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                                                )
+                                                                ||
+                                                                (
+                                                                        (
+                                                                                this.navPersonIdent == null && other.navPersonIdent != null
+                                                                                        ||
+                                                                                        this.navPersonIdent != null && other.navPersonIdent == null
+                                                                        )
+                                                                                &&
+                                                                                Objects.equals(this.aktoerId, other.aktoerId)
+                                                                )
+                                                )
+                                )
+                )
                 ;
     }
 

@@ -327,9 +327,9 @@ public class OppgaveRestClient {
                                     log.warn(
                                             "Noen oppgaver lest fra databasen har blitt ansett som duplikater. " +
                                                     "discrepancyBetweenReadAndAccumulated: {}" +
-                                                    "sizeOfOppgaverReadBeforeAccumulation: {}" +
-                                                    "sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
-                                                    "sizeOfOppgaverAccumulatedAfterAccumulation: {}",
+                                                    ", sizeOfOppgaverReadBeforeAccumulation: {}" +
+                                                    ", sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
+                                                    ", sizeOfOppgaverAccumulatedAfterAccumulation: {}",
                                             discrepancyBetweenReadAndAccumulated,
                                             sizeOfOppgaverReadBeforeAccumulation,
                                             sizeOfOppgaverAccumulatedBeforeAccumulation,

@@ -617,10 +617,7 @@ class OppgaveSynkronisererTest {
 
         final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
         when(mockedOkosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()).thenReturn(false);
-
-        // From Steinar originally. EBCDIC? final String linjeMedUspesifikkMelding = "14067823770422070401    2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ  8020         REFARBG 00981002431";
-        // Funker i en annen test:               "00123456789055209429 2010-12-222010-12-30RETUK231B3502010-12-012010-12-31000001456070H 8020         REFARBG 80000510102            "
-        final String linjeMedUspesifikkMelding = "14067823770422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170H 8020         REFARBG 00981002431            ";
+        final String linjeMedUspesifikkMelding = "14067823770422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
         final IMeldingReader<OsMelding> meldingReader = new OsMeldingReader(OsMelding::new);
         final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
                 meldingReader

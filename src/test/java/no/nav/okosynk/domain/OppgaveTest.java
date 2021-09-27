@@ -92,92 +92,113 @@ public class OppgaveTest {
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh2",
                         false // equals
                 ),
-                Arguments.of(
+                // -----------------------------------------------------------------------------------------------------
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId2", "navPersonIdent1", "b1", "o1", "sh1",
-                        true // equals
+                        false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent2", "b1", "o1", "sh1",
-                        true // equals
+                        false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId2", "navPersonIdent2", "b1", "o1", "sh1",
+                        false // equals
+                ),
+                Arguments.of( // OK matrise
                         "te11", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te11", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
+                        "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", null, "navPersonIdent2", "b1", "o1", "sh1",
+                        false // equals
+                ),
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "navPersonIdent2", "b1", "o1", "sh1",
+                        false // equals
+                ),
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent2", "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         true // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         false // equals
                 ),
-                Arguments.of(
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId2", null, "b1", "o1", "sh1",
+                        false // equals
+                ),
+                Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         true // equals
