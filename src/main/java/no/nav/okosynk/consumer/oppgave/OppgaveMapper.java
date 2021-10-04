@@ -29,7 +29,7 @@ public class OppgaveMapper {
         final PostOppgaveRequestJson postOppgaveRequestJson = new PostOppgaveRequestJson();
 
         final int numberOfActorTypes =
-                Stream.of(oppgave.aktoerId, oppgave.bnr, oppgave.navPersonIdent, oppgave.orgnr, oppgave.samhandlernr)
+                Stream.of(oppgave.aktoerId, oppgave.bnr, oppgave.folkeregisterIdent, oppgave.orgnr, oppgave.samhandlernr)
                         .map(actor -> actor == null ? 0 : 1)
                         .reduce(0, (a, b) -> a + b);
         if (numberOfActorTypes > 1) {
@@ -44,7 +44,7 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setBeskrivelse(oppgave.beskrivelse);
             postOppgaveRequestJson.setBnr(oppgave.bnr);
             postOppgaveRequestJson.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
-            postOppgaveRequestJson.setNavPersonIdent(oppgave.navPersonIdent);
+            postOppgaveRequestJson.setFolkeregisterIdent(oppgave.folkeregisterIdent);
             postOppgaveRequestJson.setOppgavetype(oppgave.oppgavetypeKode);
             postOppgaveRequestJson.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
             postOppgaveRequestJson.setOrgnr(oppgave.orgnr);
@@ -54,8 +54,8 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
         }
 
-        if (AktoerUt.isDnr(postOppgaveRequestJson.getNavPersonIdent())) {
-            logger.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getNavPersonIdent().substring(0, 6) + "*****");
+        if (AktoerUt.isDnr(postOppgaveRequestJson.getFolkeregisterIdent())) {
+            logger.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getFolkeregisterIdent().substring(0, 6) + "*****");
         }
 
         return postOppgaveRequestJson;
@@ -64,7 +64,7 @@ public class OppgaveMapper {
     static Oppgave mapFromFinnOppgaveResponseJsonToOppgave(final FinnOppgaveResponseJson finnOppgaveResponseJson) {
 
         final Collection<IdentJson> identer = finnOppgaveResponseJson.getIdenter();
-        final String navPersonIdent =
+        final String folkeregisterIdent =
                 (identer == null)
                         ?
                         null
@@ -98,15 +98,15 @@ public class OppgaveMapper {
                         .withMappeId(finnOppgaveResponseJson.getMappeId())
                         .withAnsvarligSaksbehandlerIdent(finnOppgaveResponseJson.getTilordnetRessurs())
                         .withAktoerId(finnOppgaveResponseJson.getAktoerId())
-                        .withNavPersonIdent(navPersonIdent)
+                        .withFolkeregisterIdent(folkeregisterIdent)
                         .withSamhandlernr(finnOppgaveResponseJson.getSamhandlernr())
                         .withOrgnr(finnOppgaveResponseJson.getOrgnr())
                         .withBnr(finnOppgaveResponseJson.getBnr())
 
                         .build();
 
-        if (AktoerUt.isDnr(oppgave.navPersonIdent)) {
-            logger.info("dnr found in FinnOppgaveResponseJson: " + oppgave.navPersonIdent.substring(0, 6) + "*****");
+        if (AktoerUt.isDnr(oppgave.folkeregisterIdent)) {
+            logger.info("dnr found in FinnOppgaveResponseJson: " + oppgave.folkeregisterIdent.substring(0, 6) + "*****");
         }
         return oppgave;
     }

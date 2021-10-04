@@ -103,7 +103,7 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                         if (isBnr(gjelderId)) {
                                             builder.withBnr(gjelderId);
                                         } else {
-                                            if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+                                            if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
                                                 try {
                                                     final AktoerRespons aktoerRespons =
                                                             this.aktoerRestClient.hentGjeldendeAktoerId(gjelderId);
@@ -120,8 +120,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                     return null;
                                                 }
                                             } else {
-                                                log.debug("Using navPersonIdent as is");
-                                                builder.withNavPersonIdent(gjelderId);
+                                                log.debug("Using folkeregisterIdent as is");
+                                                builder.withFolkeregisterIdent(gjelderId);
                                             }
                                         }
                                     } else if (Objects.equals(type, SAMHANDLER)) {

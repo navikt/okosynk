@@ -1,5 +1,6 @@
 package no.nav.okosynk.consumer.oppgave.json;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -9,19 +10,22 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class PostOppgaveRequestJson extends AbstractOppgaveJson {
 
-    private String navPersonIdent;
+    @JsonAlias("navPersonIdent")
+    @JsonProperty("folkeregisterIdent")
+    private String folkeregisterIdent;
 
     public PostOppgaveRequestJson() {
         super();
     }
 
-    @JsonProperty("navPersonIdent")
-    public String getNavPersonIdent() {
-        return this.navPersonIdent;
+    @JsonAlias("navPersonIdent")
+    @JsonProperty("folkeregisterIdent")
+    public String getFolkeregisterIdent() {
+        return this.folkeregisterIdent;
     }
 
-    public void setNavPersonIdent(final String navPersonIdent) {
-        this.navPersonIdent = navPersonIdent;
+    public void setFolkeregisterIdent(final String folkeregisterIdent) {
+        this.folkeregisterIdent = folkeregisterIdent;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(other))
-                .append(this.navPersonIdent, oppgaveJson.navPersonIdent)
+                .append(this.folkeregisterIdent, oppgaveJson.folkeregisterIdent)
                 .isEquals();
     }
 
@@ -46,7 +50,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
     public int hashCode() {
         return new HashCodeBuilder(39, 41)
                 .appendSuper(super.hashCode())
-                .append(navPersonIdent)
+                .append(folkeregisterIdent)
                 .toHashCode();
     }
 
@@ -54,7 +58,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
     public String toString() {
         return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .appendSuper(super.toString())
-                .append("navPersonIdent", this.navPersonIdent)
+                .append("folkeregisterIdent", this.folkeregisterIdent == null ? null : this.folkeregisterIdent.length() > 5 ? this.folkeregisterIdent.substring(0, 6) + "*****" : "*** ugyldig lengde *****")
                 .toString();
     }
 }

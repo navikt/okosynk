@@ -30,7 +30,7 @@ public class Oppgave {
     public final int versjon;
 
     public final String aktoerId;
-    public final String navPersonIdent;
+    public final String folkeregisterIdent;
     public final String bnr;
     public final String orgnr;
     public final String samhandlernr;
@@ -54,7 +54,7 @@ public class Oppgave {
         this.ansvarligSaksbehandlerIdent = oppgaveBuilder.saksbehandlerIdent;
 
         this.aktoerId = oppgaveBuilder.aktoerId;
-        this.navPersonIdent = oppgaveBuilder.navPersonIdent;
+        this.folkeregisterIdent = oppgaveBuilder.folkeregisterIdent;
         this.orgnr = oppgaveBuilder.orgnr;
         this.samhandlernr = oppgaveBuilder.samhandlernr;
         this.bnr = oppgaveBuilder.bnr;
@@ -85,29 +85,29 @@ public class Oppgave {
                         (
                                 this.aktoerId == null && other.aktoerId == null
                                         &&
-                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                        Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
                         )
                                 ||
                                 (
                                         Objects.equals(this.aktoerId, other.aktoerId)
                                                 &&
-                                                this.navPersonIdent == null && other.navPersonIdent == null
+                                                this.folkeregisterIdent == null && other.folkeregisterIdent == null
                                 )
                                 ||
                                 (
                                         !(this.aktoerId == null && other.aktoerId == null)
                                                 &&
-                                                !(this.navPersonIdent == null && other.navPersonIdent == null)
+                                                !(this.folkeregisterIdent == null && other.folkeregisterIdent == null)
                                                 &&
                                                 (
                                                         (
                                                                 this.aktoerId != null && other.aktoerId != null
                                                                         &&
-                                                                        this.navPersonIdent != null && other.navPersonIdent != null
+                                                                        this.folkeregisterIdent != null && other.folkeregisterIdent != null
                                                                         &&
                                                                         Objects.equals(this.aktoerId, other.aktoerId)
                                                                         &&
-                                                                        Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                                                        Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
                                                         )
                                                                 ||
                                                                 (
@@ -117,14 +117,14 @@ public class Oppgave {
                                                                                         this.aktoerId != null && other.aktoerId == null
                                                                         )
                                                                                 &&
-                                                                                Objects.equals(this.navPersonIdent, other.navPersonIdent)
+                                                                                Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
                                                                 )
                                                                 ||
                                                                 (
                                                                         (
-                                                                                this.navPersonIdent == null && other.navPersonIdent != null
+                                                                                this.folkeregisterIdent == null && other.folkeregisterIdent != null
                                                                                         ||
-                                                                                        this.navPersonIdent != null && other.navPersonIdent == null
+                                                                                        this.folkeregisterIdent != null && other.folkeregisterIdent == null
                                                                         )
                                                                                 &&
                                                                                 Objects.equals(this.aktoerId, other.aktoerId)
@@ -154,7 +154,7 @@ public class Oppgave {
                 new StringBuffer()
                         .append("oppgaveId                  : ").append(this.oppgaveId).append(LOG_FIELD_SEPARATOR)
                         .append("aktoerId                   : ").append(this.aktoerId).append(LOG_FIELD_SEPARATOR)
-                        .append("navPersonIdent             : ").append(this.navPersonIdent).append(LOG_FIELD_SEPARATOR)
+                        .append("folkeregisterIdent         : ").append(this.folkeregisterIdent).append(LOG_FIELD_SEPARATOR)
                         .append("samhandlernr               : ").append(this.samhandlernr).append(LOG_FIELD_SEPARATOR)
                         .append("beskrivelse                : ").append(this.beskrivelse == null ? "<null>" : beskrivelse.substring(0, Math.min(beskrivelse.length(), 30))).append("...").append(LOG_FIELD_SEPARATOR)
                         .append("orgnr                      : ").append(this.orgnr).append(LOG_FIELD_SEPARATOR)
@@ -193,7 +193,7 @@ public class Oppgave {
         private String fagomradeKode;
         private boolean lest;
         private String mappeId;
-        private String navPersonIdent;
+        private String folkeregisterIdent;
         private String oppgaveId;
         private String oppgavetypeKode;
         private String orgnr;
@@ -213,8 +213,8 @@ public class Oppgave {
             return this;
         }
 
-        public OppgaveBuilder withNavPersonIdent(final String navPersonIdent) {
-            this.navPersonIdent = navPersonIdent;
+        public OppgaveBuilder withFolkeregisterIdent(final String folkeregisterIdent) {
+            this.folkeregisterIdent = folkeregisterIdent;
             return this;
         }
 
@@ -310,7 +310,7 @@ public class Oppgave {
 
         public OppgaveBuilder withSameValuesAs(final Oppgave otherOppgave) {
             this.oppgaveId = otherOppgave.oppgaveId;
-            this.navPersonIdent = otherOppgave.navPersonIdent;
+            this.folkeregisterIdent = otherOppgave.folkeregisterIdent;
             this.aktoerId = otherOppgave.aktoerId;
             this.samhandlernr = otherOppgave.samhandlernr;
             this.orgnr = otherOppgave.orgnr;

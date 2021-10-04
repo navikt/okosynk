@@ -52,8 +52,8 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     }
 
     @Override
-    public boolean shouldConvertNavPersonIdentToAktoerId() {
-        return getBoolean(Constants.SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY, false);
+    public boolean shouldConvertFolkeregisterIdentToAktoerId() {
+        return getBoolean(Constants.SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY, false);
     }
 
     @Override

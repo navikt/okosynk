@@ -15,6 +15,7 @@ import no.nav.okosynk.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
 import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.Oppgave;
+import no.nav.okosynk.domain.util.AktoerUt;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -207,8 +208,10 @@ public class OppgaveRestClient {
                     } catch (JsonParseException jpe) {
                         parseRawErrorAndThrow(response);
                     }
-                    log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}", postOppgaveRequestJson,
-                            errorResponse);
+                    log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}. {}",
+                            postOppgaveRequestJson,
+                            errorResponse,
+                            AktoerUt.isDnr(postOppgaveRequestJson.getFolkeregisterIdent()) ? "Hint: folkeregisterIdent er et dnr." : "");
                     oppgaverSomIkkeErOpprettet.add(postOppgaveRequestJson);
                 } else {
                     oppgaverSomErOpprettet.add(
@@ -350,7 +353,7 @@ public class OppgaveRestClient {
                         }
                 );
         try {
-            final Oppgave aRandomFoundOppgave = oppgaverAccumulated.stream().filter(oppgave -> oppgave.navPersonIdent != null || oppgave.aktoerId != null).findAny().get();
+            final Oppgave aRandomFoundOppgave = oppgaverAccumulated.stream().filter(oppgave -> oppgave.folkeregisterIdent != null || oppgave.aktoerId != null).findAny().get();
             log.debug("A random found oppgave: " + aRandomFoundOppgave);
         } catch (Exception e) {
             log.warn("Exception when logging a random found oppgave", e);

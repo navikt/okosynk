@@ -179,7 +179,7 @@ public class OppgaveMapperUnitTest {
         return RandUt.constructRandomAlphaNumString(random.nextInt(79), OppgaveMapperUnitTest.random);
     }
 
-    private static String generateRandomNavPersonIdent() {
+    private static String generateRandomFolkeregisterIdent() {
         return RandUt.constructRandomAlphaNumString(OppgaveMapperUnitTest.random.nextInt(87), OppgaveMapperUnitTest.random);
     }
 
@@ -332,7 +332,7 @@ public class OppgaveMapperUnitTest {
                         .withFagomradeKode(OppgaveMapperUnitTest.generateRandomTema())
                         .withLest(RandUt.generateRandomBoolean(OppgaveMapperUnitTest.random))
                         .withMappeId(OppgaveMapperUnitTest.generateRandomMappeId())
-                        .withNavPersonIdent(aktorType == 'N' ? OppgaveMapperUnitTest.generateRandomNavPersonIdent() : null)
+                        .withFolkeregisterIdent(aktorType == 'N' ? OppgaveMapperUnitTest.generateRandomFolkeregisterIdent() : null)
                         .withOppgaveId(OppgaveMapperUnitTest.generateRandomId())
                         .withOppgavetypeKode(generateRandomOppgavetype())
                         .withOrgnr(aktorType == 'O' ? OppgaveMapperUnitTest.generateRandomOrgnr() : null)
@@ -352,7 +352,7 @@ public class OppgaveMapperUnitTest {
         assertEquals(expectedOppgave.behandlingstype, actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
         assertEquals(expectedOppgave.beskrivelse, actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
         assertEquals(expectedOppgave.bnr, actualPostOppgaveRequestJson.getBnr(), "bnr");
-        assertEquals(expectedOppgave.navPersonIdent, actualPostOppgaveRequestJson.getNavPersonIdent(), "navPersonIdent");
+        assertEquals(expectedOppgave.folkeregisterIdent, actualPostOppgaveRequestJson.getFolkeregisterIdent(), "folkeregisterIdent");
         assertEquals(expectedOppgave.oppgavetypeKode, actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
         assertEquals(expectedOppgave.orgnr, actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
         assertEquals(expectedOppgave.prioritetKode, actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");
@@ -389,7 +389,7 @@ public class OppgaveMapperUnitTest {
                         .withAktivTil(LocalDate.of(1970 + random.nextInt(52), 1 + random.nextInt(12), 1 + random.nextInt(28)))
                         .withAktoerId(actorTypes.contains('A') ? RandUt.constructRandomAlphaNumString(random.nextInt(99), OppgaveMapperUnitTest.random) : null)
                         .withBnr(actorTypes.contains('B') ? RandUt.constructRandomAlphaNumString(random.nextInt(97), OppgaveMapperUnitTest.random) : null)
-                        .withNavPersonIdent(actorTypes.contains('N') ? RandUt.constructRandomAlphaNumString(random.nextInt(87), OppgaveMapperUnitTest.random) : null)
+                        .withFolkeregisterIdent(actorTypes.contains('N') ? RandUt.constructRandomAlphaNumString(random.nextInt(87), OppgaveMapperUnitTest.random) : null)
                         .withOrgnr(actorTypes.contains('O') ? RandUt.constructRandomAlphaNumString(random.nextInt(73), OppgaveMapperUnitTest.random) : null)
                         .withSamhandlernr(actorTypes.contains('S') ? RandUt.constructRandomAlphaNumString(random.nextInt(61), OppgaveMapperUnitTest.random) : null)
                         .build();
@@ -466,7 +466,7 @@ public class OppgaveMapperUnitTest {
         assertEquals(expectedFinnOppgaveResponseJson.getTilordnetRessurs(), actualOppgave.ansvarligSaksbehandlerIdent, "ansvarligSaksbehandlerIdent");
         assertEquals(expectedFinnOppgaveResponseJson.getVersjon(), actualOppgave.versjon, "versjon");
 
-        assertNull(actualOppgave.navPersonIdent, "navPersonIdent");
+        assertNull(actualOppgave.folkeregisterIdent, "folkeregisterIdent");
         assertEquals(expectedFinnOppgaveResponseJson.getAktoerId(), actualOppgave.aktoerId, "aktoerId");
         assertEquals(expectedFinnOppgaveResponseJson.getBnr(), actualOppgave.bnr, "bnr");
         assertEquals(expectedFinnOppgaveResponseJson.getOrgnr(), actualOppgave.orgnr, "orgnr");
@@ -475,11 +475,11 @@ public class OppgaveMapperUnitTest {
 
     @ParameterizedTest
     @MethodSource("provideDifferentCombinationsOfAktoerIdAndIdenter")
-    void when_FinnOppgaveResponseJson_contains_different_values_for_aktoerId_and_identer_then_the_mapping_should_set_or_not_set_the_navPersonIdent_accordingly(
+    void when_FinnOppgaveResponseJson_contains_different_values_for_aktoerId_and_identer_then_the_mapping_should_set_or_not_set_the_folkeregisterIdent_accordingly(
             final String aktoerId,
             final Collection<IdentJson> identer,
             final String expectedAktoerId,
-            final String expectedNavPersonIdent
+            final String expectedFolkeregisterIdent
     ) {
         final FinnOppgaveResponseJson expectedFinnOppgaveResponseJson = new FinnOppgaveResponseJson();
         expectedFinnOppgaveResponseJson.setVersjon(131); // Integer/int type of problem, although it is irrelevant for this test
@@ -490,6 +490,6 @@ public class OppgaveMapperUnitTest {
         final Oppgave actualOppgave = OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedFinnOppgaveResponseJson);
 
         assertEquals(expectedAktoerId, actualOppgave.aktoerId, "aktoerId");
-        assertEquals(expectedNavPersonIdent, actualOppgave.navPersonIdent, "navPersonIdent");
+        assertEquals(expectedFolkeregisterIdent, actualOppgave.folkeregisterIdent, "folkeregisterIdent");
     }
 }

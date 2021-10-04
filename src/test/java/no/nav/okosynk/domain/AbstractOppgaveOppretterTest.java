@@ -15,7 +15,7 @@ public abstract class AbstractOppgaveOppretterTest {
 
     protected AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
 
-    private boolean shouldConvertNavPersonIdentToAktoerId_saved = true;
+    private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
 
     protected AbstractOppgaveOppretterTest(final IOkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
@@ -23,20 +23,20 @@ public abstract class AbstractOppgaveOppretterTest {
 
     @BeforeEach
     void beforeEach() {
-        this.shouldConvertNavPersonIdentToAktoerId_saved =
-                this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId();
-        setShouldConvertNavPersonIdentToAktoerId(false);
+        this.shouldConvertFolkeregisterIdentToAktoerId_saved =
+                this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId();
+        setShouldConvertFolkeregisterIdentToAktoerId(false);
     }
 
     @AfterEach
     void afterEach() {
-        setShouldConvertNavPersonIdentToAktoerId(this.shouldConvertNavPersonIdentToAktoerId_saved);
+        setShouldConvertFolkeregisterIdentToAktoerId(this.shouldConvertFolkeregisterIdentToAktoerId_saved);
     }
 
-    protected void setShouldConvertNavPersonIdentToAktoerId(final boolean shouldConvertNavPersonIdentToAktoerId) {
+    protected void setShouldConvertFolkeregisterIdentToAktoerId(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
         System.setProperty(
-                Constants.SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY,
-                Boolean.valueOf(shouldConvertNavPersonIdentToAktoerId).toString());
+                Constants.SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY,
+                Boolean.valueOf(shouldConvertFolkeregisterIdentToAktoerId).toString());
     }
 
     @Test

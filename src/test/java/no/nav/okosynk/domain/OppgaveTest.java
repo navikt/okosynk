@@ -43,7 +43,7 @@ public class OppgaveTest {
                         .withFagomradeKode(RandUt.constructRandomAlphaNumString(random.nextInt(17) + 1, random))
                         .withLest(RandUt.generateRandomBoolean(random))
                         .withMappeId(RandUt.constructRandomAlphaNumString(random.nextInt(19) + 1, random))
-                        .withNavPersonIdent(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
+                        .withFolkeregisterIdent(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
                         .withOppgaveId(RandUt.constructRandomAlphaNumString(random.nextInt(23) + 1, random))
                         .withOppgavetypeKode(RandUt.constructRandomAlphaNumString(random.nextInt(29) + 1, random))
                         .withOrgnr(RandUt.constructRandomAlphaNumString(random.nextInt(9) + 1, random))
@@ -63,119 +63,119 @@ public class OppgaveTest {
     public static Stream<Arguments> provideEqualsRelatedValuesForOppgave() {
         return Stream.of(
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te2", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te2", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty3", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty3", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an2", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an2", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b2", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b2", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o2", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o2", "sh1",
                         false // equals
                 ),
                 Arguments.of(
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh2",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh2",
                         false // equals
                 ),
                 // -----------------------------------------------------------------------------------------------------
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId2", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId2", "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent2", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent2", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId2", "navPersonIdent2", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId2", "folkeregisterIdent2", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te11", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
-                        "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te11", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te11", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te11", "ty2", "an1", null, "navPersonIdent2", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te11", "ty2", "an1", null, "folkeregisterIdent2", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
                         true // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", null, "navPersonIdent2", "b1", "o1", "sh1",
-                        false // equals
-                ),
-                Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent2", "b1", "o1", "sh1",
-                        true // equals
-                ),
-                Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
-                        true // equals
-                ),
-                Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
-                        true // equals
-                ),
-                Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent2", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
                         "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent2", "b1", "o1", "sh1",
+                        true // equals
+                ),
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        true // equals
+                ),
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        true // equals
+                ),
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        false // equals
+                ),
+                Arguments.of( // OK matrise
+                        "te1", "ty2", "an1", "aktoerId1", null, "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", "aktoerId1", "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", "aktoerId1", "folkeregisterIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
                         false // equals
                 ),
                 Arguments.of( // OK matrise
@@ -184,7 +184,7 @@ public class OppgaveTest {
                         false // equals
                 ),
                 Arguments.of( // OK matrise
-                        "te1", "ty2", "an1", null, "navPersonIdent1", "b1", "o1", "sh1",
+                        "te1", "ty2", "an1", null, "folkeregisterIdent1", "b1", "o1", "sh1",
                         "te1", "ty2", "an1", null, null, "b1", "o1", "sh1",
                         false // equals
                 ),
@@ -349,18 +349,18 @@ public class OppgaveTest {
     }
 
     @Test
-    void when_two_oppgaver_with_differing_navPersonIdent_are_compared_then_they_should_differ() {
+    void when_two_oppgaver_with_differing_folkeregisterIdent_are_compared_then_they_should_differ() {
 
         enteringTestHeaderLogger.debug(null);
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withNavPersonIdent("17023410293")
+                        .withFolkeregisterIdent("17023410293")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withNavPersonIdent("17023410292")
+                        .withFolkeregisterIdent("17023410292")
                         .build();
 
         assertFalse(oppgave1.equals(oppgave2));
@@ -410,7 +410,7 @@ public class OppgaveTest {
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
                         .withAktoerId("X")
-                        .withNavPersonIdent("10293847563")
+                        .withFolkeregisterIdent("10293847563")
                         .withSamhandlernr("456")
                         .withOrgnr("890456")
                         .withBnr("0890456")
@@ -422,7 +422,7 @@ public class OppgaveTest {
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
                         .withAktoerId("X")
-                        .withNavPersonIdent("10293847563")
+                        .withFolkeregisterIdent("10293847563")
                         .withSamhandlernr("456")
                         .withOrgnr("890456")
                         .withBnr("0890456")
@@ -442,7 +442,7 @@ public class OppgaveTest {
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
                         .withAktoerId("X")
-                        .withNavPersonIdent("10293847563")
+                        .withFolkeregisterIdent("10293847563")
                         .withSamhandlernr("456")
                         .withOrgnr("890456")
                         .withBnr("0890456")
@@ -460,7 +460,7 @@ public class OppgaveTest {
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
                         .withAktoerId("X")
-                        .withNavPersonIdent("10293847563")
+                        .withFolkeregisterIdent("10293847563")
                         .withSamhandlernr("456")
                         .withOrgnr("890456")
                         .withBnr("0890456")
@@ -539,7 +539,7 @@ public class OppgaveTest {
         final String expectedAnsvarligEnhetId = "lisdnjhpqr";
         final String expectedOppgaveId = "ABC";
         final String expectedAktoerId = "192837465";
-        final String expectedNavPersonIdent = "10293847563";
+        final String expectedFolkeregisterIdent = "10293847563";
         final String expectedSamhandlernr = "XYZabx999";
         final String expectedOrgnr = "111166666222234444";
         final String expectedBnr = "10102929383847475656";
@@ -553,7 +553,7 @@ public class OppgaveTest {
                         .withOppgavetypeKode(expectedOppgavetypeKode)
                         .withAnsvarligEnhetId(expectedAnsvarligEnhetId)
                         .withOppgaveId(expectedOppgaveId)
-                        .withNavPersonIdent(expectedNavPersonIdent)
+                        .withFolkeregisterIdent(expectedFolkeregisterIdent)
                         .withAktoerId(expectedAktoerId)
                         .withSamhandlernr(expectedSamhandlernr)
                         .withOrgnr(expectedOrgnr)
@@ -570,7 +570,7 @@ public class OppgaveTest {
         assertTrue(presentationString.contains(expectedAnsvarligEnhetId));
         assertTrue(presentationString.contains(expectedOppgaveId));
         assertTrue(presentationString.contains(expectedAktoerId));
-        assertTrue(presentationString.contains(expectedNavPersonIdent));
+        assertTrue(presentationString.contains(expectedFolkeregisterIdent));
         assertTrue(presentationString.contains(expectedSamhandlernr));
         assertTrue(presentationString.contains(expectedOrgnr));
         assertTrue(presentationString.contains(expectedBnr));
@@ -584,7 +584,7 @@ public class OppgaveTest {
             final String behandlingstype_batch,
             final String ansvarligEnhetId_batch,
             final String aktoerId_batch,
-            final String navPersonIdent_batch,
+            final String folkeregisterIdent_batch,
             final String bnr_batch,
             final String orgnr_batch,
             final String samhandlernr_batch,
@@ -593,7 +593,7 @@ public class OppgaveTest {
             final String behandlingstype_db,
             final String ansvarligEnhetId_db,
             final String aktoerId_db,
-            final String navPersonIdent_db,
+            final String folkeregisterIdent_db,
             final String bnr_db,
             final String orgnr_db,
             final String samhandlernr_db,
@@ -606,7 +606,7 @@ public class OppgaveTest {
                         .withBehandlingstype(behandlingstype_batch)
                         .withAnsvarligEnhetId(ansvarligEnhetId_batch)
                         .withAktoerId(aktoerId_batch)
-                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withFolkeregisterIdent(folkeregisterIdent_batch)
                         .withBnr(bnr_batch)
                         .withOrgnr(orgnr_batch)
                         .withSamhandlernr(samhandlernr_batch)
@@ -618,7 +618,7 @@ public class OppgaveTest {
                         .withBehandlingstype(behandlingstype_db)
                         .withAnsvarligEnhetId(ansvarligEnhetId_db)
                         .withAktoerId(aktoerId_db)
-                        .withNavPersonIdent(navPersonIdent_db)
+                        .withFolkeregisterIdent(folkeregisterIdent_db)
                         .withBnr(bnr_db)
                         .withOrgnr(orgnr_db)
                         .withSamhandlernr(samhandlernr_db)

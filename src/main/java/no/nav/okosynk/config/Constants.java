@@ -16,7 +16,7 @@ public class Constants {
     public static final String REST_AKTOER_REGISTER_URL_KEY = "AKTOERREGISTER_URL";
     public static final String REST_STS_URL_KEY = "REST_STS_URL";
     public static final String X_CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
-    public static final String SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID_KEY = "SHOULD_CONVERT_NAVPERSONIDENT_TO_AKTOERID";
+    public static final String SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY = "SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID";
 
     static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";

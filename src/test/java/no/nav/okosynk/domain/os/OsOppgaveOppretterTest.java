@@ -67,15 +67,15 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void applyReturnererOppgaveMedRiktigeVerdier(final boolean shouldConvertNavPersonIdentToAktoerId) {
+    void applyReturnererOppgaveMedRiktigeVerdier(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
 
         enteringTestHeaderLogger.debug(null);
 
-        setShouldConvertNavPersonIdentToAktoerId(shouldConvertNavPersonIdentToAktoerId);
+        setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
 
-        final String expectedNavPersonIdent = "10108000398";
+        final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
-        when(this.aktoerRestClient.hentGjeldendeAktoerId(expectedNavPersonIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
+        when(this.aktoerRestClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(OsOppgaveOppretterTest.OS_MELDING_1)).get();
         assertAll(
                 () -> assertEquals("OKO_OS", oppgave.oppgavetypeKode),
@@ -90,12 +90,12 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 () -> assertFalse(oppgave.lest)
         );
 
-        if (this.okosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()) {
+        if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
             assertEquals(expectedAktoerId, oppgave.aktoerId);
-            assertEquals(null, oppgave.navPersonIdent);
+            assertEquals(null, oppgave.folkeregisterIdent);
         } else {
             assertEquals(null, oppgave.aktoerId);
-            assertEquals(expectedNavPersonIdent, oppgave.navPersonIdent);
+            assertEquals(expectedFolkeregisterIdent, oppgave.folkeregisterIdent);
         }
     }
 

@@ -387,7 +387,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_batch,
             final String ansvarligEnhetId_batch,
             final String aktoerId_batch,
-            final String navPersonIdent_batch,
+            final String folkeregisterIdent_batch,
             final String bnr_batch,
             final String orgnr_batch,
             final String samhandlernr_batch,
@@ -396,7 +396,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_db,
             final String ansvarligEnhetId_db,
             final String aktoerId_db,
-            final String navPersonIdent_db,
+            final String folkeregisterIdent_db,
             final String bnr_db,
             final String orgnr_db,
             final String samhandlernr_db,
@@ -411,7 +411,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_batch)
                         .withAnsvarligEnhetId(ansvarligEnhetId_batch)
                         .withAktoerId(aktoerId_batch)
-                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withFolkeregisterIdent(folkeregisterIdent_batch)
                         .withBnr(bnr_batch)
                         .withOrgnr(orgnr_batch)
                         .withSamhandlernr(samhandlernr_batch)
@@ -425,7 +425,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_db)
                         .withAnsvarligEnhetId(ansvarligEnhetId_db)
                         .withAktoerId(aktoerId_db)
-                        .withNavPersonIdent(navPersonIdent_db)
+                        .withFolkeregisterIdent(folkeregisterIdent_db)
                         .withBnr(bnr_db)
                         .withOrgnr(orgnr_db)
                         .withSamhandlernr(samhandlernr_db)
@@ -447,7 +447,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_batch,
             final String ansvarligEnhetId_batch,
             final String aktoerId_batch,
-            final String navPersonIdent_batch,
+            final String folkeregisterIdent_batch,
             final String bnr_batch,
             final String orgnr_batch,
             final String samhandlernr_batch,
@@ -456,7 +456,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_db,
             final String ansvarligEnhetId_db,
             final String aktoerId_db,
-            final String navPersonIdent_db,
+            final String folkeregisterIdent_db,
             final String bnr_db,
             final String orgnr_db,
             final String samhandlernr_db,
@@ -471,7 +471,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_batch)
                         .withAnsvarligEnhetId(ansvarligEnhetId_batch)
                         .withAktoerId(aktoerId_batch)
-                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withFolkeregisterIdent(folkeregisterIdent_batch)
                         .withBnr(bnr_batch)
                         .withOrgnr(orgnr_batch)
                         .withSamhandlernr(samhandlernr_batch)
@@ -485,7 +485,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_db)
                         .withAnsvarligEnhetId(ansvarligEnhetId_db)
                         .withAktoerId(aktoerId_db)
-                        .withNavPersonIdent(navPersonIdent_db)
+                        .withFolkeregisterIdent(folkeregisterIdent_db)
                         .withBnr(bnr_db)
                         .withOrgnr(orgnr_db)
                         .withSamhandlernr(samhandlernr_db)
@@ -507,7 +507,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_batch,
             final String ansvarligEnhetId_batch,
             final String aktoerId_batch,
-            final String navPersonIdent_batch,
+            final String folkeregisterIdent_batch,
             final String bnr_batch,
             final String orgnr_batch,
             final String samhandlernr_batch,
@@ -516,7 +516,7 @@ class OppgaveSynkronisererTest {
             final String behandlingstype_db,
             final String ansvarligEnhetId_db,
             final String aktoerId_db,
-            final String navPersonIdent_db,
+            final String folkeregisterIdent_db,
             final String bnr_db,
             final String orgnr_db,
             final String samhandlernr_db,
@@ -531,7 +531,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_batch)
                         .withAnsvarligEnhetId(ansvarligEnhetId_batch)
                         .withAktoerId(aktoerId_batch)
-                        .withNavPersonIdent(navPersonIdent_batch)
+                        .withFolkeregisterIdent(folkeregisterIdent_batch)
                         .withBnr(bnr_batch)
                         .withOrgnr(orgnr_batch)
                         .withSamhandlernr(samhandlernr_batch)
@@ -545,7 +545,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype(behandlingstype_db)
                         .withAnsvarligEnhetId(ansvarligEnhetId_db)
                         .withAktoerId(aktoerId_db)
-                        .withNavPersonIdent(navPersonIdent_db)
+                        .withFolkeregisterIdent(folkeregisterIdent_db)
                         .withBnr(bnr_db)
                         .withOrgnr(orgnr_db)
                         .withSamhandlernr(samhandlernr_db)
@@ -616,7 +616,7 @@ class OppgaveSynkronisererTest {
     void when_simulating_OS_batch_file_line_to_oppgave_then_no_oppgave_should_be_found_for_opprett() throws MeldingUnreadableException {
 
         final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
-        when(mockedOkosynkConfiguration.shouldConvertNavPersonIdentToAktoerId()).thenReturn(false);
+        when(mockedOkosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()).thenReturn(false);
         final String linjeMedUspesifikkMelding = "14067823770422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
         final IMeldingReader<OsMelding> meldingReader = new OsMeldingReader(OsMelding::new);
         final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
@@ -637,7 +637,7 @@ class OppgaveSynkronisererTest {
                         .withBehandlingstype("ae0215")
                         .withAnsvarligEnhetId("4151")
                         .withAktoerId("1933942921119")
-                        .withNavPersonIdent("14067823770")
+                        .withFolkeregisterIdent("14067823770")
                         .withBnr(null)
                         .withOrgnr(null)
                         .withSamhandlernr(null)

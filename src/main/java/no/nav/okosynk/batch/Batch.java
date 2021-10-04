@@ -172,9 +172,9 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
         batchOppgaver
                 .stream()
-                .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.navPersonIdent))
+                .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.folkeregisterIdent))
                 .forEach(batchOppgave ->
-                        logger.info("dnr found in the batch file: {}", batchOppgave.navPersonIdent.substring(0, 6) + "*****")
+                        logger.info("dnr found in the batch file: {}", batchOppgave.folkeregisterIdent.substring(0, 6) + "*****")
                 );
 
         logger.info("batchOppgaver.size(): {}", batchOppgaver.size());

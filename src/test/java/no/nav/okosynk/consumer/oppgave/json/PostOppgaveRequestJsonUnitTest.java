@@ -35,10 +35,10 @@ public class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<
         fillWithAllHardCodedData(postOppgaveRequestJson2);
         assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
 
-        final String navPersonIdent = "10123145698";
-        postOppgaveRequestJson1.setNavPersonIdent(navPersonIdent);
+        final String folkeregisterIdent = "10123145698";
+        postOppgaveRequestJson1.setFolkeregisterIdent(folkeregisterIdent);
         assertFalse(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
-        postOppgaveRequestJson2.setNavPersonIdent(navPersonIdent);
+        postOppgaveRequestJson2.setFolkeregisterIdent(folkeregisterIdent);
         assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
     }
 
