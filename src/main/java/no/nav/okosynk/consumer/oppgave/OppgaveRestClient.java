@@ -211,7 +211,7 @@ public class OppgaveRestClient {
                     log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}. {}",
                             postOppgaveRequestJson,
                             errorResponse,
-                            AktoerUt.isDnr(postOppgaveRequestJson.getFolkeregisterIdent()) ? "Hint: folkeregisterIdent er et dnr." : "");
+                            AktoerUt.isDnr(postOppgaveRequestJson.getNpidOrFolkeregisterIdent()) ? "Hint: folkeregisterIdent er et dnr." : "");
                     oppgaverSomIkkeErOpprettet.add(postOppgaveRequestJson);
                 } else {
                     oppgaverSomErOpprettet.add(

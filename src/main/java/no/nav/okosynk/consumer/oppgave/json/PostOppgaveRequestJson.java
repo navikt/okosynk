@@ -11,21 +11,19 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 public class PostOppgaveRequestJson extends AbstractOppgaveJson {
 
     @JsonAlias("navPersonIdent")
-    @JsonProperty("folkeregisterIdent")
-    private String folkeregisterIdent;
+    private String npidOrFolkeregisterIdent;
 
     public PostOppgaveRequestJson() {
         super();
     }
 
-    @JsonAlias("navPersonIdent")
-    @JsonProperty("folkeregisterIdent")
-    public String getFolkeregisterIdent() {
-        return this.folkeregisterIdent;
+    @JsonProperty("npidOrFolkeregisterIdent")
+    public String getNpidOrFolkeregisterIdent() {
+        return this.npidOrFolkeregisterIdent;
     }
 
-    public void setFolkeregisterIdent(final String folkeregisterIdent) {
-        this.folkeregisterIdent = folkeregisterIdent;
+    public void setNpidOrFolkeregisterIdent(final String npidOrFolkeregisterIdent) {
+        this.npidOrFolkeregisterIdent = npidOrFolkeregisterIdent;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
 
         return new EqualsBuilder()
                 .appendSuper(super.equals(other))
-                .append(this.folkeregisterIdent, oppgaveJson.folkeregisterIdent)
+                .append(this.npidOrFolkeregisterIdent, oppgaveJson.npidOrFolkeregisterIdent)
                 .isEquals();
     }
 
@@ -50,7 +48,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
     public int hashCode() {
         return new HashCodeBuilder(39, 41)
                 .appendSuper(super.hashCode())
-                .append(folkeregisterIdent)
+                .append(npidOrFolkeregisterIdent)
                 .toHashCode();
     }
 
@@ -58,7 +56,7 @@ public class PostOppgaveRequestJson extends AbstractOppgaveJson {
     public String toString() {
         return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
                 .appendSuper(super.toString())
-                .append("folkeregisterIdent", this.folkeregisterIdent == null ? null : this.folkeregisterIdent.length() > 5 ? this.folkeregisterIdent.substring(0, 6) + "*****" : "*** ugyldig lengde *****")
+                .append("folkeregisterIdent", this.npidOrFolkeregisterIdent == null ? null : this.npidOrFolkeregisterIdent.length() > 5 ? this.npidOrFolkeregisterIdent.substring(0, 6) + "*****" : "*** ugyldig lengde *****")
                 .toString();
     }
 }

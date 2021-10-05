@@ -352,7 +352,7 @@ public class OppgaveMapperUnitTest {
         assertEquals(expectedOppgave.behandlingstype, actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
         assertEquals(expectedOppgave.beskrivelse, actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
         assertEquals(expectedOppgave.bnr, actualPostOppgaveRequestJson.getBnr(), "bnr");
-        assertEquals(expectedOppgave.folkeregisterIdent, actualPostOppgaveRequestJson.getFolkeregisterIdent(), "folkeregisterIdent");
+        assertEquals(expectedOppgave.folkeregisterIdent, actualPostOppgaveRequestJson.getNpidOrFolkeregisterIdent(), "folkeregisterIdent");
         assertEquals(expectedOppgave.oppgavetypeKode, actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
         assertEquals(expectedOppgave.orgnr, actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
         assertEquals(expectedOppgave.prioritetKode, actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");

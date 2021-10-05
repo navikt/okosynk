@@ -44,7 +44,7 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setBeskrivelse(oppgave.beskrivelse);
             postOppgaveRequestJson.setBnr(oppgave.bnr);
             postOppgaveRequestJson.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
-            postOppgaveRequestJson.setFolkeregisterIdent(oppgave.folkeregisterIdent);
+            postOppgaveRequestJson.setNpidOrFolkeregisterIdent(oppgave.folkeregisterIdent);
             postOppgaveRequestJson.setOppgavetype(oppgave.oppgavetypeKode);
             postOppgaveRequestJson.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
             postOppgaveRequestJson.setOrgnr(oppgave.orgnr);
@@ -54,8 +54,8 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
         }
 
-        if (AktoerUt.isDnr(postOppgaveRequestJson.getFolkeregisterIdent())) {
-            logger.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getFolkeregisterIdent().substring(0, 6) + "*****");
+        if (AktoerUt.isDnr(postOppgaveRequestJson.getNpidOrFolkeregisterIdent())) {
+            logger.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getNpidOrFolkeregisterIdent().substring(0, 6) + "*****");
         }
 
         return postOppgaveRequestJson;

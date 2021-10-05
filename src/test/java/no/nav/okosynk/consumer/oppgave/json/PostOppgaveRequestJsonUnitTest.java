@@ -29,16 +29,16 @@ public class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<
     @Test
     void when_selected_sub_fields_differ_then_the_result_should_be_unequal() {
 
-        final PostOppgaveRequestJson postOppgaveRequestJson1 = createEmptyInstance();
+            final PostOppgaveRequestJson postOppgaveRequestJson1 = createEmptyInstance();
         fillWithAllHardCodedData(postOppgaveRequestJson1);
         final PostOppgaveRequestJson postOppgaveRequestJson2 = createEmptyInstance();
         fillWithAllHardCodedData(postOppgaveRequestJson2);
         assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
 
         final String folkeregisterIdent = "10123145698";
-        postOppgaveRequestJson1.setFolkeregisterIdent(folkeregisterIdent);
+        postOppgaveRequestJson1.setNpidOrFolkeregisterIdent(folkeregisterIdent);
         assertFalse(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
-        postOppgaveRequestJson2.setFolkeregisterIdent(folkeregisterIdent);
+        postOppgaveRequestJson2.setNpidOrFolkeregisterIdent(folkeregisterIdent);
         assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
     }
 
