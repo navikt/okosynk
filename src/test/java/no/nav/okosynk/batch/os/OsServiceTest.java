@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 class OsServiceTest extends AbstractServiceTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String MOCK_OS_LINJE = "10108000398009543471 2008-10-102008-10-10NEG K231B2962008-11-012008-11-30000000008820æ 4151         GS      10108000398            ";
 
@@ -34,7 +34,7 @@ class OsServiceTest extends AbstractServiceTest {
 
     @Test
     public void when_a_batch_is_created_it_should_not_be_null()
-        throws ConfigureOrInitializeOkosynkIoException {
+            throws ConfigureOrInitializeOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -50,7 +50,7 @@ class OsServiceTest extends AbstractServiceTest {
         when(mockedOsService.createMeldingMapper(any(AktoerRestClient.class))).thenReturn(mock(IMeldingMapper.class));
 
         final Batch<? extends AbstractMelding> osBatch =
-            mockedOsService.createAndConfigureBatch(getOkosynkConfiguration());
+                mockedOsService.createAndConfigureBatch(getOkosynkConfiguration());
 
         assertNotNull(osBatch);
     }

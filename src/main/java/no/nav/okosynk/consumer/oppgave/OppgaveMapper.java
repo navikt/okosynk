@@ -21,6 +21,7 @@ public class OppgaveMapper {
 
     static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
     private static final Logger logger = LoggerFactory.getLogger(OppgaveMapper.class);
+    private static final Logger secureLog = LoggerFactory.getLogger("securelog");
 
     static PostOppgaveRequestJson mapFromFinnOppgaveResponseJsonToOppgave(final Oppgave oppgave) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
 
@@ -55,7 +56,7 @@ public class OppgaveMapper {
         }
 
         if (AktoerUt.isDnr(postOppgaveRequestJson.getNpidOrFolkeregisterIdent())) {
-            logger.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getNpidOrFolkeregisterIdent().substring(0, 6) + "*****");
+            secureLog.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getNpidOrFolkeregisterIdent().substring(0, 6) + "*****");
         }
 
         return postOppgaveRequestJson;

@@ -1,7 +1,7 @@
 package no.nav.okosynk.domain.ur;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
@@ -20,9 +20,9 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
     private UrOppgaveOppretter urOppgaveOppretter;
     private UrMappingRegelRepository urMappingRegelRepository;
 
-    public UrMapper(final AktoerRestClient aktoerRestClient, final IOkosynkConfiguration okosynkConfiguration) {
+    public UrMapper(final IAktoerClient aktoerClient, final IOkosynkConfiguration okosynkConfiguration) {
         this.urMappingRegelRepository = new UrMappingRegelRepository();
-        this.urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerRestClient, okosynkConfiguration);
+        this.urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerClient, okosynkConfiguration);
     }
 
     @Override

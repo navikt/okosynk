@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import no.nav.okosynk.batch.AbstractBatchBlackBoxTest;
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UrBatchBlackBoxTest {
+public class UrBatchBlackBoxTest extends AbstractBatchBlackBoxTest {
 
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
@@ -38,11 +39,11 @@ public class UrBatchBlackBoxTest {
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         batch =
-                new Batch<UrMelding>(
+                new Batch<>(
                         okosynkConfiguration,
                         Constants.BATCH_TYPE.UR,
                         new UrMeldingReader(UrMelding::new),
-                        new UrMapper(new AktoerRestClient(okosynkConfiguration, Constants.BATCH_TYPE.UR), okosynkConfiguration));
+                        new UrMapper(AbstractBatchBlackBoxTest.createAktoerClient(okosynkConfiguration, Constants.BATCH_TYPE.UR), okosynkConfiguration));
         batch.setUspesifikkMeldingLinjeReader(meldingReaderMock);
     }
 

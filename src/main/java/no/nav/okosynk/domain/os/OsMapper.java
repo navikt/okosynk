@@ -1,7 +1,7 @@
 package no.nav.okosynk.domain.os;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.Oppgave;
 import org.slf4j.Logger;
@@ -20,9 +20,9 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
     private OsOppgaveOppretter osOppgaveOppretter;
     private OsMappingRegelRepository osMappingRegelRepository;
 
-    public OsMapper(final AktoerRestClient aktoerRestClient, final IOkosynkConfiguration okosynkConfiguration) {
+    public OsMapper(final IAktoerClient aktoerClient, final IOkosynkConfiguration okosynkConfiguration) {
         this.osMappingRegelRepository = new OsMappingRegelRepository();
-        this.osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerRestClient, okosynkConfiguration);
+        this.osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerClient, okosynkConfiguration);
     }
 
     @Override

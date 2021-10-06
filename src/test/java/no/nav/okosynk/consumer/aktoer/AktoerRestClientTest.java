@@ -146,8 +146,8 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerRestClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons actualAktoerRespons =
                 assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
         assertNull(actualAktoerRespons.getFeilmelding());
@@ -165,7 +165,7 @@ public class AktoerRestClientTest {
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
-        assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
     }
 
     @Test
@@ -178,11 +178,11 @@ public class AktoerRestClientTest {
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final IllegalStateException illegalStateException =
                 assertThrows(IllegalStateException.class,
-                        () -> aktoerRestClient.hentGjeldendeAktoerId("98765412345"));
+                        () -> aktoerClient.hentGjeldendeAktoerId("98765412345"));
         assertNotNull(illegalStateException.getCause());
         assertEquals(JsonParseException.class, illegalStateException.getCause().getClass());
     }
@@ -201,11 +201,11 @@ public class AktoerRestClientTest {
         // Will provoke an error:
         System.clearProperty(Constants.REST_AKTOER_REGISTER_URL_KEY);
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
 
         assertThrows(IllegalStateException.class,
-                () -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                () -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
     }
 
     @Test
@@ -223,12 +223,12 @@ public class AktoerRestClientTest {
         System.setProperty(Constants.REST_AKTOER_REGISTER_URL_KEY,
                 "977yf83hg38yh6/7/-+09763423454vjhbkjn");
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
 
         final IllegalStateException illegalStateException =
                 assertThrows(IllegalStateException.class,
-                        () -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                        () -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNotNull(illegalStateException.getCause());
         assertEquals(ClientProtocolException.class, illegalStateException.getCause().getClass());
@@ -251,12 +251,12 @@ public class AktoerRestClientTest {
         System.setProperty(Constants.REST_AKTOER_REGISTER_URL_KEY,
                 "99::::\\ht\\tpssss::::/fiiiileeeee::::///:89898999898989898:///////hei//på/deg/?s=7");
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
 
         final IllegalStateException illegalStateException =
                 assertThrows(IllegalStateException.class,
-                        () -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                        () -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNotNull(illegalStateException.getCause());
         assertEquals(URISyntaxException.class, illegalStateException.getCause().getClass());
@@ -273,10 +273,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons aktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNull(aktoerRespons.getAktoerId());
         assertNotNull(aktoerRespons.getFeilmelding());
@@ -294,10 +294,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons aktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNull(aktoerRespons.getAktoerId());
         assertNotNull(aktoerRespons.getFeilmelding());
@@ -314,10 +314,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons aktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNull(aktoerRespons.getAktoerId());
         assertNotNull(aktoerRespons.getFeilmelding());
@@ -334,10 +334,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons aktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
 
         assertNull(aktoerRespons.getAktoerId());
         assertNotNull(aktoerRespons.getFeilmelding());
@@ -354,10 +354,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons actualAktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
         assertNotNull(actualAktoerRespons.getFeilmelding());
         assertNull(actualAktoerRespons.getAktoerId());
     }
@@ -373,10 +373,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons actualAktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
         assertNotNull(actualAktoerRespons.getFeilmelding());
         assertNull(actualAktoerRespons.getAktoerId());
     }
@@ -392,10 +392,10 @@ public class AktoerRestClientTest {
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
         final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.OS;
 
-        final AktoerRestClient aktoerRestClient =
-                assertDoesNotThrow(() -> new AktoerRestClient(okosynkConfiguration, batchType));
+        final IAktoerClient aktoerClient =
+                assertDoesNotThrow(() -> AktoerRestClientTest.createAktoerClient(okosynkConfiguration, batchType));
         final AktoerRespons actualAktoerRespons =
-                assertDoesNotThrow(() -> aktoerRestClient.hentGjeldendeAktoerId(TEST_FNR));
+                assertDoesNotThrow(() -> aktoerClient.hentGjeldendeAktoerId(TEST_FNR));
         assertNotNull(actualAktoerRespons.getFeilmelding());
         assertNull(actualAktoerRespons.getAktoerId());
     }
@@ -590,5 +590,12 @@ public class AktoerRestClientTest {
                 presumableJsonOfAktoerRegisterResponse,
                 HttpURLConnection.HTTP_OK
         );
+    }
+
+    private static IAktoerClient createAktoerClient(
+            final IOkosynkConfiguration okosynkConfiguration,
+            final Constants.BATCH_TYPE batchType
+    ) {
+        return new AktoerRestClient(okosynkConfiguration, batchType);
     }
 }

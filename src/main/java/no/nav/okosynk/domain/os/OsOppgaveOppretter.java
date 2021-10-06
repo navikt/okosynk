@@ -1,7 +1,7 @@
 package no.nav.okosynk.domain.os;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractOppgaveOppretter;
 
 import java.util.Comparator;
@@ -15,10 +15,10 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     OsOppgaveOppretter(
             final OsMappingRegelRepository mappingRegelRepository,
-            final AktoerRestClient aktoerRestClient,
+            final IAktoerClient aktoerClient,
             final IOkosynkConfiguration okosynkConfiguration) {
 
-        super(mappingRegelRepository, aktoerRestClient, okosynkConfiguration);
+        super(mappingRegelRepository, aktoerClient, okosynkConfiguration);
     }
 
     @Override

@@ -2,6 +2,7 @@ package no.nav.okosynk.domain.ur;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractOppgaveOppretter;
 
 import java.util.Comparator;
@@ -15,10 +16,10 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     UrOppgaveOppretter(
             final UrMappingRegelRepository mappingRegelRepository,
-            final AktoerRestClient aktoerRestClient,
+            final IAktoerClient aktoerClient,
             final IOkosynkConfiguration okosynkConfiguration) {
 
-        super(mappingRegelRepository, aktoerRestClient, okosynkConfiguration);
+        super(mappingRegelRepository, aktoerClient, okosynkConfiguration);
     }
 
     @Override

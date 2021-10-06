@@ -85,9 +85,14 @@
             <!-- Logging-avhengigheter -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
             <dependency>
@@ -113,7 +118,6 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logstash.encoder.version}</version>
-                <scope>runtime</scope>
             </dependency>
 
             <dependency>
@@ -356,10 +360,23 @@
             <version>${commons-io.version}</version>
         </dependency>
 
-        <!-- Logging -->
+        <!-- BEGIN Logging related -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.logstash.logback</groupId>
+            <artifactId>logstash-logback-encoder</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <dependency>
@@ -373,6 +390,8 @@
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
 
+        <!-- END Logging related -->
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -384,11 +403,6 @@
             <artifactId>pact-jvm-consumer-junit5</artifactId>
             <version>${pact.version}</version>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
         </dependency>
 
         <dependency>

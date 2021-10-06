@@ -26,7 +26,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class AktoerRestClient {
+public class AktoerRestClient implements IAktoerClient {
 
     public static final String NAV_CALLID = "Nav-Call-Id";
     public static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
@@ -63,7 +63,8 @@ public class AktoerRestClient {
         return new OidcStsClient(okosynkConfiguration, batchType);
     }
 
-    public AktoerRespons hentGjeldendeAktoerId(final String fnr) {
+    @Override
+    public AktoerRespons hentGjeldendeAktoerId(final String folkeregisterIdent) {
         final AktoerRespons aktoerRespons;
         final URI uri;
         try {
@@ -81,7 +82,7 @@ public class AktoerRestClient {
         final String oidcToken = getOidcToken(okosynkConfiguration, batchType);
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + oidcToken);
         request.addHeader(AktoerRestClient.NAV_CALLID, String.valueOf(UUID.randomUUID()));
-        request.addHeader(AktoerRestClient.NAV_PERSONIDENTER, fnr);
+        request.addHeader(AktoerRestClient.NAV_PERSONIDENTER, folkeregisterIdent);
         request.addHeader(AktoerRestClient.NAV_CONSUMER_ID, this.consumerId);
         request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
@@ -90,7 +91,7 @@ public class AktoerRestClient {
             if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
                 final ObjectMapper objectMapper = new ObjectMapper();
                 final JsonNode jsonNode = objectMapper.readTree(response.getEntity().getContent());
-                final JsonNode aktoerResponseJsonNode = jsonNode.get(fnr);
+                final JsonNode aktoerResponseJsonNode = jsonNode.get(folkeregisterIdent);
                 final AktoerIdent aktoerIdent =
                         objectMapper.treeToValue(aktoerResponseJsonNode, AktoerIdent.class);
 

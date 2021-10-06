@@ -2,7 +2,7 @@ package no.nav.okosynk.domain;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,16 +37,16 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
 
     private final IOkosynkConfiguration okosynkConfiguration;
     private final AbstractMappingRegelRepository mappingRegelRepository;
-    private final AktoerRestClient aktoerRestClient;
+    private final IAktoerClient aktoerClient;
 
     protected AbstractOppgaveOppretter(
             final AbstractMappingRegelRepository mappingRegelRepository,
-            final AktoerRestClient aktoerRestClient,
+            final IAktoerClient aktoerClient,
             final IOkosynkConfiguration okosynkConfiguration) {
 
         this.okosynkConfiguration = okosynkConfiguration;
         this.mappingRegelRepository = mappingRegelRepository;
-        this.aktoerRestClient = aktoerRestClient;
+        this.aktoerClient = aktoerClient;
     }
 
     public static String getFagomradeKode() {
@@ -106,7 +106,7 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                             if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
                                                 try {
                                                     final AktoerRespons aktoerRespons =
-                                                            this.aktoerRestClient.hentGjeldendeAktoerId(gjelderId);
+                                                            this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
                                                     if (isNotBlank(aktoerRespons.getFeilmelding())) {
                                                         log.warn(
                                                                 "Fikk feilmelding fra aktoerregisteret ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
