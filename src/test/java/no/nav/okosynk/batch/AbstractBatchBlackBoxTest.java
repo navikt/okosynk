@@ -2,8 +2,8 @@ package no.nav.okosynk.batch;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
+import no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret;
 
 public abstract class AbstractBatchBlackBoxTest {
 
@@ -11,6 +11,6 @@ public abstract class AbstractBatchBlackBoxTest {
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType
     ) {
-        return new AktoerRestClient(okosynkConfiguration, batchType);
+        return new PdlRestClientWithFallbackToAktoerRegisteret(okosynkConfiguration, batchType);
     }
 }

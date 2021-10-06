@@ -52,6 +52,7 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.okosynk.config.Constants.AUTHORIZATION;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
@@ -149,7 +150,7 @@ public class OppgaveRestClient {
     private static void addAzureAdAuthenticationHeader(
             final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
         final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
-        request.addHeader("Authorization", "Bearer " + azureAdAuthenticationToken);
+        request.addHeader(AUTHORIZATION, "Bearer " + azureAdAuthenticationToken);
     }
 
     private static void addBasicAuthenticationHeader(

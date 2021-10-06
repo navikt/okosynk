@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
+
 /**
  * https://doc.nais.io/appendix/zero-trust/index.html
  * https://doc.nais.io/nais-application/application/
@@ -133,7 +135,7 @@ public class AzureAdAuthenticationClient {
             httpPostParameters.add(ImmutablePair.of("grant_type", AzureAdAuthenticationClient.GRANT_TYPE));
             // ---------------------------------------------------------------------------------------------------------
             final List<Map.Entry<String, String>> httpPostHeaders = new ArrayList<Map.Entry<String, String>>() {{
-                add(ImmutablePair.of("Content-Type", "application/x-www-form-urlencoded"));
+                add(ImmutablePair.of(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, "application/x-www-form-urlencoded"));
             }};
             // ---------------------------------------------------------------------------------------------------------
             logger.info("About to acquire an Azure AD access token...");

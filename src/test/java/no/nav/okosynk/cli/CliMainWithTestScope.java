@@ -21,6 +21,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -117,7 +119,7 @@ public class CliMainWithTestScope extends CliMain {
                                 .withQueryParam("identgruppe", equalTo("AktoerId"))
                                 .withQueryParam("gjeldende", equalTo("true"))
                                 .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer "))
-                                .withHeader(AktoerRestClient.NAV_CALLID, matching(".*"))
+                                .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
                                 .withHeader(AktoerRestClient.NAV_PERSONIDENTER, matching(".*"))
                                 .withHeader(AktoerRestClient.NAV_CONSUMER_ID, matching(".*"))
                                 .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
@@ -201,7 +203,7 @@ public class CliMainWithTestScope extends CliMain {
                 .stubFor(
                         WireMock
                                 .post(WireMock.urlEqualTo(urlContext))
-                                .withHeader("Content-Type", equalTo("application/x-www-form-urlencoded"))
+                                .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, equalTo("application/x-www-form-urlencoded"))
                                 .willReturn(
                                         aResponse()
                                                 .withBodyFile(responseFilename)

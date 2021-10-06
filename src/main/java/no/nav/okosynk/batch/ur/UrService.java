@@ -3,7 +3,7 @@ package no.nav.okosynk.batch.ur;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.ur.UrMapper;
@@ -22,7 +22,7 @@ public class UrService extends AbstractService<UrMelding> {
     }
 
     @Override
-    protected IMeldingMapper<UrMelding> createMeldingMapper(final AktoerRestClient aktoerRestClient) {
+    protected IMeldingMapper<UrMelding> createMeldingMapper(final IAktoerClient aktoerRestClient) {
         return new UrMapper(aktoerRestClient, getOkosynkConfiguration());
     }
 }

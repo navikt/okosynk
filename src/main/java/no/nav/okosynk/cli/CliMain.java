@@ -8,7 +8,6 @@ import no.nav.okosynk.batch.ur.UrService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

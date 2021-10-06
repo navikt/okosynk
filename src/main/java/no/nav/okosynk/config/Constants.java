@@ -2,6 +2,15 @@ package no.nav.okosynk.config;
 
 public class Constants {
 
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY = "Nav-Consumer-Token";
+    public static final String HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE = "application/json";
+    public static final String HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE = "text/plain";
+    public static final String HTTP_HEADER_NAV_CALL_ID_KEY = "Nav-Call-Id";
+    public static final String HTTP_HEADER_X_CORRELATION_ID_KEY = "X_CORRELATION_ID";
+    public static final String HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY = "Content-Type";
+
+
     public static final String BATCH_MAX_NUMBER_OF_TRIES_KEY = "batch.max.number.of.tries";
     public static final String BATCH_RETRY_WAIT_TIME_IN_MS_KEY = "batch.retry.wait.time.in.ms";
     public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;

@@ -19,15 +19,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static no.nav.okosynk.config.Constants.AUTHORIZATION;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
+import static org.apache.http.HttpHeaders.ACCEPT;
 
 
 @ExtendWith(PactConsumerTestExt.class)
 @PactTestFor(providerName = "OppgaveResource")
 public class ConsumerPactTest {
 
-    private Map<String, String> headers = MapUtils.putAll(new HashMap<>(), new String[] {
-            "Content-Type", "application/json"
+    private Map<String, String> headers = MapUtils.putAll(new HashMap<>(), new String[]{
+            HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE
     });
 
     @Pact(provider="OppgaveResource", consumer="okosynk_consumer")
@@ -80,8 +84,8 @@ public class ConsumerPactTest {
     void test_opprett(MockServer mockServer) throws IOException {
 
         HttpResponse httpResponse = Request.Post(mockServer.getUrl() + "/api/v1/oppgaver")
-                .setHeader("Authorization", "Basic srvbokosynk001")
-                .setHeader("Accept", "application/json")
+                .setHeader(AUTHORIZATION, "Basic srvbokosynk001")
+                .setHeader(ACCEPT, HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE)
                 .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .bodyString(createOpprettOppgaveJson(), ContentType.APPLICATION_JSON)
                 .execute()
@@ -92,15 +96,15 @@ public class ConsumerPactTest {
     @PactTestFor(pactMethod = "soek")
     void test_soek(MockServer mockServer) throws IOException {
         HttpResponse httpResponse = Request.Get(mockServer.getUrl() + "/api/v1/oppgaver?opprettetAv=srvbokosynk001&tema=OKO&statuskategori=AAPEN")
-                .setHeader("Authorization", "Basic srvbokosynk001")
-                .setHeader("Accept", "application/json")
+                .setHeader(AUTHORIZATION, "Basic srvbokosynk001")
+                .setHeader(ACCEPT, HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE)
                 .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .execute()
                 .returnResponse();
 
         httpResponse = Request.Get(mockServer.getUrl() + "/api/v1/oppgaver?opprettetAv=srvbokosynk002&tema=OKO&statuskategori=AAPEN")
-                .setHeader("Authorization", "Basic srvbokosynk001")
-                .setHeader("Accept", "application/json")
+                .setHeader(AUTHORIZATION, "Basic srvbokosynk001")
+                .setHeader(ACCEPT, HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE)
                 .setHeader(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb")
                 .execute()
                 .returnResponse();
@@ -125,8 +129,8 @@ public class ConsumerPactTest {
 
     private Map<String, String> headers() {
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Basic srvbokosynk001");
-        headers.put("Accept", "application/json");
+        headers.put(AUTHORIZATION, "Basic srvbokosynk001");
+        headers.put(ACCEPT, HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE);
         headers.put(X_CORRELATION_ID_HEADER_KEY, "b8c764acfb-0a04-fd3b-c1db-bc3782890ea1cb");
         return headers;
     }

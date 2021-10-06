@@ -24,11 +24,11 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public class AktoerRestClient implements IAktoerClient {
 
-    public static final String NAV_CALLID = "Nav-Call-Id";
     public static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
     public static final String NAV_PERSONIDENTER = "Nav-Personidenter";
     private static final Logger log = LoggerFactory.getLogger(AktoerRestClient.class);
@@ -81,7 +81,7 @@ public class AktoerRestClient implements IAktoerClient {
         final HttpUriRequest request = new HttpGet(uri);
         final String oidcToken = getOidcToken(okosynkConfiguration, batchType);
         request.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + oidcToken);
-        request.addHeader(AktoerRestClient.NAV_CALLID, String.valueOf(UUID.randomUUID()));
+        request.addHeader(HTTP_HEADER_NAV_CALL_ID_KEY, String.valueOf(UUID.randomUUID()));
         request.addHeader(AktoerRestClient.NAV_PERSONIDENTER, folkeregisterIdent);
         request.addHeader(AktoerRestClient.NAV_CONSUMER_ID, this.consumerId);
         request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());

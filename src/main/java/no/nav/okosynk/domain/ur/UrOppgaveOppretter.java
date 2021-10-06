@@ -1,7 +1,6 @@
 package no.nav.okosynk.domain.ur;
 
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractOppgaveOppretter;
 

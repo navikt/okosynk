@@ -4,6 +4,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static no.nav.okosynk.config.Constants.AUTHORIZATION;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
+import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -101,9 +107,9 @@ public class AktoerRestClientTest {
         wireMockServer
                 .stubFor(
                         get(urlEqualTo(urlIncludingParms))
-                                .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Bearer[\\s\\n]*\\.[\\n0-9a-zA-Z]*\\."))
-                                .withHeader("Nav-Call-Id", matching(
+                                .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
+                                .withHeader(AUTHORIZATION, matching("Bearer[\\s\\n]*\\.[\\n0-9a-zA-Z]*\\."))
+                                .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(
                                         "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
                                 .withHeader("Nav-Personidenter", matching("[0-9]{11}"))
                                 .withHeader("Nav-Consumer-Id", matching("[a-z0-9A-Z]*"))
@@ -113,7 +119,7 @@ public class AktoerRestClientTest {
                                         new EqualToPattern(AktoerRestClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
                                         aResponse()
-                                                .withHeader("Content-Type", "text/plain")
+                                                .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE)
                                                 .withStatus(httpCode)
                                                 .withBody(responseBody)
                                 )

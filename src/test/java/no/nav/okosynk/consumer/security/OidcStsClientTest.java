@@ -6,6 +6,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
+import static no.nav.okosynk.config.Constants.AUTHORIZATION;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
+import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
+import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -105,13 +110,13 @@ public class OidcStsClientTest {
         wireMockServer
                 .stubFor(
                         get(urlEqualTo(urlIncludingParms))
-                                .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*="))
+                                .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
+                                .withHeader(AUTHORIZATION, matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
                                         aResponse()
-                                                .withHeader("Content-Type", "text/plain")
+                                                .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE)
                                                 .withStatus(200)
                                                 .withBody(responseBody)
                                 )
@@ -131,13 +136,13 @@ public class OidcStsClientTest {
                                 .inScenario(scenarioName)
                                 .whenScenarioStateIs(STARTED)
                                 .willSetStateTo("2")
-                                .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*="))
+                                .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
+                                .withHeader(AUTHORIZATION, matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
                                         aResponse()
-                                                .withHeader("Content-Type", "text/plain")
+                                                .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE)
                                                 .withStatus(200)
                                                 .withBody(firstResponseBody)
                                 )
@@ -147,13 +152,13 @@ public class OidcStsClientTest {
                         get(urlEqualTo(urlIncludingParms))
                                 .inScenario(scenarioName)
                                 .whenScenarioStateIs("2")
-                                .withHeader("Accept", matching("application/json"))
-                                .withHeader("Authorization", matching("Basic .*="))
+                                .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
+                                .withHeader(AUTHORIZATION, matching("Basic .*="))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_1, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(OidcStsClientTest.TEST_URL_PARM_KEY_2, new EqualToPattern(OidcStsClientTest.TEST_URL_PARM_VALUE_2))
                                 .willReturn(
                                         aResponse()
-                                                .withHeader("Content-Type", "text/plain")
+                                                .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE)
                                                 .withStatus(200)
                                                 .withBody(secondResponseBody)
                                 )

@@ -3,7 +3,7 @@ package no.nav.okosynk.batch.os;
 import no.nav.okosynk.batch.AbstractService;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.os.OsMapper;
@@ -22,7 +22,7 @@ public class OsService extends AbstractService<OsMelding> {
     }
 
     @Override
-    protected IMeldingMapper<OsMelding> createMeldingMapper(final AktoerRestClient aktoerRestClient) {
+    protected IMeldingMapper<OsMelding> createMeldingMapper(final IAktoerClient aktoerRestClient) {
         return new OsMapper(aktoerRestClient, getOkosynkConfiguration());
     }
 }

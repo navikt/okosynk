@@ -5,6 +5,8 @@ import no.nav.okosynk.cli.AlertMetricsFactory;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
+import no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
 import no.nav.okosynk.domain.IMeldingMapper;
@@ -27,7 +29,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     private final IOkosynkConfiguration okosynkConfiguration;
     private boolean shouldRun;
     private BatchStatus lastBatchStatus;
-    private AktoerRestClient aktoerRestClient;
+    private IAktoerClient aktoerRestClient;
     private Batch<? extends AbstractMelding> batch;
     private IMeldingLinjeFileReader meldingLinjeFileReader;
 
@@ -102,13 +104,13 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return batch;
     }
 
-    protected AktoerRestClient createAktoerRestClient() {
-        return new AktoerRestClient(getOkosynkConfiguration(), getBatchType());
+    protected IAktoerClient createAktoerRestClient() {
+        return new PdlRestClientWithFallbackToAktoerRegisteret(getOkosynkConfiguration(), getBatchType());
     }
 
     protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();
 
-    protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final AktoerRestClient aktoerRestClient);
+    protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final IAktoerClient aktoerRestClient);
 
     protected IOkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;
@@ -143,7 +145,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         this.batch = batch;
     }
 
-    private AktoerRestClient getAktoerRestClient() {
+    private IAktoerClient getAktoerRestClient() {
 
         if (this.aktoerRestClient == null) {
             setAktoerRestClient(createAktoerRestClient());
@@ -151,7 +153,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return this.aktoerRestClient;
     }
 
-    void setAktoerRestClient(final AktoerRestClient aktoerRestClient) {
+    void setAktoerRestClient(final IAktoerClient aktoerRestClient) {
         this.aktoerRestClient = aktoerRestClient;
     }
 

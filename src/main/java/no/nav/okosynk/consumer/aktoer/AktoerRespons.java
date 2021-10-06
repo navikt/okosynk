@@ -1,5 +1,9 @@
 package no.nav.okosynk.consumer.aktoer;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 public class AktoerRespons {
 
   private final String feilmelding;
@@ -16,13 +20,5 @@ public class AktoerRespons {
 
   public static AktoerRespons ok(final String aktoerId) {
     return new AktoerRespons(aktoerId, null);
-  }
-
-  public String getFeilmelding() {
-    return feilmelding;
-  }
-
-  public String getAktoerId() {
-    return aktoerId;
   }
 }
