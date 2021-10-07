@@ -30,7 +30,7 @@
                 <logLevel/>
                 <logLevelValue/>
                 <stackTrace/>
-                <provider class="no.nav.oppgave.infrastruktur.FilteringJsonProvider"/>
+                <provider/>
                 <mdc/>
             </providers>
         </encoder>
