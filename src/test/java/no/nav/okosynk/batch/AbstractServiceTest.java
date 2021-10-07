@@ -3,7 +3,7 @@ package no.nav.okosynk.batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public abstract class AbstractServiceTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final AktoerRestClient mockedAktoerRestClient = mock(AktoerRestClient.class);
+        final IAktoerClient mockedAktoerClient = mock(IAktoerClient.class);
 
         final AbstractService<? extends AbstractMelding> service = getService();
         assertNotNull(service.getAlertMetrics());
@@ -61,7 +61,7 @@ public abstract class AbstractServiceTest {
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpHostUrlKey(), "lkjnlknkl");
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpUserKey(), "SomeDummyDude");
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpPasswordKey(), "SomeDummyPwd");
-        service.setAktoerRestClient(mockedAktoerRestClient);
+        service.setAktoerClient(mockedAktoerClient);
 
         assertDoesNotThrow(() -> service.run());
         assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, service.getLastBatchStatus());

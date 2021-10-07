@@ -9,7 +9,7 @@ import no.nav.okosynk.batch.AbstractServiceTest;
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
@@ -47,7 +47,7 @@ class UrServiceTest extends AbstractServiceTest {
         when(mockedUrService.createAndConfigureBatch(any())).thenCallRealMethod();
         when(mockedUrService.getBatchType()).thenReturn(BATCH_TYPE.UR);
         when(mockedUrService.createMeldingReader()).thenReturn(mock(UrMeldingReader.class));
-        when(mockedUrService.createMeldingMapper(any(AktoerRestClient.class))).thenReturn(mock(IMeldingMapper.class));
+        when(mockedUrService.createMeldingMapper(any(IAktoerClient.class))).thenReturn(mock(IMeldingMapper.class));
 
         final Batch<? extends AbstractMelding> urBatch =
                 mockedUrService.createAndConfigureBatch(getOkosynkConfiguration());

@@ -38,7 +38,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     OsOppgaveOppretterTest() {
         super(new FakeOkosynkConfiguration());
-        this.osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerRestClient, this.okosynkConfiguration);
+        this.osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient, this.okosynkConfiguration);
     }
 
     @Test
@@ -75,7 +75,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
-        when(this.aktoerRestClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
+        when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(OsOppgaveOppretterTest.OS_MELDING_1)).get();
         assertAll(
                 () -> assertEquals("OKO_OS", oppgave.oppgavetypeKode),
@@ -110,7 +110,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 .append(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE)
                 .toString();
 
-        when(this.aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
+        when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         assertEquals(forventetSamletBeskrivelse, this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_1, OsOppgaveOppretterTest.OS_MELDING_2)).get().beskrivelse);
         assertEquals(forventetSamletBeskrivelse, this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_2, OsOppgaveOppretterTest.OS_MELDING_1)).get().beskrivelse);
     }
@@ -123,7 +123,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
         final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
 
-        when(this.aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
+        when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_2, OsOppgaveOppretterTest.OS_MELDING_1)).get();
 
         assertAll(
@@ -141,7 +141,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
         final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
 
-        when(this.aktoerRestClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
+        when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_1, OsOppgaveOppretterTest.OS_MELDING_2)).get();
 
         assertAll(
@@ -176,7 +176,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019400æ 8020         BA      10108000398            ");
 
-        when(this.aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(this.aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
@@ -190,7 +190,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019401æ 8020         BA      10108000398            ");
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));

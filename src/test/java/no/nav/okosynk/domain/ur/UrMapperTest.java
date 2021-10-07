@@ -8,7 +8,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,12 +43,12 @@ class UrMapperTest {
     private UrMelding annenUrMeldingSomSkalBliTilOppgave;
     private UrMelding urMeldingUtenMappingRegel;
     private UrMelding urMeldingEFOG;
-    private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private IAktoerClient aktoerClient = mock(IAktoerClient.class);
     private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
 
     @BeforeEach
     void setUp() {
-        urMapper = new UrMapper(this.aktoerRestClient, this.okosynkConfiguration);
+        urMapper = new UrMapper(this.aktoerClient, this.okosynkConfiguration);
         urMeldingSomSkalBliTilOppgave = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         annenUrMeldingSomSkalBliTilOppgave = new UrMelding(ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         urMeldingUtenMappingRegel = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);
@@ -81,11 +81,11 @@ class UrMapperTest {
 
         setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
 
-        Mockito.reset(aktoerRestClient);
+        Mockito.reset(aktoerClient);
 
         final String expectedFolkeregisterIdent = "02029512345";
         final String expectedAktoerId = "123";
-        when(aktoerRestClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
+        when(aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final List<Oppgave> oppgaver =
             urMapper.lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
 
@@ -110,10 +110,10 @@ class UrMapperTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        Mockito.reset(aktoerRestClient);
+        Mockito.reset(aktoerClient);
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
-        when(aktoerRestClient.hentGjeldendeAktoerId("05073512345")).thenReturn(AktoerRespons.ok("1234"));
+        when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(aktoerClient.hentGjeldendeAktoerId("05073512345")).thenReturn(AktoerRespons.ok("1234"));
         List<Oppgave> oppgaver = urMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
@@ -129,9 +129,9 @@ class UrMapperTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        Mockito.reset(aktoerRestClient);
+        Mockito.reset(aktoerClient);
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
 
         List<Oppgave> oppgaver =
                 urMapper.lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));

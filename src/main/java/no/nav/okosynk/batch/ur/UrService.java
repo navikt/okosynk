@@ -22,7 +22,7 @@ public class UrService extends AbstractService<UrMelding> {
     }
 
     @Override
-    protected IMeldingMapper<UrMelding> createMeldingMapper(final IAktoerClient aktoerRestClient) {
-        return new UrMapper(aktoerRestClient, getOkosynkConfiguration());
+    protected IMeldingMapper<UrMelding> createMeldingMapper(final IAktoerClient aktoerClient) {
+        return new UrMapper(aktoerClient, getOkosynkConfiguration());
     }
 }

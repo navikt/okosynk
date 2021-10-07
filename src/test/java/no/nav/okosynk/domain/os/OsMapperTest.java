@@ -4,7 +4,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.Oppgave;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,7 @@ class OsMapperTest {
     private OsMelding annenOsMeldingSomSkalBliTilOppgave;
     private OsMelding osMeldingSomIkkeHarMapping;
     private OsMelding osMeldingEFOG;
-    private AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    private IAktoerClient aktoerRestClient = mock(IAktoerClient.class);
     private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
 
     @BeforeEach

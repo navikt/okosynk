@@ -107,7 +107,7 @@ public class OppgaveMapper {
                         .build();
 
         if (AktoerUt.isDnr(oppgave.folkeregisterIdent)) {
-            logger.info("dnr found in FinnOppgaveResponseJson: " + oppgave.folkeregisterIdent.substring(0, 6) + "*****");
+            secureLog.info("dnr found in FinnOppgaveResponseJson: " + oppgave.folkeregisterIdent.substring(0, 6) + "*****");
         }
         return oppgave;
     }

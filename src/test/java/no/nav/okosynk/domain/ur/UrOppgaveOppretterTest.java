@@ -38,7 +38,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     UrOppgaveOppretterTest() {
         super(new FakeOkosynkConfiguration());
-        this.urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerRestClient, this.okosynkConfiguration);
+        this.urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient, this.okosynkConfiguration);
     }
 
     @Test
@@ -75,7 +75,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
-        when(this.aktoerRestClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
+        when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(UrOppgaveOppretterTest.UR_MELDING_1)).get();
         assertAll(
                 () -> assertEquals("OKO_UR", oppgave.oppgavetypeKode),
@@ -170,7 +170,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
-        when(this.aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(this.aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
@@ -184,7 +184,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019401æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
-        when(aktoerRestClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
+        when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));

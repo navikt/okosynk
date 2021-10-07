@@ -2,7 +2,7 @@ package no.nav.okosynk.domain;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ public abstract class AbstractOppgaveOppretterTest {
 
     protected final IOkosynkConfiguration okosynkConfiguration;
 
-    protected AktoerRestClient aktoerRestClient = mock(AktoerRestClient.class);
+    protected IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
     private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
 

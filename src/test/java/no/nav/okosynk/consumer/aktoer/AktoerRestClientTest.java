@@ -9,6 +9,8 @@ import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSO
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
+import static no.nav.okosynk.consumer.aktoer.AktoerRestClient.NAV_CONSUMER_ID;
+import static no.nav.okosynk.consumer.aktoer.AktoerRestClient.NAV_PERSONIDENTER;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,8 +113,8 @@ public class AktoerRestClientTest {
                                 .withHeader(AUTHORIZATION, matching("Bearer[\\s\\n]*\\.[\\n0-9a-zA-Z]*\\."))
                                 .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(
                                         "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
-                                .withHeader("Nav-Personidenter", matching("[0-9]{11}"))
-                                .withHeader("Nav-Consumer-Id", matching("[a-z0-9A-Z]*"))
+                                .withHeader(NAV_PERSONIDENTER, matching("[0-9]{11}"))
+                                .withHeader(NAV_CONSUMER_ID, matching("[a-z0-9A-Z]*"))
                                 .withQueryParam(AktoerRestClientTest.TEST_URL_PARM_KEY_1,
                                         new EqualToPattern(AktoerRestClientTest.TEST_URL_PARM_VALUE_1))
                                 .withQueryParam(AktoerRestClientTest.TEST_URL_PARM_KEY_2,

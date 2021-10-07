@@ -4,7 +4,6 @@ import no.nav.okosynk.cli.AbstractAlertMetrics;
 import no.nav.okosynk.cli.AlertMetricsFactory;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret;
 import no.nav.okosynk.domain.AbstractMelding;
@@ -29,7 +28,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     private final IOkosynkConfiguration okosynkConfiguration;
     private boolean shouldRun;
     private BatchStatus lastBatchStatus;
-    private IAktoerClient aktoerRestClient;
+    private IAktoerClient aktoerClient;
     private Batch<? extends AbstractMelding> batch;
     private IMeldingLinjeFileReader meldingLinjeFileReader;
 
@@ -104,13 +103,13 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return batch;
     }
 
-    protected IAktoerClient createAktoerRestClient() {
+    protected IAktoerClient createAktoerClient() {
         return new PdlRestClientWithFallbackToAktoerRegisteret(getOkosynkConfiguration(), getBatchType());
     }
 
     protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();
 
-    protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final IAktoerClient aktoerRestClient);
+    protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final IAktoerClient aktoerClient);
 
     protected IOkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;
@@ -127,7 +126,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
                         okosynkConfiguration,
                         getBatchType(),
                         createMeldingReader(),
-                        createMeldingMapper(getAktoerRestClient())
+                        createMeldingMapper(getAktoerClient())
                 );
 
         return batch;
@@ -145,16 +144,16 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         this.batch = batch;
     }
 
-    private IAktoerClient getAktoerRestClient() {
+    private IAktoerClient getAktoerClient() {
 
-        if (this.aktoerRestClient == null) {
-            setAktoerRestClient(createAktoerRestClient());
+        if (this.aktoerClient == null) {
+            setAktoerClient(createAktoerClient());
         }
-        return this.aktoerRestClient;
+        return this.aktoerClient;
     }
 
-    void setAktoerRestClient(final IAktoerClient aktoerRestClient) {
-        this.aktoerRestClient = aktoerRestClient;
+    void setAktoerClient(final IAktoerClient aktoerClient) {
+        this.aktoerClient = aktoerClient;
     }
 
     private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)

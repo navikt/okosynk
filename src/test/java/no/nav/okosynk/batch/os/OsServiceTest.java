@@ -9,7 +9,7 @@ import no.nav.okosynk.batch.AbstractServiceTest;
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.os.OsMeldingReader;
@@ -47,7 +47,7 @@ class OsServiceTest extends AbstractServiceTest {
         when(mockedOsService.createAndConfigureBatch(any())).thenCallRealMethod();
         when(mockedOsService.getBatchType()).thenReturn(BATCH_TYPE.OS);
         when(mockedOsService.createMeldingReader()).thenReturn(mock(OsMeldingReader.class));
-        when(mockedOsService.createMeldingMapper(any(AktoerRestClient.class))).thenReturn(mock(IMeldingMapper.class));
+        when(mockedOsService.createMeldingMapper(any(IAktoerClient.class))).thenReturn(mock(IMeldingMapper.class));
 
         final Batch<? extends AbstractMelding> osBatch =
                 mockedOsService.createAndConfigureBatch(getOkosynkConfiguration());

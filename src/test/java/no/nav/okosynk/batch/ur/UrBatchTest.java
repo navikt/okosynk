@@ -10,7 +10,7 @@ import no.nav.okosynk.batch.AbstractBatchTest;
 import no.nav.okosynk.batch.Batch;
 import no.nav.okosynk.batch.BatchStatus;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.ur.UrMapper;
 import no.nav.okosynk.domain.ur.UrMelding;
 import no.nav.okosynk.domain.ur.UrMeldingReader;
@@ -36,7 +36,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
+                    new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -52,7 +52,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 null,
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
+                    new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -68,7 +68,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 null,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
+                    new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -84,7 +84,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 null,
-                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
+                    new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             )
         );
     }
@@ -118,7 +118,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                 this.getOkosynkConfiguration(),
                 Constants.BATCH_TYPE.UR,
                 new UrMeldingReader(UrMelding::new),
-                new UrMapper(mock(AktoerRestClient.class), getOkosynkConfiguration())
+                    new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             );
 
         assertDoesNotThrow(() -> { batch.run(); });
