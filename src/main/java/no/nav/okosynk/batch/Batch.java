@@ -29,6 +29,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
     static final int UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT = 25000;
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
+    private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
     private final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
@@ -174,7 +175,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                 .stream()
                 .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.folkeregisterIdent))
                 .forEach(batchOppgave ->
-                        logger.info("dnr found in the batch file: {}", batchOppgave.folkeregisterIdent.substring(0, 6) + "*****")
+                        secureLog.info("dnr found in the batch file: {}", batchOppgave.folkeregisterIdent.substring(0, 6) + "*****")
                 );
 
         logger.info("batchOppgaver.size(): {}", batchOppgaver.size());

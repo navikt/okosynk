@@ -1,10 +1,12 @@
 package no.nav.okosynk.consumer.oppgave.json;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum IdentGruppeV2 {
     @JsonProperty("FOLKEREGISTERIDENT")
     FOLKEREGISTERIDENT("FOLKEREGISTERIDENT"),
+    @JsonAlias("AKTORID")
     @JsonProperty("AKTOERID")
     AKTOERID("AKTOERID"),
     @JsonProperty("NPID")

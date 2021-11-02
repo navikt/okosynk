@@ -69,7 +69,7 @@ public class OidcStsClientTest {
             "." + Base64.getEncoder().encodeToString(TEST_EXPIRED_JSON_TOKEN.getBytes()) + ".";
     private final static String TEST_NON_EXPIRED_JSON_TOKEN =
             "{\n  \"sub\"       : \"alice\",\n  \"iss\"       : \"https://openid.c2id.com\",\n  \"aud\"       : \"client-12345\",\n  \"nonce\"     : \"n-0S6_WzA2Mj\",\n  \"auth_time\" : 1311280969,\n  \"acr\"       : \"c2id.loa.hisec\",\n  \"iat\"       : 1311280970,\n  \"exp\"       : " + Integer.MAX_VALUE + "\n}";
-    private final static String TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN =
+    public final static String TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN =
             "." + Base64.getEncoder().encodeToString(TEST_NON_EXPIRED_JSON_TOKEN.getBytes()) + ".";
 
     private WireMockServer wireMockServer = null;

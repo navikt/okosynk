@@ -36,28 +36,33 @@
         </encoder>
     </appender>
 
-    <logger name="securelog" level="INFO" additivity="false">
+    <logger name="secureLog" level="INFO" additivity="false">
         <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
     <logger name="org.apache.cxf" level="WARN">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
     <logger name="org.glassfish.jersey" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
     <logger name="no.nav.okosynk" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
     <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
     <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
+        <appender-ref ref="SECURE_LOG_APPENDER"/>
     </root>
 
 </configuration>

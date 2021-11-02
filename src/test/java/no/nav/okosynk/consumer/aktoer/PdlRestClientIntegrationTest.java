@@ -1,16 +1,23 @@
 package no.nav.okosynk.consumer.aktoer;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import no.nav.okosynk.config.AbstractOkosynkConfiguration;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.consumer.security.OidcStsClientTest;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
@@ -30,11 +37,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 public class PdlRestClientIntegrationTest {
 
+    private static String PDL_TEST_URL_PROTOCOL = "http";
+    private static String PDL_TEST_URL_SERVER = "localhost";
     private static final int PDL_TEST_URL_PORT = 9012;
-    private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = "http://localhost:" + PDL_TEST_URL_PORT;
+    private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = PDL_TEST_URL_PROTOCOL + "://" + PDL_TEST_URL_SERVER + ":" + PDL_TEST_URL_PORT;
     private static final String PDL_TEST_URL_CONTEXT = "/graphql";
     private static final String PDL_TEST_URL = PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT + PDL_TEST_URL_CONTEXT;
     private final static WireMockServer wireMockServer =
@@ -42,31 +52,55 @@ public class PdlRestClientIntegrationTest {
                     .port(PDL_TEST_URL_PORT)
                     .extensions(new ResponseTemplateTransformer(true)));
 
-    private static final String TEST_TOKEN = "---RUBBISH-TOKEN-FOR-TEST---";
+    private static final String TEST_TOKEN = OidcStsClientTest.TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN;// "---RUBBISH-TOKEN-FOR-TEST---";
 
     private static final PdlRestClient alwaysThrowingPdlRestClient =
-            new PdlRestClient(null, null, true);
+            new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR, true);
 
     private static final PdlRestClient nonAlwaysThrowingPdlRestClient =
-            new PdlRestClient(null, null, false);
+            new PdlRestClient(
+                    new FakeOkosynkConfiguration() {{
+
+                    }}
+
+                    , Constants.BATCH_TYPE.UR, false);
 
     private static final PdlRestClient defaultPdlRestClient =
-            new PdlRestClient(null, null);
+            new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
+
+    private static String savedPdlUrl;
+
+    private static void configureOkSts(final WireMockServer wireMockServer) throws JsonProcessingException {
+        OidcStsClientTest.configureResourceUrlWithoutParms(
+                PdlRestClientIntegrationTest.PDL_TEST_URL_PROTOCOL,
+                PdlRestClientIntegrationTest.PDL_TEST_URL_SERVER,
+                PdlRestClientIntegrationTest.PDL_TEST_URL_PORT);
+        OidcStsClientTest.setupStubWithOKResponseEntityAndWithAnInterpretableToken(wireMockServer);
+    }
 
     @BeforeAll
     static void beforeAll() {
+        PdlRestClientIntegrationTest.savedPdlUrl = System.getProperty(AbstractOkosynkConfiguration.PDL_URL_KEY);
+        System.setProperty(AbstractOkosynkConfiguration.PDL_URL_KEY, PDL_TEST_URL);
         PdlRestClientIntegrationTest.wireMockServer.start();
     }
 
     @AfterAll
     static void afterAll() {
         PdlRestClientIntegrationTest.wireMockServer.stop();
+        if (PdlRestClientIntegrationTest.savedPdlUrl == null) {
+            System.clearProperty(AbstractOkosynkConfiguration.PDL_URL_KEY);
+        } else {
+            System.setProperty(AbstractOkosynkConfiguration.PDL_URL_KEY, PdlRestClientIntegrationTest.savedPdlUrl);
+        }
     }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws JsonProcessingException {
         //reset(/*mockedOppgaveConfiguration, mockedOidcStsClient, mockedPdlRedisCache*/);
         PdlRestClientIntegrationTest.wireMockServer.resetAll();
+        PdlRestClientIntegrationTest.wireMockServer.start();
+        PdlRestClientIntegrationTest.configureOkSts(PdlRestClientIntegrationTest.wireMockServer);
     }
 
     @AfterEach
@@ -80,6 +114,17 @@ public class PdlRestClientIntegrationTest {
 
     @Test
     void when_instantiated_not_to_always_throw_then_it_should_not_throw() {
+
+        PdlRestClientIntegrationTest.wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_ok_PostHentIdenterResponse_001.json")
+                                        .withStatus(200)
+                        )
+        );
+
         assertDoesNotThrow(() -> PdlRestClientIntegrationTest.nonAlwaysThrowingPdlRestClient.hentGjeldendeAktoerId("dummy"));
     }
 
@@ -102,19 +147,19 @@ public class PdlRestClientIntegrationTest {
                                         .withStatus(200)
                         )
         );
-        /*
-        // TODO: Re-introduce:
-        final NotImplementedException actualThrowable =
+        final IllegalStateException actualThrowable =
                 assertThrows(
-                        NotImplementedException.class,
+                        IllegalStateException.class,
                         () -> PdlRestClientIntegrationTest
                                 .nonAlwaysThrowingPdlRestClient
                                 .hentGjeldendeAktoerId(expectedFolkeregisterIdent)
                 );
+
+        assertInstanceOf(IllegalStateException.class, actualThrowable);
         assertEquals("Exception received when trying to parse the response", actualThrowable.getMessage());
         assertNotNull(actualThrowable.getCause());
-        assertInstanceOf(JsonProcessingException.class, actualThrowable.getCause().getClass());
-         */
+        assertInstanceOf(JsonProcessingException.class, actualThrowable.getCause());
+        assertInstanceOf(JsonParseException.class, actualThrowable.getCause());
     }
 
     private MappingBuilder createPostRequestMappingBuilder() {

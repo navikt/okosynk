@@ -17,7 +17,7 @@ public class PdlPersonIdentCollection {
         return
                 this.pdlPersonIdenter
                         .stream()
-                        .filter(personIdent -> PdlGruppe.AKTOERID.equals(personIdent.getGruppe()))
+                        .filter(personIdent -> PdlGruppe.AKTORID.equals(personIdent.getGruppe()))
                         .findAny()
                 ;
     }

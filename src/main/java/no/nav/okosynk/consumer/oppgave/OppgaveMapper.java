@@ -21,7 +21,7 @@ public class OppgaveMapper {
 
     static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
     private static final Logger logger = LoggerFactory.getLogger(OppgaveMapper.class);
-    private static final Logger secureLog = LoggerFactory.getLogger("securelog");
+    private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
     static PostOppgaveRequestJson mapFromFinnOppgaveResponseJsonToOppgave(final Oppgave oppgave) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
 

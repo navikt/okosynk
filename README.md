@@ -245,13 +245,18 @@ eller
 
 ```kubectl delete cronjob okosynkur```
 
+## "Ping" PDl preprod
+
+```curl -v -X OPTIONS  https://pdl-api.dev.intern.nav.no/graphql```
+
 # General practical commands, hints and tips
+
 - Which ports are being listened to (e.g. to see whether the SFTP server is running and listening to the expected port)
     - ```sudo lsof -i -P | grep -i "listen"``` (MAC)
     - ```netstat -an -ptcp | grep LISTEN``` (MAC)
-- En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun 
+- En flatfil kan kjøres flere ganger. En oppgave vil oppdateres tilsvarende endringene i flatfilen hver gang, men kun
   ferdigstilles hvis det har gått lengre tid enn 8 timer siden sist oppgaven ble endret.
-- Ved lokal utvikling benyttes `src/test/resources/application-test.testset_001.properties` for properties som vanligvis 
+- Ved lokal utvikling benyttes `src/test/resources/application-test.testset_001.properties` for properties som vanligvis
   vil ligge i yaml/Kubernetes.
 - OS - service user srvbokosynk001
 - UR - service user srvbokosynk002

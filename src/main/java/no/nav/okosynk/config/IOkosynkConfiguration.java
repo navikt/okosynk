@@ -80,4 +80,6 @@ public interface IOkosynkConfiguration {
     String getAzureAppScopes();
 
     String getSecureHttpProxyUrl();
+
+    String getPdlUrl();
 }

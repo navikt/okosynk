@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 public abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     public static final String AZURE_APP_CLIENT_ID_KEY = "AZURE_APP_CLIENT_ID";
+    public static final String PDL_URL_KEY = "PDL_URL";
 
     public AbstractOkosynkConfiguration() {
     }
@@ -131,5 +132,10 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     @Override
     public String getSecureHttpProxyUrl() {
         return getString("HTTPS_PROXY");
+    }
+
+    @Override
+    public String getPdlUrl() {
+        return getRequiredString(PDL_URL_KEY);
     }
 }

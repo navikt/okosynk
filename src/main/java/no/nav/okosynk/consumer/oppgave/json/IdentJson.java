@@ -1,11 +1,15 @@
 package no.nav.okosynk.consumer.oppgave.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
+@EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IdentJson {
 
     private String ident;
