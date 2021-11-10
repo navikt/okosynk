@@ -17,8 +17,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -41,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 public class PdlRestClientIntegrationTest {
 
@@ -201,7 +198,9 @@ public class PdlRestClientIntegrationTest {
                                 .nonAlwaysThrowingPdlRestClient
                                 .hentGjeldendeAktoerId(npidOrFolkeregisterIdent)
                 );
-        assertEquals("Error when calling PDL. Response could not be parsed as an expected error message: {\n    \"data\": {\n        \"hentIdenter\": null\n    }\n}\n", actualThrowable.getMessage());
+        final String expectedMsg = "Error when calling PDL. Response could not be parsed as an expected error message: {\n    \"data\": {\n        \"hentIdenter\": null\n    }\n}\n".replaceAll("\n", "").replaceAll(" ", "");
+        final String actualMsg = actualThrowable.getMessage().replaceAll("\n", "").replaceAll("\r", "").replaceAll(" ", "");
+        assertEquals(expectedMsg, actualMsg);
     }
 
     @Test
