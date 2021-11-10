@@ -23,6 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static no.nav.okosynk.config.Constants.AUTHORIZATION;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
@@ -34,29 +35,25 @@ import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 public class PdlRestClientIntegrationTest {
 
-    private static String PDL_TEST_URL_PROTOCOL = "http";
-    private static String PDL_TEST_URL_SERVER = "localhost";
     private static final int PDL_TEST_URL_PORT = 9012;
-    private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = PDL_TEST_URL_PROTOCOL + "://" + PDL_TEST_URL_SERVER + ":" + PDL_TEST_URL_PORT;
     private static final String PDL_TEST_URL_CONTEXT = "/graphql";
-    private static final String PDL_TEST_URL = PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT + PDL_TEST_URL_CONTEXT;
     private final static WireMockServer wireMockServer =
             new WireMockServer(new WireMockConfiguration()
                     .port(PDL_TEST_URL_PORT)
                     .extensions(new ResponseTemplateTransformer(true)));
-
     private static final String TEST_TOKEN = OidcStsClientTest.TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN;// "---RUBBISH-TOKEN-FOR-TEST---";
-
     private static final PdlRestClient alwaysThrowingPdlRestClient =
             new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR, true);
-
     private static final PdlRestClient nonAlwaysThrowingPdlRestClient =
             new PdlRestClient(
                     new FakeOkosynkConfiguration() {{
@@ -64,10 +61,12 @@ public class PdlRestClientIntegrationTest {
                     }}
 
                     , Constants.BATCH_TYPE.UR, false);
-
     private static final PdlRestClient defaultPdlRestClient =
             new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
-
+    private static String PDL_TEST_URL_PROTOCOL = "http";
+    private static String PDL_TEST_URL_SERVER = "localhost";
+    private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = PDL_TEST_URL_PROTOCOL + "://" + PDL_TEST_URL_SERVER + ":" + PDL_TEST_URL_PORT;
+    private static final String PDL_TEST_URL = PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT + PDL_TEST_URL_CONTEXT;
     private static String savedPdlUrl;
 
     private static void configureOkSts(final WireMockServer wireMockServer) throws JsonProcessingException {
@@ -134,7 +133,79 @@ public class PdlRestClientIntegrationTest {
     }
 
     @Test
-    void when_hentAktoerId_response_non_parsable_then_an_exception_should_be_thrown() {
+    void when_buildHentIdenterEntityAsString_then_it_should_contain_a_string_as_expected() {
+
+        final String ident = "12345678911";
+        final String hentIdenterEntityAsString = PdlRestClient.buildHentIdenterEntityAsString(ident);
+        assertNotNull(hentIdenterEntityAsString);
+        assertFalse(hentIdenterEntityAsString.isEmpty());
+
+        final String stringPart1 = "hentIdenter(ident: $ident, historikk: false)";
+        assertTrue(hentIdenterEntityAsString.contains(stringPart1));
+
+        final String stringPart2 = "\"ident\": \"" + ident + "\"";
+        assertTrue(hentIdenterEntityAsString.contains(stringPart2));
+    }
+
+    @Test
+    void when_instantiated_to_always_throw_then_any_call_should_throw() {
+
+        final NotImplementedException actualThrowable =
+                assertThrows(
+                        NotImplementedException.class,
+                        () -> PdlRestClientIntegrationTest
+                                .alwaysThrowingPdlRestClient
+                                .hentGjeldendeAktoerId("rubbish")
+                );
+        assertNull(actualThrowable.getCause());
+        assertNull(actualThrowable.getMessage());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_and_not_instantiated_to_always_throw_then_an_exception_should_not_be_thrown() {
+
+        final String expectedFolkeregisterIdent = "78945678911";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, "application/json")
+                                        .withBodyFile("pdl_ok_PostHentIdenterResponse_001.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        assertDoesNotThrow(() -> nonAlwaysThrowingPdlRestClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent));
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_response_is_parsable_as_ok_response_without_data_but_invalid_as_error_then_an_exception_should_be_thrown() {
+
+        final String npidOrFolkeregisterIdent = "78945678911";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_error_error_001.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        final IllegalStateException actualThrowable =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> PdlRestClientIntegrationTest
+                                .nonAlwaysThrowingPdlRestClient
+                                .hentGjeldendeAktoerId(npidOrFolkeregisterIdent)
+                );
+        assertEquals("Error when calling PDL. Response could not be parsed as an expected error message: {\n    \"data\": {\n        \"hentIdenter\": null\n    }\n}\n", actualThrowable.getMessage());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_response_non_parsable_then_an_exception_should_be_thrown() {
 
         final String expectedFolkeregisterIdent = "78945678911";
 
@@ -160,6 +231,118 @@ public class PdlRestClientIntegrationTest {
         assertNotNull(actualThrowable.getCause());
         assertInstanceOf(JsonProcessingException.class, actualThrowable.getCause());
         assertInstanceOf(JsonParseException.class, actualThrowable.getCause());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_status_differs_from_200_then_an_exception_should_be_thrown() {
+
+        final String npidOrFolkeregisterIdent = "78945678911";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBody("Something went wrong")
+                                        .withStatus(HTTP_INTERNAL_ERROR)
+                        )
+        );
+        final IllegalStateException actualThrowable =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> PdlRestClientIntegrationTest
+                                .nonAlwaysThrowingPdlRestClient
+                                .hentGjeldendeAktoerId(npidOrFolkeregisterIdent)
+                );
+        assertEquals("Feil ved kall mot PDL", actualThrowable.getMessage());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_succeeds_then_correct_value_should_be_retrieved() {
+
+        final String npidOrFolkeregisterIdent = "78945678911";
+        final String expectedAktoerId = "3210987654321";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_ok_PostHentIdenterResponse_001.json")
+                                        .withStatus(200)
+                        )
+        );
+        final AktoerRespons actualAktoerRespons =
+                PdlRestClientIntegrationTest.nonAlwaysThrowingPdlRestClient.hentGjeldendeAktoerId(npidOrFolkeregisterIdent);
+        assertNotNull(actualAktoerRespons);
+        assertNull(actualAktoerRespons.getFeilmelding());
+        assertEquals(expectedAktoerId, actualAktoerRespons.getAktoerId());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_fails_then_an_exception_should_be_thrown() {
+
+        final String npidOrFolkeregisterIdent = "78945678911";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_error_PdlErrorResponseJson_001.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        final IllegalStateException actualThrowable =
+                assertThrows(
+                        IllegalStateException.class,
+                        () -> PdlRestClientIntegrationTest
+                                .nonAlwaysThrowingPdlRestClient
+                                .hentGjeldendeAktoerId(npidOrFolkeregisterIdent)
+                );
+        assertEquals("Error when calling PDL. pdlErrorResponseJson: PdlErrorResponseJson(errors=[PdlErrorJson(message=Ikke autentisert, locations=[PdlErrorLocationJson(line=1, column=21)], path=[hentIdenter], extensions=PdlErrorExtensionsJson(code=unauthenticated, classification=ExecutionAborted))])", actualThrowable.getMessage());
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_for_non_active_criterion_then_no_exception_should_be_thrown() {
+
+        final String nonActiveIdent = "NON-ACTIVE";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_ok_PostHentIdenterResponse_003.json")
+                                        .withStatus(200)
+                        )
+        );
+        assertDoesNotThrow(() -> nonAlwaysThrowingPdlRestClient.hentGjeldendeAktoerId(nonActiveIdent));
+    }
+
+    @Test
+    void when_hentGjeldendeAktoerId_for_non_active_criterion_then_expected_value_should_be_found() {
+
+        final String nonActiveIdent = "NON-ACTIVE";
+        final String expectedAktoerId = "1234567890123";
+
+        wireMockServer.stubFor(
+                createPostRequestMappingBuilder()
+                        .willReturn(
+                                aResponse()
+                                        .withHeader("Content-Type", "application/json")
+                                        .withBodyFile("pdl_ok_PostHentIdenterResponse_003.json")
+                                        .withStatus(200)
+                        )
+        );
+
+        final AktoerRespons actualAktoerRespons =
+                PdlRestClientIntegrationTest.nonAlwaysThrowingPdlRestClient.hentGjeldendeAktoerId(nonActiveIdent);
+
+        assertNotNull(actualAktoerRespons);
+        assertNull(actualAktoerRespons.getFeilmelding());
+        assertEquals(expectedAktoerId, actualAktoerRespons.getAktoerId());
     }
 
     private MappingBuilder createPostRequestMappingBuilder() {

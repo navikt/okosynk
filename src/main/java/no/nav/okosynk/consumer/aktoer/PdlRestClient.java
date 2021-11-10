@@ -150,7 +150,7 @@ public class PdlRestClient implements IAktoerClient {
                                                                         PdlPersonIdent
                                                                                 .builder()
                                                                                 .withIdent(aktivIdentJson.getIdent())
-                                                                                .withGruppe(mapFromIdentGruppeV2ToIdentGruppe.get(aktivIdentJson.getIdent()))
+                                                                                .withGruppe(mapFromIdentGruppeV2ToIdentGruppe.get(aktivIdentJson.getGruppe()))
                                                                                 .build()
                                                         )
                                                         .collect(Collectors.toSet())
