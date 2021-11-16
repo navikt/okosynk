@@ -24,7 +24,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         try {
             return this.pdlRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         } catch (Throwable e) {
-            log.debug("Failing when trying to access PDL, falling back on aktoerregisteret", e);
+            log.warn("Failing when trying to access PDL, falling back on aktoerregisteret", e);
             return this.aktoerRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         }
     }

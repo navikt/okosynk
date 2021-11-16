@@ -12,6 +12,7 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
 
     public static final String AZURE_APP_CLIENT_ID_KEY = "AZURE_APP_CLIENT_ID";
     public static final String PDL_URL_KEY = "PDL_URL";
+    public static final String SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY = "SHOULD_PREFER_PDL_TO_AKTOERREGISTERET";
 
     public AbstractOkosynkConfiguration() {
     }
@@ -137,5 +138,10 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     @Override
     public String getPdlUrl() {
         return getRequiredString(PDL_URL_KEY);
+    }
+
+    @Override
+    public boolean shouldPreferPdlToAktoerregisteret() {
+        return getBoolean(AbstractOkosynkConfiguration.SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, true);
     }
 }

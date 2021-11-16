@@ -22,6 +22,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static no.nav.okosynk.config.AbstractOkosynkConfiguration.SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY;
 import static no.nav.okosynk.config.Constants.AUTHORIZATION;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
@@ -58,13 +59,13 @@ public class PdlRestClientIntegrationTest {
                     }}
 
                     , Constants.BATCH_TYPE.UR, false);
-    private static final PdlRestClient defaultPdlRestClient =
-            new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
     private static String PDL_TEST_URL_PROTOCOL = "http";
     private static String PDL_TEST_URL_SERVER = "localhost";
     private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = PDL_TEST_URL_PROTOCOL + "://" + PDL_TEST_URL_SERVER + ":" + PDL_TEST_URL_PORT;
     private static final String PDL_TEST_URL = PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT + PDL_TEST_URL_CONTEXT;
     private static String savedPdlUrl;
+
+    private String savedShouldPreferPdlToAktoerregisteret = null;
 
     private static void configureOkSts(final WireMockServer wireMockServer) throws JsonProcessingException {
         OidcStsClientTest.configureResourceUrlWithoutParms(
@@ -97,10 +98,16 @@ public class PdlRestClientIntegrationTest {
         PdlRestClientIntegrationTest.wireMockServer.resetAll();
         PdlRestClientIntegrationTest.wireMockServer.start();
         PdlRestClientIntegrationTest.configureOkSts(PdlRestClientIntegrationTest.wireMockServer);
+        this.savedShouldPreferPdlToAktoerregisteret = System.getProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
     }
 
     @AfterEach
     void afterEach() {
+        if (this.savedShouldPreferPdlToAktoerregisteret == null) {
+            System.clearProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
+        } else {
+            System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, savedShouldPreferPdlToAktoerregisteret);
+        }
     }
 
     @Test
@@ -125,8 +132,13 @@ public class PdlRestClientIntegrationTest {
     }
 
     @Test
-    void when_instantiated_as_default_then_it_should_throw() {
-        assertThrows(NotImplementedException.class, () -> PdlRestClientIntegrationTest.defaultPdlRestClient.hentGjeldendeAktoerId("dummy"));
+    void when_instantiated_not_to_prefer_pdl_then_it_should_throw() {
+
+        System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, "false");
+
+        final PdlRestClient defaultPdlRestClient = new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
+
+        assertThrows(NotImplementedException.class, () -> defaultPdlRestClient.hentGjeldendeAktoerId("dummy"));
     }
 
     @Test

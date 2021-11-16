@@ -59,6 +59,8 @@ spec:
       value: "false"
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io/graphql
+    - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
+      value: "false"
 
   vault:
     enabled: true
