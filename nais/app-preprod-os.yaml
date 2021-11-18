@@ -56,11 +56,11 @@ spec:
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
       value: "true"
     - name: SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID
-      value: "false"
+      value: "true"
     - name: PDL_URL
       value: https://pdl-api.dev-fss-pub.nais.io/graphql
     - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
-      value: "false"
+      value: "true"
 
   vault:
     enabled: true
