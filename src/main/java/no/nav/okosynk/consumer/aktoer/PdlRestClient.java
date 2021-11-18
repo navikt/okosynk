@@ -28,10 +28,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.nav.okosynk.config.Constants.AUTHORIZATION;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_X_CORRELATION_ID_KEY;
+import static no.nav.okosynk.config.Constants.*;
 
 public class PdlRestClient implements IAktoerClient {
 
@@ -86,7 +83,7 @@ public class PdlRestClient implements IAktoerClient {
                         .header(AUTHORIZATION, "Bearer " + selfAuthenticationToken)
                         .header(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, "Bearer " + selfAuthenticationToken)
                         .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
-                        .header(HTTP_HEADER_X_CORRELATION_ID_KEY, correlationId)
+                        .header(X_CORRELATION_ID_HEADER_KEY, correlationId)
                         .buildPost(Entity.text(hentIdenterEntityAsString));
         log.info("Henter identer fra pdl for folkeregisterIdent...");
         final Response postHentIdenterResponse = invocation.invoke();

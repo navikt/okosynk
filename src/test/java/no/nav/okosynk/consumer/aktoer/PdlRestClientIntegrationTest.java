@@ -29,7 +29,7 @@ import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAI
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_X_CORRELATION_ID_KEY;
+import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -361,7 +361,7 @@ public class PdlRestClientIntegrationTest {
                 .withHeader(AUTHORIZATION, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
                 .withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
                 .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
-                .withHeader(HTTP_HEADER_X_CORRELATION_ID_KEY, matching(".*"))
+                .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
                 .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
                 .withHeader(CONTENT_TYPE, matching(HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE))
                 ;

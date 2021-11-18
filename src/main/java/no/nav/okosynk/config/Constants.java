@@ -7,7 +7,6 @@ public class Constants {
     public static final String HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE = "application/json";
     public static final String HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE = "text/plain";
     public static final String HTTP_HEADER_NAV_CALL_ID_KEY = "Nav-Call-Id";
-    public static final String HTTP_HEADER_X_CORRELATION_ID_KEY = "X_CORRELATION_ID";
     public static final String HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY = "Content-Type";
 
 
