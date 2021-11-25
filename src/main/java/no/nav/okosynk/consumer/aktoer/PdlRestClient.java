@@ -55,6 +55,8 @@ public class PdlRestClient implements IAktoerClient {
         this.okosynkConfiguration = okosynkConfiguration;
         this.batchType = batchType;
         this.shouldAlwaysThrow = shouldAlwaysThrow;
+
+        log.info("PDL REST client created. batchType: {}, shouldAlwaysThrow: {}", this.batchType, this.shouldAlwaysThrow);
     }
 
     static String buildHentIdenterEntityAsString(final String ident) {
