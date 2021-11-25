@@ -57,6 +57,7 @@ spec:
       value: "true"
     - name: PDL_URL
       value: https://pdl-api.prod-fss-pub.nais.io/graphql
+      # FROM arbeidsfordeling-facade: https://pdl-api.intern.nav.no/graphql
     - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
       value: "false"
 

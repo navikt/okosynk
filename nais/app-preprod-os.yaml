@@ -58,7 +58,7 @@ spec:
     - name: SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID
       value: "true"
     - name: PDL_URL
-      value: https://pdl-api.dev-fss-pub.nais.io/graphql
+      value: https://pdl-api-q1.dev.intern.nav.no/graphql
     - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
       value: "true"
 
