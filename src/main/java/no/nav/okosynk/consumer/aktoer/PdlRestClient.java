@@ -118,7 +118,7 @@ public class PdlRestClient implements IAktoerClient {
                     folkeregisterIdent,
                     postHentIdenterResponse.getStatus(),
                     postHentIdenterResponseAsString);
-            secureLog.warn(msg);
+            log.error(msg); // Change to secureLog when secureLog is working
             throw new IllegalStateException("Feil ved kall mot PDL");
         }
         final PdlPersonIdentCollection pdlPersonIdentCollection =
