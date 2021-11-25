@@ -2,6 +2,7 @@ package no.nav.okosynk.consumer.aktoer;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,9 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
             aktoerResponsFromPdl = this.pdlRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         } catch (Throwable e) {
             log.warn("Failing when trying to access PDL, falling back on aktoerregisteret", e);
+            if (!(e instanceof NotImplementedException)) {
+                log.error("Crash against PDL: ", e);
+            }
         }
 
         final AktoerRespons aktoerResponsFromTps = this.aktoerRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
