@@ -17,6 +17,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.ws.rs.core.MediaType;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -362,7 +364,7 @@ public class PdlRestClientIntegrationTest {
                 .withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
                 .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                .withHeader(ACCEPT, matching(HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE))
+                .withHeader(ACCEPT, matching(MediaType.TEXT_PLAIN))
                 .withHeader(CONTENT_TYPE, matching(HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE))
                 ;
     }
