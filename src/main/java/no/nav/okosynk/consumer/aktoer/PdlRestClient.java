@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -86,7 +87,7 @@ public class PdlRestClient implements IAktoerClient {
                         .header(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, "Bearer " + selfAuthenticationToken)
                         .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
                         .header(X_CORRELATION_ID_HEADER_KEY, correlationId)
-                        .buildPost(Entity.text(hentIdenterEntityAsString));
+                        .buildPost(Entity.json(hentIdenterEntityAsString));
         log.info("Henter identer fra pdl for folkeregisterIdent...");
         final Response postHentIdenterResponse = invocation.invoke();
         final String postHentIdenterResponseAsString = postHentIdenterResponse.readEntity(String.class);

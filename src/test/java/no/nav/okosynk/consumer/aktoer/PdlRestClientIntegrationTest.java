@@ -364,8 +364,7 @@ public class PdlRestClientIntegrationTest {
                 .withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
                 .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
                 .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                //.withHeader(ACCEPT, matching(MediaType.MEDIA_TYPE_WILDCARD))
-                .withHeader(CONTENT_TYPE, matching(HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE))
+                .withHeader(CONTENT_TYPE, matching(MediaType.APPLICATION_JSON))
                 ;
     }
 }
