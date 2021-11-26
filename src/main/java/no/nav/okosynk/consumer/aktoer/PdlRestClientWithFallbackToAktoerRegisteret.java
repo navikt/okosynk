@@ -3,14 +3,12 @@ package no.nav.okosynk.consumer.aktoer;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.domain.util.AktoerUt;
-import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClient {
@@ -41,7 +39,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         try {
             aktoerResponsFromPdl = this.pdlRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         } catch (Throwable e) {
-            final String msg = "Failing when trying to access PDL, falling back on aktoerregisteret";
+            final String msg = "Failing when trying to access PDL. The result from TPS will be preferred.";
             log.error(msg, e);
             aktoerResponsFromPdl = AktoerRespons.feil(msg);
         }
@@ -66,7 +64,10 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
             }
         }
 
-        return this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret() ? aktoerResponsFromPdl : aktoerResponsFromTps;
+        return this.okosynkConfiguration
+                .shouldPreferPdlToAktoerregisteret() ?
+                (aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl : aktoerResponsFromTps)
+                : aktoerResponsFromTps;
     }
 
     @Override
