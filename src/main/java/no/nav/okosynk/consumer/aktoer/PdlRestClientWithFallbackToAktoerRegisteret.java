@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClient {
@@ -95,7 +96,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         }
 
         public void incDiff(final String folkeregisterIdent) {
-            stats.get(FolkeregisterIdentType.of(folkeregisterIdent)).incDiff();
+            stats.get(FolkeregisterIdentType.of(folkeregisterIdent)).incDiff(folkeregisterIdent);
             log.info("pdlTpsStatistics: " + this);
         }
 
@@ -109,16 +110,18 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
                     stats
                             .keySet()
                             .stream()
-                            .map(folkeregisterIdentType -> folkeregisterIdentType.name() + ": " + stats.toString())
+                            .map(folkeregisterIdentType -> folkeregisterIdentType.name() + ": " + stats.get(folkeregisterIdentType).toString())
                             .collect(Collectors.joining(", "));
         }
     }
 
     public static class DiffEq {
-        int noDiff = 0;
-        int noEq = 0;
+        private int noDiff = 0;
+        private int noEq = 0;
+        private String folkeregisterIdentsWithDifferences = "";
 
-        public void incDiff() {
+        public void incDiff(final String folkeregisterIdent) {
+            folkeregisterIdentsWithDifferences += (folkeregisterIdentsWithDifferences.equals("") ? "" : ", ") + folkeregisterIdent;
             noDiff++;
         }
 
@@ -128,7 +131,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
 
         @Override
         public String toString() {
-            return "eq: " + noEq + ", diff: " + noDiff;
+            return "eq: " + noEq + ", diff: " + noDiff + ", folkeregisterIdentsWithDifferences: " + folkeregisterIdentsWithDifferences;
         }
     }
 }
