@@ -81,7 +81,7 @@ public class PdlRestClient implements IAktoerClient {
         final Invocation invocation =
                 jerseyHttpClient
                         .target(pdlUrl)
-                        .request(MediaType.MEDIA_TYPE_WILDCARD)
+                        .request()
                         .header(AUTHORIZATION, "Bearer " + selfAuthenticationToken)
                         .header(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, "Bearer " + selfAuthenticationToken)
                         .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
