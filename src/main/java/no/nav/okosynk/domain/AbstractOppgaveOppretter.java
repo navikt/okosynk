@@ -3,6 +3,7 @@ package no.nav.okosynk.domain;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
+import no.nav.okosynk.domain.util.AktoerUt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,7 +175,6 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     protected abstract Comparator<MELDINGSTYPE> getMeldingComparator();
 
     private boolean isBnr(String aktorNr) {
-        int month = Integer.valueOf(substring(aktorNr, 2, 4));
-        return (month >= 21 && month <= 32);
+        return AktoerUt.isBnr(aktorNr);
     }
 }
