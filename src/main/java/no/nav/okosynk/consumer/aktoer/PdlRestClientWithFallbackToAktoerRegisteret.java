@@ -47,12 +47,12 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
 
         final AktoerRespons aktoerResponsFromTps = this.aktoerRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         if (aktoerResponsFromPdl != null) {
-            final String aktoerIdFromPdl = aktoerResponsFromPdl.getAktoerId();
-            final String aktoerIdFromTps = aktoerResponsFromTps.getAktoerId();
+            final String aktoerIdFromPdl = aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl.getAktoerId() : "Finnes ikke";
+            final String aktoerIdFromTps = aktoerResponsFromTps.isOk() ? aktoerResponsFromTps.getAktoerId() : "Finnes ikke";
             if (Objects.equals(aktoerIdFromPdl, aktoerIdFromTps)) {
                 pdlTpsStatistics.incEq(folkeregisterIdent);
             } else {
-                pdlTpsStatistics.incDiff(folkeregisterIdent);
+                pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
                 final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
                 log.warn(msgBase);
                 secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerIdFromTps);
@@ -60,7 +60,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
             log.info("About to return aktoerResponsFromPdl");
             return aktoerResponsFromPdl;
         } else {
-            pdlTpsStatistics.incDiff(folkeregisterIdent);
+            pdlTpsStatistics.incDiff(folkeregisterIdent, null, null);
             log.info("About to return aktoerResponsFromTps");
             return aktoerResponsFromTps;
         }
@@ -95,8 +95,8 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
             stats.put(FolkeregisterIdentType.FNR, new DiffEq());
         }
 
-        public void incDiff(final String folkeregisterIdent) {
-            stats.get(FolkeregisterIdentType.of(folkeregisterIdent)).incDiff(folkeregisterIdent);
+        public void incDiff(final String folkeregisterIdent, final String aktoerIdFromPdl, final String aktoerIdFromTps) {
+            stats.get(FolkeregisterIdentType.of(folkeregisterIdent)).incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
             log.info("pdlTpsStatistics: " + this);
         }
 
@@ -120,8 +120,8 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         private int noEq = 0;
         private String folkeregisterIdentsWithDifferences = "";
 
-        public void incDiff(final String folkeregisterIdent) {
-            folkeregisterIdentsWithDifferences += (folkeregisterIdentsWithDifferences.equals("") ? "" : ", ") + folkeregisterIdent;
+        public void incDiff(final String folkeregisterIdent, final String aktoerIdFromPdl, final String aktoerIdFromTps) {
+            folkeregisterIdentsWithDifferences += (folkeregisterIdentsWithDifferences.equals("") ? "" : ", ") + "[" + folkeregisterIdent + " - " + aktoerIdFromPdl + " - " + aktoerIdFromTps + "]";
             noDiff++;
         }
 

@@ -21,4 +21,8 @@ public class AktoerRespons {
   public static AktoerRespons ok(final String aktoerId) {
     return new AktoerRespons(aktoerId, null);
   }
+
+  public boolean isOk() {
+    return feilmelding == null;
+  }
 }
