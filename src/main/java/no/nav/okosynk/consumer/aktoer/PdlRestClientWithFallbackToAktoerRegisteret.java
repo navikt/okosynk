@@ -66,7 +66,11 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
     }
 
     @Override
-    public void finalize() {
+    protected void finalize() {
+        report();
+    }
+
+    private void report() {
         log.info("pdlTpsStatistics: " + pdlTpsStatistics);
     }
 
@@ -92,6 +96,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
 
         public void incDiff(final String folkeregisterIdent) {
             stats.get(FolkeregisterIdentType.of(folkeregisterIdent)).incDiff();
+            log.info("pdlTpsStatistics: " + this);
         }
 
         public void incEq(final String folkeregisterIdent) {
