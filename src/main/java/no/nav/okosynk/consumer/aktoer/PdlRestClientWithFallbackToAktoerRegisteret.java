@@ -21,12 +21,14 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
     private final IAktoerClient pdlRestClient;
     private final IAktoerClient aktoerRestClient;
     private final PdlTpsStatistics pdlTpsStatistics = new PdlTpsStatistics();
+    private final IOkosynkConfiguration okosynkConfiguration;
 
     public PdlRestClientWithFallbackToAktoerRegisteret(
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) {
         this.pdlRestClient = new PdlRestClient(okosynkConfiguration, batchType);
         this.aktoerRestClient = new AktoerRestClient(okosynkConfiguration, batchType);
+        this.okosynkConfiguration = okosynkConfiguration;
 
         log.info("PdlRestClientWithFallbackToAktoerRegisteret created. batchType: {}", batchType);
         secureLog.info("Just making sure something is logged wih secureLog, never mind!");
@@ -35,35 +37,36 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
     @Override
     public AktoerRespons hentGjeldendeAktoerId(final String folkeregisterIdent) {
 
-        AktoerRespons aktoerResponsFromPdl = null;
+        AktoerRespons aktoerResponsFromPdl;
         try {
             aktoerResponsFromPdl = this.pdlRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         } catch (Throwable e) {
-            log.warn("Failing when trying to access PDL, falling back on aktoerregisteret", e);
-            if (!(e instanceof NotImplementedException)) {
-                log.error("Crash against PDL: ", e);
-            }
+            final String msg = "Failing when trying to access PDL, falling back on aktoerregisteret";
+            log.error(msg, e);
+            aktoerResponsFromPdl = AktoerRespons.feil(msg);
         }
 
         final AktoerRespons aktoerResponsFromTps = this.aktoerRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
-        if (aktoerResponsFromPdl != null) {
-            final String aktoerIdFromPdl = aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl.getAktoerId() : "Finnes ikke";
-            final String aktoerIdFromTps = aktoerResponsFromTps.isOk() ? aktoerResponsFromTps.getAktoerId() : "Finnes ikke";
-            if (Objects.equals(aktoerIdFromPdl, aktoerIdFromTps)) {
-                pdlTpsStatistics.incEq(folkeregisterIdent);
+        {
+            if (aktoerResponsFromPdl != null) {
+                final String aktoerIdFromPdl = aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl.getAktoerId() : "Finnes ikke";
+                final String aktoerIdFromTps = aktoerResponsFromTps.isOk() ? aktoerResponsFromTps.getAktoerId() : "Finnes ikke";
+                if (Objects.equals(aktoerIdFromPdl, aktoerIdFromTps)) {
+                    pdlTpsStatistics.incEq(folkeregisterIdent);
+                } else {
+                    pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
+                    final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
+                    log.warn(msgBase);
+                    secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerIdFromTps);
+                }
+                log.info("About to return aktoerResponsFromPdl");
             } else {
-                pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
-                final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
-                log.warn(msgBase);
-                secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerIdFromTps);
+                pdlTpsStatistics.incDiff(folkeregisterIdent, null, null);
+                log.info("About to return aktoerResponsFromTps");
             }
-            log.info("About to return aktoerResponsFromPdl");
-            return aktoerResponsFromPdl;
-        } else {
-            pdlTpsStatistics.incDiff(folkeregisterIdent, null, null);
-            log.info("About to return aktoerResponsFromTps");
-            return aktoerResponsFromTps;
         }
+
+        return this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret() ? aktoerResponsFromPdl : aktoerResponsFromTps;
     }
 
     @Override

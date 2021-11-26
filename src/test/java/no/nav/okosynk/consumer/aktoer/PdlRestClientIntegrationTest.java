@@ -52,15 +52,9 @@ public class PdlRestClientIntegrationTest {
                     .port(PDL_TEST_URL_PORT)
                     .extensions(new ResponseTemplateTransformer(true)));
     private static final String TEST_TOKEN = OidcStsClientTest.TEST_BASE64_ENCODED_AND_TAGGED_NON_EXPIRED_JSON_TOKEN;// "---RUBBISH-TOKEN-FOR-TEST---";
-    private static final PdlRestClient alwaysThrowingPdlRestClient =
-            new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR, true);
     private static final PdlRestClient nonAlwaysThrowingPdlRestClient =
-            new PdlRestClient(
-                    new FakeOkosynkConfiguration() {{
-
-                    }}
-
-                    , Constants.BATCH_TYPE.UR, false);
+            new PdlRestClient(new FakeOkosynkConfiguration() {{
+            }}, Constants.BATCH_TYPE.UR);
     private static String PDL_TEST_URL_PROTOCOL = "http";
     private static String PDL_TEST_URL_SERVER = "localhost";
     private static final String PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT = PDL_TEST_URL_PROTOCOL + "://" + PDL_TEST_URL_SERVER + ":" + PDL_TEST_URL_PORT;
@@ -113,11 +107,6 @@ public class PdlRestClientIntegrationTest {
     }
 
     @Test
-    void when_instantiated_to_always_throw_then_it_should_throw() {
-        assertThrows(NotImplementedException.class, () -> PdlRestClientIntegrationTest.alwaysThrowingPdlRestClient.hentGjeldendeAktoerId("dummy"));
-    }
-
-    @Test
     void when_instantiated_not_to_always_throw_then_it_should_not_throw() {
 
         PdlRestClientIntegrationTest.wireMockServer.stubFor(
@@ -140,7 +129,7 @@ public class PdlRestClientIntegrationTest {
 
         final PdlRestClient defaultPdlRestClient = new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
 
-        assertThrows(NotImplementedException.class, () -> defaultPdlRestClient.hentGjeldendeAktoerId("dummy"));
+        assertThrows(IllegalStateException.class, () -> defaultPdlRestClient.hentGjeldendeAktoerId("dummy"));
     }
 
     @Test
@@ -156,20 +145,6 @@ public class PdlRestClientIntegrationTest {
 
         final String stringPart2 = "\"ident\": \"" + ident + "\"";
         assertTrue(hentIdenterEntityAsString.contains(stringPart2));
-    }
-
-    @Test
-    void when_instantiated_to_always_throw_then_any_call_should_throw() {
-
-        final NotImplementedException actualThrowable =
-                assertThrows(
-                        NotImplementedException.class,
-                        () -> PdlRestClientIntegrationTest
-                                .alwaysThrowingPdlRestClient
-                                .hentGjeldendeAktoerId("rubbish")
-                );
-        assertNull(actualThrowable.getCause());
-        assertNull(actualThrowable.getMessage());
     }
 
     @Test

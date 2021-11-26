@@ -40,24 +40,15 @@ public class PdlRestClient implements IAktoerClient {
 
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
-    private final boolean shouldAlwaysThrow;
     private OidcStsClient oidcStsClient;
-
-    public PdlRestClient(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-        this(okosynkConfiguration, batchType, !okosynkConfiguration.shouldPreferPdlToAktoerregisteret());
-    }
 
     PdlRestClient(
             final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType,
-            final boolean shouldAlwaysThrow) {
+            final Constants.BATCH_TYPE batchType) {
         this.okosynkConfiguration = okosynkConfiguration;
         this.batchType = batchType;
-        this.shouldAlwaysThrow = shouldAlwaysThrow;
 
-        log.info("PDL REST client created. batchType: {}, shouldAlwaysThrow: {}", this.batchType, this.shouldAlwaysThrow);
+        log.info("PDL REST client created. batchType: {}", this.batchType);
     }
 
     static String buildHentIdenterEntityAsString(final String ident) {
@@ -169,10 +160,6 @@ public class PdlRestClient implements IAktoerClient {
 
     @Override
     public AktoerRespons hentGjeldendeAktoerId(final String folkeregisterIdent) {
-
-        if (this.shouldAlwaysThrow) {
-            throw new NotImplementedException();
-        }
 
         final PdlPersonIdentCollection pdlPersonIdentCollection =
                 PdlRestClient.hentAktivePdlIdenterFromPdl(
