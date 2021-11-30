@@ -54,7 +54,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
                 pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
                 final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
                 log.warn(msgBase);
-                secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerResponsFromTps.getAktoerId());
+                log.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerResponsFromTps.getAktoerId());
             }
         }
 
