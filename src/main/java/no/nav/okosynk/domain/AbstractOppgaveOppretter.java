@@ -110,7 +110,7 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                             this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
                                                     if (isNotBlank(aktoerRespons.getFeilmelding())) {
                                                         log.warn(
-                                                                "Fikk feilmelding fra aktoerregisteret ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
+                                                                "Fikk feilmelding fra leverandør av aktoerid  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
                                                                 aktoerRespons.getFeilmelding());
                                                         return null;
                                                     } else {
