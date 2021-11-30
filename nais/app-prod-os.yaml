@@ -58,7 +58,7 @@ spec:
     - name: PDL_URL
       value: https://pdl-api.nais.adeo.no/graphql
     - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
-      value: "false"
+      value: "true"
 
   vault:
     enabled: true

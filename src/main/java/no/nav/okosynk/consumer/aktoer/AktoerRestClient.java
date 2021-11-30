@@ -65,7 +65,6 @@ public class AktoerRestClient implements IAktoerClient {
 
     @Override
     public AktoerRespons hentGjeldendeAktoerId(final String folkeregisterIdent) {
-        final AktoerRespons aktoerRespons;
         final URI uri;
         try {
             final String restAktoerRegisterUrl =
@@ -86,6 +85,7 @@ public class AktoerRestClient implements IAktoerClient {
         request.addHeader(AktoerRestClient.NAV_CONSUMER_ID, this.consumerId);
         request.addHeader(HttpHeaders.ACCEPT, ContentType.APPLICATION_JSON.getMimeType());
 
+        final AktoerRespons aktoerRespons;
         try (final CloseableHttpResponse response = getCloseableHttpClient().execute(request)) {
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {

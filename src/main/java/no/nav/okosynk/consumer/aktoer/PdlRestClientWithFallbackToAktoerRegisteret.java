@@ -46,28 +46,35 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
 
         final AktoerRespons aktoerResponsFromTps = this.aktoerRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         {
-            if (aktoerResponsFromPdl != null) {
-                final String aktoerIdFromPdl = aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl.getAktoerId() : "Finnes ikke";
-                final String aktoerIdFromTps = aktoerResponsFromTps.isOk() ? aktoerResponsFromTps.getAktoerId() : "Finnes ikke";
-                if (Objects.equals(aktoerIdFromPdl, aktoerIdFromTps)) {
-                    pdlTpsStatistics.incEq(folkeregisterIdent);
-                } else {
-                    pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
-                    final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
-                    log.warn(msgBase);
-                    secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerIdFromTps);
-                }
-                log.info("About to return aktoerResponsFromPdl");
+            final String aktoerIdFromPdl = aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl.getAktoerId() : "Finnes ikke";
+            final String aktoerIdFromTps = aktoerResponsFromTps.isOk() ? aktoerResponsFromTps.getAktoerId() : "Finnes ikke";
+            if (Objects.equals(aktoerIdFromPdl, aktoerIdFromTps)) {
+                pdlTpsStatistics.incEq(folkeregisterIdent);
             } else {
-                pdlTpsStatistics.incDiff(folkeregisterIdent, null, null);
-                log.info("About to return aktoerResponsFromTps");
+                pdlTpsStatistics.incDiff(folkeregisterIdent, aktoerIdFromPdl, aktoerIdFromTps);
+                final String msgBase = "Discrepancy between the aktoerIds returned from TPS and PDL";
+                log.warn(msgBase);
+                secureLog.warn("{}, aktoerIdFromPdl: {}, aktoerIdFromTps: {}", msgBase, aktoerIdFromPdl, aktoerResponsFromTps.getAktoerId());
             }
         }
 
-        return this.okosynkConfiguration
-                .shouldPreferPdlToAktoerregisteret() ?
-                (aktoerResponsFromPdl.isOk() ? aktoerResponsFromPdl : aktoerResponsFromTps)
-                : aktoerResponsFromTps;
+        final AktoerRespons aktoerResponsChosen;
+        String msg = "shouldPreferPdlToAktoerregisteret: " + this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret();
+        if (this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret()) {
+            msg += ", aktoerResponsFromPdl.isOk()" + aktoerResponsFromPdl.isOk();
+            if (aktoerResponsFromPdl.isOk()) {
+                msg = "Returning aktoerResponsFromPdl, because " + msg;
+                aktoerResponsChosen = aktoerResponsFromPdl;
+            } else {
+                msg = "Returning aktoerResponsFromTps, because " + msg;
+                aktoerResponsChosen = aktoerResponsFromTps;
+            }
+        } else {
+            msg = "Returning aktoerResponsFromTps, because " + msg;
+            aktoerResponsChosen = aktoerResponsFromTps;
+        }
+
+        return aktoerResponsChosen;
     }
 
     @Override
