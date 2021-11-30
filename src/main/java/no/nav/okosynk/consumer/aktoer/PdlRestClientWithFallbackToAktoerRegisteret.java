@@ -61,7 +61,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         final AktoerRespons aktoerResponsChosen;
         String msg = "shouldPreferPdlToAktoerregisteret: " + this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret();
         if (this.okosynkConfiguration.shouldPreferPdlToAktoerregisteret()) {
-            msg += ", aktoerResponsFromPdl.isOk()" + aktoerResponsFromPdl.isOk();
+            msg += ", aktoerResponsFromPdl.isOk(): " + aktoerResponsFromPdl.isOk();
             if (aktoerResponsFromPdl.isOk()) {
                 msg = "Returning aktoerResponsFromPdl, because " + msg;
                 aktoerResponsChosen = aktoerResponsFromPdl;
