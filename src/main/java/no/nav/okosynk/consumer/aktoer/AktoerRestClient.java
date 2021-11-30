@@ -97,7 +97,7 @@ public class AktoerRestClient implements IAktoerClient {
 
                 if (isNotBlank(aktoerIdent.getFeilmelding())) {
                     aktoerRespons = AktoerRespons.feil(String
-                            .format("Mottok feilmelding fra aktoerregisteret: %s", aktoerIdent.getFeilmelding()));
+                            .format("Mottok feilmelding fra leverandøren av aktoerid: %s", aktoerIdent.getFeilmelding()));
                 } else {
                     final List<AktoerIdentEntry> identer = aktoerIdent.getIdenter();
                     if (identer != null && !identer.isEmpty()) {
