@@ -39,7 +39,7 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
         try {
             aktoerResponsFromPdl = this.pdlRestClient.hentGjeldendeAktoerId(folkeregisterIdent);
         } catch (Throwable e) {
-            final String msg = "Failing when trying to access PDL. The result from TPS will be preferred.";
+            final String msg = "Failing when trying to access PDL.";
             log.error(msg, e);
             aktoerResponsFromPdl = AktoerRespons.feil(msg);
         }
@@ -66,13 +66,15 @@ public class PdlRestClientWithFallbackToAktoerRegisteret implements IAktoerClien
                 msg = "Returning aktoerResponsFromPdl, because " + msg;
                 aktoerResponsChosen = aktoerResponsFromPdl;
             } else {
-                msg = "Returning aktoerResponsFromTps, because " + msg;
+                msg = "Returning aktoerResponsFromTps, because " + msg + ", aktoerResponsFromPdl.getFeilmelding(): " + aktoerResponsFromPdl.getFeilmelding();
                 aktoerResponsChosen = aktoerResponsFromTps;
             }
         } else {
             msg = "Returning aktoerResponsFromTps, because " + msg;
             aktoerResponsChosen = aktoerResponsFromTps;
         }
+
+        log.info(msg);
 
         return aktoerResponsChosen;
     }
