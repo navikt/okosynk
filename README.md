@@ -40,7 +40,6 @@ teste lokalt mot disse hvis naisdevice tillater det. Det er ikke forsøkt.
 
 ### Lokal testkjøring av batchen med skreddersøm
 - Kopiér og rename følgende filer...
-    - ... src/test/resources/__files/aktoerRegisterResponseFnrToAktoerId.testset_001.json
     - ... src/test/resources/__files/stsResponse.testset_001.json
     - ... src/test/resources/__files/oppgaveResponseFinnOppgaver.testset_001.json
     - ... src/test/resources/__files/oppgaveResponseOpprettOppgaver.testset_001.json

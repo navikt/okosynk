@@ -35,7 +35,6 @@ import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 public class PdlRestClient implements IAktoerClient {
 
     private static final Logger log = LoggerFactory.getLogger(PdlRestClient.class);
-    private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
     private static final String FILE_NAME_HENT_IDENTER_GRAPHQL_QUERY = "pdl/hentIdenter.graphql";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

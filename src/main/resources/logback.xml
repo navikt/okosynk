@@ -60,11 +60,6 @@
         <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
-    <logger name="no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret" level="INFO">
-        <appender-ref ref="STDOUT_JSON"/>
-        <appender-ref ref="SECURE_LOG_APPENDER"/>
-    </logger>
-
     <root level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="SECURE_LOG_APPENDER"/>

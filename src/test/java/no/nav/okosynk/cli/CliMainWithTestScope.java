@@ -6,7 +6,6 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.consumer.aktoer.AktoerRestClient;
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
@@ -44,7 +43,6 @@ public class CliMainWithTestScope extends CliMain {
     private static Collection<WireMockServer> startMockedProviderServers(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
         final Collection<WireMockServer> mockedProviderServers = new ArrayList<>();
         mockedProviderServers.add(CliMainWithTestScope.mockPrometheusProviderAndStartIt(okosynkConfiguration));
-        mockedProviderServers.add(CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockStsProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockAzureAdProviderAndStartIt(okosynkConfiguration));
         mockedProviderServers.add(CliMainWithTestScope.mockOppgaveProviderAndStartIt(okosynkConfiguration));
@@ -91,54 +89,6 @@ public class CliMainWithTestScope extends CliMain {
             final com.github.tomakehurst.wiremock.http.Request request,
             final com.github.tomakehurst.wiremock.http.Response response) {
         logger.info("*** Mocked *** Prometheus request body: \n{}", request.getBodyAsString());
-    }
-
-    private static WireMockServer mockAktoerRegisterProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
-        final String restAktoerRegisterUrl =
-                okosynkConfiguration.getRequiredString(Constants.REST_AKTOER_REGISTER_URL_KEY);
-        final URL url = new URL(restAktoerRegisterUrl);
-        final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
-        wireMockConfiguration.port(url.getPort());
-        wireMockConfiguration.extensions(new ResponseTemplateTransformer(true));
-        final WireMockServer wireMockServer = new WireMockServer(wireMockConfiguration);
-        wireMockServer.addMockServiceRequestListener(CliMainWithTestScope::logAktoerRegisterRequest);
-        wireMockServer.start();
-        CliMainWithTestScope.mockAktoerRegisterProviderAndStartIt(wireMockServer, okosynkConfiguration);
-
-        return wireMockServer;
-    }
-
-    private static void mockAktoerRegisterProviderAndStartIt(final WireMockServer wireMockServer, final IOkosynkConfiguration okosynkConfiguration) {
-
-        final String responseFilename = okosynkConfiguration.getRequiredString("testset_fileName_aktoerRegisterResponseFnrToAktoerId");
-        wireMockServer
-                .stubFor(
-                        WireMock
-                                .get(WireMock.urlEqualTo("/aktoerregister/api/v1/identer?identgruppe=AktoerId&gjeldende=true"))
-                                .withQueryParam("identgruppe", equalTo("AktoerId"))
-                                .withQueryParam("gjeldende", equalTo("true"))
-                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer "))
-                                .withHeader(Constants.HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
-                                .withHeader(AktoerRestClient.NAV_PERSONIDENTER, matching(".*"))
-                                .withHeader(AktoerRestClient.NAV_CONSUMER_ID, matching(".*"))
-                                .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
-                                .willReturn(
-                                        aResponse()
-                                                .withBodyFile(responseFilename)
-                                                .withStatus(200)
-                                )
-                )
-        ;
-    }
-
-    private static void logAktoerRegisterRequest(
-            final com.github.tomakehurst.wiremock.http.Request request,
-            final com.github.tomakehurst.wiremock.http.Response response) {
-        logger.info("*** Mocked *** AktoerRegister request absoluteUrl: {}", request.getAbsoluteUrl());
-        logger.info("*** Mocked *** AktoerRegister request headers: \n{}", request.getHeaders());
-        logger.info("*** Mocked *** AktoerRegister request parameter: {}", request.queryParameter("identgruppe"));
-        logger.info("*** Mocked *** AktoerRegister request parameter: {}", request.queryParameter("gjeldende"));
-        logger.info("*** Mocked *** AktoerRegister response body: {}", new String(response.getBody()));
     }
 
     private static WireMockServer mockStsProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {

@@ -31,8 +31,6 @@
 
     <logger name="no.nav.okosynk" level="DEBUG"/>
 
-    <logger name="no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret" level="WARN"/>
-
     <logger name="no.nav.sbl.dialogarena.common.cxf" level="INFO"/>
 
     <logger name="org.apache.cxf" level="WARN"/>

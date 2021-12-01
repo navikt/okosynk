@@ -21,7 +21,6 @@ public class Constants {
     public static final String NAV_TRUSTSTORE_PATH_KEY = "NAV_TRUSTSTORE_PATH";
     public static final String OPPGAVE_URL_KEY = "OPPGAVE_URL";
     public static final String PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY = "PUSH_GATEWAY_ADDRESS";
-    public static final String REST_AKTOER_REGISTER_URL_KEY = "AKTOERREGISTER_URL";
     public static final String REST_STS_URL_KEY = "REST_STS_URL";
     public static final String X_CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
     public static final String SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY = "SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID";

@@ -3,8 +3,6 @@ package no.nav.okosynk.config;
 import org.apache.commons.configuration2.ex.ConversionException;
 import org.javatuples.Quintet;
 import org.javatuples.Sextet;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -13,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static no.nav.okosynk.config.AbstractOkosynkConfiguration.SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -24,22 +21,6 @@ public class OkosynkConfigurationTest {
             LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final Logger logger = LoggerFactory.getLogger(OkosynkConfigurationTest.class);
-
-    private String savedShouldPreferPdlToAktoerregisteret = null;
-
-    @BeforeEach
-    void beforeEach() {
-        this.savedShouldPreferPdlToAktoerregisteret = System.getProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
-    }
-
-    @AfterEach
-    void afterEach() {
-        if (savedShouldPreferPdlToAktoerregisteret == null) {
-            System.clearProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
-        } else {
-            System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, savedShouldPreferPdlToAktoerregisteret);
-        }
-    }
 
     @Test
     @DisplayName("Test that the OkosynkConfiguration cannot be instantiated with a null applicationPropertiesFileName parameter")
@@ -717,35 +698,5 @@ public class OkosynkConfigurationTest {
 
             assertEquals(expectedVal, actualVal, msg);
         }
-    }
-
-    @Test
-    void when_SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_is_not_set_then_shouldPreferPdlToAktoerregisteret_should_return_expected_value() {
-        System.clearProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
-        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
-        final boolean expectedShouldPreferPdlToAktoerregisteret = true;
-        final boolean actualShouldPreferPdlToAktoerregisteret = okosynkConfiguration.shouldPreferPdlToAktoerregisteret();
-        assertEquals(expectedShouldPreferPdlToAktoerregisteret, actualShouldPreferPdlToAktoerregisteret);
-    }
-
-    @Test
-    void when_SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_is_false_then_shouldPreferPdlToAktoerregisteret_should_return_false() {
-        System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, "false");
-        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
-        final boolean expectedShouldPreferPdlToAktoerregisteret = false;
-        final boolean actualShouldPreferPdlToAktoerregisteret = okosynkConfiguration.shouldPreferPdlToAktoerregisteret();
-        assertEquals(expectedShouldPreferPdlToAktoerregisteret, actualShouldPreferPdlToAktoerregisteret);
-    }
-
-    @Test
-    void when_SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_is_true_then_shouldPreferPdlToAktoerregisteret_should_return_true() {
-        System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, "true");
-        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
-        final boolean expectedShouldPreferPdlToAktoerregisteret = true;
-        final boolean actualShouldPreferPdlToAktoerregisteret = okosynkConfiguration.shouldPreferPdlToAktoerregisteret();
-        assertEquals(expectedShouldPreferPdlToAktoerregisteret, actualShouldPreferPdlToAktoerregisteret);
     }
 }

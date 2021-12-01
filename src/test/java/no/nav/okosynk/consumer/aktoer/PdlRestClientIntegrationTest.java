@@ -10,9 +10,7 @@ import no.nav.okosynk.config.AbstractOkosynkConfiguration;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.consumer.security.OidcStsClientTest;
-import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,15 +22,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
-import static no.nav.okosynk.config.AbstractOkosynkConfiguration.SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY;
 import static no.nav.okosynk.config.Constants.AUTHORIZATION;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
-import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -61,8 +55,6 @@ public class PdlRestClientIntegrationTest {
     private static final String PDL_TEST_URL = PDL_TEST_URL_PROTOCOL_SERVER_AND_PORT + PDL_TEST_URL_CONTEXT;
     private static String savedPdlUrl;
 
-    private String savedShouldPreferPdlToAktoerregisteret = null;
-
     private static void configureOkSts(final WireMockServer wireMockServer) throws JsonProcessingException {
         OidcStsClientTest.configureResourceUrlWithoutParms(
                 PdlRestClientIntegrationTest.PDL_TEST_URL_PROTOCOL,
@@ -90,20 +82,9 @@ public class PdlRestClientIntegrationTest {
 
     @BeforeEach
     void beforeEach() throws JsonProcessingException {
-        //reset(/*mockedOppgaveConfiguration, mockedOidcStsClient, mockedPdlRedisCache*/);
         PdlRestClientIntegrationTest.wireMockServer.resetAll();
         PdlRestClientIntegrationTest.wireMockServer.start();
         PdlRestClientIntegrationTest.configureOkSts(PdlRestClientIntegrationTest.wireMockServer);
-        this.savedShouldPreferPdlToAktoerregisteret = System.getProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
-    }
-
-    @AfterEach
-    void afterEach() {
-        if (this.savedShouldPreferPdlToAktoerregisteret == null) {
-            System.clearProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY);
-        } else {
-            System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, savedShouldPreferPdlToAktoerregisteret);
-        }
     }
 
     @Test
@@ -124,8 +105,6 @@ public class PdlRestClientIntegrationTest {
 
     @Test
     void when_instantiated_not_to_prefer_pdl_then_it_should_throw() {
-
-        System.setProperty(SHOULD_PREFER_PDL_TO_AKTOERREGISTERET_KEY, "false");
 
         final PdlRestClient defaultPdlRestClient = new PdlRestClient(new FakeOkosynkConfiguration(), Constants.BATCH_TYPE.UR);
 

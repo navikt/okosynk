@@ -29,8 +29,6 @@ spec:
   env:
     - name: OPPGAVE_URL
       value: https://oppgave.nais.preprod.local/api/v1/oppgaver
-    - name: AKTOERREGISTER_URL
-      value: https://app-q1.adeo.no/aktoerregister/api/v1/identer
     - name: REST_STS_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
     - name: SECURITYTOKENSERVICE_URL
@@ -59,8 +57,6 @@ spec:
       value: "true"
     - name: PDL_URL
       value: https://pdl-api-q1.dev.intern.nav.no/graphql
-    - name: SHOULD_PREFER_PDL_TO_AKTOERREGISTERET
-      value: "true"
 
   vault:
     enabled: true

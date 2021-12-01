@@ -82,6 +82,4 @@ public interface IOkosynkConfiguration {
     String getSecureHttpProxyUrl();
 
     String getPdlUrl();
-
-    boolean shouldPreferPdlToAktoerregisteret();
 }
