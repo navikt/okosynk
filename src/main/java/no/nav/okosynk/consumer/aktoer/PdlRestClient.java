@@ -43,7 +43,7 @@ public class PdlRestClient implements IAktoerClient {
     private final Constants.BATCH_TYPE batchType;
     private OidcStsClient oidcStsClient;
 
-    PdlRestClient(
+    public PdlRestClient(
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) {
         this.okosynkConfiguration = okosynkConfiguration;

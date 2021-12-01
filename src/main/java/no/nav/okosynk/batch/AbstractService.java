@@ -5,6 +5,7 @@ import no.nav.okosynk.cli.AlertMetricsFactory;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
+import no.nav.okosynk.consumer.aktoer.PdlRestClient;
 import no.nav.okosynk.consumer.aktoer.PdlRestClientWithFallbackToAktoerRegisteret;
 import no.nav.okosynk.domain.AbstractMelding;
 import no.nav.okosynk.domain.AbstractMeldingReader;
@@ -104,7 +105,8 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     }
 
     protected IAktoerClient createAktoerClient() {
-        return new PdlRestClientWithFallbackToAktoerRegisteret(getOkosynkConfiguration(), getBatchType());
+        //return new PdlRestClientWithFallbackToAktoerRegisteret(getOkosynkConfiguration(), getBatchType());
+        return new PdlRestClient(getOkosynkConfiguration(), getBatchType());
     }
 
     protected abstract AbstractMeldingReader<MELDINGSTYPE> createMeldingReader();
