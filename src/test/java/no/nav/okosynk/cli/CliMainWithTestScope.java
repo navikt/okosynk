@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import no.nav.okosynk.config.AbstractOkosynkConfiguration;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import org.apache.http.HttpHeaders;
@@ -31,7 +32,6 @@ import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 public class CliMainWithTestScope extends CliMain {
 
     private static final Logger logger = LoggerFactory.getLogger(CliMainWithTestScope.class);
-
     private IStartableAndStoppable testFtpServerStarter = null;
     private Collection<WireMockServer> mockedProviderServers;
 
@@ -56,20 +56,9 @@ public class CliMainWithTestScope extends CliMain {
         return mockedProviderServers;
     }
 
-
-// TPS -> PDL
-/*
-    - name: AKTOERREGISTER_URL
-      value: https://app.adeo.no/aktoerregister/api/v1/identer
- */
-
-    // TPS -> PDL
-    public static final String REST_AKTOERID_PROVIDER_URL_KEY = "PDL_URL";
-
-    // TPS -> PDL
     private static WireMockServer mockAktoerIdProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
         final String aktoerIdProviderUrl =
-                okosynkConfiguration.getRequiredString(REST_AKTOERID_PROVIDER_URL_KEY);
+                okosynkConfiguration.getRequiredString(AbstractOkosynkConfiguration.PDL_URL_KEY);
         final URL url = new URL(aktoerIdProviderUrl);
         final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
         wireMockConfiguration.port(url.getPort());
@@ -82,7 +71,6 @@ public class CliMainWithTestScope extends CliMain {
         return wireMockServer;
     }
 
-    // TPS -> PDL
     private static void logAktoerIdProviderRequest(
             final com.github.tomakehurst.wiremock.http.Request request,
             final com.github.tomakehurst.wiremock.http.Response response) {
@@ -91,44 +79,19 @@ public class CliMainWithTestScope extends CliMain {
         logger.info("*** Mocked *** AktoerIdProvider response body: {}", new String(response.getBody()));
     }
 
-    // TPS -> PDL
-    public static final String NAV_PERSONIDENTER = "Nav-Personidenter";
-
-    // TPS -> PDL
-    public static final String NAV_CONSUMER_ID = "Nav-Consumer-Id";
-
-    // TPS -> PDL
     private static void mockAktoerIdProviderAndStartIt(final WireMockServer wireMockServer, final IOkosynkConfiguration okosynkConfiguration) {
 
-        // testset_fileName_aktoerRegisterResponseFnrToAktoerId -> testset_fileName_aktoerIdProviderResponseFnrToAktoerId
         final String responseFilename = okosynkConfiguration.getRequiredString("testset_fileName_aktoerIdProviderResponseFnrToAktoerId");
-        /*
 
-        return  OK: ->    post(urlPathMatching(PdlRestClientIntegrationTest.PDL_TEST_URL_CONTEXT))
-                OK: ->    .withHeader(AUTHORIZATION, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
-                OK: ->    .withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, matching("Bearer " + PdlRestClientIntegrationTest.TEST_TOKEN))
-                OK: ->    .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
-                OK: ->    .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-                OK: ->    .withHeader(CONTENT_TYPE, matching(MediaType.APPLICATION_JSON))
-                ;
-         */
         wireMockServer
                 .stubFor(
                         WireMock
-/* OK */.post(WireMock.urlEqualTo("/graphql"))
-/* OK */.withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer "))
-/* OK */.withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, containing("Bearer "))
-
-
-/* OK */.withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
-/* OK */.withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
-/* OK */.withHeader(CONTENT_TYPE, matching(MediaType.APPLICATION_JSON))
-
-
-/* OK */ //                     .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
-/* OK */ //                     .withHeader(NAV_PERSONIDENTER, matching(".*"))
-/* OK */ //                     .withHeader(NAV_CONSUMER_ID, matching(".*"))
-/* OK */ //                     .withHeader(HttpHeaders.ACCEPT, equalTo(ContentType.APPLICATION_JSON.getMimeType()))
+                                .post(WireMock.urlEqualTo("/graphql"))
+                                .withHeader(HttpHeaders.AUTHORIZATION, containing("Bearer "))
+                                .withHeader(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, containing("Bearer "))
+                                .withHeader(HTTP_HEADER_NAV_CALL_ID_KEY, matching(".*"))
+                                .withHeader(X_CORRELATION_ID_HEADER_KEY, matching(".*"))
+                                .withHeader(CONTENT_TYPE, matching(MediaType.APPLICATION_JSON))
                                 .willReturn(
                                         aResponse()
                                                 .withBodyFile(responseFilename)
@@ -137,7 +100,6 @@ public class CliMainWithTestScope extends CliMain {
                 )
         ;
     }
-
 
     private static WireMockServer mockPrometheusProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
 
@@ -222,7 +184,7 @@ public class CliMainWithTestScope extends CliMain {
     }
 
     private static WireMockServer mockAzureAdProviderAndStartIt(final IOkosynkConfiguration okosynkConfiguration) throws MalformedURLException {
-         final String azureAdUrl = okosynkConfiguration.getAzureAppTokenUrl();
+        final String azureAdUrl = okosynkConfiguration.getAzureAppTokenUrl();
         final URL url = new URL(azureAdUrl);
         final WireMockConfiguration wireMockConfiguration = WireMockConfiguration.wireMockConfig();
         wireMockConfiguration.port(url.getPort());
