@@ -37,9 +37,13 @@ import org.apache.http.message.AbstractHttpMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,6 +53,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -425,11 +430,14 @@ public class OppgaveRestClient {
                 }
             }
 
+            final String finnOppgaverResponseJsonEntityAsString =
+                    new BufferedReader(
+                            new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8)
+                    )
+                            .lines()
+                            .collect(Collectors.joining(System.lineSeparator()));
             final ObjectMapper objectMapper =
                     new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            final HttpEntity httpEntity = response.getEntity();
-            final Scanner scanner = new Scanner(httpEntity.getContent()).useDelimiter(System.lineSeparator());
-            final String finnOppgaverResponseJsonEntityAsString = scanner.hasNext() ? scanner.next() : "";
             final FinnOppgaverResponseJson finnOppgaverResponseJson =
                     objectMapper.readValue(finnOppgaverResponseJsonEntityAsString, FinnOppgaverResponseJson.class);
             try {

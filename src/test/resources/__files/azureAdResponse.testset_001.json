@@ -1,5 +1,5 @@
 {
   "token_type": "Bearer",
   "expires_in": 3599,
-  "access_token": "*** Some Fake Axure AD Token For Testing Purposes ***"
+  "access_token": "*** Some Fake Azure AD Token For Testing Purposes ***"
 }

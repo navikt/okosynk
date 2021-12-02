@@ -25,4 +25,4 @@
   "id": "{{randomValue length=9 type='NUMERIC'}}",
   "endretTidspunkt": "{{now format='yyyy-MM-dd'}}T{{now format='hh:mm:ss'}}.000+02:00",
   "opprettetTidspunkt": "{{now format='yyyy-MM-dd'}}T{{now format='hh:mm:ss'}}.000+02:00"
-}
+}Ω

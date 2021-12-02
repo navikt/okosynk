@@ -1,0 +1,23 @@
+{
+  "data": {
+    "hentIdenter": {
+      "identer": [
+        {
+          "ident": "{{jsonPath request.body '$.variables.ident'}}",
+          "historisk": false,
+          "gruppe": "FOLKEREGISTERIDENT"
+        },
+        {
+          "ident": "12345678911",
+          "historisk": false,
+          "gruppe": "NPID"
+        },
+        {
+          "ident": "123456789",
+          "historisk": false,
+          "gruppe": "AKTORID"
+        }
+      ]
+    }
+  }
+}
