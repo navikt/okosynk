@@ -1,12 +1,10 @@
 package no.nav.okosynk.domain.os;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.aktoer.AktoerRespons;
 import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.domain.Oppgave;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,31 +57,12 @@ class OsMapperTest {
         osMeldingEFOG = new OsMelding(OS_MELDING_EFOG);
     }
 
-    @BeforeEach
-    void beforeEach() {
-        this.shouldConvertFolkeregisterIdentToAktoerId_saved = this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId();
-        setShouldConvertFolkeregisterIdentToAktoerId(true);
-    }
-
-    @AfterEach
-    void afterEach() {
-        setShouldConvertFolkeregisterIdentToAktoerId(this.shouldConvertFolkeregisterIdentToAktoerId_saved);
-    }
-
-    private void setShouldConvertFolkeregisterIdentToAktoerId(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
-        System.setProperty(
-                Constants.SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY,
-                Boolean.valueOf(shouldConvertFolkeregisterIdentToAktoerId).toString());
-    }
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med faggruppe \"EFOG\" som skal bli til oppgave.")
     void lagUrOppgaveMedFaggruppeEFOG(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
 
         enteringTestHeaderLogger.debug(null);
-
-        setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
 
         Mockito.reset(aktoerRestClient);
 
@@ -101,13 +80,8 @@ class OsMapperTest {
         assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
 
-        if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
-            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-            assertEquals(null, oppgaver.get(0).folkeregisterIdent);
-        } else {
-            assertEquals(null, oppgaver.get(0).aktoerId);
-            assertEquals(expectedfFlkeregisterIdent, oppgaver.get(0).folkeregisterIdent);
-        }
+        assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
     }
 
     @Test
@@ -136,8 +110,6 @@ class OsMapperTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
-
         Mockito.reset(aktoerRestClient);
 
         final String expectedFolkeregisterIdent = "07063012345";
@@ -149,13 +121,8 @@ class OsMapperTest {
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
-        if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
-            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-            assertEquals(null, oppgaver.get(0).folkeregisterIdent);
-        } else {
-            assertEquals(null, oppgaver.get(0).aktoerId);
-            assertEquals(expectedFolkeregisterIdent, oppgaver.get(0).folkeregisterIdent);
-        }
+        assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
     }
 
     @Test

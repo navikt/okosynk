@@ -44,7 +44,6 @@ class UrMapperTest {
     private UrMelding urMeldingUtenMappingRegel;
     private UrMelding urMeldingEFOG;
     private IAktoerClient aktoerClient = mock(IAktoerClient.class);
-    private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
 
     @BeforeEach
     void setUp() {
@@ -55,23 +54,6 @@ class UrMapperTest {
         urMeldingEFOG = new UrMelding(UR_MELDING_EFOG);
     }
 
-    @BeforeEach
-    void beforeEach() {
-        this.shouldConvertFolkeregisterIdentToAktoerId_saved = this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId();
-        setShouldConvertFolkeregisterIdentToAktoerId(true);
-    }
-
-    @AfterEach
-    void afterEach() {
-        setShouldConvertFolkeregisterIdentToAktoerId(this.shouldConvertFolkeregisterIdentToAktoerId_saved);
-    }
-
-    private void setShouldConvertFolkeregisterIdentToAktoerId(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
-        System.setProperty(
-                Constants.SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY,
-                Boolean.valueOf(shouldConvertFolkeregisterIdentToAktoerId).toString());
-    }
-
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med oppdragsKode \"EFOG\" som skal bli til oppgave.")
@@ -79,15 +61,13 @@ class UrMapperTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
-
         Mockito.reset(aktoerClient);
 
         final String expectedFolkeregisterIdent = "02029512345";
         final String expectedAktoerId = "123";
         when(aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
         final List<Oppgave> oppgaver =
-            urMapper.lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
+                urMapper.lagOppgaver(lagMeldinglisteMedEttElement(urMeldingEFOG));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
@@ -95,13 +75,8 @@ class UrMapperTest {
         assertNull(oppgaver.get(0).behandlingstype);
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
 
-        if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
-            assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-            assertEquals(null, oppgaver.get(0).folkeregisterIdent);
-        } else {
-            assertEquals(null, oppgaver.get(0).aktoerId);
-            assertEquals(expectedFolkeregisterIdent, oppgaver.get(0).folkeregisterIdent);
-        }
+        assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
+        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
     }
 
     @Test

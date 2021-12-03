@@ -51,8 +51,6 @@ spec:
       value: OS
     - name: SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE
       value: "true"
-    - name: SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID
-      value: "true"
     - name: PDL_URL
       value: https://pdl-api.intern.nav.no/graphql
 

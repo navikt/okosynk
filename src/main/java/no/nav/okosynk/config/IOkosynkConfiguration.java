@@ -51,8 +51,6 @@ public interface IOkosynkConfiguration {
 
     boolean shouldAuthenticateUsingAzureADAgainstOppgave();
 
-    boolean shouldConvertFolkeregisterIdentToAktoerId();
-
     String getNaisAppName();
 
     String getBatchBruker(final Constants.BATCH_TYPE batchType);

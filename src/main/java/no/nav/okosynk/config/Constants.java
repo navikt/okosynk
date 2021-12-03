@@ -9,7 +9,6 @@ public class Constants {
     public static final String HTTP_HEADER_NAV_CALL_ID_KEY = "Nav-Call-Id";
     public static final String HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY = "Content-Type";
 
-
     public static final String BATCH_MAX_NUMBER_OF_TRIES_KEY = "batch.max.number.of.tries";
     public static final String BATCH_RETRY_WAIT_TIME_IN_MS_KEY = "batch.retry.wait.time.in.ms";
     public static final int FTP_HOST_PORT_DEFAULT_VALUE = 20;
@@ -23,7 +22,6 @@ public class Constants {
     public static final String PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY = "PUSH_GATEWAY_ADDRESS";
     public static final String REST_STS_URL_KEY = "REST_STS_URL";
     public static final String X_CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
-    public static final String SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY = "SHOULD_CONVERT_FOLKEREGISTERIDENT_TO_AKTOERID";
 
     static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";

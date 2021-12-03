@@ -4,6 +4,8 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
+import no.nav.okosynk.consumer.aktoer.AktoerRespons;
+import no.nav.okosynk.consumer.aktoer.IAktoerClient;
 import no.nav.okosynk.consumer.oppgave.OppgaveRestClient;
 import no.nav.okosynk.domain.IMeldingMapper;
 import no.nav.okosynk.domain.IMeldingReader;
@@ -36,6 +38,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anySet;
 import static org.mockito.Mockito.anyCollection;
@@ -47,7 +50,6 @@ import static org.mockito.Mockito.when;
 
 class OppgaveSynkronisererTest {
 
-    public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
     private static final Logger logger =
             LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
     private static final Logger enteringTestHeaderLogger =
@@ -55,6 +57,7 @@ class OppgaveSynkronisererTest {
 
     private static final Random random = new Random(18766876876L);
 
+    public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
     private static final Constants.BATCH_TYPE BATCH_TYPE = Constants.BATCH_TYPE.OS;
     private static final String OPPGAVEID_GSAK = "185587300";
     private static final String OPPGAVEID = "185587998";
@@ -145,6 +148,51 @@ class OppgaveSynkronisererTest {
 //        this.okosynkConfiguration.clearSystemProperty("urbatch.bruker");
 //
 //        // =====================================================================
+    }
+
+    @Test
+    void when_simulating_OS_batch_file_line_to_oppgave_then_no_oppgave_should_be_found_for_opprett() throws MeldingUnreadableException {
+
+        final String expectedAktoerId = "1933953921119";
+        final String expectedFolkeregisterIdent = "25067823770";
+
+        final IAktoerClient aktoerClient = mock(IAktoerClient.class);
+        when(aktoerClient.hentGjeldendeAktoerId(any())).thenReturn(AktoerRespons.ok(expectedAktoerId));
+
+        final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
+        final String linjeMedUspesifikkMelding =
+                expectedFolkeregisterIdent
+                        + "422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
+        final IMeldingReader<OsMelding> meldingReader = new OsMeldingReader(OsMelding::new);
+        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
+                meldingReader
+                        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
+                                new HashSet<String>() {{
+                                    add(linjeMedUspesifikkMelding);
+                                }}
+                                        .stream()
+                        );
+        final IMeldingMapper<OsMelding> spesifikkMapper = new OsMapper(aktoerClient, mockedOkosynkConfiguration);
+        final Set<Oppgave> batchOppgaver = new HashSet<>(spesifikkMapper.lagOppgaver(spesifikkMeldingFraLinjeMedUspesifikkMelding));
+
+        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
+        oppgaverLestFraDatabasen
+                .add(new Oppgave.OppgaveBuilder()
+                        .withBehandlingstema(null)
+                        .withBehandlingstype("ae0215")
+                        .withAnsvarligEnhetId("4151")
+                        .withAktoerId(expectedAktoerId)
+                        .withFolkeregisterIdent(expectedFolkeregisterIdent)
+                        .withBnr(null)
+                        .withOrgnr(null)
+                        .withSamhandlernr(null)
+                        .build());
+        assertTrue(batchOppgaver.containsAll(oppgaverLestFraDatabasen));
+        assertTrue(oppgaverLestFraDatabasen.containsAll(batchOppgaver));
+
+        final Collection<Oppgave> oppgaverSomSkalOpprettes =
+                OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(batchOppgaver, oppgaverLestFraDatabasen);
+        assertEquals(0, oppgaverSomSkalOpprettes.size());
     }
 
     @Test
@@ -570,16 +618,6 @@ class OppgaveSynkronisererTest {
         return oppgaveliste;
     }
 
-    private Set<OppgaveSynkroniserer.OppgaveOppdatering> lagOppgaveOppdatering(
-            final Oppgave oppgaveLestFraBatch,
-            final Oppgave oppgaveLestFraDatabasen) {
-
-        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaveOppdateringsListe = new HashSet<>();
-        oppgaveOppdateringsListe.add(new OppgaveSynkroniserer.OppgaveOppdatering(oppgaveLestFraBatch, oppgaveLestFraDatabasen));
-
-        return oppgaveOppdateringsListe;
-    }
-
     private Oppgave lagOppgave(String oppgaveId, String brukerId) {
         return lagOppgave(oppgaveId, brukerId,
                 "STATUS;;oppsummer meldinger slått sammen til en oppgave");
@@ -609,43 +647,5 @@ class OppgaveSynkronisererTest {
                         .build();
 
         return oppgave;
-    }
-
-    @Test
-    void when_simulating_OS_batch_file_line_to_oppgave_then_no_oppgave_should_be_found_for_opprett() throws MeldingUnreadableException {
-
-        final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
-        when(mockedOkosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()).thenReturn(false);
-        final String linjeMedUspesifikkMelding = "14067823770422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
-        final IMeldingReader<OsMelding> meldingReader = new OsMeldingReader(OsMelding::new);
-        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
-                meldingReader
-                        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
-                                new HashSet<String>() {{
-                                    add(linjeMedUspesifikkMelding);
-                                }}
-                                        .stream()
-                        );
-        final IMeldingMapper<OsMelding> spesifikkMapper = new OsMapper(null, mockedOkosynkConfiguration);
-        final Set<Oppgave> batchOppgaver = new HashSet<>(spesifikkMapper.lagOppgaver(spesifikkMeldingFraLinjeMedUspesifikkMelding));
-
-        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
-        oppgaverLestFraDatabasen
-                .add(new Oppgave.OppgaveBuilder()
-                        .withBehandlingstema(null)
-                        .withBehandlingstype("ae0215")
-                        .withAnsvarligEnhetId("4151")
-                        .withAktoerId("1933942921119")
-                        .withFolkeregisterIdent("14067823770")
-                        .withBnr(null)
-                        .withOrgnr(null)
-                        .withSamhandlernr(null)
-                        .build());
-        assertTrue(batchOppgaver.containsAll(oppgaverLestFraDatabasen));
-        assertTrue(oppgaverLestFraDatabasen.containsAll(batchOppgaver));
-
-        final Collection<Oppgave> oppgaverSomSkalOpprettes =
-                OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(batchOppgaver, oppgaverLestFraDatabasen);
-        assertEquals(0, oppgaverSomSkalOpprettes.size());
     }
 }

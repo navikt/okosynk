@@ -53,11 +53,6 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     }
 
     @Override
-    public boolean shouldConvertFolkeregisterIdentToAktoerId() {
-        return getBoolean(Constants.SHOULD_CONVERT_FOLKEREGISTER_IDENT_TO_AKTOERID_KEY, false);
-    }
-
-    @Override
     public String getNaisAppName() {
         return getRequiredString(Constants.NAIS_APP_NAME_KEY);
     }

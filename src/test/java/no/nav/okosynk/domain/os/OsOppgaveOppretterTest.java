@@ -71,8 +71,6 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        setShouldConvertFolkeregisterIdentToAktoerId(shouldConvertFolkeregisterIdentToAktoerId);
-
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
         when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
@@ -90,13 +88,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 () -> assertFalse(oppgave.lest)
         );
 
-        if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
-            assertEquals(expectedAktoerId, oppgave.aktoerId);
-            assertEquals(null, oppgave.folkeregisterIdent);
-        } else {
-            assertEquals(null, oppgave.aktoerId);
-            assertEquals(expectedFolkeregisterIdent, oppgave.folkeregisterIdent);
-        }
+        assertEquals(expectedAktoerId, oppgave.aktoerId);
+        assertEquals(null, oppgave.folkeregisterIdent);
     }
 
     @Test

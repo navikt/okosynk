@@ -97,32 +97,26 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
 
                             if (mappingRegel.isPresent()) {
                                 final String gjelderId = melding.gjelderId;
-
                                 if (isNotBlank(gjelderId)) {
                                     final String type = melding.utledGjelderIdType();
                                     if (Objects.equals(type, PERSON)) {
                                         if (isBnr(gjelderId)) {
                                             builder.withBnr(gjelderId);
                                         } else {
-                                            if (this.okosynkConfiguration.shouldConvertFolkeregisterIdentToAktoerId()) {
-                                                try {
-                                                    final AktoerRespons aktoerRespons =
-                                                            this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
-                                                    if (isNotBlank(aktoerRespons.getFeilmelding())) {
-                                                        log.warn(
-                                                                "Fikk feilmelding fra leverandør av aktoerid  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
-                                                                aktoerRespons.getFeilmelding());
-                                                        return null;
-                                                    } else {
-                                                        builder.withAktoerId(aktoerRespons.getAktoerId());
-                                                    }
-                                                } catch (Exception e) {
-                                                    log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
+                                            try {
+                                                final AktoerRespons aktoerRespons =
+                                                        this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
+                                                if (isNotBlank(aktoerRespons.getFeilmelding())) {
+                                                    log.warn(
+                                                            "Fikk feilmelding fra leverandør av aktoerid  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
+                                                            aktoerRespons.getFeilmelding());
                                                     return null;
+                                                } else {
+                                                    builder.withAktoerId(aktoerRespons.getAktoerId());
                                                 }
-                                            } else {
-                                                log.debug("Using folkeregisterIdent as is");
-                                                builder.withFolkeregisterIdent(gjelderId);
+                                            } catch (Exception e) {
+                                                log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
+                                                return null;
                                             }
                                         }
                                     } else if (Objects.equals(type, SAMHANDLER)) {
