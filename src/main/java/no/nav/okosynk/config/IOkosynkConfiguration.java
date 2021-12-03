@@ -49,8 +49,6 @@ public interface IOkosynkConfiguration {
      */
     Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType);
 
-    boolean shouldAuthenticateUsingAzureADAgainstOppgave();
-
     String getNaisAppName();
 
     String getBatchBruker(final Constants.BATCH_TYPE batchType);

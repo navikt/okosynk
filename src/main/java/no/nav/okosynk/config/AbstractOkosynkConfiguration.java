@@ -48,11 +48,6 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     }
 
     @Override
-    public boolean shouldAuthenticateUsingAzureADAgainstOppgave() {
-        return getBoolean(Constants.SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE_KEY, false);
-    }
-
-    @Override
     public String getNaisAppName() {
         return getRequiredString(Constants.NAIS_APP_NAME_KEY);
     }

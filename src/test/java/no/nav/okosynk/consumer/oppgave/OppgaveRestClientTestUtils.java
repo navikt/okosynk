@@ -10,6 +10,7 @@ import no.nav.okosynk.consumer.oppgave.json.IdentGruppeV2;
 import no.nav.okosynk.consumer.oppgave.json.IdentJson;
 import no.nav.okosynk.consumer.oppgave.json.PatchOppgaverResponseJson;
 import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
+import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;
@@ -269,6 +270,9 @@ class OppgaveRestClientTestUtils {
         when(mockedOppgaveRestClient.getOkosynkConfiguration())
                 .thenReturn(new FakeOkosynkConfiguration());
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
+
+        final AzureAdAuthenticationClient mockedAzureAdAuthenticationClient = mock(AzureAdAuthenticationClient.class);
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(mockedAzureAdAuthenticationClient);
 
         return mockedOppgaveRestClient;
     }

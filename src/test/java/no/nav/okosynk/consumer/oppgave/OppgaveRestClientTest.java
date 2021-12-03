@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -33,12 +34,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OppgaveRestClientTest {
 
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
+    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
+
+    private static final AzureAdAuthenticationClient mockedAzureAdAuthenticationClient = mock(AzureAdAuthenticationClient.class);
+
+    @BeforeAll
+    static void beforeAll() {
+        when(mockedAzureAdAuthenticationClient.getToken()).thenReturn("RUBBISH TEST TOKEN WHICH IS NO TOKEN AT ALL BUT ONLY A PLACEHOLDER");
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -82,6 +90,7 @@ class OppgaveRestClientTest {
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils
                         .prepareAMockedOppgaveRestClientThatSucceedsInFindingZeroOppgaver();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertDoesNotThrow(
@@ -103,6 +112,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFindingOneOppgave();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertDoesNotThrow(
@@ -123,6 +133,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding19Oppgaver();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertDoesNotThrow(
@@ -143,6 +154,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding50Oppgaver();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertDoesNotThrow(
@@ -163,6 +175,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding51Oppgaver();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertDoesNotThrow(
@@ -185,6 +198,8 @@ class OppgaveRestClientTest {
         when(mockedOppgaveRestClient
                 .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
                 .thenReturn(OppgaveRestClientTestUtils.reponseWithErrorCodeGreaterThan400);
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
+
         final Set<Oppgave> oppgaver = new HashSet<>();
         assertThrows(
                 IllegalStateException.class,
@@ -200,6 +215,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient oppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInCreatingZeroOppgaver();
+
         final List<Oppgave> oppgaver = new ArrayList<>();
 
         assertDoesNotThrow(
@@ -261,6 +277,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOpprettOppgaveRestClientThatFailsWithAnHttpCodeGreaterThan400();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Set<Oppgave> oppgaver = new HashSet<>();
         final Random random = new Random(919286);
@@ -340,6 +357,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedPatchOppgaverRestClientThatFailsWithAnHttpCodeGreaterThan400();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Random random = new Random(38762486);
         final Oppgave oppgave =
@@ -402,6 +420,7 @@ class OppgaveRestClientTest {
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedPatchRestClientThatSucceedsInCreatingOneOppgave();
+        when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Oppgave oppgave =
                 new OppgaveBuilder()

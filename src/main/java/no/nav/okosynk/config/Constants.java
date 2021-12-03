@@ -29,8 +29,6 @@ public class Constants {
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
 
     static final String SHOULD_RUN_OS_OR_UR_KEY = "SHOULD_RUN_OS_OR_UR";
-
-    static final String SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE_KEY = "SHOULD_AUTHENTICATE_USING_AZURE_AD_AGAINST_OPPGAVE";
     // =========================================================================
     private static final String OS_ALERT_COLLECTOR_METRIC_NAME = "okosynk_os_batch_alert";
     private static final String OS_BATCH_BRUKER_DEFAULT_VALUE = "srvbokosynk001";

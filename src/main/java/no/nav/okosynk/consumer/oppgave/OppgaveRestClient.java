@@ -18,7 +18,6 @@ import no.nav.okosynk.domain.Oppgave;
 import no.nav.okosynk.domain.util.AktoerUt;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
-import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -29,7 +28,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.AbstractHttpMessage;
@@ -52,7 +50,6 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static no.nav.okosynk.config.Constants.AUTHORIZATION;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
 import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
@@ -65,8 +62,9 @@ import static org.apache.http.entity.ContentType.APPLICATION_JSON;
 public class OppgaveRestClient {
 
     private static final Logger log = LoggerFactory.getLogger(OppgaveRestClient.class);
+
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
-    final AzureAdAuthenticationClient azureAdAuthenticationClient;
+    private final AzureAdAuthenticationClient azureAdAuthenticationClient;
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
     private final CloseableHttpClient httpClient;
@@ -96,7 +94,6 @@ public class OppgaveRestClient {
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
             final IOkosynkConfiguration okosynkConfiguration,
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
-            final UsernamePasswordCredentials usernamePasswordCredentials,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) {
         final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
@@ -104,15 +101,7 @@ public class OppgaveRestClient {
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
-        try {
-            OppgaveRestClient.addAuthenticationHeader(
-                    request,
-                    usernamePasswordCredentials,
-                    okosynkConfiguration,
-                    azureAdAuthenticationClient);
-        } catch (AuthenticationException e) {
-            throw new IllegalStateException(e);
-        }
+        OppgaveRestClient.addAzureAdAuthenticationHeader(request, azureAdAuthenticationClient);
 
         return request;
     }
@@ -126,38 +115,14 @@ public class OppgaveRestClient {
                 .orElse(0);
     }
 
-    private static void addAuthenticationHeader(
-            final HttpRequestBase request,
-            final UsernamePasswordCredentials usernamePasswordCredentials,
-            final IOkosynkConfiguration okosynkConfiguration,
-            final AzureAdAuthenticationClient azureAdAuthenticationClient
-    ) throws AuthenticationException {
-
-        boolean shouldAuthenticateUsingBasicAgainstOppgave = true;
-        if (okosynkConfiguration.shouldAuthenticateUsingAzureADAgainstOppgave()) {
-            try {
-                addAzureAdAuthenticationHeader(request, azureAdAuthenticationClient);
-                shouldAuthenticateUsingBasicAgainstOppgave = false;
-            } catch (Throwable e) {
-                log.error("Exception received when trying Azure AD authentication", e);
-                log.warn("Falling back on basic authentication");
-            }
-        }
-        if (shouldAuthenticateUsingBasicAgainstOppgave) {
-            addBasicAuthenticationHeader(request, usernamePasswordCredentials);
-        }
-    }
-
     private static void addAzureAdAuthenticationHeader(
             final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
         final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
         request.addHeader(AUTHORIZATION, "Bearer " + azureAdAuthenticationToken);
     }
 
-    private static void addBasicAuthenticationHeader(
-            final HttpRequestBase request,
-            final UsernamePasswordCredentials usernamePasswordCredentials) throws AuthenticationException {
-        request.addHeader(new BasicScheme(UTF_8).authenticate(usernamePasswordCredentials, request, null));
+    AzureAdAuthenticationClient getAzureAdAuthenticationClient() {
+        return this.azureAdAuthenticationClient;
     }
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
@@ -166,8 +131,7 @@ public class OppgaveRestClient {
                 createOppgaveRequestBase(
                         getOkosynkConfiguration(),
                         HttpPost::new,
-                        getUsernamePasswordCredentials(),
-                        this.azureAdAuthenticationClient
+                        getAzureAdAuthenticationClient()
                 );
 
         final ObjectMapper objectMapper =
@@ -256,8 +220,8 @@ public class OppgaveRestClient {
                 createOppgaveRequestBase(
                         getOkosynkConfiguration(),
                         HttpPatch::new,
-                        getUsernamePasswordCredentials(),
-                        this.azureAdAuthenticationClient);
+                        getAzureAdAuthenticationClient()
+                );
 
         final List<List<Oppgave>> listOfListsOfOppgaverToBePatched =
                 delOppListe(new ArrayList<>(oppgaverToBePatched), 500);
@@ -403,15 +367,7 @@ public class OppgaveRestClient {
         final HttpGet request = new HttpGet(uri);
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
-        try {
-            OppgaveRestClient.addAuthenticationHeader(
-                    request,
-                    getUsernamePasswordCredentials(),
-                    getOkosynkConfiguration(),
-                    this.azureAdAuthenticationClient);
-        } catch (AuthenticationException e) {
-            throw new IllegalStateException(e);
-        }
+        OppgaveRestClient.addAzureAdAuthenticationHeader(request, getAzureAdAuthenticationClient());
 
         try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
             final StatusLine statusLine = response.getStatusLine();
