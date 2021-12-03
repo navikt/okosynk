@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
@@ -258,16 +259,13 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return this.uspesifikkMeldingLinjeReader;
     }
 
-    /**
-     * TODO: OBS! Is it possible to set a reader that conflicts with the batch type?
-     *
-     * @param uspesifikkMeldingLinjeReader Self explanatory
-     */
     public void setUspesifikkMeldingLinjeReader(final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader) {
 
-        Validate.notNull(
-                uspesifikkMeldingLinjeReader, "The parameter IMeldingLinjeFileReader supplied is null"
-        );
+        Validate.notNull(uspesifikkMeldingLinjeReader, "Trying to set my IMeldingLinjeFileReader instance to null");
+        Validate.validState(
+                Objects.equals(uspesifikkMeldingLinjeReader.getBatchType(), getBatchType()),
+                "Trying to set my IMeldingLinjeFileReader instance with"
+                        + " a batch type different from the one with which this batch is instantiatted with");
 
         setBatchStatus(
                 (IMeldingLinjeFileReader.Status.OK.equals(uspesifikkMeldingLinjeReader.getStatus()))

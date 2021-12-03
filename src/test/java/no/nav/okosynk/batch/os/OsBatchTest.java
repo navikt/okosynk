@@ -115,7 +115,9 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
                     new OsMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             );
 
-        assertDoesNotThrow(() -> { batch.run(); });
+        assertDoesNotThrow(() -> {
+            batch.run();
+        });
         final BatchStatus batchStatus = batch.getBatchStatus();
         assertFalse(batchStatus.failedButRerunningMaySucceed(), "Rerunning when the batch is erroneously configured may remedy the error situation.");
         assertEquals(BatchStatus.ENDED_WITH_ERROR_CONFIGURATION, batchStatus);
@@ -124,5 +126,10 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
     @Override
     protected String getValidLineOfInputData() {
         return "***REMOVED***366572769 2019-12-232019-12-23AVVED128555 2019-12-012019-12-31000000001040A 4819         PENPOST ***REMOVED***                                                                                           ";
+    }
+
+    @Override
+    protected Constants.BATCH_TYPE getBatchType() {
+        return Constants.BATCH_TYPE.OS;
     }
 }

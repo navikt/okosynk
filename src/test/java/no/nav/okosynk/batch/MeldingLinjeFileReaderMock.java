@@ -2,6 +2,8 @@ package no.nav.okosynk.batch;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.io.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.io.IMeldingLinjeFileReader;
 
@@ -34,5 +36,10 @@ public class MeldingLinjeFileReaderMock
     public boolean removeInputData() {
         // Intentionally doing nothing
         return true;
+    }
+
+    @Override
+    public Constants.BATCH_TYPE getBatchType() {
+        return Constants.BATCH_TYPE.UR;
     }
 }

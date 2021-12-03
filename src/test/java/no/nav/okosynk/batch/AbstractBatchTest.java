@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
@@ -67,6 +69,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new NotFoundOkosynkIoException(null, null)).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -86,6 +89,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new IoOkosynkIoException(null, null)).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -105,6 +109,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new RuntimeException()).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -127,6 +132,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
         doReturn(emptyList()).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
         doReturn(IMeldingLinjeFileReader.Status.OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final OppgaveSynkroniserer mockedOppgaveSynkroniserer = mock(OppgaveSynkroniserer.class);
         doReturn(ConsumerStatistics.zero(this.batch.getBatchType())).when(mockedOppgaveSynkroniserer).synkroniser(anyCollection());
@@ -146,6 +152,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(IMeldingLinjeFileReader.Status.OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -167,6 +174,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
                 .forEach(
                         (final IMeldingLinjeFileReader.Status status) -> {
                             doReturn(status).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+                            doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
                             this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
                             Assertions.assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, batch.getBatchStatus());
                         }
@@ -180,6 +188,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
 
         final Collection<Pair<Class<? extends Exception>, BatchStatus>> exceptionsAndBatchStatuses =
@@ -221,6 +230,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final List<String> inputDataLines = new ArrayList<>();
         for (
@@ -250,6 +260,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final List<String> inputDataLines = new ArrayList<>();
         inputDataLines.add("lknlknklnklnlkn");
@@ -276,6 +287,8 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
         final List<String> inputDataLines = new ArrayList<>();
 
         inputDataLines.add(getValidLineOfInputData());
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(inputDataLines).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
 
@@ -307,6 +320,7 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
         final List<String> inputDataLines = new ArrayList<>();
 
         inputDataLines.add(getValidLineOfInputData());
+        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(inputDataLines).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(false).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
 
@@ -355,4 +369,6 @@ public abstract class AbstractBatchTest<SPESIFIKKMELDINGTYPE extends AbstractMel
     }
 
     protected abstract String getValidLineOfInputData();
+
+    protected abstract Constants.BATCH_TYPE getBatchType();
 }

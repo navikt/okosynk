@@ -121,7 +121,9 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                     new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
             );
 
-        assertDoesNotThrow(() -> { batch.run(); });
+        assertDoesNotThrow(() -> {
+            batch.run();
+        });
         final BatchStatus batchStatus = batch.getBatchStatus();
         assertFalse(batchStatus.failedButRerunningMaySucceed(), "Rerunning when the batch is erroneously configured may remedy the error situation.");
         assertEquals(BatchStatus.ENDED_WITH_ERROR_CONFIGURATION, batchStatus);
@@ -130,5 +132,10 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
     @Override
     protected String getValidLineOfInputData() {
         return "***REMOVED***PERSON      2020-01-21T12:38:3724GKA2960   00000000006860A8020GHBATCHUR2302020-01-21001618071Manuell retur - fra bank                          ***REMOVED***";
+    }
+
+    @Override
+    protected Constants.BATCH_TYPE getBatchType() {
+        return Constants.BATCH_TYPE.UR;
     }
 }

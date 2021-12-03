@@ -1,5 +1,7 @@
 package no.nav.okosynk.io;
 
+import no.nav.okosynk.config.Constants;
+
 import java.util.List;
 
 public interface IMeldingLinjeFileReader {
@@ -13,7 +15,7 @@ public interface IMeldingLinjeFileReader {
     List<String> read()
         throws ConfigureOrInitializeOkosynkIoException,
         IoOkosynkIoException,
-        NotFoundOkosynkIoException, AuthenticationOkosynkIoException, EncodingOkosynkIoException;
+            NotFoundOkosynkIoException, AuthenticationOkosynkIoException, EncodingOkosynkIoException;
 
     /**
      * Never throws anything, because renaming is considered relatively harmless.
@@ -23,4 +25,6 @@ public interface IMeldingLinjeFileReader {
     boolean removeInputData();
 
     Status getStatus();
+
+    Constants.BATCH_TYPE getBatchType();
 }

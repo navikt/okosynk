@@ -274,6 +274,7 @@ public class MeldingLinjeSftpReader
         return this.okosynkConfiguration;
     }
 
+    @Override
     public Constants.BATCH_TYPE getBatchType() {
         return this.batchType;
     }
