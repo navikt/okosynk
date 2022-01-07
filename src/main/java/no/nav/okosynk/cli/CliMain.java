@@ -43,7 +43,6 @@ public class CliMain {
 
     public CliMain(final String applicationPropertiesFileName) {
 
-        // TODO: This instance of IOkosynkConfiguration should maybe be injected around.
         final IOkosynkConfiguration okosynkConfiguration =
                 createOkosynkConfiguration(applicationPropertiesFileName);
         this.okosynkConfiguration = okosynkConfiguration;

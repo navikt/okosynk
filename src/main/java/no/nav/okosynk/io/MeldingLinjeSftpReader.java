@@ -91,7 +91,6 @@ public class MeldingLinjeSftpReader
             setStatus(IMeldingLinjeFileReader.Status.ERROR);
         }
         try {
-            // TODO: Bad programming? Just see that no exception is thrown:
             MeldingLinjeSftpReader.getFtpHostPort(ftpHostUrl);
         } catch (Throwable e) {
             setStatus(IMeldingLinjeFileReader.Status.ERROR);

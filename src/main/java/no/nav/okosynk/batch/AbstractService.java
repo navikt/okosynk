@@ -15,11 +15,6 @@ import no.nav.okosynk.io.MeldingLinjeSftpReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * TODO: Consider removing the whole service layer and let cliMain caLL batch directly.
- *
- * @param <MELDINGSTYPE>
- */
 public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractService.class);

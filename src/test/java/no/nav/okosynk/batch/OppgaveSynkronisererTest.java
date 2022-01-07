@@ -97,49 +97,25 @@ class OppgaveSynkronisererTest {
 
         when(this.mockedOppgaveRestClient.finnOppgaver(anySet()))
                 .thenReturn(
-                        // TODO: As of now, just a placeholder:
+                        // Just a placeholder:
                         ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
                 )
-    /*
-    TODO: Quasi code for what is wanted as mock.
-    .thenSetTheSeconParameterTo(
-        oppgaveListe
-    )
-    */
         ;
 
         when(this.mockedOppgaveRestClient.opprettOppgaver(anyCollection()))
                 .thenReturn(
                         ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
                 )
-        //        /*
-        //        TODO: Quasi code for what is wanted as mock.
-        //        .thenSetTheSeconParameterTo(
-        //            oppgaveListe
-        //        )
-        //         */
         ;
 
         when(this.mockedOppgaveRestClient.patchOppgaver(anySet(), anyBoolean()))
                 .thenReturn(
                         ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName())
                 )
-        //        /*
-        //        TODO: Quasi code for what is wanted as mock.
-        //        .thenSetTheSeconParameterTo(
-        //            oppgaveListe
-        //        )
-        //         */
         ;
 
         when(this.mockedOppgaveRestClient.getBatchType())
                 .thenReturn(OppgaveSynkronisererTest.BATCH_TYPE)
-//        /*
-//        TODO: Quasi code for what is wanted as mock.
-//        .thenSetTheSeconParameterTo(
-//            oppgaveListe
-//        )
-//         */
         ;
 //
 //        // =====================================================================

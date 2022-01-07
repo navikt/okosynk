@@ -17,6 +17,8 @@ spec:
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   webproxy: true
   ttlSecondsAfterFinished: 172800
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
   resources:
     requests:
       cpu: 500m
@@ -24,6 +26,8 @@ spec:
     limits:
       cpu: 500m
       memory: 4Gi
+  secureLogs:
+    enabled: true
   env:
     - name: OPPGAVE_URL
       value: https://oppgave.nais.adeo.no/api/v1/oppgaver

@@ -40,7 +40,6 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     public Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType) {
         final Collection<String> opprettetAvValuesForFinn =
                 new ArrayList<String>() {{
-                    // TODO: Just in case. When the facts are clear, then remove some of them again.
                     add(getBatchBruker(batchType));
                     add(getNaisAppName());
                 }};
