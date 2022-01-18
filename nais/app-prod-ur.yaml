@@ -16,9 +16,8 @@ spec:
   image: {{image}}
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   webproxy: true
-  ttlSecondsAfterFinished: 172800
-  successfulJobsHistoryLimit: 2
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 4
   resources:
     requests:
       cpu: 500m
