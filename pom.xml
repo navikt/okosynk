@@ -11,10 +11,10 @@
 
     <properties>
 
-        <revision>003.003.003</revision>
+        <revision>003.003.004</revision>
 
         <!-- BEGIN: Breaking bumps -->
-        <jetty.version>9.4.35.v20201120</jetty.version> <!-- Problematic: 9.4.35.v20201120 -> 11.0.0 -->
+        <jetty.version>9.4.44.v20210927</jetty.version> <!-- Problematic: 9.4.44.v20210927 -> 11.0.0 -->
         <mockito.version>1.10.19</mockito.version> <!-- Problematic: 1.10.19 -> 3.11.2 -->
         <sshd.version>1.7.0</sshd.version> <!-- Problematic: 1.7.0 -> 2.7.0 -->
         <!-- END: Breaking bumps -->
