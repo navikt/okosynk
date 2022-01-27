@@ -43,7 +43,7 @@ spec:
     - name: BATCH_RETRY_WAIT_TIME_IN_MS
       value: "300000"
     - name: BATCH_MAX_NUMBER_OF_TRIES
-      value: "18"
+      value: "30"
     - name: OSFTPBASEURL_URL
       value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input
     - name: URFTPBASEURL_URL
