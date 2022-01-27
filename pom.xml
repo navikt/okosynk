@@ -11,7 +11,7 @@
 
     <properties>
 
-        <revision>003.003.006</revision>
+        <revision>003.004.000</revision>
 
         <!-- BEGIN: Breaking bumps -->
         <jetty.version>9.4.44.v20210927</jetty.version> <!-- Problematic: 9.4.44.v20210927 -> 11.0.0 -->
@@ -59,7 +59,7 @@
         <pact.version>4.0.10</pact.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <prometheus.version>0.11.0</prometheus.version>
+        <prometheus.version>0.14.1</prometheus.version>
         <slf4j.version>2.0.0-alpha2</slf4j.version>
         <vavr.version>1.0.0-alpha-3</vavr.version>
         <wiremock.version>2.27.2</wiremock.version>
