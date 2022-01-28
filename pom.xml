@@ -23,7 +23,7 @@
         <apache.ftpserver.version>1.1.1</apache.ftpserver.version>
         <bcel.version>6.5.0</bcel.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
-        <commons-cli.version>1.4</commons-cli.version>
+        <commons-cli.version>1.5.0</commons-cli.version>
         <commons-codec.version>1.15</commons-codec.version>
         <commons-configuration2.version>2.7</commons-configuration2.version>
         <commons-io.version>2.11.0</commons-io.version>
@@ -550,13 +550,11 @@
                             <createSourcesJar>false</createSourcesJar>
                             <transformers>
 
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>no.nav.okosynk.cli.CliMain</mainClass>
                                 </transformer>
 
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>META-INF/cxf/bus-extensions.txt</resource>
                                 </transformer>
 
