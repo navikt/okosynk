@@ -16,14 +16,14 @@
         <!-- BEGIN: Breaking bumps -->
         <jetty.version>9.4.44.v20210927</jetty.version> <!-- Problematic: 9.4.44.v20210927 -> 11.0.0 -->
         <mockito.version>1.10.19</mockito.version> <!-- Problematic: 1.10.19 -> 3.11.2 -->
-        <sshd.version>2.7.0</sshd.version> <!-- Problematic: 1.7.0 -> 2.7.0 -->
+        <sshd.version>1.7.0</sshd.version> <!-- Problematic: 1.7.0 -> 2.7.0 -->
         <!-- END: Breaking bumps -->
 
         <!-- <nav.security.token-support.version>1.3.7</nav.security.token-support.version> -->
         <apache.ftpserver.version>1.1.1</apache.ftpserver.version>
         <bcel.version>6.5.0</bcel.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
-        <commons-cli.version>1.5.0</commons-cli.version>
+        <commons-cli.version>1.4</commons-cli.version>
         <commons-codec.version>1.15</commons-codec.version>
         <commons-configuration2.version>2.7</commons-configuration2.version>
         <commons-io.version>2.11.0</commons-io.version>
