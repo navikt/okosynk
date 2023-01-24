@@ -1,17 +1,16 @@
 package no.nav.okosynk.cli;
 
-import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
-import org.apache.sshd.server.Command;
+import org.apache.sshd.scp.server.ScpCommandFactory;
 import org.apache.sshd.server.SshServer;
-import org.apache.sshd.server.auth.UserAuth;
+import org.apache.sshd.server.auth.UserAuthFactory;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
 import org.apache.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.scp.ScpCommandFactory;
 import org.apache.sshd.server.session.ServerSession;
-import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
+import org.apache.sshd.server.subsystem.SubsystemFactory;
+import org.apache.sshd.sftp.server.SftpSubsystemFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class TestSftpServer
             sshServer.setPort(FTP_TEST_SERVER_PORT);
             sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
-            final List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<>();
+            final List<UserAuthFactory> userAuthFactories = new ArrayList<>();
 
             userAuthFactories.add(new UserAuthPasswordFactory());
             sshServer.setUserAuthFactories(userAuthFactories);
@@ -76,7 +75,7 @@ public class TestSftpServer
             });
 
             sshServer.setCommandFactory(new ScpCommandFactory());
-            final List<NamedFactory<Command>> namedFactoryList = new ArrayList<>();
+            final List<SubsystemFactory> namedFactoryList = new ArrayList<>();
             namedFactoryList.add(new SftpSubsystemFactory());
             sshServer.setSubsystemFactories(namedFactoryList);
 
