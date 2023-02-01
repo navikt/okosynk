@@ -229,7 +229,7 @@ public class OppgaveRestClient {
 
     public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) {
         final int bulkSize = 50;
-        final Collection<String> opprettetAvOkosynk = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
+        final Collection<String> oppgaverOpprettetAvOkosynk = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
         final AtomicInteger atomicInteger = new AtomicInteger(oppgaverAccumulated.size());
         final String oppgavetype = getBatchType().getOppgaveType();
         int offset = 0;
@@ -247,31 +247,16 @@ public class OppgaveRestClient {
                     finnOppgaverResponseJson
                             .getFinnOppgaveResponseJsons()
                             .stream()
-                            .filter(r -> opprettetAvOkosynk.contains(r.getOpprettetAv()))
+                            .filter(r -> {
+                                boolean opprettetAvOkosynk =  oppgaverOpprettetAvOkosynk.contains(r.getOpprettetAv());
+                                if(!opprettetAvOkosynk) {
+                                    log.warn("Filtrerer bort oppgave: {} fra resultatet, da denne ikke er opprettet av økosynk", r.getId());
+                                }
+                                return opprettetAvOkosynk;
+                            })
                             .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
                             .collect(Collectors.toList());
-
-            final int sizeOfOppgaverReadBeforeAccumulation = oppgaver.size();
-            final int sizeOfOppgaverAccumulatedBeforeAccumulation = oppgaverAccumulated.size();
             oppgaverAccumulated.addAll(oppgaver);
-            final int sizeOfOppgaverAccumulatedAfterAccumulation = oppgaverAccumulated.size();
-            final int discrepancyBetweenReadAndAccumulated =
-                    sizeOfOppgaverAccumulatedAfterAccumulation -
-                            (sizeOfOppgaverReadBeforeAccumulation + sizeOfOppgaverAccumulatedBeforeAccumulation);
-            if (discrepancyBetweenReadAndAccumulated != 0) {
-                log.warn(
-                        "Noen oppgaver har blitt ansett som duplikater eller er opprettet manuelt. " +
-                                "discrepancyBetweenReadAndAccumulated: {}" +
-                                ", sizeOfOppgaverReadBeforeAccumulation: {}" +
-                                ", sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
-                                ", sizeOfOppgaverAccumulatedAfterAccumulation: {}",
-                        discrepancyBetweenReadAndAccumulated,
-                        sizeOfOppgaverReadBeforeAccumulation,
-                        sizeOfOppgaverAccumulatedBeforeAccumulation,
-                        sizeOfOppgaverAccumulatedAfterAccumulation
-                );
-            }
-
             if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
                 break;
             } else {

@@ -117,11 +117,13 @@ public class OppgaveSynkroniserer {
 
         final Set<Oppgave> oppgaverSomSkalFerdigstilles =
                 OppgaveSynkroniserer.finnOppgaverSomSkalFerdigstilles(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        logger.info("Fant {} åpne oppgaver som ikke samsvarer med innhold i batchfil. Disse blir ferdigstilt", oppgaverSomSkalFerdigstilles.size());
         final Set<OppgaveOppdatering> oppgaverSomSkalOppdateres =
                 OppgaveSynkroniserer.finnOppgaverSomSkalOppdateres(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
+        logger.info("Fant {} åpne oppgaver som samsvarer med innhold i batchfil. Disse oppdateres", oppgaverSomSkalOppdateres.size());
         final Set<Oppgave> oppgaverSomSkalOpprettes =
                 OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
-
+        logger.info("Fant {} oppgaver i batchfil som ikke samsvarer med åpne oppgaver. Oppretter nye oppgaver for disse", oppgaverSomSkalOpprettes.size());
         final ConsumerStatistics consumerStatistics_ferdigstill =
                 ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
         final ConsumerStatistics consumerStatistics_oppdater =

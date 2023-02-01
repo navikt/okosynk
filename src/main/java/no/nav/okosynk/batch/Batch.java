@@ -90,6 +90,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         logger.info("Batch " + getBatchName() + " har startet.");
         try {
             final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
+            logger.info("Hentet {} oppgvelinjer fra batchfil", alleOppgaverLestFraBatchen.size());
             final ConsumerStatistics consumerStatistics =
                     getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
 
