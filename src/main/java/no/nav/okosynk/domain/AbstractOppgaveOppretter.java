@@ -40,6 +40,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     private final AbstractMappingRegelRepository mappingRegelRepository;
     private final IAktoerClient aktoerClient;
 
+    private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
+
     protected AbstractOppgaveOppretter(
             final AbstractMappingRegelRepository mappingRegelRepository,
             final IAktoerClient aktoerClient,
@@ -108,8 +110,9 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                         this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
                                                 if (isNotBlank(aktoerRespons.getFeilmelding())) {
                                                     log.warn(
-                                                            "Fikk feilmelding fra leverandør av aktoerid  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
+                                                            "Fikk feilmelding under henting av gjeldende aktøird  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
                                                             aktoerRespons.getFeilmelding());
+                                                    secureLog.warn("Kunne ikek ehnte aktørid for: {}", gjelderId);
                                                     return null;
                                                 } else {
                                                     builder.withAktoerId(aktoerRespons.getAktoerId());

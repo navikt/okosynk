@@ -79,7 +79,7 @@ public class PdlRestClient implements IAktoerClient {
                         .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
                         .header(X_CORRELATION_ID_HEADER_KEY, correlationId)
                         .buildPost(Entity.json(hentIdenterEntityAsString));
-        log.info("Henter identer fra pdl for folkeregisterIdent...");
+        log.debug("Henter identer fra pdl for folkeregisterIdent...");
         final Response postHentIdenterResponse = invocation.invoke();
         final String postHentIdenterResponseAsString = postHentIdenterResponse.readEntity(String.class);
         final Collection<IdentJson> aktiveIdentJsons;

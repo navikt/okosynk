@@ -408,12 +408,10 @@ class OppgaveRestClientTestUtils {
         finnOppgaveResponseJson.setStatus(OppgaveStatus.values()[random.nextInt(OppgaveStatus.values().length)]);
         finnOppgaveResponseJson.setOpprettetTidspunkt(createRandomDateTimeWithZone(random));
         finnOppgaveResponseJson.setEndretTidspunkt(createRandomDateTimeWithZone(random));
-        finnOppgaveResponseJson.setFerdigstiltTidspunkt(createRandomDateTimeWithZone(random));
+        finnOppgaveResponseJson.setOpprettetAv("okosynkur");
         finnOppgaveResponseJson.setId(RandomStringUtils.randomNumeric(7, 17));
-        finnOppgaveResponseJson.setOppgavetype(RandomStringUtils.randomAlphanumeric(11));
-        finnOppgaveResponseJson.setTema(RandomStringUtils.randomAlphanumeric(11));
-        finnOppgaveResponseJson.setBehandlingstema(RandomStringUtils.randomAlphanumeric(17));
-        finnOppgaveResponseJson.setBehandlingstype(RandomStringUtils.randomAlphanumeric(12));
+        finnOppgaveResponseJson.setOppgavetype("OKO_UR");
+        finnOppgaveResponseJson.setTema("OKO");
         finnOppgaveResponseJson.setPrioritet(RandomStringUtils.randomAlphanumeric(19));
         finnOppgaveResponseJson.setBeskrivelse(RandomStringUtils.randomAlphanumeric(319));
         finnOppgaveResponseJson.setFristFerdigstillelse(createRandomDate(random, true));

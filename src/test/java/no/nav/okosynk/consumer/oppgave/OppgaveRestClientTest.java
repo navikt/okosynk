@@ -376,9 +376,7 @@ class OppgaveRestClientTest {
         oppgaver.add(oppgave);
 
         final boolean shouldFerdigstille = true;
-
-        assertThrows(
-                IllegalStateException.class,
+        assertDoesNotThrow(
                 () -> {
                     final ConsumerStatistics actualConsumerStatistics =
                             mockedOppgaveRestClient.patchOppgaver(oppgaver, shouldFerdigstille);
@@ -387,7 +385,7 @@ class OppgaveRestClientTest {
                                     .add(
                                             ConsumerStatistics
                                                     .builder()
-                                                    .antallOppgaverSomMedSikkerhetIkkeErOpprettet(1)
+                                                    .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(1)
                                                     .name(BATCH_TYPE.UR.getConsumerStatisticsName())
                                                     .build()
                                     );

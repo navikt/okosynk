@@ -146,7 +146,8 @@ public class OppgaveRestClient {
                                 {
                                     try {
                                         return OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(oppgave);
-                                    } catch (OppgaveMapperException_MoreThanOneActorType | OppgaveMapperException_AktivTilFraNull e) {
+                                    } catch (OppgaveMapperException_MoreThanOneActorType |
+                                             OppgaveMapperException_AktivTilFraNull e) {
                                         throw new IllegalStateException("Feil i input date", e);
                                     }
                                 }
@@ -223,23 +224,22 @@ public class OppgaveRestClient {
                         getAzureAdAuthenticationClient()
                 );
 
-        final List<List<Oppgave>> listOfListsOfOppgaverToBePatched =
-                delOppListe(new ArrayList<>(oppgaverToBePatched), 500);
+        if (ferdigstill) {
+            log.info("Ferdigstiller {} oppgaver", oppgaverToBePatched.size());
+        } else {
+            log.info("Oppdaterer {} oppgaver", oppgaverToBePatched.size());
+        }
+        int suksess = 0;
+        int feilet = 0;
 
-        log.info(
-                "Starter patching av oppgaver, sublistestørrelse: "
-                        + "{}, antall sublister {}, antall oppgaver totalt: {}",
-                500, listOfListsOfOppgaverToBePatched.size(), oppgaverToBePatched.size());
-        final List<PatchOppgaverResponseJson> responses =
-                listOfListsOfOppgaverToBePatched.stream()
-                        .map(listOfOppgaverToBePatched -> patchOppgaver(listOfOppgaverToBePatched, ferdigstill, request))
-                        .collect(Collectors.toList());
-
-        final int suksess =
-                summerAntallFraResponse(responses, PatchOppgaverResponseJson::getSuksess);
-        final int feilet =
-                summerAntallFraResponse(responses, PatchOppgaverResponseJson::getFeilet);
-
+        for (Oppgave oppgave : oppgaverToBePatched) {
+            try {
+                patchOppgave(oppgave, ferdigstill, request);
+                suksess++;
+            } catch (Exception e) {
+                feilet++;
+            }
+        }
         if (ferdigstill) {
             return ConsumerStatistics
                     .builder(getBatchType())
@@ -261,75 +261,96 @@ public class OppgaveRestClient {
 
     public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) {
         final int bulkSize = 50;
-        final Collection<String> oppprettetAvValuesForFinn = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
+        final Collection<String> opprettetAvOkosynk = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
         final AtomicInteger atomicInteger = new AtomicInteger(oppgaverAccumulated.size());
-        oppprettetAvValuesForFinn
-                .stream()
-                .forEach(oppprettetAvValueForFinn ->
-                        {
-                            int offset = 0;
-                            log.info("Starter søk i og evt. inkrementell henting av oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\" fra oppgave-servicen...");
-                            FinnOppgaverResponseJson finnOppgaverResponseJson =
-                                    this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
-                            log.info(
-                                    "Estimat: Vi kommer totalt til å hente {} oppgaver med opprettetAv = \"" + oppprettetAvValueForFinn + "\"",
-                                    finnOppgaverResponseJson.getAntallTreffTotalt()
-                            );
-                            while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
-                                log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
+        final String oppgavetype = getBatchType().getOppgaveType();
+        int offset = 0;
+        log.info("Starter søk og evt. inkrementell henting av oppgaver av type: {}", oppgavetype);
+        FinnOppgaverResponseJson finnOppgaverResponseJson =
+                this.finnOppgaver(getBatchType().getOppgaveType(), bulkSize, offset);
+        log.info(
+                "Estimat: Vi kommer totalt til å hente {} oppgaver av oppgaver av type: {}",
+                finnOppgaverResponseJson.getAntallTreffTotalt(), oppgavetype
+        );
+        while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
+            log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
 
-                                final List<Oppgave> oppgaverReadFromTheDatabase =
-                                        finnOppgaverResponseJson
-                                                .getFinnOppgaveResponseJsons()
-                                                .stream()
-                                                .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
-                                                .collect(Collectors.toList());
+            final List<Oppgave> oppgaver =
+                    finnOppgaverResponseJson
+                            .getFinnOppgaveResponseJsons()
+                            .stream()
+                            .filter(r -> opprettetAvOkosynk.contains(r.getOpprettetAv()))
+                            .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
+                            .collect(Collectors.toList());
 
-                                final int sizeOfOppgaverReadBeforeAccumulation = oppgaverReadFromTheDatabase.size();
-                                final int sizeOfOppgaverAccumulatedBeforeAccumulation = oppgaverAccumulated.size();
-                                oppgaverAccumulated.addAll(oppgaverReadFromTheDatabase);
-                                final int sizeOfOppgaverAccumulatedAfterAccumulation = oppgaverAccumulated.size();
-                                final int discrepancyBetweenReadAndAccumulated =
-                                        sizeOfOppgaverAccumulatedAfterAccumulation -
-                                                (sizeOfOppgaverReadBeforeAccumulation + sizeOfOppgaverAccumulatedBeforeAccumulation);
-                                if (discrepancyBetweenReadAndAccumulated != 0) {
-                                    log.warn(
-                                            "Noen oppgaver lest fra databasen har blitt ansett som duplikater. " +
-                                                    "discrepancyBetweenReadAndAccumulated: {}" +
-                                                    ", sizeOfOppgaverReadBeforeAccumulation: {}" +
-                                                    ", sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
-                                                    ", sizeOfOppgaverAccumulatedAfterAccumulation: {}",
-                                            discrepancyBetweenReadAndAccumulated,
-                                            sizeOfOppgaverReadBeforeAccumulation,
-                                            sizeOfOppgaverAccumulatedBeforeAccumulation,
-                                            sizeOfOppgaverAccumulatedAfterAccumulation
-                                    );
-                                }
-
-                                if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
-                                    break;
-                                } else {
-                                    offset += bulkSize;
-                                    finnOppgaverResponseJson =
-                                            this.finnOppgaver(oppprettetAvValueForFinn, bulkSize, offset);
-                                }
-                            }
-                            log.info("Hentet totalt {} unike oppgaver fra Oppgave  med opprettetAv = \"" + oppprettetAvValueForFinn + "\"", oppgaverAccumulated.size() - atomicInteger.get());
-                            atomicInteger.addAndGet(oppgaverAccumulated.size());
-                        }
+            final int sizeOfOppgaverReadBeforeAccumulation = oppgaver.size();
+            final int sizeOfOppgaverAccumulatedBeforeAccumulation = oppgaverAccumulated.size();
+            oppgaverAccumulated.addAll(oppgaver);
+            final int sizeOfOppgaverAccumulatedAfterAccumulation = oppgaverAccumulated.size();
+            final int discrepancyBetweenReadAndAccumulated =
+                    sizeOfOppgaverAccumulatedAfterAccumulation -
+                            (sizeOfOppgaverReadBeforeAccumulation + sizeOfOppgaverAccumulatedBeforeAccumulation);
+            if (discrepancyBetweenReadAndAccumulated != 0) {
+                log.warn(
+                        "Noen oppgaver har blitt ansett som duplikater eller er opprettet manuelt. " +
+                                "discrepancyBetweenReadAndAccumulated: {}" +
+                                ", sizeOfOppgaverReadBeforeAccumulation: {}" +
+                                ", sizeOfOppgaverAccumulatedBeforeAccumulation: {}" +
+                                ", sizeOfOppgaverAccumulatedAfterAccumulation: {}",
+                        discrepancyBetweenReadAndAccumulated,
+                        sizeOfOppgaverReadBeforeAccumulation,
+                        sizeOfOppgaverAccumulatedBeforeAccumulation,
+                        sizeOfOppgaverAccumulatedAfterAccumulation
                 );
-        try {
-            final Oppgave aRandomFoundOppgave = oppgaverAccumulated.stream().filter(oppgave -> oppgave.folkeregisterIdent != null || oppgave.aktoerId != null).findAny().get();
-            log.debug("A random found oppgave: " + aRandomFoundOppgave);
-        } catch (Exception e) {
-            log.warn("Exception when logging a random found oppgave", e);
-        }
+            }
 
-        log.info("Hentet fra databasen totalt {} unike oppgaver fra Oppgave  med alle verdier av opprettetAv", oppgaverAccumulated.size());
+            if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
+                break;
+            } else {
+                offset += bulkSize;
+                finnOppgaverResponseJson =
+                        this.finnOppgaver(oppgavetype, bulkSize, offset);
+            }
+        }
+        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}",  oppgaverAccumulated.size() - atomicInteger.get(), oppgavetype);
         return ConsumerStatistics
                 .builder(getBatchType())
                 .antallOppgaverSomErHentetFraDatabasen(oppgaverAccumulated.size())
                 .build();
+    }
+
+    private void patchOppgave(Oppgave oppgave, boolean ferdigstill, HttpEntityEnclosingRequestBase request) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            final ObjectNode patchOppgaverObjectNode = objectMapper.createObjectNode();
+            patchOppgaverObjectNode.put("id", oppgave.oppgaveId);
+            patchOppgaverObjectNode.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
+            patchOppgaverObjectNode.put("versjon", oppgave.versjon);
+            patchOppgaverObjectNode.put("beskrivelse", oppgave.beskrivelse);
+            if (ferdigstill) {
+                patchOppgaverObjectNode.put("status", FERDIGSTILT.name());
+            }
+            final String jsonString = objectMapper.writeValueAsString(patchOppgaverObjectNode);
+            request.setEntity(new StringEntity(jsonString, "UTF-8"));
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
+        }
+
+        try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
+            final StatusLine statusLine = response.getStatusLine();
+            if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
+                try {
+                    final ErrorResponse errorResponse =
+                            objectMapper.readValue(response.getEntity().getContent(), ErrorResponse.class);
+                    log.error("Feil oppstod under patching av oppgave: {}", errorResponse);
+                    throw illegalStateExceptionFrom(errorResponse);
+                } catch (JsonParseException jpe) {
+                    parseRawErrorAndThrow(response);
+                }
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
+        }
     }
 
     CloseableHttpResponse executeRequest(
@@ -348,14 +369,14 @@ public class OppgaveRestClient {
     }
 
     private FinnOppgaverResponseJson finnOppgaver(
-            final String opprettetAv,
+            final String oppgavetype,
             final int bulkSize,
             final int offset) {
         final URI uri;
         try {
             uri = new URIBuilder(getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY))
-                    .addParameter("opprettetAv", opprettetAv)
                     .addParameter("tema", FAGOMRADE_OKONOMI_KODE)
+                    .addParameter("oppgavetype", oppgavetype)
                     .addParameter("statuskategori", "AAPEN")
                     .addParameter("limit", String.valueOf(bulkSize))
                     .addParameter("offset", String.valueOf(offset))
@@ -390,19 +411,7 @@ public class OppgaveRestClient {
                             .collect(Collectors.joining(System.lineSeparator()));
             final ObjectMapper objectMapper =
                     new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            final FinnOppgaverResponseJson finnOppgaverResponseJson =
-                    objectMapper.readValue(finnOppgaverResponseJsonEntityAsString, FinnOppgaverResponseJson.class);
-            try {
-                // Do some random logging of the response entity as a string:
-                if (offset < 100) {
-                    // Do some "random" logging to see some random response entities:
-                    log.debug("finnOppgaverResponseJsonEntityAsString fra oppgave: {}", finnOppgaverResponseJsonEntityAsString);
-                }
-                log.debug("A random FinnOppgaveResponseJson: " + finnOppgaverResponseJson.getFinnOppgaveResponseJsons().stream().findAny().get());
-            } catch (Exception e) {
-                log.debug("Exception when logging random oppgave info", e);
-            }
-            return finnOppgaverResponseJson;
+            return objectMapper.readValue(finnOppgaverResponseJsonEntityAsString, FinnOppgaverResponseJson.class);
         } catch (IOException e) {
             throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
         }
