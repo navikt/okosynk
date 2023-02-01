@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOppgaveRequestJson> {
 
@@ -23,23 +21,7 @@ public class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<
         final PostOppgaveRequestJson PostOppgaveRequestJson2 = new PostOppgaveRequestJson() {{
         }};
 
-        assertFalse(postOppgaveRequestJson1.equals(PostOppgaveRequestJson2));
-    }
-
-    @Test
-    void when_selected_sub_fields_differ_then_the_result_should_be_unequal() {
-
-            final PostOppgaveRequestJson postOppgaveRequestJson1 = createEmptyInstance();
-        fillWithAllHardCodedData(postOppgaveRequestJson1);
-        final PostOppgaveRequestJson postOppgaveRequestJson2 = createEmptyInstance();
-        fillWithAllHardCodedData(postOppgaveRequestJson2);
-        assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
-
-        final String folkeregisterIdent = "10123145698";
-        postOppgaveRequestJson1.setNpidOrFolkeregisterIdent(folkeregisterIdent);
-        assertFalse(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
-        postOppgaveRequestJson2.setNpidOrFolkeregisterIdent(folkeregisterIdent);
-        assertTrue(postOppgaveRequestJson1.equals(postOppgaveRequestJson2));
+        assertNotEquals(postOppgaveRequestJson1, PostOppgaveRequestJson2);
     }
 
     @Test

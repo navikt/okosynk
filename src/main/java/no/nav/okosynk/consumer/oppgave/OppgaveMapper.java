@@ -20,8 +20,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class OppgaveMapper {
 
     static final String ENHET_ID_FOR_ANDRE_EKSTERNE = "9999";
-    private static final Logger logger = LoggerFactory.getLogger(OppgaveMapper.class);
-    private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
     static PostOppgaveRequestJson mapFromFinnOppgaveResponseJsonToOppgave(final Oppgave oppgave) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
 
@@ -45,7 +43,6 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setBeskrivelse(oppgave.beskrivelse);
             postOppgaveRequestJson.setBnr(oppgave.bnr);
             postOppgaveRequestJson.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
-            postOppgaveRequestJson.setNpidOrFolkeregisterIdent(oppgave.folkeregisterIdent);
             postOppgaveRequestJson.setOppgavetype(oppgave.oppgavetypeKode);
             postOppgaveRequestJson.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
             postOppgaveRequestJson.setOrgnr(oppgave.orgnr);
@@ -53,10 +50,6 @@ public class OppgaveMapper {
             postOppgaveRequestJson.setSamhandlernr(oppgave.samhandlernr);
             postOppgaveRequestJson.setTema(oppgave.fagomradeKode);
             postOppgaveRequestJson.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
-        }
-
-        if (AktoerUt.isDnr(postOppgaveRequestJson.getNpidOrFolkeregisterIdent())) {
-            secureLog.info("dnr found in PostOppgaveRequestJson: " + postOppgaveRequestJson.getNpidOrFolkeregisterIdent().substring(0, 6) + "*****");
         }
 
         return postOppgaveRequestJson;
@@ -106,9 +99,6 @@ public class OppgaveMapper {
 
                         .build();
 
-        if (AktoerUt.isDnr(oppgave.folkeregisterIdent)) {
-            secureLog.info("dnr found in FinnOppgaveResponseJson: " + oppgave.folkeregisterIdent.substring(0, 6) + "*****");
-        }
         return oppgave;
     }
 }

@@ -352,29 +352,27 @@ public class OppgaveMapperUnitTest {
         assertEquals(expectedOppgave.behandlingstype, actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
         assertEquals(expectedOppgave.beskrivelse, actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
         assertEquals(expectedOppgave.bnr, actualPostOppgaveRequestJson.getBnr(), "bnr");
-        assertEquals(expectedOppgave.folkeregisterIdent, actualPostOppgaveRequestJson.getNpidOrFolkeregisterIdent(), "folkeregisterIdent");
         assertEquals(expectedOppgave.oppgavetypeKode, actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
         assertEquals(expectedOppgave.orgnr, actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
         assertEquals(expectedOppgave.prioritetKode, actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");
         assertEquals(expectedOppgave.samhandlernr, actualPostOppgaveRequestJson.getSamhandlernr(), "samhandlernr");
 
-        assertEquals(null, actualPostOppgaveRequestJson.getBehandlesAvApplikasjon(), "behandlesAvApplikasjon");
-        assertEquals(null, actualPostOppgaveRequestJson.getEndretAv(), "endretAv");
-        assertEquals(null, actualPostOppgaveRequestJson.getEndretAvEnhetsnr(), "endretAvEnhetsnr");
-        assertEquals(null, actualPostOppgaveRequestJson.getEndretTidspunkt(), "endretTidspunkt");
-        assertEquals(null, actualPostOppgaveRequestJson.getFerdigstiltTidspunkt(), "ferdigstiltTidspunkt");
-        assertEquals(null, actualPostOppgaveRequestJson.getId(), "id");
-        assertEquals(null, actualPostOppgaveRequestJson.getJournalpostId(), "journalpostId");
-        assertEquals(null, actualPostOppgaveRequestJson.getJournalpostkilde(), "journalpostkilde");
-        assertEquals(null, actualPostOppgaveRequestJson.getMappeId(), "mappeId");
-        assertEquals(null, actualPostOppgaveRequestJson.getMetadata(), "metadata");
-        assertEquals(null, actualPostOppgaveRequestJson.getOpprettetAv(), "opprettetAv");
-        assertEquals(null, actualPostOppgaveRequestJson.getOpprettetTidspunkt(), "opprettetTidspunkt");
-        assertEquals(null, actualPostOppgaveRequestJson.getSaksreferanse(), "saksreferanse");
-        assertEquals(null, actualPostOppgaveRequestJson.getStatus(), "status");
-        assertEquals(null, actualPostOppgaveRequestJson.getStatus(), "status");
-        assertEquals(null, actualPostOppgaveRequestJson.getTilordnetRessurs(), "tilordnetRessurs");
-        assertEquals(null, actualPostOppgaveRequestJson.getVersjon(), "versjon");
+        assertNull(actualPostOppgaveRequestJson.getBehandlesAvApplikasjon(), "behandlesAvApplikasjon");
+        assertNull(actualPostOppgaveRequestJson.getEndretAv(), "endretAv");
+        assertNull(actualPostOppgaveRequestJson.getEndretAvEnhetsnr(), "endretAvEnhetsnr");
+        assertNull(actualPostOppgaveRequestJson.getEndretTidspunkt(), "endretTidspunkt");
+        assertNull(actualPostOppgaveRequestJson.getFerdigstiltTidspunkt(), "ferdigstiltTidspunkt");
+        assertNull(actualPostOppgaveRequestJson.getId(), "id");
+        assertNull(actualPostOppgaveRequestJson.getJournalpostId(), "journalpostId");
+        assertNull(actualPostOppgaveRequestJson.getJournalpostkilde(), "journalpostkilde");
+        assertNull(actualPostOppgaveRequestJson.getMappeId(), "mappeId");
+        assertNull(actualPostOppgaveRequestJson.getMetadata(), "metadata");
+        assertNull(actualPostOppgaveRequestJson.getOpprettetAv(), "opprettetAv");
+        assertNull(actualPostOppgaveRequestJson.getOpprettetTidspunkt(), "opprettetTidspunkt");
+        assertNull(actualPostOppgaveRequestJson.getSaksreferanse(), "saksreferanse");
+        assertNull(actualPostOppgaveRequestJson.getStatus(), "status");
+        assertNull(actualPostOppgaveRequestJson.getTilordnetRessurs(), "tilordnetRessurs");
+        assertNull(actualPostOppgaveRequestJson.getVersjon(), "versjon");
     }
 
     @ParameterizedTest

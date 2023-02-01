@@ -150,10 +150,9 @@ public class OppgaveRestClient {
                     } catch (JsonParseException jpe) {
                         parseRawErrorAndThrow(response);
                     }
-                    log.error("Feil oppsto under oppretting av oppgave: {}, Error response: {}. {}",
+                    log.error("Feil oppstod under oppretting av oppgave: {}, Error response: {}",
                             postOppgaveRequestJson,
-                            errorResponse,
-                            AktoerUt.isDnr(postOppgaveRequestJson.getNpidOrFolkeregisterIdent()) ? "Hint: folkeregisterIdent er et dnr." : "");
+                            errorResponse);
                     oppgaverSomIkkeErOpprettet.add(postOppgaveRequestJson);
                 } else {
                     oppgaverSomErOpprettet.add(
@@ -237,7 +236,7 @@ public class OppgaveRestClient {
         FinnOppgaverResponseJson finnOppgaverResponseJson =
                 this.finnOppgaver(getBatchType().getOppgaveType(), bulkSize, offset);
         log.info(
-                "Estimat: Vi kommer totalt til å hente {} oppgaver av oppgaver av type: {}",
+                "Fant {} oppgaver av oppgaver av type: {}",
                 finnOppgaverResponseJson.getAntallTreffTotalt(), oppgavetype
         );
         while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
@@ -265,7 +264,11 @@ public class OppgaveRestClient {
                         this.finnOppgaver(oppgavetype, bulkSize, offset);
             }
         }
-        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}",  oppgaverAccumulated.size() - atomicInteger.get(), oppgavetype);
+        int antallOppgaverSomSkalBehandles = oppgaverAccumulated.size() - atomicInteger.get();
+        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}", antallOppgaverSomSkalBehandles  , oppgavetype);
+        if(antallOppgaverSomSkalBehandles != finnOppgaverResponseJson.getAntallTreffTotalt()) {
+            log.warn("{} oppgaver har blitt filtrert bort fra resultatet", finnOppgaverResponseJson.getAntallTreffTotalt()-antallOppgaverSomSkalBehandles);
+        }
         return ConsumerStatistics
                 .builder(getBatchType())
                 .antallOppgaverSomErHentetFraDatabasen(oppgaverAccumulated.size())

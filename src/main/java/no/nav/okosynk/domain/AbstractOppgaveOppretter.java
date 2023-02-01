@@ -110,9 +110,9 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                                                         this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
                                                 if (isNotBlank(aktoerRespons.getFeilmelding())) {
                                                     log.warn(
-                                                            "Fikk feilmelding under henting av gjeldende aktøird  ifm. mapping av oppgave fra melding i inputfil, hopper over melding. - {}",
+                                                            "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
                                                             aktoerRespons.getFeilmelding());
-                                                    secureLog.warn("Kunne ikek ehnte aktørid for: {}", gjelderId);
+                                                    secureLog.warn("Kunne ikke hente aktørid for: {}", gjelderId);
                                                     return null;
                                                 } else {
                                                     builder.withAktoerId(aktoerRespons.getAktoerId());
