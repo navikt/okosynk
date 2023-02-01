@@ -4,13 +4,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.consumer.ConsumerStatistics;
 import no.nav.okosynk.consumer.oppgave.json.FinnOppgaverResponseJson;
-import no.nav.okosynk.consumer.oppgave.json.PatchOppgaverResponseJson;
 import no.nav.okosynk.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
 import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
@@ -19,13 +17,7 @@ import no.nav.okosynk.domain.util.AktoerUt;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -40,21 +32,13 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static no.nav.okosynk.config.Constants.AUTHORIZATION;
-import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
-import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
+import static no.nav.okosynk.config.Constants.*;
 import static no.nav.okosynk.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
-import static no.nav.okosynk.consumer.util.ListeOppdeler.delOppListe;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -92,11 +76,11 @@ public class OppgaveRestClient {
     }
 
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
-            final IOkosynkConfiguration okosynkConfiguration,
+            final String oppgaveUrl,
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) {
-        final String oppgaveUrl = okosynkConfiguration.getRequiredString(OPPGAVE_URL_KEY);
+
         final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl);
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
@@ -104,15 +88,6 @@ public class OppgaveRestClient {
         OppgaveRestClient.addAzureAdAuthenticationHeader(request, azureAdAuthenticationClient);
 
         return request;
-    }
-
-    private static int summerAntallFraResponse(
-            final List<PatchOppgaverResponseJson> responses,
-            final ToIntFunction<PatchOppgaverResponseJson> function) {
-        return responses.stream()
-                .mapToInt(function)
-                .reduce(Integer::sum)
-                .orElse(0);
     }
 
     private static void addAzureAdAuthenticationHeader(
@@ -129,7 +104,7 @@ public class OppgaveRestClient {
 
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        getOkosynkConfiguration(),
+                        getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY),
                         HttpPost::new,
                         getAzureAdAuthenticationClient()
                 );
@@ -217,13 +192,6 @@ public class OppgaveRestClient {
             return ConsumerStatistics.zero(getBatchType());
         }
 
-        final HttpEntityEnclosingRequestBase request =
-                createOppgaveRequestBase(
-                        getOkosynkConfiguration(),
-                        HttpPatch::new,
-                        getAzureAdAuthenticationClient()
-                );
-
         if (ferdigstill) {
             log.info("Ferdigstiller {} oppgaver", oppgaverToBePatched.size());
         } else {
@@ -234,7 +202,7 @@ public class OppgaveRestClient {
 
         for (Oppgave oppgave : oppgaverToBePatched) {
             try {
-                patchOppgave(oppgave, ferdigstill, request);
+                patchOppgave(oppgave, ferdigstill);
                 suksess++;
             } catch (Exception e) {
                 feilet++;
@@ -319,8 +287,14 @@ public class OppgaveRestClient {
                 .build();
     }
 
-    private void patchOppgave(Oppgave oppgave, boolean ferdigstill, HttpEntityEnclosingRequestBase request) {
+    private void patchOppgave(Oppgave oppgave, boolean ferdigstill) {
         ObjectMapper objectMapper = new ObjectMapper();
+        final HttpEntityEnclosingRequestBase request =
+                createOppgaveRequestBase(
+                        getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY) + String.format("/%s", oppgave.oppgaveId),
+                        HttpPatch::new,
+                        getAzureAdAuthenticationClient()
+                );
         try {
             final ObjectNode patchOppgaverObjectNode = objectMapper.createObjectNode();
             patchOppgaverObjectNode.put("id", oppgave.oppgaveId);
@@ -417,39 +391,8 @@ public class OppgaveRestClient {
         }
     }
 
-    private PatchOppgaverResponseJson patchOppgaver(
-            final List<Oppgave> oppgaveListe,
-            final boolean ferdigstill,
-            final HttpEntityEnclosingRequestBase request) {
-        try {
-            final ObjectNode patchOppgaverObjectNode = createPatchOppgaverObjectNode(oppgaveListe, ferdigstill);
-            final String jsonString = new ObjectMapper().writeValueAsString(patchOppgaverObjectNode);
-            request.setEntity(new StringEntity(jsonString, "UTF-8"));
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Noe gikk galt under serialisering av patch request", e);
-        }
 
-        try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
-            final StatusLine statusLine = response.getStatusLine();
-            if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-                try {
-                    final ErrorResponse errorResponse =
-                            new ObjectMapper().readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    log.error("Feil oppsto under patching av oppgaver: {}", errorResponse);
-                    throw illegalStateExceptionFrom(errorResponse);
-                } catch (JsonParseException jpe) {
-                    parseRawErrorAndThrow(response);
-                }
-            }
-
-            return new ObjectMapper()
-                    .readValue(response.getEntity().getContent(), PatchOppgaverResponseJson.class);
-        } catch (IOException e) {
-            throw new IllegalStateException("Feilet ved kall mot Oppgave API", e);
-        }
-    }
-
-    private PatchOppgaverResponseJson parseRawErrorAndThrow(
+    private void parseRawErrorAndThrow(
             final CloseableHttpResponse response
     ) throws IOException {
 
@@ -457,29 +400,6 @@ public class OppgaveRestClient {
                 .readValue(response.getEntity().getContent(), String.class);
         log.error("Feilet under parsing av oppgave error response: {}", responseBody);
         throw new IllegalStateException("Feilet under parsing av oppgave error response");
-    }
-
-    private ObjectNode createPatchOppgaverObjectNode(
-            final List<Oppgave> oppgaverToBePatched,
-            final boolean ferdigstill
-    ) {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final ObjectNode patchOppgaverObjectNode = objectMapper.createObjectNode();
-        patchOppgaverObjectNode.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
-        if (ferdigstill) {
-            patchOppgaverObjectNode.put("status", FERDIGSTILT.name());
-        }
-        final ArrayNode patchOppgaverArrayNode = patchOppgaverObjectNode.putArray("oppgaver");
-
-        oppgaverToBePatched.forEach(oppgaveToBePatched -> {
-            final ObjectNode oppgaveToBePatchedObjectNnode = objectMapper.createObjectNode();
-            oppgaveToBePatchedObjectNnode.put("id", oppgaveToBePatched.oppgaveId);
-            oppgaveToBePatchedObjectNnode.put("versjon", oppgaveToBePatched.versjon);
-            oppgaveToBePatchedObjectNnode.put("beskrivelse", oppgaveToBePatched.beskrivelse);
-            patchOppgaverArrayNode.add(oppgaveToBePatchedObjectNnode);
-        });
-
-        return patchOppgaverObjectNode;
     }
 
     private IllegalStateException illegalStateExceptionFrom(

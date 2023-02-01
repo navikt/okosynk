@@ -417,7 +417,7 @@ class OppgaveRestClientTest {
         final Random random = new Random(38762486);
 
         final OppgaveRestClient mockedOppgaveRestClient =
-                OppgaveRestClientTestUtils.prepareAMockedPatchRestClientThatSucceedsInCreatingOneOppgave();
+                OppgaveRestClientTestUtils.prepareAMockedPatchRestClientThatSucceedsInUpdatingOneOppgave();
         when(mockedOppgaveRestClient.getAzureAdAuthenticationClient()).thenReturn(OppgaveRestClientTest.mockedAzureAdAuthenticationClient);
 
         final Oppgave oppgave =

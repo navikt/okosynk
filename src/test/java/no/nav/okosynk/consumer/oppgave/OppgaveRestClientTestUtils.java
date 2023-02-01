@@ -8,7 +8,6 @@ import no.nav.okosynk.consumer.oppgave.json.FinnOppgaveResponseJson;
 import no.nav.okosynk.consumer.oppgave.json.FinnOppgaverResponseJson;
 import no.nav.okosynk.consumer.oppgave.json.IdentGruppeV2;
 import no.nav.okosynk.consumer.oppgave.json.IdentJson;
-import no.nav.okosynk.consumer.oppgave.json.PatchOppgaverResponseJson;
 import no.nav.okosynk.consumer.oppgave.json.PostOppgaveResponseJson;
 import no.nav.okosynk.consumer.security.AzureAdAuthenticationClient;
 import org.apache.commons.io.IOUtils;
@@ -548,7 +547,7 @@ class OppgaveRestClientTestUtils {
         return oppgaveRestClient;
     }
 
-    static OppgaveRestClient prepareAMockedPatchRestClientThatSucceedsInCreatingOneOppgave()
+    static OppgaveRestClient prepareAMockedPatchRestClientThatSucceedsInUpdatingOneOppgave()
             throws IOException {
 
         final CloseableHttpResponse preparedCloseableHttpResponse =
@@ -572,22 +571,8 @@ class OppgaveRestClientTestUtils {
                     public HttpEntity getEntity() {
                         return new HttpEntityWithAllMethodsImplementedAndThrowing() {
                             @Override
-                            public InputStream getContent() throws IOException, UnsupportedOperationException {
-                                final ObjectMapper objectMapper = new ObjectMapper();
-                                objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
-
-                                final PatchOppgaverResponseJson patchOppgaverResponseJson = new PatchOppgaverResponseJson();
-
-                                patchOppgaverResponseJson.setFeilet(0);
-                                patchOppgaverResponseJson.setSuksess(1);
-                                patchOppgaverResponseJson.setTotalt(1);
-
-                                final String patchOppgaverResponseAsJsonString =
-                                        objectMapper.writeValueAsString(patchOppgaverResponseJson);
-                                final InputStream patchOppgaverResponseAsJsonStringInputStream =
-                                        IOUtils.toInputStream(patchOppgaverResponseAsJsonString, Charset.defaultCharset());
-
-                                return patchOppgaverResponseAsJsonStringInputStream;
+                            public InputStream getContent() throws UnsupportedOperationException {
+                                return IOUtils.toInputStream("Leses ikke", Charset.defaultCharset());
                             }
                         };
                     }
