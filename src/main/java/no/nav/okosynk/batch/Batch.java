@@ -90,7 +90,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         logger.info("Batch " + getBatchName() + " har startet.");
         try {
             final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
-            logger.info("Hentet {} oppgvelinjer fra batchfil", alleOppgaverLestFraBatchen.size());
+            logger.info("Hentet {} oppgvelinjer som skal behandles", alleOppgaverLestFraBatchen.size());
             final ConsumerStatistics consumerStatistics =
                     getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
 
@@ -159,7 +159,6 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
             ConfigurationBatchException {
 
         logger.debug("Entering Batch.hentBatchOppgaver...");
-
         final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
         final int actualnumberOfOppgaverRetrievedFromBatchInput = linjerMedUspesifikkeMeldinger.size();
         if (actualnumberOfOppgaverRetrievedFromBatchInput > UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT) {
@@ -170,7 +169,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         logger.debug("linjerMedUspesifikkeMeldinger.size(): {}", linjerMedUspesifikkeMeldinger.size());
         final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger =
                 opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
-        logger.debug("spesifikkeMeldinger.size(): {}", spesifikkeMeldinger.size());
+        logger.info("Konverterer {} meldinger til oppgaver", spesifikkeMeldinger.size());
         final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
 
         batchOppgaver
@@ -207,7 +206,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
             );
             linjerMedUspesifikkeMeldinger = getUspesifikkMeldingLinjeReader().read();
             logger.info(
-                    "STATISTIKK: {} meldinger ble lest inn. Batch name: {}",
+                    "{} meldinger ble lest inn fra fil. Batch name: {}",
                     linjerMedUspesifikkeMeldinger.size(),
                     getBatchName());
         } catch (IoOkosynkIoException e) {

@@ -267,7 +267,7 @@ public class OppgaveRestClient {
         int antallOppgaverSomSkalBehandles = oppgaverAccumulated.size() - atomicInteger.get();
         log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}", antallOppgaverSomSkalBehandles  , oppgavetype);
         if(antallOppgaverSomSkalBehandles != finnOppgaverResponseJson.getAntallTreffTotalt()) {
-            log.warn("{} oppgaver har blitt filtrert bort fra resultatet", finnOppgaverResponseJson.getAntallTreffTotalt()-antallOppgaverSomSkalBehandles);
+            log.warn("{} oppgaver har blitt filtrert bort fra resultatet. Disse er enten duplikater eller har blitt opprettet utenfor økosynk", finnOppgaverResponseJson.getAntallTreffTotalt()-antallOppgaverSomSkalBehandles);
         }
         return ConsumerStatistics
                 .builder(getBatchType())

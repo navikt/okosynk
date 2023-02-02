@@ -99,8 +99,7 @@ public class OidcStsClient {
     }
 
     private String getTokenFromSts() {
-
-        log.info("henter OIDC Token for {}.", this.batchBruker);
+        log.info("Henter OIDC Token for {}.", this.batchBruker);
         final HttpGet request = new HttpGet(this.endpointUri);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         try {

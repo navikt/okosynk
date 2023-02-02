@@ -48,7 +48,7 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
                         .filter(urMeldingSkalBliOppgave())
                         .collect(Collectors.toList());
 
-        logger.info("STATISTIKK: Antall meldinger med duplikater er {}",
+        logger.info("Antall meldinger som tilfredsstiller mappingregel: {}",
                 meldingerMedMappingRegel.size());
 
         return meldingerMedMappingRegel

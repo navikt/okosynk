@@ -105,7 +105,7 @@ public class OppgaveSynkroniserer {
     ) {
         final String bruker = this.okosynkConfiguration.getBatchBruker(getBatchType());
 
-        logger.info("Bruker {} forsøker å synkronisere {} oppgaver lest fra batch input.", bruker,
+        logger.info("Bruker {} forsøker å synkronisere {} oppgaver.", bruker,
                 alleOppgaverLestFraBatchenFuncParm.size());
 
         final Set<Oppgave> alleOppgaverLestFraBatchen =
