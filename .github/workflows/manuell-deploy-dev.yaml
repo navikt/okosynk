@@ -1,0 +1,57 @@
+name: Manuell deploy dev
+run-name: Deploy feature branch ${{ github.ref_name }} by @${{ github.actor }}
+on:
+  workflow_dispatch:
+
+jobs:
+  build-project:
+    name: deploy-dev-prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+      - name: cache maven dependencies
+        uses: actions/cache@preview
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name:
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8.0.x'
+      - name: build and test
+        run: mvn clean install dependency:resolve-plugins dependency:go-offline
+      - name: create docker tag
+        run: |
+          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          DOCKER_TAG=$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)
+          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
+          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
+          echo "APPLICATION=$APPLICATION" >> $GITHUB_ENV
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+      - name: build docker image
+        run: |
+          docker build --tag $IMAGE .
+      - name: login to Github Package Registry
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
+      - name: push docker image
+        run: |
+          docker push $IMAGE
+      - name: deploy OS to q1
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: dev-fss
+          RESOURCE: nais/app-preprod-os.yaml
+      - name: deploy UR to q1
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
+          CLUSTER: dev-fss
+          RESOURCE: nais/app-preprod-ur.yaml
