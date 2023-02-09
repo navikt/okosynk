@@ -19,7 +19,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name:
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: '8.0.x'
       - name: build and test
