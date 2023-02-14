@@ -69,7 +69,7 @@ jobs:
           echo IMAGE_TAG:$IMAGE_TAG
           echo COMMIT_TAG:$COMMIT_TAG
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
         with:
           ref: ${{env.COMMIT_TAG}}
       - name: create docker tag
@@ -98,7 +98,9 @@ jobs:
         if: env.IMAGE_TAG_USED == ''
         uses: actions/setup-java@v3
         with:
-          java-version: '8.0.x'
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
       - name: build and test app
         if: env.IMAGE_TAG_USED == ''
         env:

@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
       - name: cache maven dependencies
         uses: actions/cache@preview
         with:
@@ -21,7 +21,9 @@ jobs:
       - name:
         uses: actions/setup-java@v3
         with:
-          java-version: '8.0.x'
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'maven'
       - name: build and test
         run: mvn clean install dependency:resolve-plugins dependency:go-offline
       - name: create docker tag
