@@ -45,9 +45,9 @@ spec:
     - name: BATCH_MAX_NUMBER_OF_TRIES
       value: "3"
     - name: OSFTPBASEURL_URL
-      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/os.input
+      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/OS.INPUT
     - name: URFTPBASEURL_URL
-      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/ur.input
+      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/UR.INPUT
     - name: AZURE_APP_SCOPE_OPPGAVE
       value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
     - name: SHOULD_RUN_OS_OR_UR
