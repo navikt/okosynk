@@ -11,14 +11,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      - name: cache maven dependencies
-        uses: actions/cache@preview
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name:
+      - name: Setup Java and Maven
         uses: actions/setup-java@v3
         with:
           java-version: '11'
