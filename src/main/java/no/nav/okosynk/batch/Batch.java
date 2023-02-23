@@ -210,19 +210,14 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                     linjerMedUspesifikkeMeldinger.size(),
                     getBatchName());
         } catch (IoOkosynkIoException e) {
-            logger.error(errorMsg, e);
             throw new IoBatchException(e);
         } catch (NotFoundOkosynkIoException e) {
-            logger.error(errorMsg, e);
             throw new InputDataNotFoundBatchException(e);
         } catch (AuthenticationOkosynkIoException | EncodingOkosynkIoException | NullPointerException e) {
-            logger.error(errorMsg, e);
             throw new ConfigurationBatchException(e);
         } catch (ConfigureOrInitializeOkosynkIoException e) {
-            logger.error(errorMsg, e);
             throw new GeneralBatchException(e);
         } catch (Throwable e) {
-            logger.error(errorMsg, e);
             throw new GeneralBatchException(e);
         }
 

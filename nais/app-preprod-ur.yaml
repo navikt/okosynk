@@ -16,6 +16,7 @@ spec:
   image: {{image}}
   schedule: "0 4 * * *" # Every morning at 04:00 UTC
   webproxy: true
+  backoffLimit: 3
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
   resources:

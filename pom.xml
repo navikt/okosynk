@@ -39,8 +39,8 @@
         <jacoco.version>0.8.3</jacoco.version>
         <jakarta.activation.version>1.2.2</jakarta.activation.version>
         <jakarta.ws.rs.version>2.1.5</jakarta.ws.rs.version>
-        <java.compilation.source.version>1.8</java.compilation.source.version>
-        <java.compilation.target.version>1.8</java.compilation.target.version>
+        <java.compilation.source.version>11</java.compilation.source.version>
+        <java.compilation.target.version>11</java.compilation.target.version>
         <javatuples.version>1.2</javatuples.version>
         <jersey.version>2.32</jersey.version>
         <jsch.version>0.1.55</jsch.version>
