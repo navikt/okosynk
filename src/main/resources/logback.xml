@@ -55,7 +55,7 @@
         <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
 
-    <logger name="no.nav.okosynk.consumer.oppgave.OppgaveRestClient" level="INFO">
+    <logger name="no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient" level="INFO">
         <appender-ref ref="STDOUT_JSON"/>
         <appender-ref ref="SECURE_LOG_APPENDER"/>
     </logger>
