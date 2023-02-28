@@ -5,6 +5,8 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 
 import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
@@ -28,27 +30,14 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     @Override
     protected String lagBeskrivelse(final UrMelding melding) {
-        return new StringBuilder()
-                .append(melding.nyesteVentestatus)
-                .append(getFeltSeparator())
-                .append(melding.arsaksTekst)
-                .append(getFeltSeparator())
-                .append("postert/bilagsnummer:")
-                .append(formatAsNorwegianDate(melding.datoPostert))
-                .append("/")
-                .append(melding.bilagsId)
-                .append(getFeltSeparator())
-                .append(melding.hentNettoBelopSomStreng())
-                .append("kr")
-                .append(getFeltSeparator())
-                .append("statusdato:")
-                .append(formatAsNorwegianDate(melding.datoForStatus))
-                .append(getFeltSeparator())
-                .append("UtbTil:")
-                .append(melding.mottakerId)
-                .append(getFeltSeparator())
-                .append(melding.brukerId)
-                .toString()
+        return Stream.of(melding.nyesteVentestatus,
+                        melding.arsaksTekst,
+                        "postert/bilagsnummer:" + formatAsNorwegianDate(melding.datoPostert) + "/" + melding.bilagsId,
+                        melding.hentNettoBelopSomStreng() + "kr",
+                        "statusdato:" + formatAsNorwegianDate(melding.datoForStatus),
+                        "UtbTil:" + melding.mottakerId,
+                        melding.brukerId)
+                .collect(Collectors.joining(getFeltSeparator()))
                 .trim();
     }
 
