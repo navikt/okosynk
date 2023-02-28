@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBuilder;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingTestGenerator;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -3,8 +3,6 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingMapper;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.model.Oppgave;
 
 import java.util.Collection;

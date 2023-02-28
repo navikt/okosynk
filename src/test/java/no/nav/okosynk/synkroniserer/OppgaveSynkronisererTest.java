@@ -9,7 +9,7 @@ import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingMapper;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.MeldingUnreadableException;
 import no.nav.okosynk.model.Oppgave;

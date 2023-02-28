@@ -3,9 +3,7 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingFunksjonelleAggregeringsKriterier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

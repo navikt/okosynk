@@ -1,6 +1,5 @@
-package no.nav.okosynk.hentbatchoppgaver.parselinje;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMappingRegelRepository;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 
 public class OsMeldingFunksjonelleAggregeringsKriterier {
