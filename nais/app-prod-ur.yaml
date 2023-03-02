@@ -2,9 +2,9 @@ apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
   labels:
-    team: oppgavehandtering
+    team: okonomi
   name: okosynkur
-  namespace: oppgavehandtering
+  namespace: okonomi
 spec:
   azure:
     application:

@@ -3,7 +3,7 @@ kind: Alert
 metadata:
   name: okosynk-alerts
   labels:
-    team: oppgavehandtering
+    team: okonomi
 spec:
   receivers: # receivers for all alerts below
     slack:

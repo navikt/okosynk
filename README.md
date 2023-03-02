@@ -10,8 +10,8 @@ disse oppgavene som skal ligge i oppgave-applikasjonen.
 
 Okosynk er en batchjobb som kjører kl. UTC 4:00 hver morgen hele året (altså kl 05:00 om vinteren og kl 0:600 om sommeren norsk tid).
 Den kjører på nais-plattformen i to miljøer:
-1) Cluster `dev-fss`, i namespace `oppgavehandtering`
-2) Cluster `prod-fss`, i namespace `oppgavehandtering`
+1) Cluster `dev-fss`, i namespace `okonomi`
+2) Cluster `prod-fss`, i namespace `okonomi`
 
 Okosynk kjøres som to separate jobber, og de heter hhv. okosynkos og okosynkur (nais name). Det er samme koden som kjører, 
 men de er konfigurert forskjellig. 
@@ -70,7 +70,7 @@ og
 
 ```
 kubectl config use-context <riktig cluster> (enten `dev-fss` eller `prod-fss`)
-kubectl config set-context <riktig cluster> --namespace=<riktig namespace> (<riktig namespace> er `oppgavehandtering` uavhengig av om det er `dev` eller `prod`)
+kubectl config set-context <riktig cluster> --namespace=<riktig namespace> (<riktig namespace> er `okonomi` uavhengig av om det er `dev` eller `prod`)
 ```
 
 Ved å kjøre
