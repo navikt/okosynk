@@ -1,4 +1,4 @@
-package no.nav.okosynk.hentbatchoppgaver.parselinje;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.model.Oppgave;

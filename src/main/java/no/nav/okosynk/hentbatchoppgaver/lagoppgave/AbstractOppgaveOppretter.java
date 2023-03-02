@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -21,8 +20,8 @@ import java.util.stream.Collectors;
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.*;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMelding>
-        implements Function<List<MELDINGSTYPE>, Optional<Oppgave>> {
+public abstract class AbstractOppgaveOppretter<T extends AbstractMelding>
+        implements Function<List<T>, Optional<Oppgave>> {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
     private static final String fagomradeKode = "OKO";
@@ -30,10 +29,6 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
     private static final String linjeSeparator = System.getProperty(
             "line.separator"); // Does not need to use IOkosynkConfiguration, because "line.separator" is part of the no.nav.okosynk.io.os/java ecosystem.
     private static final String recordSeparator = linjeSeparator + linjeSeparator;
-    private static final String forsteFeltSeparator = ";;   ";
-    private static final String feltSeparator = ";   ";
-    private static final DateTimeFormatter NORSK_DATO_FORMAT_UTEN_KLOKKESLETT = DateTimeFormatter
-            .ofPattern("dd.MM.yy");
 
     private final IOkosynkConfiguration okosynkConfiguration;
     private final AbstractMappingRegelRepository mappingRegelRepository;
@@ -67,20 +62,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
         return recordSeparator;
     }
 
-    public static String getForsteFeltSeparator() {
-        return forsteFeltSeparator;
-    }
-
-    public static String getFeltSeparator() {
-        return feltSeparator;
-    }
-
-    public static String formatAsNorwegianDate(final LocalDate dato) {
-        return NORSK_DATO_FORMAT_UTEN_KLOKKESLETT.format(dato);
-    }
-
     @Override
-    public Optional<Oppgave> apply(final List<MELDINGSTYPE> meldinger) {
+    public Optional<Oppgave> apply(final List<T> meldinger) {
 
         meldinger.sort(getMeldingComparator());
 
@@ -88,75 +71,78 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
                 .stream()
                 .findAny()
                 .map(
-                        (final MELDINGSTYPE melding) -> {
-
-                            final LocalDate aktivFra = LocalDate.now();
-                            final Optional<MappingRegel> mappingRegel =
-                                    this.mappingRegelRepository.finnRegel(melding);
-
-                            Oppgave.OppgaveBuilder builder = new Oppgave.OppgaveBuilder();
-
-                            if (mappingRegel.isPresent()) {
-                                final String gjelderId = melding.gjelderId;
-                                if (isNotBlank(gjelderId)) {
-                                    final String type = melding.utledGjelderIdType();
-                                    if (Objects.equals(type, PERSON)) {
-                                        if (isBnr(gjelderId)) {
-                                            builder.withBnr(gjelderId);
-                                        } else {
-                                            try {
-                                                final AktoerRespons aktoerRespons =
-                                                        this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
-                                                if (isNotBlank(aktoerRespons.getFeilmelding())) {
-                                                    log.warn(
-                                                            "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
-                                                            aktoerRespons.getFeilmelding());
-                                                    secureLog.warn("Kunne ikke hente aktørid for: {}", gjelderId);
-                                                    return null;
-                                                } else {
-                                                    builder.withAktoerId(aktoerRespons.getAktoerId());
-                                                }
-                                            } catch (Exception e) {
-                                                log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
-                                                return null;
-                                            }
-                                        }
-                                    } else if (Objects.equals(type, SAMHANDLER)) {
-                                        builder.withSamhandlernr(gjelderId);
-                                    } else if (Objects.equals(type, ORGANISASJON)) {
-                                        builder.withOrgnr(gjelderId);
-                                    }
-                                }
-
-                                return builder
-                                        .withOppgavetypeKode(oppgaveTypeKode())
-                                        .withFagomradeKode(getFagomradeKode())
-                                        .withBehandlingstema(
-                                                isNotBlank(mappingRegel.get().behandlingstema) ? mappingRegel.get().behandlingstema : null)
-                                        .withBehandlingstype(
-                                                isNotBlank(mappingRegel.get().behandlingstype) ? mappingRegel.get().behandlingstype : null)
-                                        .withPrioritetKode(getPrioritetKode())
-                                        .withBeskrivelse(lagSamletBeskrivelse(meldinger))
-                                        .withAktivFra(aktivFra)
-                                        .withAktivTil(aktivFra.plusDays(antallDagerFrist()))
-                                        .withAnsvarligEnhetId(mappingRegel.get().ansvarligEnhetId)
-                                        .withLest(false)
-                                        .withAntallMeldinger(meldinger.size())
-                                        .build();
-
-                            } else {
-                                return null;
-                            }
-                        }
+                        getMeldingstypeOppgaveFunction(meldinger)
                 );
     }
 
-    public String lagSamletBeskrivelse(final List<MELDINGSTYPE> meldinger) {
+    // Under construction
+    private Function<T, Oppgave> getMeldingstypeOppgaveFunction(List<T> meldinger) {
+        return (final T melding) -> {
 
-        final List<String> beskrivelser = meldinger.stream().map(this::lagBeskrivelse)
-                .collect(Collectors.toList());
+            final LocalDate aktivFra = LocalDate.now();
+            final Optional<MappingRegel> mappingRegel =
+                    this.mappingRegelRepository.finnRegel(melding);
 
-        return String.join(getRecordSeparator(), beskrivelser)
+            Oppgave.OppgaveBuilder builder = new Oppgave.OppgaveBuilder();
+
+            if (mappingRegel.isPresent()) {
+                final String gjelderId = melding.gjelderId;
+                if (isNotBlank(gjelderId)) {
+                    final String type = melding.utledGjelderIdType();
+                    if (Objects.equals(type, PERSON)) {
+                        if (isBnr(gjelderId)) {
+                            builder.withBnr(gjelderId);
+                        } else {
+                            try {
+                                final AktoerRespons aktoerRespons =
+                                        this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
+                                if (isNotBlank(aktoerRespons.getFeilmelding())) {
+                                    log.warn(
+                                            "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
+                                            aktoerRespons.getFeilmelding());
+                                    secureLog.warn("Kunne ikke hente aktørid for: {}", gjelderId);
+                                    return null;
+                                } else {
+                                    builder.withAktoerId(aktoerRespons.getAktoerId());
+                                }
+                            } catch (Exception e) {
+                                log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
+                                return null;
+                            }
+                        }
+                    } else if (Objects.equals(type, SAMHANDLER)) {
+                        builder.withSamhandlernr(gjelderId);
+                    } else if (Objects.equals(type, ORGANISASJON)) {
+                        builder.withOrgnr(gjelderId);
+                    }
+                }
+
+                return builder
+                        .withOppgavetypeKode(oppgaveTypeKode())
+                        .withFagomradeKode(getFagomradeKode())
+                        .withBehandlingstema(
+                                isNotBlank(mappingRegel.get().behandlingstema) ? mappingRegel.get().behandlingstema : null)
+                        .withBehandlingstype(
+                                isNotBlank(mappingRegel.get().behandlingstype) ? mappingRegel.get().behandlingstype : null)
+                        .withPrioritetKode(getPrioritetKode())
+                        .withBeskrivelse(lagSamletBeskrivelse(meldinger))
+                        .withAktivFra(aktivFra)
+                        .withAktivTil(aktivFra.plusDays(antallDagerFrist()))
+                        .withAnsvarligEnhetId(mappingRegel.get().ansvarligEnhetId)
+                        .withLest(false)
+                        .withAntallMeldinger(meldinger.size())
+                        .build();
+
+            } else {
+                return null;
+            }
+        };
+    }
+
+    public String lagSamletBeskrivelse(final List<T> meldinger) {
+        return meldinger.stream()
+                .map(AbstractMelding::lagBeskrivelse)
+                .collect(Collectors.joining(getRecordSeparator()))
                 .replaceFirst(getFeltSeparator(), getForsteFeltSeparator());
     }
 
@@ -164,9 +150,8 @@ public abstract class AbstractOppgaveOppretter<MELDINGSTYPE extends AbstractMeld
 
     protected abstract int antallDagerFrist();
 
-    protected abstract String lagBeskrivelse(final MELDINGSTYPE melding);
 
-    protected abstract Comparator<MELDINGSTYPE> getMeldingComparator();
+    protected abstract Comparator<T> getMeldingComparator();
 
     private boolean isBnr(String aktorNr) {
         return AktoerUt.isBnr(aktorNr);

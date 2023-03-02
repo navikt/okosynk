@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -27,8 +28,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("ConstantConditions")
 class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
+    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
     private static final UrMelding UR_MELDING_1 = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
     private static final UrMelding UR_MELDING_2 = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8020INNT   UR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
     private static final UrMelding UR_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8019ANDRUTBUR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
@@ -47,8 +47,8 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         assertAll(
-                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, this.urOppgaveOppretter.lagBeskrivelse(UrOppgaveOppretterTest.UR_MELDING_1)),
-                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, this.urOppgaveOppretter.lagBeskrivelse(UrOppgaveOppretterTest.UR_MELDING_2))
+                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_1.lagBeskrivelse()),
+                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_2.lagBeskrivelse())
         );
     }
 
@@ -113,8 +113,8 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String urMelding1DatoPostert = UrOppgaveOppretter.formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
-        final String urMelding2DatoPostert = UrOppgaveOppretter.formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
+        final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
+        final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
 
         final Oppgave oppgave = this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_2, UrOppgaveOppretterTest.UR_MELDING_1)).get();
 
@@ -130,8 +130,8 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String urMelding1DatoPostert = UrOppgaveOppretter.formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
-        final String urMelding2DatoPostert = UrOppgaveOppretter.formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
+        final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
+        final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
 
         final Oppgave oppgave = this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_1, UrOppgaveOppretterTest.UR_MELDING_2)).get();
 

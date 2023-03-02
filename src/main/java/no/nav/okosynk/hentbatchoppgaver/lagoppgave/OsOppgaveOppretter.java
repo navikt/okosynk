@@ -5,6 +5,11 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 
 import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.getFeltSeparator;
 
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
@@ -24,40 +29,6 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     @Override
     protected Comparator<OsMelding> getMeldingComparator() {
         return meldingComparator;
-    }
-
-    @Override
-    protected String lagBeskrivelse(final OsMelding melding) {
-        return new StringBuilder()
-                .append(melding.nyesteVentestatus)
-                .append(getFeltSeparator())
-                .append(melding.hentNettoBelopSomStreng())
-                .append("kr")
-                .append(getFeltSeparator())
-                .append("beregningsdato/id:")
-                .append(formatAsNorwegianDate(melding.beregningsDato))
-                .append("/")
-                .append(melding.beregningsId)
-                .append(getFeltSeparator())
-                .append("periode:")
-                .append(formatAsNorwegianDate(melding.forsteFomIPeriode))
-                .append("-")
-                .append(formatAsNorwegianDate(melding.sisteTomIPeriode))
-                .append(getFeltSeparator())
-                .append("feilkonto:")
-                .append(melding.flaggFeilkonto)
-                .append(getFeltSeparator())
-                .append("statusdato:")
-                .append(formatAsNorwegianDate(melding.datoForStatus))
-                .append(getFeltSeparator())
-                .append(melding.etteroppgjor == null ? "" : melding.etteroppgjor)
-                .append(getFeltSeparator())
-                .append("UtbTil:")
-                .append(melding.utbetalesTilId)
-                .append(getFeltSeparator())
-                .append(melding.brukerId)
-                .toString()
-                .trim();
     }
 
     @Override

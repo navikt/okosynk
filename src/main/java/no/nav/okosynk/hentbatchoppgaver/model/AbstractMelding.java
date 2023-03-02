@@ -4,6 +4,7 @@ import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingParser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public abstract class AbstractMelding {
@@ -18,6 +19,12 @@ public abstract class AbstractMelding {
     public static final String PERSON                     = "PERSON";
     public static final String SAMHANDLER                 = "SAMHANDLER";
 
+    public static String formatAsNorwegianDate(final LocalDate dato) {
+        return DateTimeFormatter.ofPattern("dd.MM.yy").format(dato);
+    }
+    public static String getForsteFeltSeparator() {
+        return ";;   ";
+    }
     public  final String    behandlendeEnhet;
     public  final double    totaltNettoBelop;
     public  final String    gjelderId;
@@ -30,7 +37,10 @@ public abstract class AbstractMelding {
     }
 
     private final AbstractMeldingParser parser;
-
+    public abstract String lagBeskrivelse();
+    public static String getFeltSeparator() {
+        return ";   ";
+    }
     protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
 
         this.parser = parser;

@@ -1,4 +1,4 @@
-package no.nav.okosynk.hentbatchoppgaver.parselinje;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.provider.Arguments;

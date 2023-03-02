@@ -1,6 +1,5 @@
-package no.nav.okosynk.hentbatchoppgaver.parselinje;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 
 public class UrMeldingFunksjonelleAggregeringsKriterier {
