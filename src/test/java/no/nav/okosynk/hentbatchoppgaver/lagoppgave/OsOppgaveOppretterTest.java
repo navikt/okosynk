@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,8 +48,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         assertAll(
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, this.osOppgaveOppretter.lagBeskrivelse(OsOppgaveOppretterTest.OS_MELDING_1)),
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, this.osOppgaveOppretter.lagBeskrivelse(OsOppgaveOppretterTest.OS_MELDING_2))
+                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, OsOppgaveOppretterTest.OS_MELDING_1.lagBeskrivelse()),
+                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, OsOppgaveOppretterTest.OS_MELDING_2.lagBeskrivelse())
         );
     }
 
@@ -113,8 +114,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_2, OsOppgaveOppretterTest.OS_MELDING_1)).get();
@@ -131,8 +132,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = OsOppgaveOppretter.formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_1, OsOppgaveOppretterTest.OS_MELDING_2)).get();

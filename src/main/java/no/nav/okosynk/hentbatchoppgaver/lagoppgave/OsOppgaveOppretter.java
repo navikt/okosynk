@@ -8,6 +8,9 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.getFeltSeparator;
+
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     private static final String OPPGAVETYPE_KODE = "OKO_OS";
@@ -26,23 +29,6 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     @Override
     protected Comparator<OsMelding> getMeldingComparator() {
         return meldingComparator;
-    }
-
-    @Override
-    protected String lagBeskrivelse(final OsMelding melding) {
-        return Stream.of(
-                        melding.nyesteVentestatus,
-                        melding.hentNettoBelopSomStreng() + "kr",
-                        "beregningsdato/id:" + formatAsNorwegianDate(melding.beregningsDato) + "/" + melding.beregningsId,
-                        "periode:" + formatAsNorwegianDate(melding.forsteFomIPeriode) + "-" + formatAsNorwegianDate(melding.sisteTomIPeriode),
-                        "feilkonto:" + melding.flaggFeilkonto,
-                        "statusdato:" + formatAsNorwegianDate(melding.datoForStatus),
-                        melding.etteroppgjor == null ? "" : melding.etteroppgjor,
-                        "UtbTil:" + melding.utbetalesTilId,
-                        melding.brukerId
-                )
-                .collect(Collectors.joining(getFeltSeparator()))
-                .trim();
     }
 
     @Override

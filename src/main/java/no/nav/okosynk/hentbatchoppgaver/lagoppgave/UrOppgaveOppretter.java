@@ -8,6 +8,9 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.getFeltSeparator;
+
 public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     private static final String OPPGAVETYPE_KODE = "OKO_UR";
@@ -26,19 +29,6 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
     @Override
     protected Comparator<UrMelding> getMeldingComparator() {
         return MELDINGCOMPARATOR;
-    }
-
-    @Override
-    protected String lagBeskrivelse(final UrMelding melding) {
-        return Stream.of(melding.nyesteVentestatus,
-                        melding.arsaksTekst,
-                        "postert/bilagsnummer:" + formatAsNorwegianDate(melding.datoPostert) + "/" + melding.bilagsId,
-                        melding.hentNettoBelopSomStreng() + "kr",
-                        "statusdato:" + formatAsNorwegianDate(melding.datoForStatus),
-                        "UtbTil:" + melding.mottakerId,
-                        melding.brukerId)
-                .collect(Collectors.joining(getFeltSeparator()))
-                .trim();
     }
 
     @Override
