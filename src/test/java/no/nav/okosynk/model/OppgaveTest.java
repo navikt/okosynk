@@ -400,6 +400,87 @@ public class OppgaveTest {
     }
 
     @Test
+    void when_only_one_aktoer_id_is_set_then_they_should_be_different() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        final Oppgave oppgave1 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        final Oppgave oppgave2 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId("Y")
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        assertFalse(oppgave1.equals(oppgave2));
+    }
+
+    @Test
+    void when_only_one_fnr_is_set_then_they_should_be_different() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        final Oppgave oppgave1 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        final Oppgave oppgave2 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent("X")
+                        .build();
+
+        assertFalse(oppgave1.equals(oppgave2));
+    }
+
+    @Test
+    void when_one_oppgave_has_fnr_and_the_other_aktoer_then_they_should_be_different() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        final Oppgave oppgave1 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent("X")
+                        .build();
+
+        final Oppgave oppgave2 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId("Y")
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        assertFalse(oppgave1.equals(oppgave2));
+    }
+
+    @Test
+    void when_no_fnr_and_no_aktoer_then_surprisingly_they_should_be_equal() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        final Oppgave oppgave1 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        final Oppgave oppgave2 =
+                new Oppgave.OppgaveBuilder()
+                        .withAktoerId(null)
+                        .withFolkeregisterIdent(null)
+                        .build();
+
+        assertTrue(oppgave1.equals(oppgave2));
+    }
+
+
+    @Test
     void when_two_oppgaver_with_no_differing_important_fields_are_compared_then_they_should_equal() {
 
         enteringTestHeaderLogger.debug(null);

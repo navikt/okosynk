@@ -7,12 +7,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.security.AzureAdAuthenticationClient;
-import no.nav.okosynk.model.Oppgave;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -52,7 +52,7 @@ public class OppgaveRestClient {
     private final Constants.BATCH_TYPE batchType;
     private final CloseableHttpClient httpClient;
     private final UsernamePasswordCredentials credentials;
-    private final String message = "Feilet ved kall mot Oppgave API";
+    private static final String message = "Feilet ved kall mot Oppgave API";
 
     public OppgaveRestClient(
             final IOkosynkConfiguration okosynkConfiguration,
@@ -233,7 +233,7 @@ public class OppgaveRestClient {
         int offset = 0;
         log.info("Starter søk og evt. inkrementell henting av oppgaver av type: {}", oppgavetype);
         FinnOppgaverResponseJson finnOppgaverResponseJson =
-                this.finnOppgaver(getBatchType().getOppgaveType(), bulkSize, offset);
+                this.finnOppgaver(bulkSize, offset);
         log.info(
                 "Fant {} oppgaver av oppgaver av type: {}",
                 finnOppgaverResponseJson.getAntallTreffTotalt(), oppgavetype
@@ -246,8 +246,8 @@ public class OppgaveRestClient {
                             .getFinnOppgaveResponseJsons()
                             .stream()
                             .filter(r -> {
-                                boolean opprettetAvOkosynk =  oppgaverOpprettetAvOkosynk.contains(r.getOpprettetAv());
-                                if(!opprettetAvOkosynk) {
+                                boolean opprettetAvOkosynk = oppgaverOpprettetAvOkosynk.contains(r.getOpprettetAv());
+                                if (!opprettetAvOkosynk) {
                                     log.warn("Filtrerer bort oppgave: {} fra resultatet, da denne ikke er opprettet av økosynk", r.getId());
                                 }
                                 return opprettetAvOkosynk;
@@ -260,13 +260,13 @@ public class OppgaveRestClient {
             } else {
                 offset += bulkSize;
                 finnOppgaverResponseJson =
-                        this.finnOppgaver(oppgavetype, bulkSize, offset);
+                        this.finnOppgaver(bulkSize, offset);
             }
         }
         int antallOppgaverSomSkalBehandles = oppgaverAccumulated.size() - atomicInteger.get();
-        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}", antallOppgaverSomSkalBehandles  , oppgavetype);
-        if(antallOppgaverSomSkalBehandles != finnOppgaverResponseJson.getAntallTreffTotalt()) {
-            log.warn("{} oppgaver har blitt filtrert bort fra resultatet. Disse er enten duplikater eller har blitt opprettet utenfor økosynk", finnOppgaverResponseJson.getAntallTreffTotalt()-antallOppgaverSomSkalBehandles);
+        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}", antallOppgaverSomSkalBehandles, oppgavetype);
+        if (antallOppgaverSomSkalBehandles != finnOppgaverResponseJson.getAntallTreffTotalt()) {
+            log.warn("{} oppgaver har blitt filtrert bort fra resultatet. Disse er enten duplikater eller har blitt opprettet utenfor økosynk", finnOppgaverResponseJson.getAntallTreffTotalt() - antallOppgaverSomSkalBehandles);
         }
         return ConsumerStatistics
                 .builder(getBatchType())
@@ -328,15 +328,12 @@ public class OppgaveRestClient {
         return this.credentials;
     }
 
-    private FinnOppgaverResponseJson finnOppgaver(
-            final String oppgavetype,
-            final int bulkSize,
-            final int offset) {
+    private FinnOppgaverResponseJson finnOppgaver(final int bulkSize, final int offset) {
         final URI uri;
         try {
             uri = new URIBuilder(getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY))
                     .addParameter("tema", FAGOMRADE_OKONOMI_KODE)
-                    .addParameter("oppgavetype", oppgavetype)
+                    .addParameter("opprettetAv", (getBatchType() == BATCH_TYPE.OS ? "okosynkos" : "okosynkur"))
                     .addParameter("statuskategori", "AAPEN")
                     .addParameter("limit", String.valueOf(bulkSize))
                     .addParameter("offset", String.valueOf(offset))

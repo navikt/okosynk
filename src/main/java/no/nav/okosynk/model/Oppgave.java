@@ -3,6 +3,7 @@ package no.nav.okosynk.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class Oppgave {
 
@@ -55,6 +56,10 @@ public class Oppgave {
         this.bnr = oppgaveBuilder.bnr;
     }
 
+    boolean bareEnFinnes(String... strings) {
+        return Stream.of(strings).filter(Objects::nonNull).count() == 1L;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -65,69 +70,15 @@ public class Oppgave {
         }
         Oppgave other = (Oppgave) o;
         return Objects.equals(this.behandlingstema, other.behandlingstema)
-                &&
-                Objects.equals(this.behandlingstype, other.behandlingstype)
-                &&
-                Objects.equals(this.ansvarligEnhetId, other.ansvarligEnhetId)
-                &&
-                Objects.equals(this.bnr, other.bnr)
-                &&
-                Objects.equals(this.orgnr, other.orgnr)
-                &&
-                Objects.equals(this.samhandlernr, other.samhandlernr)
-                &&
-                (
-                        (
-                                this.aktoerId == null && other.aktoerId == null
-                                        &&
-                                        Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
-                        )
-                                ||
-                                (
-                                        Objects.equals(this.aktoerId, other.aktoerId)
-                                                &&
-                                                this.folkeregisterIdent == null && other.folkeregisterIdent == null
-                                )
-                                ||
-                                (
-                                        !(this.aktoerId == null && other.aktoerId == null)
-                                                &&
-                                                !(this.folkeregisterIdent == null && other.folkeregisterIdent == null)
-                                                &&
-                                                (
-                                                        (
-                                                                this.aktoerId != null && other.aktoerId != null
-                                                                        &&
-                                                                        this.folkeregisterIdent != null && other.folkeregisterIdent != null
-                                                                        &&
-                                                                        Objects.equals(this.aktoerId, other.aktoerId)
-                                                                        &&
-                                                                        Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
-                                                        )
-                                                                ||
-                                                                (
-                                                                        (
-                                                                                this.aktoerId == null && other.aktoerId != null
-                                                                                        ||
-                                                                                        this.aktoerId != null && other.aktoerId == null
-                                                                        )
-                                                                                &&
-                                                                                Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent)
-                                                                )
-                                                                ||
-                                                                (
-                                                                        (
-                                                                                this.folkeregisterIdent == null && other.folkeregisterIdent != null
-                                                                                        ||
-                                                                                        this.folkeregisterIdent != null && other.folkeregisterIdent == null
-                                                                        )
-                                                                                &&
-                                                                                Objects.equals(this.aktoerId, other.aktoerId)
-                                                                )
-                                                )
-                                )
-                )
-                ;
+               && Objects.equals(this.behandlingstype, other.behandlingstype)
+               && Objects.equals(this.ansvarligEnhetId, other.ansvarligEnhetId)
+               && Objects.equals(this.bnr, other.bnr)
+               && Objects.equals(this.orgnr, other.orgnr)
+               && Objects.equals(this.samhandlernr, other.samhandlernr)
+               && !bareEnFinnes(this.aktoerId, other.aktoerId, this.folkeregisterIdent, other.folkeregisterIdent)
+               && (Objects.equals(this.aktoerId, other.aktoerId) && (this.folkeregisterIdent == null || other.folkeregisterIdent == null)
+                   || Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent) && (this.aktoerId == null || other.aktoerId == null)
+                   || Objects.equals(this.aktoerId, other.aktoerId) && Objects.equals(this.folkeregisterIdent, other.folkeregisterIdent));
     }
 
     @Override
