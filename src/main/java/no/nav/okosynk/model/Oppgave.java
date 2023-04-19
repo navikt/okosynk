@@ -1,5 +1,7 @@
 package no.nav.okosynk.model;
 
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.AbstractOppgaveOppretter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -246,6 +248,27 @@ public class Oppgave {
 
         public OppgaveBuilder withAnsvarligSaksbehandlerIdent(final String saksbehandlerIdent) {
             this.saksbehandlerIdent = saksbehandlerIdent;
+            return this;
+        }
+
+        public OppgaveBuilder withGjelderIdResultat(final AbstractOppgaveOppretter.GjelderIdResultat gjelderIdResultat) {
+            switch (gjelderIdResultat.getGjelderIdFelt()) {
+                case BNR:
+                    this.bnr = gjelderIdResultat.getGjelderId();
+                    break;
+                case AKTORID:
+                    this.aktoerId = gjelderIdResultat.getGjelderId();
+                    break;
+                case SAMHANDLER:
+                    this.samhandlernr = gjelderIdResultat.getGjelderId();
+                    break;
+                case ORGANISASJON:
+                    this.orgnr = gjelderIdResultat.getGjelderId();
+                    break;
+                case FEIL:
+                case INGEN_GJELDERID:
+                    break;
+            }
             return this;
         }
 

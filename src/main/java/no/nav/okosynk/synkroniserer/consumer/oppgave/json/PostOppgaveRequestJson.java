@@ -1,12 +1,74 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.LocalDateTimeSerializer;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveStatus;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.time.LocalDateTime;
+
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 public class PostOppgaveRequestJson extends AbstractOppgaveJson {
+    @Override
+    @JsonIgnore
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    public LocalDateTime getEndretTidspunkt() {
+        return super.getEndretTidspunkt();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getId() {
+        return super.getId();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getOpprettetAv() {
+        return super.getOpprettetAv();
+    }
+
+    @Override
+    @JsonIgnore
+    public Integer getVersjon() {
+        return super.getVersjon();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getEndretAvEnhetsnr() {
+        return super.getEndretAvEnhetsnr();
+    }
+
+    @Override
+    @JsonIgnore
+    public OppgaveStatus getStatus() {
+        return super.getStatus();
+    }
+
+    @Override
+    @JsonIgnore
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    public LocalDateTime getOpprettetTidspunkt() {
+        return super.getOpprettetTidspunkt();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getEndretAv() {
+        return super.getEndretAv();
+    }
+
+    @Override
+    @JsonIgnore
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    public LocalDateTime getFerdigstiltTidspunkt() {
+        return super.getFerdigstiltTidspunkt();
+    }
 
     @Override
     public boolean equals(final Object other) {

@@ -1,34 +1,36 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 
 import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.getFeltSeparator;
+import java.util.List;
 
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     private static final String OPPGAVETYPE_KODE = "OKO_OS";
     private static final int ANTALL_DAGER_FRIST = 7;
-
     private static final Comparator<OsMelding> meldingComparator = OsMelding.BEREGNINGS_DATO_COMPARATOR;
 
     OsOppgaveOppretter(
             final OsMappingRegelRepository mappingRegelRepository,
-            final IAktoerClient aktoerClient,
-            final IOkosynkConfiguration okosynkConfiguration) {
+            final IAktoerClient aktoerClient) {
 
-        super(mappingRegelRepository, aktoerClient, okosynkConfiguration);
+        super(mappingRegelRepository, aktoerClient);
     }
 
     @Override
     protected Comparator<OsMelding> getMeldingComparator() {
         return meldingComparator;
+    }
+
+    @Override
+    protected String summerOgKonsolider(List<OsMelding> osMeldings) {
+        return osMeldings.stream()
+                .sorted(this.getMeldingComparator())
+                .map(OsBeskrivelseInfo::new)
+                .reduce(OsBeskrivelseInfo::pluss)
+                .map(OsBeskrivelseInfo::lagBeskrivelse).orElse("");
     }
 
     @Override

@@ -35,11 +35,11 @@ public class OppgaveSynkroniserer {
     }
 
     /**
-     * Extracts for creation oppgaver read frm the batch file that are not in the database
+     * Extracts for creation
      *
-     * @param alleOppgaverLestFraBatchen
-     * @param oppgaverLestFraDatabasen
-     * @return
+     * @param alleOppgaverLestFraBatchen meldinger fra inputfil
+     * @param oppgaverLestFraDatabasen meldinger som allerede er i oppdragsystemet
+     * @return oppgaver read frm the batch file that are not in the database
      */
     static Set<Oppgave> finnOppgaverSomSkalOpprettes(
             final Set<Oppgave> alleOppgaverLestFraBatchen,
@@ -103,7 +103,7 @@ public class OppgaveSynkroniserer {
                 new HashSet<>(alleOppgaverLestFraBatchenFuncParm);
 
         final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
-        final ConsumerStatistics consumerStatistics_finn =
+        final ConsumerStatistics consumerStatisticsFinn =
                 getOppgaveRestClient().finnOppgaver(oppgaverLestFraDatabasen);
 
         final Set<Oppgave> oppgaverSomSkalFerdigstilles =
@@ -115,24 +115,24 @@ public class OppgaveSynkroniserer {
         final Set<Oppgave> oppgaverSomSkalOpprettes =
                 finnOppgaverSomSkalOpprettes(alleOppgaverLestFraBatchen, oppgaverLestFraDatabasen);
         logger.info("Fant {} oppgaver i batchfil som ikke samsvarer med åpne oppgaver. Oppretter nye oppgaver for disse", oppgaverSomSkalOpprettes.size());
-        final ConsumerStatistics consumerStatistics_ferdigstill =
+        final ConsumerStatistics consumerStatisticsFerdigstill =
                 ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
-        final ConsumerStatistics consumerStatistics_oppdater =
+        final ConsumerStatistics consumerStatisticsOppdater =
                 oppdaterOppgaver(oppgaverSomSkalOppdateres);
-        final ConsumerStatistics consumerStatistics_opprett =
+        final ConsumerStatistics consumerStatisticsOpprett =
                 opprettOppgaver(oppgaverSomSkalOpprettes);
 
         //Kan skrives om til å basere seg på patch resultatene
-        final ConsumerStatistics consumerStatistics_accumulated =
+        final ConsumerStatistics consumerStatisticsAccumulated =
                 ConsumerStatistics.addAll(
-                        consumerStatistics_finn,
-                        consumerStatistics_ferdigstill,
-                        consumerStatistics_oppdater,
-                        consumerStatistics_opprett);
+                        consumerStatisticsFinn,
+                        consumerStatisticsFerdigstill,
+                        consumerStatisticsOppdater,
+                        consumerStatisticsOpprett);
 
         loggAntallMeldingerMedOppgave(oppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes);
 
-        return consumerStatistics_accumulated;
+        return consumerStatisticsAccumulated;
     }
 
     ConsumerStatistics ferdigstillOppgaver(final Set<Oppgave> oppgaver) {
@@ -143,8 +143,9 @@ public class OppgaveSynkroniserer {
         final String oppgaveType = getBatchType().getOppgaveType();
         final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
                 .equals(oppgave.oppgavetypeKode, oppgaveType);
-        final Predicate<Oppgave> ikkeNyligEndret = oppgave -> oppgave.sistEndret
-                .isBefore(LocalDateTime.now().minusHours(8));
+        final Predicate<Oppgave> ikkeNyligEndret = oppgave -> Optional.ofNullable(oppgave.sistEndret)
+                .filter(d -> d.isBefore(LocalDateTime.now().minusHours(8)))
+                .isPresent();
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()
                 .filter(ikkeNyligEndret)
                 .filter(harUendretOppgaveType)
@@ -220,12 +221,12 @@ public class OppgaveSynkroniserer {
 
         final Integer antallMeldingerSomHarEnOppdaterOppgave = oppgaverSomSkalOppdateres.stream()
                 .map(oppgaveOppdatering -> oppgaveOppdatering.oppgaveLestFraBatchen.antallMeldinger)
-                .reduce((sum, i) -> sum + i)
+                .reduce(Integer::sum)
                 .orElse(0);
 
         final Integer antallMeldingerSomHarEnOpprettOppgave = oppgaverSomSkalOpprettes.stream()
                 .map(oppgave -> oppgave.antallMeldinger)
-                .reduce((sum, i) -> sum + i)
+                .reduce(Integer::sum)
                 .orElse(0);
 
         final int antallOppgaver = oppgaverSomSkalOppdateres.size() + oppgaverSomSkalOpprettes.size();
@@ -249,8 +250,8 @@ public class OppgaveSynkroniserer {
 
     static class OppgaveOppdatering {
 
-        private Oppgave oppgaveLestFraBatchen;
-        private Oppgave oppgaveLestFraDatabasen;
+        private final Oppgave oppgaveLestFraBatchen;
+        private final Oppgave oppgaveLestFraDatabasen;
 
         OppgaveOppdatering(
                 final Oppgave oppgaveLestFraBatchen,

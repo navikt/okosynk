@@ -1,15 +1,10 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 
 import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.getFeltSeparator;
+import java.util.List;
 
 public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
@@ -20,15 +15,21 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     UrOppgaveOppretter(
             final UrMappingRegelRepository mappingRegelRepository,
-            final IAktoerClient aktoerClient,
-            final IOkosynkConfiguration okosynkConfiguration) {
+            final IAktoerClient aktoerClient) {
 
-        super(mappingRegelRepository, aktoerClient, okosynkConfiguration);
+        super(mappingRegelRepository, aktoerClient);
     }
 
     @Override
     protected Comparator<UrMelding> getMeldingComparator() {
         return MELDINGCOMPARATOR;
+    }
+
+    @Override
+    protected String summerOgKonsolider(List<UrMelding> urMeldings) {
+        return urMeldings.stream().map(UrBeskrivelseInfo::new)
+                .reduce(UrBeskrivelseInfo::pluss)
+                .map(UrBeskrivelseInfo::lagBeskrivelse).orElse("");
     }
 
     @Override

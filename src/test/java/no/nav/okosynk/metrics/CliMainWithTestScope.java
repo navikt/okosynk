@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
+import jakarta.ws.rs.core.MediaType;
 import no.nav.okosynk.CliMain;
 import no.nav.okosynk.config.AbstractOkosynkConfiguration;
 import no.nav.okosynk.config.Constants;
@@ -13,7 +14,6 @@ import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.MediaType;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;

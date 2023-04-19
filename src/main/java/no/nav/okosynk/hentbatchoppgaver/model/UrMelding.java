@@ -1,17 +1,14 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
-
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
 
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 
 public class UrMelding extends AbstractMelding {
 
@@ -106,19 +103,6 @@ public class UrMelding extends AbstractMelding {
                             otherRegel.ansvarligEnhetId
                         )
                 );
-    }
-
-    @Override
-    public String lagBeskrivelse() {
-        return Stream.of(nyesteVentestatus,
-                        arsaksTekst,
-                        "postert/bilagsnummer:" + formatAsNorwegianDate(datoPostert) + "/" + bilagsId,
-                        hentNettoBelopSomStreng() + "kr",
-                        "statusdato:" + formatAsNorwegianDate(datoForStatus),
-                        "UtbTil:" + mottakerId,
-                        brukerId)
-                .collect(Collectors.joining(getFeltSeparator()))
-                .trim();
     }
 
 }

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -551,8 +552,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
         Mockito.doThrow(IOException.class).when(mockedInputStream).close();
 
@@ -583,8 +584,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
@@ -601,8 +602,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
@@ -620,8 +621,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
@@ -639,8 +640,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
@@ -658,8 +659,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =
@@ -676,8 +677,8 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
 
         final InputStream mockedInputStream = mock(InputStream.class);
         when(mockedInputStream.read()).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any())).thenReturn(-1);
-        when(mockedInputStream.read(Matchers.any(), Matchers.anyInt(), Matchers.anyInt()))
+        when(mockedInputStream.read(any())).thenReturn(-1);
+        when(mockedInputStream.read(any(), anyInt(), anyInt()))
                 .thenReturn(-1);
 
         final IMeldingLinjeFileReader uspesifikkMeldingLinjeFtpReader =

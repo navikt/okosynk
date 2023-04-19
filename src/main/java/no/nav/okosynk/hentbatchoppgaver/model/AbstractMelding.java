@@ -19,11 +19,10 @@ public abstract class AbstractMelding {
     public static final String PERSON                     = "PERSON";
     public static final String SAMHANDLER                 = "SAMHANDLER";
 
+    public static final String FORSTE_FELTSEPARATOR = ";;   ";
+
     public static String formatAsNorwegianDate(final LocalDate dato) {
         return DateTimeFormatter.ofPattern("dd.MM.yy").format(dato);
-    }
-    public static String getForsteFeltSeparator() {
-        return ";;   ";
     }
     public  final String    behandlendeEnhet;
     public  final double    totaltNettoBelop;
@@ -31,16 +30,12 @@ public abstract class AbstractMelding {
     public  final LocalDate datoForStatus;
     public  final String    nyesteVentestatus;
     public  final String    brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
-
+public static final String FELTSEPARATOR = ";   ";
     public AbstractMeldingParser getParser() {
         return parser;
     }
 
     private final AbstractMeldingParser parser;
-    public abstract String lagBeskrivelse();
-    public static String getFeltSeparator() {
-        return ";   ";
-    }
     protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
 
         this.parser = parser;

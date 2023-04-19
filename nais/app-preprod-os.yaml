@@ -36,7 +36,7 @@ spec:
     - name: SECURITYTOKENSERVICE_URL
       value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
     - name: PUSH_GATEWAY_ADDRESS
-      value: nais-prometheus-pushgateway.nais:9091
+      value: prometheus-pushgateway.nais-system:9091
     - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
       value: "0"
     - name: FILE_READER_MAX_NUMBER_OF_TRIES

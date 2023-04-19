@@ -1,7 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.model.Oppgave;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import org.slf4j.Logger;
@@ -17,12 +16,12 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
 
     private static final Logger logger = LoggerFactory.getLogger(UrMapper.class);
 
-    private UrOppgaveOppretter urOppgaveOppretter;
-    private UrMappingRegelRepository urMappingRegelRepository;
+    private final UrOppgaveOppretter urOppgaveOppretter;
+    private final UrMappingRegelRepository urMappingRegelRepository;
 
-    public UrMapper(final IAktoerClient aktoerClient, final IOkosynkConfiguration okosynkConfiguration) {
+    public UrMapper(final IAktoerClient aktoerClient) {
         this.urMappingRegelRepository = new UrMappingRegelRepository();
-        this.urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerClient, okosynkConfiguration);
+        this.urOppgaveOppretter = new UrOppgaveOppretter(urMappingRegelRepository, aktoerClient);
     }
 
     @Override

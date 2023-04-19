@@ -23,15 +23,15 @@ abstract class AbstractMetrics {
             final IOkosynkConfiguration okosynkConfiguration,
             final BATCH_TYPE batchType) {
 
-        final String pushGatewayEndpointNameAndPort =
+        final String localpushGatewayEndpointNameAndPort =
                 okosynkConfiguration
-                        .getPrometheusAddress("nais-prometheus-prometheus-pushgateway.nais:9091");
+                        .getPrometheusAddress("prometheus-pushgateway.nais-system:9091");
 
-        final CollectorRegistry collectorRegistry = new CollectorRegistry();
-        collectorRegistry.clear();
+        final CollectorRegistry localcollectorRegistry = new CollectorRegistry();
+        localcollectorRegistry.clear();
         this.batchType = batchType;
-        this.pushGatewayEndpointNameAndPort = pushGatewayEndpointNameAndPort;
-        this.collectorRegistry = collectorRegistry;
+        this.pushGatewayEndpointNameAndPort = localpushGatewayEndpointNameAndPort;
+        this.collectorRegistry = localcollectorRegistry;
         this.pushGateway = new PushGateway(this.pushGatewayEndpointNameAndPort);
     }
 
@@ -61,7 +61,7 @@ abstract class AbstractMetrics {
                             "kubernetes-pods",
                             Collections.singletonMap("cronjob", getBatchName())
                     );
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error(getBatchName() + " failed pushing metric(s) ", e);
         }
     }

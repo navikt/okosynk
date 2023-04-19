@@ -38,7 +38,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     UrOppgaveOppretterTest() {
         super(new FakeOkosynkConfiguration());
-        this.urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient, this.okosynkConfiguration);
+        this.urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient);
     }
 
     @Test
@@ -47,8 +47,8 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         assertAll(
-                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_1.lagBeskrivelse()),
-                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_2.lagBeskrivelse())
+                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new UrBeskrivelseInfo(UrOppgaveOppretterTest.UR_MELDING_1).lagBeskrivelse()),
+                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new UrBeskrivelseInfo(UrOppgaveOppretterTest.UR_MELDING_2).lagBeskrivelse())
         );
     }
 

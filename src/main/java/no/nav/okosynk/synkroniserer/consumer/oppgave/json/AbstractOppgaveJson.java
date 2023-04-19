@@ -1,7 +1,5 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave.json;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.LocalDateTimeSerializer;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveStatus;
@@ -47,8 +45,6 @@ public abstract class AbstractOppgaveJson {
     private String orgnr;
     private String samhandlernr;
 
-    @JsonIgnore
-    @JsonProperty("id")
     public String getId() {
         return id;
     }
@@ -57,8 +53,6 @@ public abstract class AbstractOppgaveJson {
         this.id = id;
     }
 
-    @JsonIgnore
-    @JsonProperty("endretAvEnhetsnr")
     public String getEndretAvEnhetsnr() {
         return endretAvEnhetsnr;
     }
@@ -235,8 +229,6 @@ public abstract class AbstractOppgaveJson {
         this.mappeId = mappeId;
     }
 
-    @JsonIgnore
-    @JsonProperty("status")
     public OppgaveStatus getStatus() {
         return this.status;
     }
@@ -245,8 +237,6 @@ public abstract class AbstractOppgaveJson {
         this.status = status;
     }
 
-    @JsonIgnore
-    @JsonProperty("opprettetAv")
     public String getOpprettetAv() {
         return this.opprettetAv;
     }
@@ -255,8 +245,6 @@ public abstract class AbstractOppgaveJson {
         this.opprettetAv = opprettetAv;
     }
 
-    @JsonIgnore
-    @JsonProperty("opprettetTidspunkt")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     public LocalDateTime getOpprettetTidspunkt() {
         return this.opprettetTidspunkt;
@@ -266,8 +254,6 @@ public abstract class AbstractOppgaveJson {
         this.opprettetTidspunkt = opprettetTidspunkt == null ? null : ZonedDateTime.parse(opprettetTidspunkt).toLocalDateTime();
     }
 
-    @JsonIgnore
-    @JsonProperty("versjon")
     public Integer getVersjon() {
         return this.versjon;
     }
@@ -276,8 +262,6 @@ public abstract class AbstractOppgaveJson {
         this.versjon = versjon;
     }
 
-    @JsonIgnore
-    @JsonProperty("endretAv")
     public String getEndretAv() {
         return this.endretAv;
     }
@@ -286,8 +270,6 @@ public abstract class AbstractOppgaveJson {
         this.endretAv = endretAv;
     }
 
-    @JsonIgnore
-    @JsonProperty("endretTidspunkt")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     public LocalDateTime getEndretTidspunkt() {
         return this.endretTidspunkt;
@@ -297,8 +279,6 @@ public abstract class AbstractOppgaveJson {
         this.endretTidspunkt = endretTidspunkt == null ? null : ZonedDateTime.parse(endretTidspunkt).toLocalDateTime();
     }
 
-    @JsonIgnore
-    @JsonProperty("ferdigstiltTidspunkt")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     public LocalDateTime getFerdigstiltTidspunkt() {
         return this.ferdigstiltTidspunkt;

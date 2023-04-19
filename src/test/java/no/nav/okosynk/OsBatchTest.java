@@ -30,7 +30,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
                         this.getOkosynkConfiguration(),
                         Constants.BATCH_TYPE.OS,
                         new MeldingReader<>(OsMelding::new),
-                        new OsMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
+                        new OsMapper(mock(IAktoerClient.class))
                 )
         );
     }
@@ -41,7 +41,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
         enteringTestHeaderLogger.debug(null);
 
         MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
-        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class), getOkosynkConfiguration());
+        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
                         new Batch<>(null, Constants.BATCH_TYPE.OS, osMeldingMeldingReader, osMapper)
@@ -55,7 +55,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
 
         MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
         IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
-        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class), okosynkConfiguration);
+        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class, () ->
                 new Batch<>(okosynkConfiguration, null, osMeldingMeldingReader, osMapper)
         );
@@ -67,7 +67,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
         enteringTestHeaderLogger.debug(null);
 
         IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
-        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class), okosynkConfiguration);
+        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () -> new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.OS, null, osMapper));
     }
@@ -77,13 +77,16 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
 
         enteringTestHeaderLogger.debug(null);
 
+        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
+
         assertThrows(
                 NullPointerException.class,
                 () ->
                         new Batch<>(
-                                this.getOkosynkConfiguration(),
+                                okosynkConfiguration,
                                 Constants.BATCH_TYPE.OS,
-                                new MeldingReader<>(OsMelding::new),
+                                osMeldingMeldingReader,
                                 null
                         )
         );
@@ -91,7 +94,7 @@ class OsBatchTest extends AbstractBatchTest<OsMelding> {
 
     @Override
     protected String getValidLineOfInputData() {
-        return "***REMOVED***366572769 2019-12-232019-12-23AVVED128555 2019-12-012019-12-31000000001040A 4819         PENPOST ***REMOVED***                                                                                           ";
+        return "01010112345366572769 2019-12-232019-12-23AVVED128555 2019-12-012019-12-31000000001040A 4819         PENPOST 01010112345                                                                                           ";
     }
 
     @Override

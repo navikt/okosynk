@@ -30,7 +30,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
                         this.getOkosynkConfiguration(),
                         Constants.BATCH_TYPE.UR,
                         new MeldingReader<>(UrMelding::new),
-                        new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration())
+                        new UrMapper(mock(IAktoerClient.class))
                 )
         );
     }
@@ -41,7 +41,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
         enteringTestHeaderLogger.debug(null);
 
         MeldingReader<UrMelding> urMeldingMeldingReader = new MeldingReader<>(UrMelding::new);
-        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class), getOkosynkConfiguration());
+        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
                         new Batch<>(
@@ -60,7 +60,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
         IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
         MeldingReader<UrMelding> urMeldingMeldingReader = new MeldingReader<>(UrMelding::new);
-        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class), okosynkConfiguration);
+        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
                         new Batch<>(
@@ -78,7 +78,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
         enteringTestHeaderLogger.debug(null);
 
         IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
-        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class), okosynkConfiguration);
+        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
                         new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.UR, null, urMapper)
@@ -101,7 +101,7 @@ class UrBatchTest extends AbstractBatchTest<UrMelding> {
 
     @Override
     protected String getValidLineOfInputData() {
-        return "***REMOVED***PERSON      2020-01-21T12:38:3724GKA2960   00000000006860A8020GHBATCHUR2302020-01-21001618071Manuell retur - fra bank                          ***REMOVED***";
+        return "01010112345PERSON      2020-01-21T12:38:3724GKA2960   00000000006860A8020GHBATCHUR2302020-01-21001618071Manuell retur - fra bank                          01010112345";
     }
 
     @Override

@@ -1,14 +1,9 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaveResponseJson;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveResponseJson;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.json.*;
 import no.nav.okosynk.synkroniserer.consumer.security.AzureAdAuthenticationClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,18 +18,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyCollection;
-import static org.mockito.Matchers.anySet;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +37,7 @@ class OppgaveRestClientTestUtils {
                     return new StatusLineWithAllMethodsImplementedAndThrowing() {
                         @Override
                         public int getStatusCode() {
-                            return HttpResponseStatus.NOT_FOUND.code();
+                            return HTTP_NOT_FOUND;
                         }
                     };
                 }
@@ -65,9 +54,7 @@ class OppgaveRestClientTestUtils {
                             final ObjectMapper objectMapper = new ObjectMapper();
                             final String errorAsJsonString =
                                     objectMapper.writeValueAsString(errorResponse);
-                            final InputStream errorAsJsonStringInputStream =
-                                    IOUtils.toInputStream(errorAsJsonString, Charset.defaultCharset());
-                            return errorAsJsonStringInputStream;
+                            return IOUtils.toInputStream(errorAsJsonString, Charset.defaultCharset());
                         }
                     };
                 }
@@ -92,7 +79,7 @@ class OppgaveRestClientTestUtils {
                         return new StatusLineWithAllMethodsImplementedAndThrowing() {
                             @Override
                             public int getStatusCode() {
-                                return HttpResponseStatus.OK.code();
+                                return HTTP_OK;
                             }
                         };
                     }
@@ -101,11 +88,9 @@ class OppgaveRestClientTestUtils {
                     public HttpEntity getEntity() {
                         return new HttpEntityWithAllMethodsImplementedAndThrowing() {
                             @Override
-                            public InputStream getContent() throws IOException, UnsupportedOperationException {
-                                final InputStream oppgaveDtoAsJsonStringInputStream =
-                                        IOUtils.toInputStream("", Charset.defaultCharset());
+                            public InputStream getContent() throws UnsupportedOperationException {
 
-                                return oppgaveDtoAsJsonStringInputStream;
+                                return IOUtils.toInputStream("", Charset.defaultCharset());
                             }
                         };
                     }
@@ -136,7 +121,7 @@ class OppgaveRestClientTestUtils {
                         return new StatusLineWithAllMethodsImplementedAndThrowing() {
                             @Override
                             public int getStatusCode() {
-                                return HttpResponseStatus.OK.code();
+                                return HTTP_OK;
                             }
                         };
                     }
@@ -160,10 +145,8 @@ class OppgaveRestClientTestUtils {
 
                                 final String postOppgaveResponseJsonString =
                                         objectMapper.writeValueAsString(postOppgaveResponseJson);
-                                final InputStream oppgaveDtoAsJsonStringInputStream =
-                                        IOUtils.toInputStream(postOppgaveResponseJsonString, Charset.defaultCharset());
 
-                                return oppgaveDtoAsJsonStringInputStream;
+                                return IOUtils.toInputStream(postOppgaveResponseJsonString, Charset.defaultCharset());
                             }
                         };
                     }
@@ -185,7 +168,7 @@ class OppgaveRestClientTestUtils {
 
         final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
         when(mockedOppgaveRestClient
-                .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+                .executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(createTestResponseWithNOppgaver(0));
 
         return mockedOppgaveRestClient;
@@ -196,7 +179,7 @@ class OppgaveRestClientTestUtils {
 
         final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
         when(mockedOppgaveRestClient
-                .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+                .executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(createTestResponseWithNOppgaver(1))
                 .thenReturn(createTestResponseWithNOppgaver(0))
         ;
@@ -209,7 +192,7 @@ class OppgaveRestClientTestUtils {
 
         final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
         when(mockedOppgaveRestClient
-                .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+                .executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(createTestResponseWithNOppgaver(19))
                 .thenReturn(createTestResponseWithNOppgaver(0))
         ;
@@ -222,7 +205,7 @@ class OppgaveRestClientTestUtils {
 
         final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
         when(mockedOppgaveRestClient
-                .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+                .executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(createTestResponseWithNOppgaver(50))
                 .thenReturn(createTestResponseWithNOppgaver(0))
         ;
@@ -235,7 +218,7 @@ class OppgaveRestClientTestUtils {
 
         final OppgaveRestClient mockedOppgaveRestClient = prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail();
         when(mockedOppgaveRestClient
-                .executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+                .executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(createTestResponseWithNOppgaver(50))
                 .thenReturn(createTestResponseWithNOppgaver(1))
                 .thenReturn(createTestResponseWithNOppgaver(0))
@@ -244,8 +227,7 @@ class OppgaveRestClientTestUtils {
         return mockedOppgaveRestClient;
     }
 
-    static OppgaveRestClient prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail()
-            throws IOException {
+    static OppgaveRestClient prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail() {
 
         System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
         final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
@@ -280,7 +262,7 @@ class OppgaveRestClientTestUtils {
 
         System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
         final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
-        when(mockedOppgaveRestClient.patchOppgaver(anySet(), anyBoolean())).thenCallRealMethod();
+        when(mockedOppgaveRestClient.patchOppgaver(anyCollection(), anyBoolean())).thenCallRealMethod();
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
         when(mockedOppgaveRestClient.getOkosynkConfiguration())
@@ -293,19 +275,13 @@ class OppgaveRestClientTestUtils {
     static OppgaveRestClient prepareAMockedOpprettOppgaveRestClientThatFailsWithAnHttpCodeGreaterThan400()
             throws IOException {
 
-        final OppgaveRestClient mockedOppgaveRestClient =
-                OppgaveRestClientTestUtils.prepareAMockedOpprettOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400();
-
-        return mockedOppgaveRestClient;
+        return OppgaveRestClientTestUtils.prepareAMockedOpprettOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400();
     }
 
     static OppgaveRestClient prepareAMockedPatchOppgaverRestClientThatFailsWithAnHttpCodeGreaterThan400()
             throws IOException {
 
-        final OppgaveRestClient mockedOppgaveRestClient =
-                OppgaveRestClientTestUtils.prepareAMockedPatchOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400();
-
-        return mockedOppgaveRestClient;
+        return OppgaveRestClientTestUtils.prepareAMockedPatchOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400();
     }
 
     private static OppgaveRestClient prepareAMockedOpprettOppgaveRestClientBaseThatFailsWithAnHttpCodeGreaterThan400()
@@ -319,7 +295,7 @@ class OppgaveRestClientTestUtils {
         when(mockedOppgaveRestClient.getOkosynkConfiguration())
                 .thenReturn(new FakeOkosynkConfiguration());
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
-        when(mockedOppgaveRestClient.executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
+        when(mockedOppgaveRestClient.executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(OppgaveRestClientTestUtils.reponseWithErrorCodeGreaterThan400);
 
         return mockedOppgaveRestClient;
@@ -342,10 +318,10 @@ class OppgaveRestClientTestUtils {
         return mockedOppgaveRestClient;
     }
 
-    private static String createRandomDate(final Random random, final boolean mayBeNull) {
+    private static String createRandomDate(final Random random) {
 
         final String randomDate;
-        if ((random.nextInt(1000) < 900) || !mayBeNull) {
+        if (random.nextInt(1000) < 900) {
             randomDate =
                     String.format(
                             "%04d-%02d-%02d",
@@ -362,18 +338,15 @@ class OppgaveRestClientTestUtils {
 
     static String createRandomDateTimeWithZone(final Random random) {
 
-        final String randomDateTimeWithZone =
-                String.format(
-                        "%04d-%02d-%02dT%02d:%02d:%02d+02:00[Europe/Paris]",
-                        2013 + random.nextInt(5),
-                        1 + random.nextInt(11),
-                        1 + random.nextInt(27),
-                        random.nextInt(23),
-                        random.nextInt(59),
-                        random.nextInt(59)
-                );
-
-        return randomDateTimeWithZone;
+        return String.format(
+                "%04d-%02d-%02dT%02d:%02d:%02d+02:00[Europe/Paris]",
+                2013 + random.nextInt(5),
+                1 + random.nextInt(11),
+                1 + random.nextInt(27),
+                random.nextInt(23),
+                random.nextInt(59),
+                random.nextInt(59)
+        );
     }
 
     private static FinnOppgaveResponseJson createOneOppgaveDto(final Random random) {
@@ -403,7 +376,7 @@ class OppgaveRestClientTestUtils {
         finnOppgaveResponseJson.setOrgnr(RandomStringUtils.randomAlphanumeric(13));
         finnOppgaveResponseJson.setSamhandlernr(RandomStringUtils.randomAlphanumeric(23));
 
-        finnOppgaveResponseJson.setAktivDato(createRandomDate(random, true));
+        finnOppgaveResponseJson.setAktivDato(createRandomDate(random));
         finnOppgaveResponseJson.setStatus(OppgaveStatus.values()[random.nextInt(OppgaveStatus.values().length)]);
         finnOppgaveResponseJson.setOpprettetTidspunkt(createRandomDateTimeWithZone(random));
         finnOppgaveResponseJson.setEndretTidspunkt(createRandomDateTimeWithZone(random));
@@ -413,7 +386,7 @@ class OppgaveRestClientTestUtils {
         finnOppgaveResponseJson.setTema("OKO");
         finnOppgaveResponseJson.setPrioritet(RandomStringUtils.randomAlphanumeric(19));
         finnOppgaveResponseJson.setBeskrivelse(RandomStringUtils.randomAlphanumeric(319));
-        finnOppgaveResponseJson.setFristFerdigstillelse(createRandomDate(random, true));
+        finnOppgaveResponseJson.setFristFerdigstillelse(createRandomDate(random));
         finnOppgaveResponseJson.setTildeltEnhetsnr(RandomStringUtils.randomAlphanumeric(7));
         finnOppgaveResponseJson.setMappeId(RandomStringUtils.randomAlphanumeric(21));
         finnOppgaveResponseJson.setTilordnetRessurs(RandomStringUtils.randomAlphanumeric(14));
@@ -424,87 +397,81 @@ class OppgaveRestClientTestUtils {
 
     private static CloseableHttpResponse createTestResponseWithNOppgaver(final int noOppgaver) {
 
-        final CloseableHttpResponse closeableHttpResponse =
-                new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
+        return new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
 
-                    final StatusLine statusLine = new StatusLineWithAllMethodsImplementedAndThrowing() {
-                        @Override
-                        public int getStatusCode() {
-                            return HttpResponseStatus.OK.code();
-                        }
-                    };
+            final StatusLine statusLine = new StatusLineWithAllMethodsImplementedAndThrowing() {
+                @Override
+                public int getStatusCode() {
+                    return HTTP_OK;
+                }
+            };
 
-                    final HttpEntity httpEntity = new HttpEntityWithAllMethodsImplementedAndThrowing() {
+            final HttpEntity httpEntity = new HttpEntityWithAllMethodsImplementedAndThrowing() {
 
-                        final int noOppgaverWanted = noOppgaver;
+                final int noOppgaverWanted = noOppgaver;
 
-                        @Override
-                        public InputStream getContent() throws IOException, UnsupportedOperationException {
+                @Override
+                public InputStream getContent() throws IOException, UnsupportedOperationException {
 
-                            final FinnOppgaverResponseJson finnOppgaverResponseJson =
-                                    new FinnOppgaverResponseJson() {
+                    final FinnOppgaverResponseJson finnOppgaverResponseJson =
+                            new FinnOppgaverResponseJson() {
 
-                                        @Override
-                                        public List<FinnOppgaveResponseJson> getFinnOppgaveResponseJsons() {
+                                @Override
+                                public List<FinnOppgaveResponseJson> getFinnOppgaveResponseJsons() {
 
-                                            if (super.getFinnOppgaveResponseJsons() == null) {
-                                                final List<FinnOppgaveResponseJson> oppgaver = new ArrayList<>();
-                                                int counter = 0;
-                                                final Random random = new Random(889735);
+                                    if (super.getFinnOppgaveResponseJsons() == null) {
+                                        final List<FinnOppgaveResponseJson> oppgaver = new ArrayList<>();
+                                        int counter = 0;
+                                        final Random random = new Random(889735);
 
-                                                while (counter++ < noOppgaverWanted) {
-                                                    oppgaver.add(createOneOppgaveDto(random));
-                                                }
-                                                super.setFinnOppgaveResponseJsons(oppgaver);
-                                                super.setAntallTreffTotalt(oppgaver.size());
-                                            }
-                                            return super.getFinnOppgaveResponseJsons();
+                                        while (counter++ < noOppgaverWanted) {
+                                            oppgaver.add(createOneOppgaveDto(random));
                                         }
+                                        super.setFinnOppgaveResponseJsons(oppgaver);
+                                        super.setAntallTreffTotalt(oppgaver.size());
+                                    }
+                                    return super.getFinnOppgaveResponseJsons();
+                                }
 
-                                        @Override
-                                        public int getAntallTreffTotalt() {
-                                            this.getFinnOppgaveResponseJsons(); // Guarantee that the oppgaver have been created
-                                            return super.getAntallTreffTotalt();
-                                        }
-                                    };
+                                @Override
+                                public int getAntallTreffTotalt() {
+                                    this.getFinnOppgaveResponseJsons(); // Guarantee that the oppgaver have been created
+                                    return super.getAntallTreffTotalt();
+                                }
+                            };
 
-                            final ObjectMapper objectMapper = new ObjectMapper();
-                            objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
+                    final ObjectMapper objectMapper = new ObjectMapper();
+                    objectMapper.setAnnotationIntrospector(new DisablingJsonIgnoreIntrospector());
 
-                            final String oppgaveAsJsonString =
-                                    objectMapper.writeValueAsString(finnOppgaverResponseJson);
-                            final InputStream oppgaveAsJsonStringInputStream =
-                                    IOUtils.toInputStream(oppgaveAsJsonString, Charset.defaultCharset());
+                    final String oppgaveAsJsonString =
+                            objectMapper.writeValueAsString(finnOppgaverResponseJson);
 
-                            return oppgaveAsJsonStringInputStream;
-                        }
-                    };
+                    return IOUtils.toInputStream(oppgaveAsJsonString, Charset.defaultCharset());
+                }
+            };
 
-                    @Override
-                    public ProtocolVersion getProtocolVersion() {
-                        return getStatusLine().getProtocolVersion();
-                    }
+            @Override
+            public ProtocolVersion getProtocolVersion() {
+                return getStatusLine().getProtocolVersion();
+            }
 
-                    @Override
-                    public StatusLine getStatusLine() {
-                        return this.statusLine;
-                    }
+            @Override
+            public StatusLine getStatusLine() {
+                return this.statusLine;
+            }
 
-                    @Override
-                    public HttpEntity getEntity() {
-                        return httpEntity;
-                    }
+            @Override
+            public HttpEntity getEntity() {
+                return httpEntity;
+            }
 
-                    @Override
-                    public void close() throws IOException {
-                    }
-                };
-
-        return closeableHttpResponse;
+            @Override
+            public void close() {
+            }
+        };
     }
 
-    static OppgaveRestClient prepareAMockedPatchRestClientThatSucceedsInCreatingZeroOppgaver()
-            throws IOException {
+    static OppgaveRestClient prepareAMockedPatchRestClientThatSucceedsInCreatingZeroOppgaver() throws IOException {
 
         final CloseableHttpResponse preparedCloseableHttpResponse =
                 new CloseableHttpResponseWithAllMethodsImplementedAndThrowing() {
@@ -518,7 +485,7 @@ class OppgaveRestClientTestUtils {
                         return new StatusLineWithAllMethodsImplementedAndThrowing() {
                             @Override
                             public int getStatusCode() {
-                                return HttpResponseStatus.OK.code();
+                                return HTTP_OK;
                             }
                         };
                     }
@@ -527,11 +494,8 @@ class OppgaveRestClientTestUtils {
                     public HttpEntity getEntity() {
                         return new HttpEntityWithAllMethodsImplementedAndThrowing() {
                             @Override
-                            public InputStream getContent() throws IOException, UnsupportedOperationException {
-                                final InputStream oppgaveDtoAsJsonStringInputStream =
-                                        IOUtils.toInputStream("", Charset.defaultCharset());
-
-                                return oppgaveDtoAsJsonStringInputStream;
+                            public InputStream getContent() throws UnsupportedOperationException {
+                                return IOUtils.toInputStream("", Charset.defaultCharset());
                             }
                         };
                     }
@@ -562,7 +526,7 @@ class OppgaveRestClientTestUtils {
                         return new StatusLineWithAllMethodsImplementedAndThrowing() {
                             @Override
                             public int getStatusCode() {
-                                return HttpResponseStatus.OK.code();
+                                return HTTP_OK;
                             }
                         };
                     }

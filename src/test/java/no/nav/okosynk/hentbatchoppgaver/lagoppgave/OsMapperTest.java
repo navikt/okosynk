@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -47,7 +49,7 @@ class OsMapperTest {
 
     @BeforeEach
     void setUp() {
-        osMapper = new OsMapper(this.aktoerRestClient, this.okosynkConfiguration);
+        osMapper = new OsMapper(this.aktoerRestClient);
         osMeldingSomSkalBliTilOppgave = new OsMelding(OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         annenOsMeldingSomSkalBliTilOppgave = new OsMelding(ANNEN_OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         osMeldingSomIkkeHarMapping = new OsMelding(OS_MELDING_SOM_IKKE_HAR_MAPPING);
@@ -98,6 +100,31 @@ class OsMapperTest {
         assertEquals(2, oppgaver.size());
         assertEquals("1234", oppgaver.get(0).aktoerId);
         assertEquals("123", oppgaver.get(1).aktoerId);
+    }
+
+    @Test
+    @DisplayName("lagOppgaver returnerer oppgave med ett innslag i beskrivelsen for hver statuskode")
+    void lagFire() {
+        final List<OsMelding> FIRE = Stream.of(""+
+                        "05029745821495681278 2023-03-142023-03-14AVRKK231B2622022-12-012022-12-31000000059480æ 8020         ARBYT   05029745821            ",
+                        "05029745821495681278 2023-03-142023-03-14AVAVK231B2622023-01-012023-01-31000000015040æ 8020         ARBYT   05029745821            ",
+                        "05029745821495681278 2023-03-142023-03-14AVRKK231B2622023-01-012023-01-31000000153760æ 8020         ARBYT   05029745821            ",
+                        "05029745821495681278 2023-03-142023-03-14AVAVK231B2622023-02-012023-03-31000000216490æ 8020         ARBYT   05029745821            ")
+                .map(OsMelding::new)
+                .collect(Collectors.toList());
+        enteringTestHeaderLogger.debug(null);
+
+        Mockito.reset(aktoerRestClient);
+
+        when(aktoerRestClient.hentGjeldendeAktoerId("05029745821")).thenReturn(AktoerRespons.ok("123"));
+        List<Oppgave> oppgaver = osMapper.lagOppgaver(FIRE);
+
+        assertNotNull(oppgaver);
+
+        assertEquals(1, oppgaver.size());
+        Oppgave oppgave = oppgaver.get(0);
+        assertEquals(1, oppgave.beskrivelse.split("AVRK").length-1);
+        assertEquals(1, oppgave.beskrivelse.split("AVAV").length-1);
     }
 
     @ParameterizedTest

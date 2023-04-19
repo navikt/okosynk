@@ -2,15 +2,13 @@ package no.nav.okosynk.hentbatchoppgaver.model;
 
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class OsMelding extends AbstractMelding {
 
@@ -82,22 +80,6 @@ public class OsMelding extends AbstractMelding {
             ;
     }
 
-    @Override
-    public String lagBeskrivelse() {
-        return Stream.of(
-                        nyesteVentestatus,
-                        hentNettoBelopSomStreng() + "kr",
-                        "beregningsdato/id:" + formatAsNorwegianDate(beregningsDato) + "/" + beregningsId,
-                        "periode:" + formatAsNorwegianDate(forsteFomIPeriode) + "-" + formatAsNorwegianDate(sisteTomIPeriode),
-                        "feilkonto:" + flaggFeilkonto,
-                        "statusdato:" + formatAsNorwegianDate(datoForStatus),
-                        etteroppgjor == null ? "" : etteroppgjor,
-                        "UtbTil:" + utbetalesTilId,
-                        brukerId
-                )
-                .collect(Collectors.joining(getFeltSeparator()))
-                .trim();
-    }
     @Override
     public String toString() {
 

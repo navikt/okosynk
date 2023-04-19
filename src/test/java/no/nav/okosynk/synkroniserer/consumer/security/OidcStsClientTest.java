@@ -1,31 +1,10 @@
 package no.nav.okosynk.synkroniserer.consumer.security;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.matching;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
-import static no.nav.okosynk.config.Constants.AUTHORIZATION;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
-import static org.apache.http.HttpHeaders.ACCEPT;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.matching.EqualToPattern;
-import java.util.Base64;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
@@ -35,6 +14,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Base64;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
+import static no.nav.okosynk.config.Constants.*;
+import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 public class OidcStsClientTest {
 
@@ -53,14 +42,13 @@ public class OidcStsClientTest {
 
     private final static String TEST_URL_PARMS =
             "?"
-                    + TEST_URL_PARM_KEY_1 + "=" + TEST_URL_PARM_VALUE_1
-                    + "&"
-                    + TEST_URL_PARM_KEY_2 + "=" + TEST_URL_PARM_VALUE_2
-            ;
+            + TEST_URL_PARM_KEY_1 + "=" + TEST_URL_PARM_VALUE_1
+            + "&"
+            + TEST_URL_PARM_KEY_2 + "=" + TEST_URL_PARM_VALUE_2;
 
     private final static String TEST_CONTEXT_FOR_MATCHING =
             OidcStsClientTest.TEST_URL_CONTEXT
-                    + OidcStsClientTest.TEST_URL_PARMS;
+            + OidcStsClientTest.TEST_URL_PARMS;
 
     private final static String TEST_NON_EXISTING_CONTEXT_FOR_MATCHING = TEST_URL_CONTEXT + "/NOT/" + TEST_URL_PARMS;
     private final static String TEST_EXPIRED_JSON_TOKEN =
@@ -89,7 +77,7 @@ public class OidcStsClientTest {
     public static void configureResourceUrlWithoutParms(
             final String protocol,
             final String server,
-            final int    port) {
+            final int port) {
         final String testUrl = protocol + "://" + server + ":" + port + OidcStsClientTest.TEST_URL_CONTEXT;
         System.setProperty(Constants.REST_STS_URL_KEY, testUrl);
     }
@@ -104,8 +92,8 @@ public class OidcStsClientTest {
 
     private static void setupStub(
             final WireMockServer wireMockServer,
-            final String         urlIncludingParms,
-            final String         responseBody) {
+            final String urlIncludingParms,
+            final String responseBody) {
 
         wireMockServer
                 .stubFor(
@@ -125,9 +113,9 @@ public class OidcStsClientTest {
 
     private static void setupStubScenarioForExpiredAndThenNotExpiredAccessToken(
             final WireMockServer wireMockServer,
-            final String         urlIncludingParms,
-            final String         firstResponseBody,
-            final String         secondResponseBody) {
+            final String urlIncludingParms,
+            final String firstResponseBody,
+            final String secondResponseBody) {
 
         final String scenarioName = "ExpierdAndThenNotExpiredToken";
         wireMockServer
@@ -174,7 +162,7 @@ public class OidcStsClientTest {
     }
 
     @AfterEach
-    void afterEach () {
+    void afterEach() {
         this.wireMockServer.resetAll();
         this.wireMockServer.stop();
         this.wireMockServer = null;
@@ -188,8 +176,8 @@ public class OidcStsClientTest {
 
         setupStubWithOKResponseEntityAndWithAnInterpretableToken();
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType             = Constants.BATCH_TYPE.UR;
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
 
         assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
     }
@@ -203,16 +191,13 @@ public class OidcStsClientTest {
         setupStubWithOKResponseEntityButWithAnUninterpretableToken();
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
-        final OidcStsClient oidcStsClient                =
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
+        final OidcStsClient oidcStsClient =
                 assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
-        final NullPointerException nullPointerException =
-                assertThrows(
-                        NullPointerException.class,
-                        oidcStsClient::getOidcToken
-                );
-
-        assertNull(nullPointerException.getMessage());
+        assertThrows(
+                NullPointerException.class,
+                oidcStsClient::getOidcToken
+        );
     }
 
     @Test
@@ -222,8 +207,8 @@ public class OidcStsClientTest {
 
         setupStubWithRubbishResponseEntity();
 
-        final IOkosynkConfiguration okosynkConfiguration  = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType             = Constants.BATCH_TYPE.UR;
+        final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
         final IllegalStateException illegalStateException =
                 assertThrows(
                         IllegalStateException.class,
@@ -245,7 +230,7 @@ public class OidcStsClientTest {
         setupStubWithOKResponseEntityAndWithAnInterpretableToken();
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
         final OidcStsClient oidcStsClient =
                 assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));
         final String actualOidcToken =
@@ -263,7 +248,7 @@ public class OidcStsClientTest {
         setupStubWithOKResponseEntityAndWithAnInterpretableTokenButWithAnErroneousUrl();
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
 
         final IllegalStateException illegalStateException =
                 assertThrows(
@@ -284,7 +269,7 @@ public class OidcStsClientTest {
         setupStubWithOKResponseEntityAndWithAnInterpretableTokenThatIsFirstExpiredAndThenFresh();
 
         final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-        final Constants.BATCH_TYPE  batchType            = Constants.BATCH_TYPE.UR;
+        final Constants.BATCH_TYPE batchType = Constants.BATCH_TYPE.UR;
 
         final OidcStsClient oidcStsClient =
                 assertDoesNotThrow(() -> new OidcStsClient(okosynkConfiguration, batchType));

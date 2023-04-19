@@ -39,7 +39,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
     OsOppgaveOppretterTest() {
         super(new FakeOkosynkConfiguration());
-        this.osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient, this.okosynkConfiguration);
+        this.osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient);
     }
 
     @Test
@@ -48,8 +48,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         assertAll(
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, OsOppgaveOppretterTest.OS_MELDING_1.lagBeskrivelse()),
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, OsOppgaveOppretterTest.OS_MELDING_2.lagBeskrivelse())
+                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new OsBeskrivelseInfo(OsOppgaveOppretterTest.OS_MELDING_1).lagBeskrivelse()),
+                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new OsBeskrivelseInfo(OsOppgaveOppretterTest.OS_MELDING_2).lagBeskrivelse())
         );
     }
 

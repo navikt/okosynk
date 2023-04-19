@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
@@ -12,12 +11,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class OsMapper implements IMeldingMapper<OsMelding> {
-    private OsOppgaveOppretter osOppgaveOppretter;
-    private OsMappingRegelRepository osMappingRegelRepository;
+    private final OsOppgaveOppretter osOppgaveOppretter;
+    private final OsMappingRegelRepository osMappingRegelRepository;
 
-    public OsMapper(final IAktoerClient aktoerClient, final IOkosynkConfiguration okosynkConfiguration) {
+    public OsMapper(final IAktoerClient aktoerClient) {
         this.osMappingRegelRepository = new OsMappingRegelRepository();
-        this.osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerClient, okosynkConfiguration);
+        this.osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerClient);
     }
 
     @Override
@@ -41,7 +40,6 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
         return ufiltrerteOsMeldinger
                 .stream()
                 .filter(osMeldingSkalBliOppgave())
-                .distinct()
                 .collect(
                         Collectors
                                 .groupingBy(OsMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList())

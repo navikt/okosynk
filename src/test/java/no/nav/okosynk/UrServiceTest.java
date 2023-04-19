@@ -45,21 +45,11 @@ class UrServiceTest extends AbstractServiceTest {
         when(mockedUrService.createAndConfigureBatch(any())).thenCallRealMethod();
         when(mockedUrService.getBatchType()).thenReturn(BATCH_TYPE.UR);
         when(mockedUrService.createMeldingReader()).thenReturn(mock(MeldingReader.class));
-        when(mockedUrService.createMeldingMapper(any(IAktoerClient.class))).thenReturn(mock(IMeldingMapper.class));
+        when(mockedUrService.createMeldingMapper(any())).thenReturn(mock(IMeldingMapper.class));
 
         final Batch<? extends AbstractMelding> urBatch =
                 mockedUrService.createAndConfigureBatch(getOkosynkConfiguration());
 
         assertNotNull(urBatch);
     }
-
-    /*
-    private void setUpBatchFullfortMock(final IOkosynkConfiguration okosynkConfiguration) throws MeldingUnreadableException {
-
-        getService() = Mockito.spy(new UrService(okosynkConfiguration));
-        final Batch<UrMelding> batch = getService().createAndConfigureBatch(getOkosynkConfiguration());
-        batch.setUspesifikkMeldingLinjeReader(new MeldingLinjeFileReaderMock(MOCK_UR_LINJE));
-        when(getService().createAndConfigureBatch(getOkosynkConfiguration())).thenReturn((Batch)batch);
-    }
-     */
 }

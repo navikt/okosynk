@@ -21,6 +21,6 @@ public class OsService extends AbstractService<OsMelding> {
 
     @Override
     protected IMeldingMapper<OsMelding> createMeldingMapper(final IAktoerClient aktoerClient) {
-        return new OsMapper(aktoerClient, getOkosynkConfiguration());
+        return new OsMapper(aktoerClient);
     }
 }

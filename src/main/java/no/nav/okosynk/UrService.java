@@ -21,6 +21,6 @@ public class UrService extends AbstractService<UrMelding> {
 
     @Override
     protected IMeldingMapper<UrMelding> createMeldingMapper(final IAktoerClient aktoerClient) {
-        return new UrMapper(aktoerClient, getOkosynkConfiguration());
+        return new UrMapper(aktoerClient);
     }
 }

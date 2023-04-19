@@ -46,7 +46,7 @@ class UrMapperTest {
 
     @BeforeEach
     void setUp() {
-        urMapper = new UrMapper(this.aktoerClient, this.okosynkConfiguration);
+        urMapper = new UrMapper(this.aktoerClient);
         urMeldingSomSkalBliTilOppgave = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         annenUrMeldingSomSkalBliTilOppgave = new UrMelding(ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         urMeldingUtenMappingRegel = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);

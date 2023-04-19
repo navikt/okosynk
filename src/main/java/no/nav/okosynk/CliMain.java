@@ -219,12 +219,9 @@ public class CliMain {
                 }
             } while (true);
 
-            services
-                    .forEach(
-                            service ->
-                                    service
-                                            .getAlertMetrics()
-                                            .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
+            services.forEach(service -> service
+                        .getAlertMetrics()
+                        .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
                     );
         } finally {
             postRunAllBatches();
