@@ -15,11 +15,10 @@ public class Configuration {
     private Map<String, String> getAllProps() {
         HashMap<String, String> copy = new HashMap<>();
 
-        List<PrioritizedMap> collect = Stream.concat(configurations.stream(), Stream.of(this))
+        Stream.concat(configurations.stream(), Stream.of(this))
                 .map(c -> new PrioritizedMap(c.getOwnProps(), c.PRIORITY))
                 .sorted(Comparator.comparingInt(PrioritizedMap::priority).reversed())
-                .toList();
-        collect.forEach(p -> copy.putAll(p.map()));
+                .forEach(p -> copy.putAll(p.map()));
 
         return copy;
     }
