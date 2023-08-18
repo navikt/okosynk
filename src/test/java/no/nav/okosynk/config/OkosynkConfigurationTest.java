@@ -1,6 +1,6 @@
 package no.nav.okosynk.config;
 
-import org.apache.commons.configuration2.ex.ConversionException;
+import no.nav.okosynk.config.homemade.ConversionException;
 import org.javatuples.Quintet;
 import org.javatuples.Sextet;
 import org.junit.jupiter.api.DisplayName;
@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class OkosynkConfigurationTest {
 
@@ -101,13 +99,11 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    /**
+    /*
      * To make the test pass...
-     *
      *  ...the following environment variables must be set:
      * TEST_ENV_001 TEST_ENV_001_VAL
      * test_env_002 TEST_ENV_002_VAL
-     *
      * ...the following environment variables must NOT be set:
      * TEST_ENV_003
      */
@@ -119,7 +115,7 @@ public class OkosynkConfigurationTest {
         final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final List<Quintet<String, String, String, String, String>> testData =
-                new ArrayList<Quintet<String, String, String, String, String>>() {{
+                new ArrayList<>() {{
 
                     add(new Quintet<>("test_env_001", "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
                     add(new Quintet<>("test_env_001", "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
@@ -206,13 +202,11 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    /**
+    /*
      * To make the test pass...
-     *
      *  ...the following environment variables must be set:
      * TEST_ENV_001 TEST_ENV_001_VAL
      * test_env_002 TEST_ENV_002_VAL
-     *
      * ...the following environment variables must NOT be set:
      * TEST_ENV_003
      */
@@ -224,7 +218,7 @@ public class OkosynkConfigurationTest {
         final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final List<Quintet<String, String, String, String, String>> testData =
-                new ArrayList<Quintet<String, String, String, String, String>>() {{
+                new ArrayList<>() {{
 
                     add(new Quintet<>("test_env_001", "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
                     add(new Quintet<>("test_env_001", "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
@@ -317,14 +311,13 @@ public class OkosynkConfigurationTest {
 
     @Test
     void testGetRequiredIntFirstPriorityKeyWithStringValue() {
-
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
         final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final List<Quintet<String, String, String, String, Integer>> testData =
-                new ArrayList<Quintet<String, String, String, String, Integer>>() {{
+                new ArrayList<>() {{
 
                     add(new Quintet<>("test_env_001", "test_env_001_valx", "TEST_ENV_001", "TEST_ENV_001_VAL", null));
                     add(new Quintet<>("test_env_001", "TEST_ENV_001_VALx", "TEST_ENV_001", "TEST_ENV_001_VAL", null));
@@ -349,7 +342,6 @@ public class OkosynkConfigurationTest {
                     add(new Quintet<>("TEST_ENV_003", "test_env_003_valx", null, null, null));
                     add(new Quintet<>("TEST_ENV_003", "TEST_ENV_003_VALx", null, null, null));
 
-                    add(new Quintet<>("test_env_003", null, null, null, null));
                     add(new Quintet<>("TEST_ENV_003", null, null, null, null));
 
                     add(new Quintet<>("test.env.003", "test_env_003_valx", null, null, null));
@@ -410,8 +402,7 @@ public class OkosynkConfigurationTest {
                 } else {
                     expectedExceptionClass = ConversionException.class;
                 }
-                assertThrows(expectedExceptionClass,
-                        () -> okosynkConfiguration.getRequiredInt(secondPriorityKey));
+                assertThrows(expectedExceptionClass, () -> okosynkConfiguration.getRequiredInt(secondPriorityKey));
             } else {
                 final int actualVal = okosynkConfiguration.getRequiredInt(secondPriorityKey);
                 assertEquals(expectedVal, actualVal, msg);
@@ -420,16 +411,24 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    /**
-     * To make the test pass...
-     *
-     *  ...the following environment variables must be set:
-     * TEST_ENV_001 TEST_ENV_001_VAL
-     * test_env_002 TEST_ENV_002_VAL
-     *
-     * ...the following environment variables must NOT be set:
-     * TEST_ENV_003
-     */
+    void testGetRequiredIntFirstPriorityKeyWithStringValuex() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
+        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+
+        final String secondPriorityKey = "test_env_001";
+        final String secondPriorityVal = "test_env_001_valx";
+        final String firstPriorityKey = "TEST_ENV_001";
+
+        okosynkConfiguration.clearSystemProperty(firstPriorityKey);
+        okosynkConfiguration.clearSystemProperty(secondPriorityKey);
+        okosynkConfiguration.setSystemProperty(secondPriorityKey, secondPriorityVal);
+        assertThrows(RuntimeException.class, () -> okosynkConfiguration.getRequiredInt(secondPriorityKey));
+    }
+
+    @Test
     void testGetStringWithDefaultFirstPriorityKeyWithStringValue() {
 
         enteringTestHeaderLogger.debug(null);
@@ -438,7 +437,7 @@ public class OkosynkConfigurationTest {
         final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final List<Sextet<String, String, String, String, String, String>> testData =
-                new ArrayList<Sextet<String, String, String, String, String, String>>() {{
+                new ArrayList<>() {{
 
                     add(new Sextet<>("test_env_001", "test_env_001_valx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
                     add(new Sextet<>("test_env_001", "TEST_ENV_001_VALx", "defVal", "TEST_ENV_001", "TEST_ENV_001_VAL", "TEST_ENV_001_VAL"));
@@ -517,19 +516,6 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    /**
-     * To make the test pass...
-     *
-     *  ...the following environment variables must be set:
-     * TEST_BOOL_ENV_001 true
-     * TEST_BOOL_ENV_002 false
-     * test_bool_env_003 true
-     * test_bool_env_004 false
-     *
-     * ...the following environment variables must NOT be set:
-     * TEST_BOOL_ENV_005
-     * test_bool_env_006
-     */
     public void testGetBooleanFirstPriorityKeyWithStringValue() {
 
         enteringTestHeaderLogger.debug(null);
@@ -538,7 +524,7 @@ public class OkosynkConfigurationTest {
         final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final List<Sextet<String, String, Boolean, String, String, Boolean>> testData =
-                new ArrayList<Sextet<String, String, Boolean, String, String, Boolean>>() {{
+                new ArrayList<>() {{
 
                     add(new Sextet<>("TEST_BOOL_ENV_001", "true", false, "TEST_BOOL_ENV_001", "true", true));
                     add(new Sextet<>("TEST_BOOL_ENV_001", "false", false, "TEST_BOOL_ENV_001", "true", true));
@@ -698,5 +684,49 @@ public class OkosynkConfigurationTest {
 
             assertEquals(expectedVal, actualVal, msg);
         }
+    }
+
+    @Test
+    public void testGetBooleanFirstPriorityKeyWithStringValuess() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
+        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final String secondPriorityKey = "test_bool_env_003";
+        final String secondPriorityVal = "false";
+        final boolean defVal = false;
+        final String firstPriorityKey = "test_bool_env_003";
+
+        okosynkConfiguration.clearSystemProperty(firstPriorityKey);
+        okosynkConfiguration.clearSystemProperty(secondPriorityKey);
+        okosynkConfiguration.setSystemProperty(secondPriorityKey, secondPriorityVal);
+
+        final Boolean actualTestBoolEnv003 = okosynkConfiguration.getBoolean(secondPriorityKey, defVal);
+
+        assertEquals(false, actualTestBoolEnv003);
+    }
+
+    @Test
+
+    public void testGetBooleanFirstPriorityKeyWithStringValuefoff() {
+        enteringTestHeaderLogger.debug(null);
+
+        OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
+        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+
+        final String secondPriorityKey = "TEST_BOOL_ENV_001";
+        final String secondPriorityVal = "true";
+        final boolean defVal = false;
+        final String firstPriorityKey = "TEST_BOOL_ENV_001";
+        final Boolean expectedVal = true;
+
+        okosynkConfiguration.clearSystemProperty(firstPriorityKey);
+        okosynkConfiguration.clearSystemProperty(secondPriorityKey);
+        okosynkConfiguration.setSystemProperty(secondPriorityKey, secondPriorityVal);
+
+        final Boolean actualVal = okosynkConfiguration.getBoolean(secondPriorityKey, defVal);
+
+        assertEquals(expectedVal, actualVal);
     }
 }

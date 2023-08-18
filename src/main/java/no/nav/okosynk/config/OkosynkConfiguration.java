@@ -1,14 +1,8 @@
 package no.nav.okosynk.config;
 
-import org.apache.commons.configuration2.BaseConfiguration;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.EnvironmentConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
+import io.vavr.Tuple2;
+import no.nav.okosynk.config.homemade.*;
 import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.javatuples.Quintet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -91,80 +84,40 @@ public class OkosynkConfiguration
 
     @Override
     public String getString(final String key) {
-
-        final String firstPriorityKey = convertToFirstPriorityKey(key);
-        final String secondPriorityKey = key;
-        final String value;
-
-        if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
-            value = compositeConfigurationForFirstPriority.getString(firstPriorityKey);
-        } else {
-            value = compositeConfigurationForSecondPriority.getString(secondPriorityKey);
-        }
-
-        return value;
+        return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key))
+                : compositeConfigurationForSecondPriority.getString(key);
     }
 
     @Override
     public String getString(final String key, final String defaultValue) {
-
-        final String firstPriorityKey = convertToFirstPriorityKey(key);
-        final String secondPriorityKey = key;
-        final String value;
-        if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
-            value = compositeConfigurationForFirstPriority.getString(firstPriorityKey);
-        } else {
-            value = compositeConfigurationForSecondPriority.getString(secondPriorityKey, defaultValue);
-        }
-
-        return value;
+        return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key))
+                : compositeConfigurationForSecondPriority.getString(key, defaultValue);
     }
 
     @Override
     public String getRequiredString(final String key) {
-
-        final String firstPriorityKey = convertToFirstPriorityKey(key);
-        final String secondPriorityKey = key;
-        final String value;
-        if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
-            value = compositeConfigurationForFirstPriority.getString(firstPriorityKey);
+        if (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) {
+            return compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key));
         } else {
-            checkRequired(secondPriorityKey);
-            value = compositeConfigurationForSecondPriority.getString(secondPriorityKey);
+            checkRequired(key);
+            return compositeConfigurationForSecondPriority.getString(key);
         }
-
-        return value;
     }
 
     @Override
     public boolean getBoolean(final String key, final boolean defaultValue) {
-
-        final String firstPriorityKey = convertToFirstPriorityKey(key);
-        final String secondPriorityKey = key;
-        final boolean value;
-        if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
-            value = compositeConfigurationForFirstPriority.getBoolean(firstPriorityKey);
-        } else {
-            value =
-                    compositeConfigurationForSecondPriority.getBoolean(secondPriorityKey, defaultValue);
-        }
-
-        return value;
+        return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getBoolean(convertToFirstPriorityKey(key))
+                : compositeConfigurationForSecondPriority.getBoolean(key, defaultValue);
     }
 
     @Override
     public int getRequiredInt(final String key) {
-
-        final String firstPriorityKey = convertToFirstPriorityKey(key);
-        final String secondPriorityKey = key;
-        final int value;
-        if (containsEnvironmentVariableCaseSensitively(firstPriorityKey)) {
-            value = compositeConfigurationForFirstPriority.getInt(firstPriorityKey);
+        if (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) {
+            return compositeConfigurationForFirstPriority.getInt(convertToFirstPriorityKey(key));
         } else {
-            checkRequired(secondPriorityKey);
-            value = compositeConfigurationForSecondPriority.getInt(secondPriorityKey);
+            checkRequired(key);
+            return compositeConfigurationForSecondPriority.getInt(key);
         }
-        return value;
     }
 
     @Override
@@ -213,89 +166,76 @@ public class OkosynkConfiguration
         // not know of any IOkosynkConfiguration,
         // they must have some system properties explicitly set:
         final List<Quintet<String, String, Boolean, String, String>> propertyInfos =
-                new ArrayList<Quintet<String, String, Boolean, String, String>>() {{
+                new ArrayList<>() {{
                     add(new Quintet<>(Constants.DISABLE_METRICS_REPORT_KEY,
                             Constants.DISABLE_METRICS_REPORT_EXT_KEY, false, null, null));
                     add(new Quintet<>(Constants.TILLAT_MOCK_PROPERTY_KEY,
                             Constants.TILLAT_MOCK_PROPERTY_EXT_KEY, false, null, null));
                 }};
 
-        propertyInfos
-                .stream()
-                .forEach(
-                        (propertyInfo) -> {
-                            final String okosynkKey = propertyInfo.getValue0();
-                            final String externalKey = propertyInfo.getValue1();
-                            final boolean mandatory = propertyInfo.getValue2();
-                            final String reportValuePlaceHolder = propertyInfo.getValue3();
-                            final String defaultValue = propertyInfo.getValue4();
-                            final String tempValue;
-                            if (mandatory) {
-                                tempValue = this.getRequiredString(okosynkKey);
-                            } else {
-                                tempValue = this.getString(okosynkKey);
-                            }
+        propertyInfos.forEach(
+                (propertyInfo) -> {
+                    final String okosynkKey = propertyInfo.getValue0();
+                    final String externalKey = propertyInfo.getValue1();
+                    final boolean mandatory = propertyInfo.getValue2();
+                    final String reportValuePlaceHolder = propertyInfo.getValue3();
+                    final String defaultValue = propertyInfo.getValue4();
+                    final String tempValue;
+                    if (mandatory) {
+                        tempValue = this.getRequiredString(okosynkKey);
+                    } else {
+                        tempValue = this.getString(okosynkKey);
+                    }
 
-                            final String value = (tempValue == null) ? defaultValue : tempValue;
+                    final String value = (tempValue == null) ? defaultValue : tempValue;
 
-                            if ((value != null) && (this.systemConfiguration.getProperty(externalKey) == null)) {
+                    if ((value != null) && (this.systemConfiguration.getString(externalKey) == null)) {
 
-                                this.systemConfiguration.setProperty(externalKey, value);
-                                final String reportedValue =
-                                        (reportValuePlaceHolder == null)
-                                                ?
-                                                value
-                                                :
-                                                reportValuePlaceHolder;
+                        this.systemConfiguration.setProperty(externalKey, value);
+                        final String reportedValue =
+                                (reportValuePlaceHolder == null)
+                                        ?
+                                        value
+                                        :
+                                        reportValuePlaceHolder;
 
-                                logger.info(
-                                        "The property value {} "
-                                                + "is copied from some property source {} "
-                                                + "to the system property {}.", reportedValue, okosynkKey, externalKey);
-                            }
-                        }
-                );
+                        logger.info(
+                                "The property value {} "
+                                        + "is copied from some property source {} "
+                                        + "to the system property {}.", reportedValue, okosynkKey, externalKey);
+                    }
+                }
+        );
     }
 
     private boolean containsEnvironmentVariableCaseSensitively(
             final String environmentVariableToFind) {
-
-        final Iterator<String> keyIterator = compositeConfigurationForFirstPriority.getKeys();
-        boolean containsEnvironmentVariableCaseSensitively = false;
-        while (keyIterator.hasNext()) {
-            final String environmentVariable = keyIterator.next();
-            if (environmentVariable.equals(environmentVariableToFind)) {
-                containsEnvironmentVariableCaseSensitively = true;
-                break;
-            }
-        }
-        return containsEnvironmentVariableCaseSensitively;
+        return compositeConfigurationForFirstPriority.containsKey(environmentVariableToFind);
     }
 
     /**
      * In a NAIS environment, system properties of the form x.y are all converted to corresponding
      * environment variables X_Y.
      *
-     * @param originalKey
-     * @return
+     * @param originalKey key in anycase
+     * @return key in uppercase and with . replaced with _
      */
     private String convertToFirstPriorityKey(final String originalKey) {
-        final String convertedKey = originalKey.toUpperCase().replace('.', '_');
-        return convertedKey;
+        return originalKey.toUpperCase().replace('.', '_');
     }
 
     private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
         final Configuration baseConfig = new BaseConfiguration();
         Stream.of(
-                new ImmutablePair<>("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
-                new ImmutablePair<>("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
-                new ImmutablePair<>("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
-                new ImmutablePair<>("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
-                new ImmutablePair<>("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
-                new ImmutablePair<>("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
-                new ImmutablePair<>("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
-                new ImmutablePair<>("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
-        ).forEach(pair -> addVaultProperty(baseConfig, pair.left, pair.right));
+                new Tuple2<>("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
+                new Tuple2<>("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
+                new Tuple2<>("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
+                new Tuple2<>("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
+                new Tuple2<>("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new Tuple2<>("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
+                new Tuple2<>("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new Tuple2<>("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
+        ).forEach(pair -> addVaultProperty(baseConfig, pair._1(), pair._2()));
         compositeConfiguration.addConfiguration(baseConfig);
     }
 
@@ -305,7 +245,7 @@ public class OkosynkConfiguration
             final String fileName) {
         logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
         final String propertyValue = readStringFromFile(fileName);
-        baseConfig.addProperty(propertyKey, propertyValue);
+        baseConfig.setProperty(propertyKey, propertyValue);
         logger.info("Property {} now contains the value: {}", propertyKey, (propertyValue == null ? null : propertyKey.contains("PASSWORD") ? "***<something>***" : propertyValue));
     }
 
