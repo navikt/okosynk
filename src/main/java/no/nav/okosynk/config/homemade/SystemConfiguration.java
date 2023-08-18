@@ -16,22 +16,4 @@ public class SystemConfiguration extends Configuration {
         );
         return map;
     }
-
-//    public void setProperty(String key, String value) {
-//        System.setProperty(alteredKey(key), value);
-//    }
-//
-//    public void clearProperty(String key) {
-//        System.clearProperty(alteredKey(key));
-//    }
-//
-//    public String getString(String key) {
-//        return System.getProperty(alteredKey(key));
-//    }
-//
-//
-//    private String alteredKey(String key) {
-//        return key;
-////        return key.toUpperCase().replace('.', '_');
-//    }
 }
