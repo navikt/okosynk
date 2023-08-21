@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class Configuration {
-    public int PRIORITY = 3;
+    protected int PRIORITY = 3;
     final private Map<String, String> props;
     final private List<Configuration> configurations = new ArrayList<>();
 
@@ -16,9 +16,8 @@ public class Configuration {
         HashMap<String, String> copy = new HashMap<>();
 
         Stream.concat(configurations.stream(), Stream.of(this))
-                .map(c -> new PrioritizedMap(c.getOwnProps(), c.PRIORITY))
-                .sorted(Comparator.comparingInt(PrioritizedMap::priority).reversed())
-                .forEach(p -> copy.putAll(p.map()));
+                .sorted(Comparator.comparingInt((Configuration a) -> a.PRIORITY).reversed())
+                .forEach(p -> copy.putAll(p.getOwnProps()));
 
         return copy;
     }
