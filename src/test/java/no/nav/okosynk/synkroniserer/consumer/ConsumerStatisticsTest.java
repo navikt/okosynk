@@ -1,10 +1,10 @@
 package no.nav.okosynk.synkroniserer.consumer;
 
-import com.google.common.collect.Collections2;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wiremock.com.google.common.collect.Collections2;
 
 import java.util.*;
 
@@ -114,7 +114,7 @@ class ConsumerStatisticsTest {
                         .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(primes[i++])
                         .antallOppgaverSomMedSikkerhetIkkeErOppdatert(primes[i++])
 
-                        .numberOfExceptionsReceivedDuringRun(primes[i++])
+                        .numberOfExceptionsReceivedDuringRun(primes[i])
 
                         .build();
 
@@ -148,7 +148,7 @@ class ConsumerStatisticsTest {
                                 primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
 
                         .numberOfExceptionsReceivedDuringRun(
-                                primes[i] + primes[i + numberOfFields] + primes[i++ + numberOfFields * 2])
+                                primes[i] + primes[i + numberOfFields] + primes[i + numberOfFields * 2])
 
                         .build();
 
@@ -196,19 +196,16 @@ class ConsumerStatisticsTest {
                 Collections2.permutations(allElementsSource);
 
         allPermutations
-                .stream()
                 .forEach(
                         (final List<ConsumerStatistics> allElements) ->
                                 assertThrows(
                                         IllegalArgumentException.class,
-                                        () -> {
-                                            ConsumerStatistics
-                                                    .addAll(
-                                                            allElements.get(0),
-                                                            allElements.get(1),
-                                                            allElements.get(2)
-                                                    );
-                                        }
+                                        () -> ConsumerStatistics
+                                                .addAll(
+                                                        allElements.get(0),
+                                                        allElements.get(1),
+                                                        allElements.get(2)
+                                                )
                                 )
                 );
     }
@@ -309,7 +306,7 @@ class ConsumerStatisticsTest {
 
         final ConsumerStatistics consumerStatistics =
                 ConsumerStatistics.builder().name("x").build();
-      assertNotEquals(null, consumerStatistics);
+        assertNotEquals(null, consumerStatistics);
     }
 
     @Test
@@ -339,7 +336,6 @@ class ConsumerStatisticsTest {
                 .forEach(
                         (final List<ConsumerStatistics> allConsumerStatistics) ->
                         {
-                            assertEquals(consumerStatistics1, consumerStatistics1);
                             assertEquals(consumerStatistics1, consumerStatistics2);
                             assertEquals(consumerStatistics1, consumerStatistics3);
                             assertEquals(consumerStatistics1, consumerStatistics4);
@@ -371,7 +367,6 @@ class ConsumerStatisticsTest {
                 .forEach(
                         (final List<ConsumerStatistics> allConsumerStatistics) ->
                         {
-                            assertEquals(consumerStatistics1, consumerStatistics1);
                             assertEquals(consumerStatistics1, consumerStatistics2);
                             assertEquals(consumerStatistics1, consumerStatistics3);
                         }
@@ -383,8 +378,9 @@ class ConsumerStatisticsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        int ix = 0;
+        int ix = 1;
         final Integer[] firstEverySecondPrimes = new Integer[]{
+                primes[1],
                 primes[1 + 2 * ix++],
                 primes[1 + 2 * ix++],
                 primes[1 + 2 * ix++],
@@ -394,8 +390,7 @@ class ConsumerStatisticsTest {
                 primes[1 + 2 * ix++],
                 primes[1 + 2 * ix++],
                 primes[1 + 2 * ix++],
-                primes[1 + 2 * ix++],
-                primes[1 + 2 * ix++]
+                primes[1 + 2 * ix]
         };
         final String consumerStatisticsName = "x";
         ix = 0;
@@ -410,7 +405,7 @@ class ConsumerStatisticsTest {
                         .antallOppgaverSomMedSikkerhetIkkeErOppdatert(firstEverySecondPrimes[ix++])
                         .antallOppgaverSomMedSikkerhetErFerdigstilt(firstEverySecondPrimes[ix++])
                         .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(firstEverySecondPrimes[ix++])
-                        .numberOfExceptionsReceivedDuringRun(firstEverySecondPrimes[ix++])
+                        .numberOfExceptionsReceivedDuringRun(firstEverySecondPrimes[ix])
                         .build();
 
         final Random random = new Random(13897654);
@@ -435,7 +430,7 @@ class ConsumerStatisticsTest {
                             .antallOppgaverSomMedSikkerhetIkkeErOppdatert(changedValues.get(iix++))
                             .antallOppgaverSomMedSikkerhetErFerdigstilt(changedValues.get(iix++))
                             .antallOppgaverSomMedSikkerhetIkkeErFerdigstilt(changedValues.get(iix++))
-                            .numberOfExceptionsReceivedDuringRun(changedValues.get(iix++))
+                            .numberOfExceptionsReceivedDuringRun(changedValues.get(iix))
                             .build();
             if (fixedConsumerStatistics.equals(varyingConsumerStatistics)) {
                 assertEquals(fixedConsumerStatistics.getName(), varyingConsumerStatistics.getName());
@@ -449,18 +444,18 @@ class ConsumerStatisticsTest {
             } else {
                 assertTrue(
                         fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErFerdigstilt()
-                        ||
-                        fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert()
-                        ||
-                        fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet()
-                        ||
-                        fixedConsumerStatistics.getAntallOppgaverSomErHentetFraDatabasen() != varyingConsumerStatistics.getAntallOppgaverSomErHentetFraDatabasen()
-                        ||
-                        fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt()
-                        ||
-                        fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert()
-                        ||
-                        fixedConsumerStatistics.getNumberOfExceptionsReceivedDuringRun() != varyingConsumerStatistics.getNumberOfExceptionsReceivedDuringRun()
+                                ||
+                                fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOppdatert()
+                                ||
+                                fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet()
+                                ||
+                                fixedConsumerStatistics.getAntallOppgaverSomErHentetFraDatabasen() != varyingConsumerStatistics.getAntallOppgaverSomErHentetFraDatabasen()
+                                ||
+                                fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErFerdigstilt()
+                                ||
+                                fixedConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert() != varyingConsumerStatistics.getAntallOppgaverSomMedSikkerhetIkkeErOppdatert()
+                                ||
+                                fixedConsumerStatistics.getNumberOfExceptionsReceivedDuringRun() != varyingConsumerStatistics.getNumberOfExceptionsReceivedDuringRun()
                 );
             }
 

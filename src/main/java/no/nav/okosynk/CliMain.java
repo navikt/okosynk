@@ -1,18 +1,12 @@
 package no.nav.okosynk;
 
 import io.vavr.Function1;
-import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
+import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,9 +76,7 @@ public class CliMain {
         }
         logger.info("The following properties file will be used: {}", applicationPropertiesFileName);
 
-        final MainContext mainContext = new MainContext(shouldRun, commandLine, applicationPropertiesFileName);
-
-        return mainContext;
+        return new MainContext(shouldRun, commandLine, applicationPropertiesFileName);
     }
 
     private static void postMain() {
@@ -220,9 +212,9 @@ public class CliMain {
             } while (true);
 
             services.forEach(service -> service
-                        .getAlertMetrics()
-                        .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
-                    );
+                    .getAlertMetrics()
+                    .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
+            );
         } finally {
             postRunAllBatches();
         }
@@ -261,9 +253,8 @@ public class CliMain {
             final String applicationPropertiesFileName) {
 
         OkosynkConfiguration.createAndReplaceSingletonInstance(applicationPropertiesFileName);
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
-        return okosynkConfiguration;
+        return OkosynkConfiguration.getSingletonInstance();
     }
 
     /**
