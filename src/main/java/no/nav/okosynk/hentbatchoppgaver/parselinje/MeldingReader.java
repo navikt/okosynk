@@ -1,6 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,11 +16,11 @@ public class MeldingReader<SPESIFIKKMELDINGTYPE extends AbstractMelding>
 
     private static final Logger logger = LoggerFactory.getLogger(MeldingReader.class);
 
-    public IMeldingCreator<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingCreator() {
+    public Function<String, SPESIFIKKMELDINGTYPE> getSpesifikkMeldingCreator() {
         return spesifikkMeldingCreator;
     }
 
-    private final IMeldingCreator<SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator;
+    private final Function<String, SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator;
 
     public int getLinjeNummer() {
         return linjeNummer;
@@ -32,7 +33,7 @@ public class MeldingReader<SPESIFIKKMELDINGTYPE extends AbstractMelding>
     private int linjeNummer;
 
     public MeldingReader(
-        final IMeldingCreator<SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator
+        final Function<String, SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator
     ) {
        this.spesifikkMeldingCreator = spesifikkMeldingCreator;
     }

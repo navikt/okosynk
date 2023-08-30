@@ -14,7 +14,7 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PdlErrorResponseJ
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PostPdlHentIdenterResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
-import no.nav.okosynk.synkroniserer.consumer.security.OidcStsClient;
+import no.nav.okosynk.comm.OidcStsClient;
 import no.nav.okosynk.synkroniserer.consumer.util.GraphQLUt;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.FolkeregisterIdentNotFoundPdlException;
 import org.slf4j.Logger;

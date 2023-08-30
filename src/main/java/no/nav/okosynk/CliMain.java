@@ -1,6 +1,5 @@
 package no.nav.okosynk;
 
-import io.vavr.Function1;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.function.Function;
 
 public class CliMain {
 
@@ -47,62 +47,28 @@ public class CliMain {
 
     protected static void runMain(
             final String[] args,
-            final Function1<String, ? extends CliMain> mainClassCreator) throws ParseException {
-
-        final MainContext mainContext = preMain(args);
-        try {
-            if (mainContext.shouldRun) {
-                final CliMain cliMain =
-                        mainClassCreator.apply(mainContext.applicationPropertiesFileName);
-                cliMain.runAllBatches();
-            }
-        } finally {
-            CliMain.postMain();
-        }
-        System.exit(0);
-    }
-
-    private static MainContext preMain(final String[] args) throws ParseException {
+            final Function<String, ? extends CliMain> mainClassCreator) throws Exception {
 
         logger.info("===== ENTERING OKOSYNK =====");
         final CommandLine commandLine = CliMain.treatCommandLineArgs(args);
-        final boolean shouldRun = !CliMain.commandLineContainsHelpOptions(commandLine);
-        final String applicationPropertiesFileName;
-        if (CliMain.commandLineContainsPropertyFileName(commandLine)) {
-            applicationPropertiesFileName = commandLine
-                    .getOptionValue(CLI_APPLICATION_PROPERTIES_FILENAME_KEY);
-        } else {
-            applicationPropertiesFileName = CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE;
-        }
+        final boolean shouldRun = !commandLine.hasOption(CLI_HELP_KEY);
+
+        final String applicationPropertiesFileName =
+                commandLine.hasOption(CLI_APPLICATION_PROPERTIES_FILENAME_KEY)
+                        ? commandLine.getOptionValue(CLI_APPLICATION_PROPERTIES_FILENAME_KEY)
+                : CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE;
+
         logger.info("The following properties file will be used: {}", applicationPropertiesFileName);
 
-        return new MainContext(shouldRun, commandLine, applicationPropertiesFileName);
-    }
-
-    private static void postMain() {
-        logger.info("===== OKOSYNK ABOUT TO EXIT WITH EXIT STATUS 0 =====");
-    }
-
-    private static int getRetryWaitTimeInMilliseconds(
-            final IOkosynkConfiguration okosynkConfiguration
-    ) {
-        return okosynkConfiguration
-                .getRequiredInt(Constants.BATCH_RETRY_WAIT_TIME_IN_MS_KEY);
-    }
-
-    private static int getMaxNumberOfReadTries(
-            final IOkosynkConfiguration okosynkConfiguration
-    ) {
-        return okosynkConfiguration
-                .getRequiredInt(Constants.BATCH_MAX_NUMBER_OF_TRIES_KEY);
-    }
-
-    private static boolean commandLineContainsHelpOptions(final CommandLine commandLine) {
-        return commandLine.hasOption(CLI_HELP_KEY);
-    }
-
-    private static boolean commandLineContainsPropertyFileName(final CommandLine commandLine) {
-        return commandLine.hasOption(CLI_APPLICATION_PROPERTIES_FILENAME_KEY);
+        try (final MainContext mainContext = new MainContext(shouldRun, commandLine, applicationPropertiesFileName)){
+            if (mainContext.shouldRun) {
+                final CliMain cliMain = mainClassCreator.apply(mainContext.applicationPropertiesFileName);
+                cliMain.runAllBatches();
+            }
+        } finally {
+            logger.info("===== OKOSYNK ABOUT TO EXIT WITH EXIT STATUS 0 =====");
+        }
+        System.exit(0);
     }
 
     private static CommandLine treatCommandLineArgs(final String[] args) throws ParseException {
@@ -136,7 +102,7 @@ public class CliMain {
         final CommandLine commandLine;
         try {
             commandLine = commandLineParser.parse(options, args);
-            if (commandLineContainsHelpOptions(commandLine)) {
+            if (commandLine.hasOption(CLI_HELP_KEY)) {
                 final HelpFormatter helpFormatter = new HelpFormatter();
                 helpFormatter.printHelp(CLI_PROGRAM_NAME, options);
             }
@@ -149,14 +115,6 @@ public class CliMain {
         return commandLine;
     }
 
-    protected void preRunAllBatches() {
-        final String revision = createOkosynkConfiguration().getString("revision");
-        logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
-    }
-
-    protected void postRunAllBatches() {
-    }
-
     protected IOkosynkConfiguration createOkosynkConfiguration() {
         return okosynkConfiguration;
     }
@@ -167,57 +125,38 @@ public class CliMain {
      */
     private void runAllBatches() {
 
-        preRunAllBatches();
+        final String revision = createOkosynkConfiguration().getString("revision");
+        logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
-        try {
-            final IOkosynkConfiguration okosynkConfigurationLocal = createOkosynkConfiguration();
-            final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
+        final IOkosynkConfiguration okosynkConfigurationLocal = createOkosynkConfiguration();
+        final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
 
-            if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.OS)) {
-                logger.info("Running OS");
-                services.add(new OsService(okosynkConfigurationLocal));
-            } else {
-                logger.info("Not running OS");
-            }
-            if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.UR)) {
-                logger.info("Running UR");
-                services.add(new UrService(okosynkConfigurationLocal));
-            } else {
-                logger.info("Not running UR");
-            }
-            final int sleepTimeBetweenRunsInMs = CliMain.getRetryWaitTimeInMilliseconds(okosynkConfigurationLocal);
-            final int maxNumberOfRuns = CliMain.getMaxNumberOfReadTries(okosynkConfigurationLocal);
-            int actualNumberOfRuns = 0;
-            do {
-                logger.info("About to run the batch(es) for the {}. time ...", actualNumberOfRuns + 1);
-                services
-                        .forEach(
-                                service -> {
-                                    if (service.shouldRun()) {
-                                        runOneBatch(service);
-                                    }
-                                }
-                        );
-                actualNumberOfRuns++;
-                if (
-                        actualNumberOfRuns < maxNumberOfRuns
-                                &&
-                                // A new run may potentially succeed:
-                                services.stream().anyMatch(AbstractService::shouldRun)
-                ) {
-                    retrySleep(actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
-                } else {
-                    break;
-                }
-            } while (true);
+//TODO:bli kvitt shouldRun?
+// Constants.BATCH_TYPE.OS.equals(okosynkConfigurationLocal.getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY))
 
-            services.forEach(service -> service
-                    .getAlertMetrics()
-                    .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
-            );
-        } finally {
-            postRunAllBatches();
+        if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.OS)) {
+            logger.info("Running OS");
+            services.add(new OsService(okosynkConfigurationLocal));
         }
+        if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.UR)) {
+            logger.info("Running UR");
+            services.add(new UrService(okosynkConfigurationLocal));
+        }
+
+        final int sleepTimeBetweenRunsInMs = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_RETRY_WAIT_TIME_IN_MS_KEY);
+        final int maxNumberOfRuns = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_MAX_NUMBER_OF_TRIES_KEY);
+        int actualNumberOfRuns = 0;
+        do {
+            logger.info("About to run the batch(es) for the {}. time ...", actualNumberOfRuns + 1);
+            services.stream().filter(AbstractService::shouldRun).forEach(this::runOneBatch);
+            if (++actualNumberOfRuns < maxNumberOfRuns && services.stream().anyMatch(AbstractService::shouldRun)) {
+                retrySleep(actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
+            } else {break;}
+        } while (true);
+
+        services.forEach(service -> service.getAlertMetrics()
+                .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
+        );
     }
 
     private void retrySleep(final int actualNumberOfRuns, final int maxNumberOfRuns, final int sleepTimeBetweenRunsInMs) {

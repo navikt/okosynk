@@ -1,5 +1,6 @@
 package no.nav.okosynk;
 
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
 import no.nav.okosynk.metrics.AbstractAlertMetrics;
 import no.nav.okosynk.metrics.AlertMetricsFactory;
 import no.nav.okosynk.config.Constants;
@@ -15,6 +16,9 @@ import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.MeldingLinjeSftpReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
@@ -37,11 +41,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         this.shouldRun = true;
     }
 
-    /**
-     * Never throws. The outcome can be seen solely from the return code.
-     *
-     * @return The outcome of the run.
-     */
     public BatchStatus run() {
 
         final Batch<? extends AbstractMelding> batch;
@@ -50,11 +49,11 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
             batch = getBatch();
             batch.run();
             batchStatus = batch.getBatchStatus();
-        } catch (ConfigureOrInitializeOkosynkIoException e) {
+        } catch (ConfigureOrInitializeOkosynkIoException | URISyntaxException e) {
             batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
         } finally {
             setLastBatchStatus(batchStatus);
-            setShouldRun(batchStatus.failedButRerunningMaySucceed());
+            setShouldRun(batchStatus != null && batchStatus.failedButRerunningMaySucceed());
             setBatch(null);
         }
         return batchStatus;
@@ -68,9 +67,8 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         this.lastBatchStatus = batchStatus;
     }
 
-    public AbstractService<MELDINGSTYPE> setShouldRun(final boolean shouldRun) {
+    public void setShouldRun(final boolean shouldRun) {
         this.shouldRun = shouldRun;
-        return this;
     }
 
     public boolean shouldRun() {
@@ -87,7 +85,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     public Batch<MELDINGSTYPE> createAndConfigureBatch(
             final IOkosynkConfiguration okosynkConfiguration)
-            throws ConfigureOrInitializeOkosynkIoException {
+            throws URISyntaxException {
 
         final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
 
@@ -116,20 +114,16 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     }
 
     private Batch<MELDINGSTYPE> createBatch(final IOkosynkConfiguration okosynkConfiguration) {
-
-        final Batch<MELDINGSTYPE> batch =
-                new Batch<>(
-                        okosynkConfiguration,
-                        getBatchType(),
-                        createMeldingReader(),
-                        createMeldingMapper(getAktoerClient())
-                );
-
-        return batch;
+        return new Batch<>(
+                okosynkConfiguration,
+                getBatchType(),
+                createMeldingReader(),
+                createMeldingMapper(getAktoerClient())
+        );
     }
 
     private Batch<? extends AbstractMelding> getBatch()
-            throws ConfigureOrInitializeOkosynkIoException {
+            throws ConfigureOrInitializeOkosynkIoException, URISyntaxException {
         if (this.batch == null) {
             setBatch(createAndConfigureBatch(getOkosynkConfiguration()));
         }
@@ -153,7 +147,7 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
     }
 
     private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)
-            throws ConfigureOrInitializeOkosynkIoException {
+            throws URISyntaxException {
 
         if (this.meldingLinjeFileReader == null) {
             final IMeldingLinjeFileReader meldingLinjeFileReader =
@@ -163,22 +157,19 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return this.meldingLinjeFileReader;
     }
 
-    private IMeldingLinjeFileReader createMeldingLinjeSftpReader(
-            final IOkosynkConfiguration okosynkConfiguration)
-            throws ConfigureOrInitializeOkosynkIoException {
+    private IMeldingLinjeFileReader createMeldingLinjeSftpReader(final IOkosynkConfiguration okosynkConfiguration)
+            throws URISyntaxException {
+        URI uri = new URI(okosynkConfiguration.getFtpHostUrl(getBatchType()));
 
-        final String fullyQualifiedInputFileName = getFtpInputFilePath(okosynkConfiguration);
         logger.info("Using SFTP for " + this.getClass().getSimpleName()
-                + ", reading fullyQualifiedInputFileName: \"" + fullyQualifiedInputFileName + "\"");
-        final IMeldingLinjeFileReader meldingLinjeFileReader =
-                new MeldingLinjeSftpReader(okosynkConfiguration, getBatchType(),
-                        fullyQualifiedInputFileName);
+                + ", reading fullyQualifiedInputFileName: \"" + uri.getPath() + "\"");
 
-        return meldingLinjeFileReader;
-    }
+        FtpSettings ftpSettings = new FtpSettings(
+                uri,
+                okosynkConfiguration.getFtpUser(getBatchType()),
+                okosynkConfiguration.getFtpPassword(getBatchType()),
+                okosynkConfiguration.getFtpCharsetName(getBatchType(), "ISO8859_1"));
 
-    private String getFtpInputFilePath(final IOkosynkConfiguration okosynkConfiguration)
-            throws ConfigureOrInitializeOkosynkIoException {
-        return MeldingLinjeSftpReader.getFtpInputFilePath(okosynkConfiguration.getFtpHostUrl(getBatchType()));
+        return new MeldingLinjeSftpReader(ftpSettings, getBatchType());
     }
 }

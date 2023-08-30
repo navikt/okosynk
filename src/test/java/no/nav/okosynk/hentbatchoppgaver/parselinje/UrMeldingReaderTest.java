@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +25,7 @@ class UrMeldingReaderTest {
     private static final String INPUT_STRENG_FOR_UR_MELDING_SOM_IKKE_HAR_MAPPING_TIL_OPPGAVE =
             "00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8020ANDRUTBUR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282";
 
-    UrMeldingCreator urMeldingCreator = UrMelding::new;
+    Function<String, UrMelding> urMeldingCreator = UrMelding::new;
     MeldingReader<UrMelding> urMeldingReader;
 
     @BeforeEach

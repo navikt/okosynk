@@ -7,35 +7,36 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+import static java.util.Arrays.asList;
+
 public abstract class AbstractMelding {
-
     protected static final String FIELD_SEPARATOR = System.lineSeparator();
-
-    public  static final char   TSS_PREFIX_1               = '8';
-
-    private static final char   TSS_PREFIX_2               = '9';
-    private static final int    ORGANISASJONSNUMMER_LENGDE = 9;
-    public static final String ORGANISASJON               = "ORGANISASJON";
-    public static final String PERSON                     = "PERSON";
-    public static final String SAMHANDLER                 = "SAMHANDLER";
-
+    public static final char TSS_PREFIX_1 = '8';
+    private static final char TSS_PREFIX_2 = '9';
+    private static final int ORGANISASJONSNUMMER_LENGDE = 9;
+    public static final String ORGANISASJON = "ORGANISASJON";
+    public static final String PERSON = "PERSON";
+    public static final String SAMHANDLER = "SAMHANDLER";
     public static final String FORSTE_FELTSEPARATOR = ";;   ";
 
     public static String formatAsNorwegianDate(final LocalDate dato) {
         return DateTimeFormatter.ofPattern("dd.MM.yy").format(dato);
     }
-    public  final String    behandlendeEnhet;
-    public  final double    totaltNettoBelop;
-    public  final String    gjelderId;
-    public  final LocalDate datoForStatus;
-    public  final String    nyesteVentestatus;
-    public  final String    brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
-public static final String FELTSEPARATOR = ";   ";
+
+    public final String behandlendeEnhet;
+    public final double totaltNettoBelop;
+    public final String gjelderId;
+    public final LocalDate datoForStatus;
+    public final String nyesteVentestatus;
+    public final String brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
+    public static final String FELTSEPARATOR = ";   ";
+
     public AbstractMeldingParser getParser() {
         return parser;
     }
 
     private final AbstractMeldingParser parser;
+
     protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
 
         this.parser = parser;
@@ -53,12 +54,11 @@ public static final String FELTSEPARATOR = ";   ";
         return bd.toBigInteger().toString();
     }
 
-    public String utledGjelderIdType(){
-
-        if (gjelderTss()) {
-            return SAMHANDLER;
-        } else if (gjelderOrganisasjon()) {
+    public String utledGjelderIdType() {
+        if (gjelderOrganisasjon()) {
             return ORGANISASJON;
+        } else if (gjelderTss()) {
+            return SAMHANDLER;
         } else {
             return PERSON;
         }
@@ -66,17 +66,12 @@ public static final String FELTSEPARATOR = ";   ";
 
     @Override
     public boolean equals(final Object other) {
-
         if (this == other) {
             return true;
         }
-
-        if (!(other instanceof AbstractMelding)) {
+        if (!(other instanceof AbstractMelding otherAsAbstractMelding)) {
             return false;
         }
-
-        final AbstractMelding otherAsAbstractMelding = (AbstractMelding)other;
-
         return this.gjelderId.equals(otherAsAbstractMelding.gjelderId);
     }
 
@@ -87,32 +82,23 @@ public static final String FELTSEPARATOR = ";   ";
 
     @Override
     public String toString() {
-
-        return super.toString() + FIELD_SEPARATOR +
-           "totaltNettoBelop : " + totaltNettoBelop + FIELD_SEPARATOR +
-           "gjelderId        : " + gjelderId + FIELD_SEPARATOR +
-           "datoForStatus    : " + datoForStatus + FIELD_SEPARATOR +
-           "nyesteVentestatus: " + nyesteVentestatus + FIELD_SEPARATOR +
-           "brukerId         : " + brukerId + FIELD_SEPARATOR +
-           "behandlendeEnhet : " + behandlendeEnhet;
+        return String.join(FIELD_SEPARATOR,
+                super.toString(),
+                "totaltNettoBelop : " + totaltNettoBelop,
+                "gjelderId        : " + gjelderId,
+                "datoForStatus    : " + datoForStatus,
+                "nyesteVentestatus: " + nyesteVentestatus,
+                "brukerId         : " + brukerId,
+                "behandlendeEnhet : " + behandlendeEnhet
+        );
     }
 
     private boolean gjelderTss() {
-        return
-            gjelderIkkeOrganisasjon()
-            &&
-            (
-                this.gjelderId.startsWith(String.valueOf(TSS_PREFIX_1))
-                ||
-                this.gjelderId.startsWith(String.valueOf(TSS_PREFIX_2))
-            );
+        return asList(TSS_PREFIX_1, TSS_PREFIX_2).contains(this.gjelderId.trim().charAt(0));
     }
 
     private boolean gjelderOrganisasjon() {
         return gjelderId.length() == ORGANISASJONSNUMMER_LENGDE;
     }
 
-    private boolean gjelderIkkeOrganisasjon() {
-        return !gjelderOrganisasjon();
-    }
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +25,7 @@ class OsMeldingReaderTest {
     private static final String INPUT_STRENG_FOR_OS_MELDING_UTEN_MAPPING_REGEL =
         "06025800174029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         HELSEREF06025800174            ";
 
-    OsMeldingCreator osMeldingCreator = OsMelding::new;
+    Function<String, OsMelding> osMeldingCreator = OsMelding::new;
     MeldingReader<OsMelding> osMeldingReader;
 
     @BeforeEach

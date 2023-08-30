@@ -12,50 +12,48 @@ public class Oppgave {
     private static final String LOG_FIELD_SEPARATOR = ", ";
     public final LocalDate aktivFra;
     public final LocalDate aktivTil;
-    public final int antallMeldinger;
     public final LocalDateTime sistEndret;
+    public final String aktoerId;
     public final String ansvarligEnhetId;
     public final String ansvarligSaksbehandlerIdent;
     public final String behandlingstema;
     public final String behandlingstype;
     public final String beskrivelse;
+    public final String bnr;
     public final String fagomradeKode;
-    public final boolean lest;
+    public final String folkeregisterIdent;
     public final String mappeId;
     public final String oppgaveId;
     public final String oppgavetypeKode;
+    public final String orgnr;
     public final String prioritetKode;
+    public final String samhandlernr;
+    public final boolean lest;
+    public final int antallMeldinger;
     public final int versjon;
 
-    public final String aktoerId;
-    public final String folkeregisterIdent;
-    public final String bnr;
-    public final String orgnr;
-    public final String samhandlernr;
-
     private Oppgave(OppgaveBuilder oppgaveBuilder) {
-        this.oppgaveId = oppgaveBuilder.oppgaveId;
-        this.oppgavetypeKode = oppgaveBuilder.oppgavetypeKode;
-        this.fagomradeKode = oppgaveBuilder.fagomradeKode;
-        this.behandlingstema = oppgaveBuilder.behandlingstema;
-        this.behandlingstype = oppgaveBuilder.behandlingstype;
-        this.prioritetKode = oppgaveBuilder.prioritetKode;
-        this.beskrivelse = oppgaveBuilder.beskrivelse;
         this.aktivFra = oppgaveBuilder.aktivFra;
         this.aktivTil = oppgaveBuilder.aktivTil;
-        this.ansvarligEnhetId = oppgaveBuilder.ansvarligEnhetId;
-        this.lest = oppgaveBuilder.lest;
-        this.versjon = oppgaveBuilder.versjon;
-        this.sistEndret = oppgaveBuilder.sistEndret;
-        this.antallMeldinger = oppgaveBuilder.antallMeldinger;
-        this.mappeId = oppgaveBuilder.mappeId;
-        this.ansvarligSaksbehandlerIdent = oppgaveBuilder.saksbehandlerIdent;
-
         this.aktoerId = oppgaveBuilder.aktoerId;
-        this.folkeregisterIdent = oppgaveBuilder.folkeregisterIdent;
-        this.orgnr = oppgaveBuilder.orgnr;
-        this.samhandlernr = oppgaveBuilder.samhandlernr;
+        this.ansvarligEnhetId = oppgaveBuilder.ansvarligEnhetId;
+        this.ansvarligSaksbehandlerIdent = oppgaveBuilder.saksbehandlerIdent;
+        this.antallMeldinger = oppgaveBuilder.antallMeldinger;
+        this.behandlingstema = oppgaveBuilder.behandlingstema;
+        this.behandlingstype = oppgaveBuilder.behandlingstype;
+        this.beskrivelse = oppgaveBuilder.beskrivelse;
         this.bnr = oppgaveBuilder.bnr;
+        this.fagomradeKode = oppgaveBuilder.fagomradeKode;
+        this.folkeregisterIdent = oppgaveBuilder.folkeregisterIdent;
+        this.lest = oppgaveBuilder.lest;
+        this.mappeId = oppgaveBuilder.mappeId;
+        this.oppgaveId = oppgaveBuilder.oppgaveId;
+        this.oppgavetypeKode = oppgaveBuilder.oppgavetypeKode;
+        this.orgnr = oppgaveBuilder.orgnr;
+        this.prioritetKode = oppgaveBuilder.prioritetKode;
+        this.samhandlernr = oppgaveBuilder.samhandlernr;
+        this.sistEndret = oppgaveBuilder.sistEndret;
+        this.versjon = oppgaveBuilder.versjon;
     }
 
     boolean bareEnFinnes(String... strings) {
@@ -97,29 +95,27 @@ public class Oppgave {
 
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append("oppgaveId                  : ").append(this.oppgaveId).append(LOG_FIELD_SEPARATOR)
-                .append("aktoerId                   : ").append(this.aktoerId).append(LOG_FIELD_SEPARATOR)
-                .append("folkeregisterIdent         : ").append(this.folkeregisterIdent).append(LOG_FIELD_SEPARATOR)
-                .append("samhandlernr               : ").append(this.samhandlernr).append(LOG_FIELD_SEPARATOR)
-                .append("beskrivelse                : ").append(this.beskrivelse == null ? "<null>" : beskrivelse.substring(0, Math.min(beskrivelse.length(), 30))).append("...").append(LOG_FIELD_SEPARATOR)
-                .append("orgnr                      : ").append(this.orgnr).append(LOG_FIELD_SEPARATOR)
-                .append("bnr                        : ").append(this.bnr).append(LOG_FIELD_SEPARATOR)
-                .append("oppgavetypeKode            : ").append(this.oppgavetypeKode).append(LOG_FIELD_SEPARATOR)
-                .append("fagomradeKode              : ").append(this.fagomradeKode).append(LOG_FIELD_SEPARATOR)
-                .append("behandlingstema            : ").append(this.behandlingstema).append(LOG_FIELD_SEPARATOR)
-                .append("behandlingstype            : ").append(this.behandlingstype).append(LOG_FIELD_SEPARATOR)
-                .append("prioritetKode              : ").append(this.prioritetKode).append(LOG_FIELD_SEPARATOR)
-                .append("aktivFra                   : ").append(this.aktivFra).append(LOG_FIELD_SEPARATOR)
-                .append("aktivTil                   : ").append(this.aktivTil).append(LOG_FIELD_SEPARATOR)
-                .append("ansvarligEnhetId           : ").append(this.ansvarligEnhetId).append(LOG_FIELD_SEPARATOR)
-                .append("lest                       : ").append(this.lest).append(LOG_FIELD_SEPARATOR)
-                .append("versjon                    : ").append(this.versjon).append(LOG_FIELD_SEPARATOR)
-                .append("sistEndret                 : ").append(this.sistEndret).append(LOG_FIELD_SEPARATOR)
-                .append("antallMeldinger            : ").append(this.antallMeldinger).append(LOG_FIELD_SEPARATOR)
-                .append("mappeId                    : ").append(this.mappeId).append(LOG_FIELD_SEPARATOR)
-                .append("ansvarligSaksbehandlerIdent: ").append(this.ansvarligSaksbehandlerIdent)
-                .toString();
+        return "oppgaveId                  : " + this.oppgaveId + LOG_FIELD_SEPARATOR +
+                "aktoerId                   : " + this.aktoerId + LOG_FIELD_SEPARATOR +
+                "folkeregisterIdent         : " + this.folkeregisterIdent + LOG_FIELD_SEPARATOR +
+                "samhandlernr               : " + this.samhandlernr + LOG_FIELD_SEPARATOR +
+                "beskrivelse                : " + (this.beskrivelse == null ? "<null>" : beskrivelse.substring(0, Math.min(beskrivelse.length(), 30))) + "..." + LOG_FIELD_SEPARATOR +
+                "orgnr                      : " + this.orgnr + LOG_FIELD_SEPARATOR +
+                "bnr                        : " + this.bnr + LOG_FIELD_SEPARATOR +
+                "oppgavetypeKode            : " + this.oppgavetypeKode + LOG_FIELD_SEPARATOR +
+                "fagomradeKode              : " + this.fagomradeKode + LOG_FIELD_SEPARATOR +
+                "behandlingstema            : " + this.behandlingstema + LOG_FIELD_SEPARATOR +
+                "behandlingstype            : " + this.behandlingstype + LOG_FIELD_SEPARATOR +
+                "prioritetKode              : " + this.prioritetKode + LOG_FIELD_SEPARATOR +
+                "aktivFra                   : " + this.aktivFra + LOG_FIELD_SEPARATOR +
+                "aktivTil                   : " + this.aktivTil + LOG_FIELD_SEPARATOR +
+                "ansvarligEnhetId           : " + this.ansvarligEnhetId + LOG_FIELD_SEPARATOR +
+                "lest                       : " + this.lest + LOG_FIELD_SEPARATOR +
+                "versjon                    : " + this.versjon + LOG_FIELD_SEPARATOR +
+                "sistEndret                 : " + this.sistEndret + LOG_FIELD_SEPARATOR +
+                "antallMeldinger            : " + this.antallMeldinger + LOG_FIELD_SEPARATOR +
+                "mappeId                    : " + this.mappeId + LOG_FIELD_SEPARATOR +
+                "ansvarligSaksbehandlerIdent: " + this.ansvarligSaksbehandlerIdent;
     }
 
     public static class OppgaveBuilder {

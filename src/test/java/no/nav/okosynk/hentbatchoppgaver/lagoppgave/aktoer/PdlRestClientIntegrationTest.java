@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 import no.nav.okosynk.config.AbstractOkosynkConfiguration;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.synkroniserer.consumer.security.OidcStsClientTest;
+import no.nav.okosynk.comm.OidcStsClientTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

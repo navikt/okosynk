@@ -12,7 +12,7 @@ import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveResponseJson;
-import no.nav.okosynk.synkroniserer.consumer.security.AzureAdAuthenticationClient;
+import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;

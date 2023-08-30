@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 class SftpResourceContainer {
 
   private static final Logger logger = LoggerFactory.getLogger(SftpResourceContainer.class);
-
   private final JSch javaSecureChannel;
   private Session sftpSession;
   private ChannelSftp sftpChannel;
@@ -49,9 +48,6 @@ class SftpResourceContainer {
     this.inputStream = inputStream;
   }
 
-  /**
-   * Never throws.
-   */
   void free() {
 
     if (getInputStream() != null) {

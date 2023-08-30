@@ -207,12 +207,6 @@
                 <version>3.0.12</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.vavr</groupId>
-                <artifactId>vavr</artifactId>
-                <version>1.0.0-alpha-4</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -322,17 +316,6 @@
             <version>${sshd.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.javatuples</groupId>
-            <artifactId>javatuples</artifactId>
-            <version>1.2</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.11.0</version>
@@ -424,10 +407,6 @@
             <artifactId>token-client-core</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>io.vavr</groupId>
-            <artifactId>vavr</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

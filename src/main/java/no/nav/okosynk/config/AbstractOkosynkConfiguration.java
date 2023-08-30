@@ -38,12 +38,10 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
 
     @Override
     public Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType) {
-        final Collection<String> opprettetAvValuesForFinn =
-                new ArrayList<String>() {{
-                    add(getBatchBruker(batchType));
-                    add(getNaisAppName());
-                }};
-        return Collections.unmodifiableCollection(opprettetAvValuesForFinn);
+        return Collections.unmodifiableCollection(new ArrayList<>() {{
+            add(getBatchBruker(batchType));
+            add(getNaisAppName());
+        }});
     }
 
     @Override
@@ -96,8 +94,9 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
         final String azureAppWellKnownUrl = getAzureAppWellKnownUrl();
         try {
             final URL azureAppTokenUrl = new URL(azureAppWellKnownUrl);
-            final String azureAppTokenUrlString = azureAppTokenUrl.getProtocol() + "://" + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/" + getAzureAppTenantId() + "/oauth2/v2.0/token";
-            return azureAppTokenUrlString;
+            return azureAppTokenUrl.getProtocol() + "://"
+                    + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/"
+                    + getAzureAppTenantId() + "/oauth2/v2.0/token";
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Exception received when trying to calculate the azureAppTokenUrl");
         }

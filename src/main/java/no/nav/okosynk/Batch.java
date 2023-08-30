@@ -10,7 +10,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
-import no.nav.okosynk.synkroniserer.consumer.security.AzureAdAuthenticationClient;
+import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
@@ -79,8 +79,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
 
     public void run() {
 
-        final AbstractBatchMetrics batchMetrics =
-                BatchMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
+        final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
         BatchStatus batchStatusLocal = BatchStatus.STARTED;
         setBatchStatus(batchStatusLocal);
         logger.info("Batch {} har startet.", getBatchName());

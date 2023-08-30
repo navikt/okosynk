@@ -1,4 +1,4 @@
-package no.nav.okosynk.synkroniserer.consumer.security;
+package no.nav.okosynk.comm;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;

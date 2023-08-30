@@ -2,7 +2,7 @@ package no.nav.okosynk;
 
 import org.apache.commons.cli.CommandLine;
 
-public class MainContext {
+public class MainContext implements AutoCloseable{
     public final boolean shouldRun;
     public final CommandLine commandLine;
     final String applicationPropertiesFileName;
@@ -12,4 +12,7 @@ public class MainContext {
         this.commandLine = commandLine;
         this.applicationPropertiesFileName = applicationPropertiesFileName;
     }
+
+    @Override
+    public void close() {}
 }

@@ -1,11 +1,10 @@
 package no.nav.okosynk.config;
 
-import io.vavr.Tuple2;
 import no.nav.okosynk.config.homemade.*;
 import org.apache.commons.lang3.Validate;
-import org.javatuples.Quintet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import no.nav.okosynk.config.homemade.Quintet;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -175,11 +174,11 @@ public class OkosynkConfiguration
 
         propertyInfos.forEach(
                 (propertyInfo) -> {
-                    final String okosynkKey = propertyInfo.getValue0();
-                    final String externalKey = propertyInfo.getValue1();
-                    final boolean mandatory = propertyInfo.getValue2();
-                    final String reportValuePlaceHolder = propertyInfo.getValue3();
-                    final String defaultValue = propertyInfo.getValue4();
+                    final String okosynkKey = propertyInfo._0();
+                    final String externalKey = propertyInfo._1();
+                    final boolean mandatory = propertyInfo._2();
+                    final String reportValuePlaceHolder = propertyInfo._3();
+                    final String defaultValue = propertyInfo._4();
                     final String tempValue;
                     if (mandatory) {
                         tempValue = this.getRequiredString(okosynkKey);
@@ -224,17 +223,18 @@ public class OkosynkConfiguration
         return originalKey.toUpperCase().replace('.', '_');
     }
 
+    private record Tuple2(String _1, String _2){}
     private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
         final Configuration baseConfig = new BaseConfiguration();
         Stream.of(
-                new Tuple2<>("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
-                new Tuple2<>("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
-                new Tuple2<>("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
-                new Tuple2<>("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
-                new Tuple2<>("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
-                new Tuple2<>("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
-                new Tuple2<>("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
-                new Tuple2<>("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
+                new Tuple2("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
+                new Tuple2("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
+                new Tuple2("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
+                new Tuple2("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
+                new Tuple2("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new Tuple2("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
+                new Tuple2("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
+                new Tuple2("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
         ).forEach(pair -> addVaultProperty(baseConfig, pair._1(), pair._2()));
         compositeConfiguration.addConfiguration(baseConfig);
     }
