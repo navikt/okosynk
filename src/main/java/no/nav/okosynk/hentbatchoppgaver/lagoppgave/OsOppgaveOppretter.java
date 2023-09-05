@@ -6,11 +6,13 @@ import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
+
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     private static final String OPPGAVETYPE_KODE = "OKO_OS";
     private static final int ANTALL_DAGER_FRIST = 7;
-    private static final Comparator<OsMelding> meldingComparator = OsMelding.BEREGNINGS_DATO_COMPARATOR;
 
     OsOppgaveOppretter(
             final OsMappingRegelRepository mappingRegelRepository,
@@ -21,7 +23,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     @Override
     protected Comparator<OsMelding> getMeldingComparator() {
-        return meldingComparator;
+        return comparing(osMelding -> osMelding.beregningsDato, reverseOrder());
     }
 
     @Override

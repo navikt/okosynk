@@ -248,18 +248,18 @@ public class Oppgave {
         }
 
         public OppgaveBuilder withGjelderIdResultat(final AbstractOppgaveOppretter.GjelderIdResultat gjelderIdResultat) {
-            switch (gjelderIdResultat.getGjelderIdFelt()) {
+            switch (gjelderIdResultat.gjelderIdFelt()) {
                 case BNR:
-                    this.bnr = gjelderIdResultat.getGjelderId();
+                    this.bnr = gjelderIdResultat.gjelderId();
                     break;
                 case AKTORID:
-                    this.aktoerId = gjelderIdResultat.getGjelderId();
+                    this.aktoerId = gjelderIdResultat.gjelderId();
                     break;
                 case SAMHANDLER:
-                    this.samhandlernr = gjelderIdResultat.getGjelderId();
+                    this.samhandlernr = gjelderIdResultat.gjelderId();
                     break;
                 case ORGANISASJON:
-                    this.orgnr = gjelderIdResultat.getGjelderId();
+                    this.orgnr = gjelderIdResultat.gjelderId();
                     break;
                 case FEIL:
                 case INGEN_GJELDERID:

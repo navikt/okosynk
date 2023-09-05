@@ -4,16 +4,9 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.Objects;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
-
 public class UrMelding extends AbstractMelding {
-
-    public static final Comparator<UrMelding> DATO_POSTERT_COMPARATOR =
-        comparing(urMelding -> urMelding.datoPostert, reverseOrder());
 
     public final String oppdragsKode;
     public final String gjelderIdType;
@@ -54,11 +47,9 @@ public class UrMelding extends AbstractMelding {
             return false;
         }
 
-        if (!(other instanceof UrMelding)) {
+        if (!(other instanceof UrMelding otherAsUrMelding)) {
             return false;
         }
-
-        final UrMelding otherAsUrMelding = (UrMelding)other;
 
         return
             this.gjelderIdType.equals(otherAsUrMelding.gjelderIdType)

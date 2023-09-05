@@ -3,17 +3,11 @@ package no.nav.okosynk.hentbatchoppgaver.model;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.Objects;
 
-import static java.util.Comparator.comparing;
-import static java.util.Comparator.reverseOrder;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class OsMelding extends AbstractMelding {
-
-    public static final Comparator<OsMelding> BEREGNINGS_DATO_COMPARATOR =
-        comparing(osMelding -> osMelding.beregningsDato, reverseOrder());
 
     static final String ORGANISASJON_PREFIKS = "00";
     private static final String FLAGG_FEILKONTO_DEFAULT = " ";
@@ -60,12 +54,11 @@ public class OsMelding extends AbstractMelding {
             return false;
         }
 
-        if (!(other instanceof OsMelding)) {
+        if (!(other instanceof OsMelding otherAsOsMelding)) {
             return false;
         }
 
         final AbstractMelding otherAsAbstractMelding = (AbstractMelding)other;
-        final OsMelding       otherAsOsMelding       = (OsMelding)other;
 
         return
             super.behandlendeEnhet.equals(otherAsAbstractMelding.behandlendeEnhet)

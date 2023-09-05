@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static no.nav.okosynk.hentbatchoppgaver.lagoppgave.AbstractOppgaveOppretter.GjelderIdFelt.FEIL;
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -79,22 +78,7 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
         INGEN_GJELDERID
     }
 
-    public static class GjelderIdResultat {
-        private final GjelderIdFelt gjelderIdFelt;
-        private final String gjelderId;
-
-        public GjelderIdResultat(GjelderIdFelt gjelderIdFelt, String gjelderId) {
-            this.gjelderIdFelt = gjelderIdFelt;
-            this.gjelderId = gjelderId;
-        }
-
-        public GjelderIdFelt getGjelderIdFelt() {
-            return gjelderIdFelt;
-        }
-
-        public String getGjelderId() {
-            return gjelderId;
-        }
+    public record GjelderIdResultat(GjelderIdFelt gjelderIdFelt, String gjelderId) {
     }
 
     private GjelderIdResultat bestemFeltOgGjelderId(String gjelderId, String gjelderIdType) {
@@ -123,22 +107,22 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
                                 "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
                                 aktoerRespons.getFeilmelding());
                         secureLog.warn("Kunne ikke hente aktørid for: {}", gjelderId);
-                        return new GjelderIdResultat(FEIL, null);
+                        return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
                     } else {
                         return new GjelderIdResultat(GjelderIdFelt.AKTORID, aktoerRespons.getAktoerId());
                     }
                 } catch (Exception e) {
                     log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
-                    return new GjelderIdResultat(FEIL, null);
+                    return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
                 }
             }
         }
-        return new GjelderIdResultat(FEIL, null);
+        return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
     }
 
     public String lagSamletBeskrivelse(final List<T> meldinger) {
         return meldinger.stream()
-                .collect(Collectors.groupingBy(m -> m.nyesteVentestatus + "" + m.hashCode()))
+                .collect(Collectors.groupingBy(m -> m.nyesteVentestatus + m.hashCode()))
                 .values().stream()
                 .map(l -> l.stream().sorted(this.getMeldingComparator()).collect(Collectors.toList()))
                 .map(this::summerOgKonsolider)

@@ -6,12 +6,13 @@ import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import java.util.Comparator;
 import java.util.List;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
+
 public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     private static final String OPPGAVETYPE_KODE = "OKO_UR";
     private static final int ANTALL_DAGER_FRIST = 3;
-
-    private static final Comparator<UrMelding> MELDINGCOMPARATOR = UrMelding.DATO_POSTERT_COMPARATOR;
 
     UrOppgaveOppretter(
             final UrMappingRegelRepository mappingRegelRepository,
@@ -22,7 +23,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     @Override
     protected Comparator<UrMelding> getMeldingComparator() {
-        return MELDINGCOMPARATOR;
+        return comparing(urMelding -> urMelding.datoPostert, reverseOrder());
     }
 
     @Override
