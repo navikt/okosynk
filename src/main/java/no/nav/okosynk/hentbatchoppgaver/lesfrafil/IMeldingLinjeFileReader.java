@@ -1,20 +1,24 @@
 package no.nav.okosynk.hentbatchoppgaver.lesfrafil;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.AuthenticationOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.IoOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.NotFoundOkosynkIoException;
 
 import java.util.List;
 
 public interface IMeldingLinjeFileReader {
-    enum Status {UNSET, ERROR, OK}
 
     List<String> read()
-        throws ConfigureOrInitializeOkosynkIoException,
-            IoOkosynkIoException, NotFoundOkosynkIoException, AuthenticationOkosynkIoException, EncodingOkosynkIoException;
+            throws ConfigureOrInitializeOkosynkIoException,
+            IoOkosynkIoException,
+            NotFoundOkosynkIoException,
+            AuthenticationOkosynkIoException;
 
     boolean removeInputData();
 
-    Status getStatus();
+    FileReaderStatus getStatus();
 
     Constants.BATCH_TYPE getBatchType();
 }

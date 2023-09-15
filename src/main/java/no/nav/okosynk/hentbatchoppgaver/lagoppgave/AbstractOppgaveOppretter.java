@@ -1,26 +1,24 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.model.GjelderIdType;
 import no.nav.okosynk.model.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.FELTSEPARATOR;
+import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.FORSTE_FELTSEPARATOR;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implements Function<List<T>, Optional<Oppgave>> {
+public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> {
     private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
 
     private final AbstractMappingRegelRepository<T> mappingRegelRepository;
@@ -40,8 +38,7 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
         return System.getProperty("line.separator") + System.getProperty("line.separator");
     }
 
-    @Override
-    public Optional<Oppgave> apply(final List<T> meldinger) {
+    public Optional<Oppgave> opprettOppgave(final List<T> meldinger) {
         meldinger.sort(getMeldingComparator());
         if (meldinger.isEmpty()) return Optional.empty();
 
@@ -49,8 +46,36 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
         MappingRegel mappingregel = this.mappingRegelRepository.finnRegel(melding).orElse(null);
         if (Objects.isNull(mappingregel)) return Optional.empty();
 
-        return Optional.of(new Oppgave.OppgaveBuilder()
-                .withGjelderIdResultat(this.bestemFeltOgGjelderId(melding.gjelderId, melding.utledGjelderIdType()))
+        Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder();
+
+        switch (GjelderIdType.fra(melding.gjelderId)) {
+            case BNR:
+                oppgaveBuilder.withBnr(melding.gjelderId);
+                break;
+            case SAMHANDLER:
+                oppgaveBuilder.withSamhandlernr(melding.gjelderId);
+                break;
+            case ORGANISASJON:
+                oppgaveBuilder.withOrgnr(melding.gjelderId);
+                break;
+            case AKTORID:
+                try {
+                    final AktoerRespons aktoerRespons = this.aktoerClient.hentGjeldendeAktoerId(melding.gjelderId);
+                    if (isNotBlank(aktoerRespons.getFeilmelding())) {
+                        log.warn(
+                                "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
+                                aktoerRespons.getFeilmelding());
+                        secureLog.warn("Kunne ikke hente aktørid for: {}", melding.gjelderId);
+                    } else {
+                        oppgaveBuilder.withAktoerId(aktoerRespons.getAktoerId());
+                    }
+                } catch (Exception e) {
+                    log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
+                }
+                break;
+        }
+
+        return Optional.of(oppgaveBuilder
                 .withOppgavetypeKode(oppgaveTypeKode())
                 .withFagomradeKode("OKO")
                 .withBehandlingstema(
@@ -69,64 +94,12 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
                 .build());
     }
 
-    public enum GjelderIdFelt {
-        BNR,
-        AKTORID,
-        SAMHANDLER,
-        ORGANISASJON,
-        FEIL,
-        INGEN_GJELDERID
-    }
-
-    public record GjelderIdResultat(GjelderIdFelt gjelderIdFelt, String gjelderId) {
-    }
-
-    private GjelderIdResultat bestemFeltOgGjelderId(String gjelderId, String gjelderIdType) {
-
-        if (isBlank(gjelderId)) {
-            return new GjelderIdResultat(GjelderIdFelt.INGEN_GJELDERID, null);
-        }
-
-        if (ORGANISASJON.equals(gjelderIdType)) {
-            return new GjelderIdResultat(GjelderIdFelt.ORGANISASJON, gjelderId);
-        }
-
-        if (SAMHANDLER.equals(gjelderIdType)) {
-            return new GjelderIdResultat(GjelderIdFelt.SAMHANDLER, gjelderId);
-        }
-
-        if (Objects.equals(gjelderIdType, PERSON)) {
-            if (isBnr(gjelderId)) {
-                return new GjelderIdResultat(GjelderIdFelt.BNR, gjelderId);
-            } else {
-                try {
-                    final AktoerRespons aktoerRespons =
-                            this.aktoerClient.hentGjeldendeAktoerId(gjelderId);
-                    if (isNotBlank(aktoerRespons.getFeilmelding())) {
-                        log.warn(
-                                "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
-                                aktoerRespons.getFeilmelding());
-                        secureLog.warn("Kunne ikke hente aktørid for: {}", gjelderId);
-                        return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
-                    } else {
-                        return new GjelderIdResultat(GjelderIdFelt.AKTORID, aktoerRespons.getAktoerId());
-                    }
-                } catch (Exception e) {
-                    log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
-                    return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
-                }
-            }
-        }
-        return new GjelderIdResultat(GjelderIdFelt.FEIL, null);
-    }
-
     public String lagSamletBeskrivelse(final List<T> meldinger) {
         return meldinger.stream()
-                .collect(Collectors.groupingBy(m -> m.nyesteVentestatus + m.hashCode()))
+                .collect(groupingBy(m -> m.nyesteVentestatus + m.hashCode(), LinkedHashMap::new, Collectors.toList()))
                 .values().stream()
-                .map(l -> l.stream().sorted(this.getMeldingComparator()).collect(Collectors.toList()))
                 .map(this::summerOgKonsolider)
-                .collect(Collectors.joining(getRecordSeparator()))
+                .collect(joining(getRecordSeparator()))
                 .replaceFirst(FELTSEPARATOR, FORSTE_FELTSEPARATOR);
     }
 
@@ -136,10 +109,6 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> implem
 
     protected abstract int antallDagerFrist();
 
-
     protected abstract Comparator<T> getMeldingComparator();
 
-    private boolean isBnr(String aktorNr) {
-        return AktoerUt.isBnr(aktorNr);
-    }
 }

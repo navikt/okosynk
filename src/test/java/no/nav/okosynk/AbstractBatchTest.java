@@ -1,11 +1,11 @@
 package no.nav.okosynk;
 
+import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader.Status;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
@@ -21,11 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.anyCollection;
@@ -40,19 +40,15 @@ public abstract class AbstractBatchTest {
 
     private Batch<? extends AbstractMelding> batch;
 
+    @Getter
     private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-
-    public IOkosynkConfiguration getOkosynkConfiguration() {
-        return this.okosynkConfiguration;
-    }
 
     @Test
     void when_batch_is_successfully_run_with_no_input_file_then_the_batch_status_should_be_set_to_warning_for_not_found_retries_exceeded()
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException,
-            EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -72,12 +68,11 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
-        final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
-                mock(IMeldingLinjeFileReader.class);
+        final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader = mock(IMeldingLinjeFileReader.class);
         doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new IoOkosynkIoException(null, null)).when(mockedUspesifikkMeldingLinjeReader).read();
 
@@ -92,7 +87,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -112,7 +107,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -120,7 +115,7 @@ public abstract class AbstractBatchTest {
                 mock(IMeldingLinjeFileReader.class);
         doReturn(emptyList()).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
-        doReturn(IMeldingLinjeFileReader.Status.OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+        doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
         doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final OppgaveSynkroniserer mockedOppgaveSynkroniserer = mock(OppgaveSynkroniserer.class);
@@ -142,32 +137,11 @@ public abstract class AbstractBatchTest {
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
         doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
-        doReturn(IMeldingLinjeFileReader.Status.OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+        doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
 
         Assertions.assertEquals(BatchStatus.READY, batch.getBatchStatus());
-    }
-
-    @Test
-    void when_batch_set_with_anything_but_ok_initialized_uspesifikkMeldingLinjeReader_then_then_the_batch_status_should_be_set_to_general_error() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
-                mock(IMeldingLinjeFileReader.class);
-
-        Arrays
-                .stream(Status.values())
-                .filter((final IMeldingLinjeFileReader.Status status) -> !IMeldingLinjeFileReader.Status.OK.equals(status))
-                .forEach(
-                        (final IMeldingLinjeFileReader.Status status) -> {
-                            doReturn(status).when(mockedUspesifikkMeldingLinjeReader).getStatus();
-                            doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
-                            this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
-                            Assertions.assertEquals(BatchStatus.ENDED_WITH_ERROR_GENERAL, batch.getBatchStatus());
-                        }
-                );
     }
 
     static Stream<Arguments> statusesForExceptions() {
@@ -176,7 +150,6 @@ public abstract class AbstractBatchTest {
                 arguments(Named.of("not found", NotFoundOkosynkIoException.class), BatchStatus.ENDED_WITH_WARNING_INPUT_DATA_NOT_FOUND),
                 arguments(Named.of("configure or initialize", ConfigureOrInitializeOkosynkIoException.class), BatchStatus.ENDED_WITH_ERROR_GENERAL),
                 arguments(Named.of("authenticate", AuthenticationOkosynkIoException.class), BatchStatus.ENDED_WITH_ERROR_CONFIGURATION),
-                arguments(Named.of("encoding", EncodingOkosynkIoException.class), BatchStatus.ENDED_WITH_ERROR_CONFIGURATION),
                 arguments(Named.of("nullpointer", NullPointerException.class), BatchStatus.ENDED_WITH_ERROR_CONFIGURATION),
                 arguments(Named.of("runtime", RuntimeException.class), BatchStatus.ENDED_WITH_ERROR_GENERAL)
         );
@@ -185,7 +158,7 @@ public abstract class AbstractBatchTest {
     @ParameterizedTest
     @MethodSource("statusesForExceptions")
     void when_reading_input_data_fails_with_an_exception_then_the_batch_status_should_be_set_correspondingly(Class<? extends Exception> clazz, BatchStatus batchStatus)
-            throws IoOkosynkIoException, AuthenticationOkosynkIoException, ConfigureOrInitializeOkosynkIoException, EncodingOkosynkIoException, NotFoundOkosynkIoException {
+            throws IoOkosynkIoException, AuthenticationOkosynkIoException, ConfigureOrInitializeOkosynkIoException, NotFoundOkosynkIoException {
         enteringTestHeaderLogger.debug(null);
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader = mock(IMeldingLinjeFileReader.class);
@@ -202,7 +175,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -219,9 +192,9 @@ public abstract class AbstractBatchTest {
         }
 
         doReturn(inputDataLines).when(mockedUspesifikkMeldingLinjeReader).read();
-        doReturn(IMeldingLinjeFileReader.Status.OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+        doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
 
-        this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
+        batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
         assertDoesNotThrow(() -> batch.run());
         verify(mockedUspesifikkMeldingLinjeReader).read();
         assertEquals(BatchStatus.ENDED_WITH_ERROR_TOO_MANY_INPUT_DATA_LINES, batch.getBatchStatus());
@@ -232,7 +205,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -255,7 +228,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException, EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -287,8 +260,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException,
-            EncodingOkosynkIoException {
+            NotFoundOkosynkIoException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -312,22 +284,6 @@ public abstract class AbstractBatchTest {
         assertDoesNotThrow(() -> batch.run());
         verify(mockedUspesifikkMeldingLinjeReader).read();
         assertEquals(BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN, batch.getBatchStatus());
-    }
-
-    @Test
-    void when_setting_the_melding_linje_reader_to_null_then_a_npe_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        assertThrows(NullPointerException.class, () -> this.batch.setUspesifikkMeldingLinjeReader(null));
-    }
-
-    @Test
-    void when_setting_the_synkroniserer_to_null_then_a_npe_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        assertThrows(NullPointerException.class, () -> this.batch.setOppgaveSynkroniserer(null));
     }
 
     protected void setBatch(final Batch<? extends AbstractMelding> batch) {

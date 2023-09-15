@@ -1,6 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
+import no.nav.okosynk.model.GjelderIdType;
 
 public class UrMeldingFunksjonelleAggregeringsKriterier {
 
@@ -9,12 +10,10 @@ public class UrMeldingFunksjonelleAggregeringsKriterier {
     public final String ansvarligEnhetId;
     public final String oppdragsKode;
 
-    private final UrMappingRegelRepository urMappingRegelRepository;
-
     public UrMeldingFunksjonelleAggregeringsKriterier(UrMelding urMelding) {
-        this.urMappingRegelRepository = new UrMappingRegelRepository();
+        UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
         this.gjelderId = urMelding.gjelderId;
-        this.gjelderIdType = urMelding.utledGjelderIdType();
+        this.gjelderIdType = GjelderIdType.fra(urMelding.gjelderId).toString();
         this.ansvarligEnhetId = urMappingRegelRepository.finnRegel(urMelding).map(t -> t.ansvarligEnhetId).orElse(null);
         this.oppdragsKode = urMelding.oppdragsKode;
     }

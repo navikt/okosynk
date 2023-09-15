@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +29,7 @@ class UrMeldingReaderTest {
 
     @BeforeEach
     void setUp() {
-        urMeldingReader = new MeldingReader<UrMelding>(urMeldingCreator);
+        urMeldingReader = new MeldingReader<>(urMeldingCreator);
     }
 
     @Test
@@ -42,7 +41,7 @@ class UrMeldingReaderTest {
                 urMeldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(lagUrMeldinger());
 
         assertNotNull(urMeldinger);
-        assertEquals(lagUrMeldinger().count(), urMeldinger.size());
+        assertEquals(lagUrMeldinger().size(), urMeldinger.size());
     }
 
     @Test
@@ -51,24 +50,24 @@ class UrMeldingReaderTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        Stream<String> ugyldigStream = lagStreamMedUgyldigMelding();
+        List<String> ugyldigStream = lagStreamMedUgyldigMelding();
 
         assertThrows(MeldingUnreadableException.class, () -> urMeldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(ugyldigStream));
     }
 
     // =========================================================================
 
-    private Stream<String> lagStreamMedUgyldigMelding() {
+    private List<String> lagStreamMedUgyldigMelding() {
         List<String> ugyldigMeldingListe = new ArrayList<>();
         ugyldigMeldingListe.add("UGYLDIG_MELDING");
-        return ugyldigMeldingListe.stream();
+        return ugyldigMeldingListe;
     }
 
-    private Stream<String> lagUrMeldinger() {
+    private List<String> lagUrMeldinger() {
         List<String> urMeldinger = new ArrayList<>();
         urMeldinger.add(INPUT_STRENG_FOR_UR_MELDING_SOM_HAR_MAPPING_TIL_OPPGAVE);
         urMeldinger.add(INPUT_STRENG_FOR_UR_MELDING_SOM_IKKE_HAR_MAPPING_TIL_OPPGAVE);
-        return urMeldinger.stream();
+        return urMeldinger;
 
     }
 }

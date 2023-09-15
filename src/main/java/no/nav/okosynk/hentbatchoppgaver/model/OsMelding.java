@@ -1,6 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
+import no.nav.okosynk.model.GjelderIdType;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -40,7 +41,7 @@ public class OsMelding extends AbstractMelding {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), super.behandlendeEnhet, this.beregningsId, this.beregningsDato, this.faggruppe, super.utledGjelderIdType());
+        return Objects.hash(super.hashCode(), super.behandlendeEnhet, this.beregningsId, this.beregningsDato, this.faggruppe, GjelderIdType.fra(this.gjelderId));
     }
 
     @Override
@@ -69,8 +70,7 @@ public class OsMelding extends AbstractMelding {
             &&
             this.faggruppe.equals(otherAsOsMelding.faggruppe)
             &&
-            super.utledGjelderIdType().equals(otherAsAbstractMelding.utledGjelderIdType())
-            ;
+            GjelderIdType.fra(this.gjelderId) == GjelderIdType.fra(otherAsAbstractMelding.gjelderId);
     }
 
     @Override

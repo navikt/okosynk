@@ -1,32 +1,38 @@
 package no.nav.okosynk;
 
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
-import no.nav.okosynk.metrics.AbstractAlertMetrics;
-import no.nav.okosynk.metrics.AlertMetricsFactory;
+import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.MeldingLinjeSftpReader;
+import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
+import no.nav.okosynk.metrics.AbstractAlertMetrics;
+import no.nav.okosynk.metrics.AlertMetricsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
+import static no.nav.okosynk.exceptions.BatchStatus.ENDED_WITH_ERROR_GENERAL;
+import static no.nav.okosynk.exceptions.BatchStatus.READY;
+import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
+
+public abstract class AbstractService<T extends AbstractMelding> {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractService.class);
 
+    @Getter
     private final Constants.BATCH_TYPE batchType;
     private final IOkosynkConfiguration okosynkConfiguration;
     private boolean shouldRun;
+    @Getter
     private BatchStatus lastBatchStatus;
     private IAktoerClient aktoerClient;
     private Batch<? extends AbstractMelding> batch;
@@ -43,13 +49,14 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
 
     public BatchStatus run() {
 
-        final Batch<? extends AbstractMelding> batch;
         BatchStatus batchStatus = null;
         try {
-            batch = getBatch();
+            if (batch == null) {
+                setBatch(createAndConfigureBatch(getOkosynkConfiguration()));
+            }
             batch.run();
             batchStatus = batch.getBatchStatus();
-        } catch (ConfigureOrInitializeOkosynkIoException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
         } finally {
             setLastBatchStatus(batchStatus);
@@ -57,10 +64,6 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
             setBatch(null);
         }
         return batchStatus;
-    }
-
-    public BatchStatus getLastBatchStatus() {
-        return this.lastBatchStatus;
     }
 
     private void setLastBatchStatus(final BatchStatus batchStatus) {
@@ -79,31 +82,46 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         return AlertMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
     }
 
-    public Constants.BATCH_TYPE getBatchType() {
-        return this.batchType;
-    }
-
-    public Batch<MELDINGSTYPE> createAndConfigureBatch(
+    public Batch<T> createAndConfigureBatch(
             final IOkosynkConfiguration okosynkConfiguration)
             throws URISyntaxException {
 
-        final Batch<MELDINGSTYPE> batch = createBatch(okosynkConfiguration);
+        if (aktoerClient == null) {
+            setAktoerClient(new PdlRestClient(getOkosynkConfiguration(), getBatchType()));
+        }
+        final Batch<T> meldingstypeBatch = new Batch<>(
+                okosynkConfiguration,
+                getBatchType(),
+                createMeldingReader(),
+                createMeldingMapper(aktoerClient)
+        );
 
-        final IMeldingLinjeFileReader meldingLinjeFileReader =
-                getMeldingLinjeReader(okosynkConfiguration);
+        if (meldingLinjeFileReader == null) {
+            URI uri = new URI(okosynkConfiguration.getFtpHostUrl(getBatchType()));
 
-        batch.setUspesifikkMeldingLinjeReader(meldingLinjeFileReader);
+            String formatted = "Using SFTP for %s, reading fullyQualifiedInputFileName: \"%s\"".formatted(this.getClass().getSimpleName(), uri.getPath());
+            logger.info(formatted);
 
-        return batch;
+            FtpSettings ftpSettings = new FtpSettings(
+                    uri,
+                    okosynkConfiguration.getFtpUser(getBatchType()),
+                    okosynkConfiguration.getFtpPassword(getBatchType()),
+                    okosynkConfiguration.getFtpCharsetName(getBatchType(), "ISO8859_1"));
+
+            setMeldingLinjeReader(new MeldingLinjeSftpReader(ftpSettings, getBatchType()));
+
+            meldingstypeBatch.setBatchStatus(
+                    OK == meldingLinjeFileReader.getStatus() ? READY : ENDED_WITH_ERROR_GENERAL
+            );
+        }
+
+        meldingstypeBatch.setUspesifikkMeldingLinjeReader(meldingLinjeFileReader);
+        return meldingstypeBatch;
     }
 
-    protected IAktoerClient createAktoerClient() {
-        return new PdlRestClient(getOkosynkConfiguration(), getBatchType());
-    }
+    protected abstract MeldingReader<T> createMeldingReader();
 
-    protected abstract MeldingReader<MELDINGSTYPE> createMeldingReader();
-
-    protected abstract IMeldingMapper<MELDINGSTYPE> createMeldingMapper(final IAktoerClient aktoerClient);
+    protected abstract IMeldingMapper<T> createMeldingMapper(final IAktoerClient aktoerClient);
 
     protected IOkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;
@@ -113,63 +131,12 @@ public abstract class AbstractService<MELDINGSTYPE extends AbstractMelding> {
         this.meldingLinjeFileReader = meldingLinjeFileReader;
     }
 
-    private Batch<MELDINGSTYPE> createBatch(final IOkosynkConfiguration okosynkConfiguration) {
-        return new Batch<>(
-                okosynkConfiguration,
-                getBatchType(),
-                createMeldingReader(),
-                createMeldingMapper(getAktoerClient())
-        );
-    }
-
-    private Batch<? extends AbstractMelding> getBatch()
-            throws ConfigureOrInitializeOkosynkIoException, URISyntaxException {
-        if (this.batch == null) {
-            setBatch(createAndConfigureBatch(getOkosynkConfiguration()));
-        }
-        return this.batch;
-    }
-
     void setBatch(final Batch<? extends AbstractMelding> batch) {
         this.batch = batch;
-    }
-
-    private IAktoerClient getAktoerClient() {
-
-        if (this.aktoerClient == null) {
-            setAktoerClient(createAktoerClient());
-        }
-        return this.aktoerClient;
     }
 
     void setAktoerClient(final IAktoerClient aktoerClient) {
         this.aktoerClient = aktoerClient;
     }
 
-    private IMeldingLinjeFileReader getMeldingLinjeReader(final IOkosynkConfiguration okosynkConfiguration)
-            throws URISyntaxException {
-
-        if (this.meldingLinjeFileReader == null) {
-            final IMeldingLinjeFileReader meldingLinjeFileReader =
-                    createMeldingLinjeSftpReader(okosynkConfiguration);
-            setMeldingLinjeReader(meldingLinjeFileReader);
-        }
-        return this.meldingLinjeFileReader;
-    }
-
-    private IMeldingLinjeFileReader createMeldingLinjeSftpReader(final IOkosynkConfiguration okosynkConfiguration)
-            throws URISyntaxException {
-        URI uri = new URI(okosynkConfiguration.getFtpHostUrl(getBatchType()));
-
-        logger.info("Using SFTP for " + this.getClass().getSimpleName()
-                + ", reading fullyQualifiedInputFileName: \"" + uri.getPath() + "\"");
-
-        FtpSettings ftpSettings = new FtpSettings(
-                uri,
-                okosynkConfiguration.getFtpUser(getBatchType()),
-                okosynkConfiguration.getFtpPassword(getBatchType()),
-                okosynkConfiguration.getFtpCharsetName(getBatchType(), "ISO8859_1"));
-
-        return new MeldingLinjeSftpReader(ftpSettings, getBatchType());
-    }
 }

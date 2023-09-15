@@ -2,27 +2,21 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
-import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
+import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Arrays.asList;
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
@@ -47,10 +41,9 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertAll(
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new OsBeskrivelseInfo(OsOppgaveOppretterTest.OS_MELDING_1).lagBeskrivelse()),
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new OsBeskrivelseInfo(OsOppgaveOppretterTest.OS_MELDING_2).lagBeskrivelse())
-        );
+
+        assertThat(new OsBeskrivelseInfo(OS_MELDING_1).lagBeskrivelse()).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
+        assertThat(new OsBeskrivelseInfo(OS_MELDING_2).lagBeskrivelse()).isEqualTo(OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
     }
 
     @Test
@@ -60,37 +53,34 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         List<OsMelding> meldingsliste = new ArrayList<>();
-        meldingsliste.add(OsOppgaveOppretterTest.OS_MELDING_1);
+        meldingsliste.add(OS_MELDING_1);
 
-        assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("RETU;", "RETU;;"),
-                this.osOppgaveOppretter.lagSamletBeskrivelse(meldingsliste));
+        assertThat(this.osOppgaveOppretter.lagSamletBeskrivelse(meldingsliste)).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("RETU;", "RETU;;"));
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void applyReturnererOppgaveMedRiktigeVerdier(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
+    @Test
+    void applyReturnererOppgaveMedRiktigeVerdier() {
 
         enteringTestHeaderLogger.debug(null);
 
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
         when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
-        final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(OsOppgaveOppretterTest.OS_MELDING_1)).get();
-        assertAll(
-                () -> assertEquals("OKO_OS", oppgave.oppgavetypeKode),
-                () -> assertEquals("OKO", oppgave.fagomradeKode),
-                () -> assertNull(oppgave.behandlingstema),
-                () -> assertEquals("ae0218", oppgave.behandlingstype),
-                () -> assertEquals("LAV", oppgave.prioritetKode),
-                () -> assertEquals(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("RETU;", "RETU;;"), oppgave.beskrivelse),
-                () -> assertNotNull(oppgave.aktivFra),
-                () -> assertNotNull(oppgave.aktivTil),
-                () -> assertEquals("4151", oppgave.ansvarligEnhetId),
-                () -> assertFalse(oppgave.lest)
-        );
+        final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(Collections.singletonList(OS_MELDING_1)).orElseThrow();
 
-        assertEquals(expectedAktoerId, oppgave.aktoerId);
-        assertEquals(null, oppgave.folkeregisterIdent);
+        assertThat(oppgave.oppgavetypeKode).isEqualTo("OKO_OS");
+        assertThat(oppgave.fagomradeKode).isEqualTo("OKO");
+        assertThat(oppgave.behandlingstema).isNull();
+        assertThat(oppgave.behandlingstype).isEqualTo("ae0218");
+        assertThat(oppgave.prioritetKode).isEqualTo("LAV");
+        assertThat(oppgave.beskrivelse).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("RETU;", "RETU;;"));
+        assertThat(oppgave.aktivFra).isNotNull();
+        assertThat(oppgave.aktivTil).isNotNull();
+        assertThat(oppgave.ansvarligEnhetId).isEqualTo("4151");
+        assertFalse(oppgave.lest);
+
+        assertThat(oppgave.aktoerId).isEqualTo(expectedAktoerId);
+        assertThat(oppgave.folkeregisterIdent).isNull();
     }
 
     @Test
@@ -98,15 +88,14 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String forventetSamletBeskrivelse = new StringBuffer()
-                .append(OsOppgaveOppretterTest.OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("AVVE;", "AVVE;;"))
-                .append(OsOppgaveOppretter.getRecordSeparator())
-                .append(OsOppgaveOppretterTest.OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE)
-                .toString();
+        final String forventetSamletBeskrivelse =
+                OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("AVVE;", "AVVE;;") +
+                        OsOppgaveOppretter.getRecordSeparator() +
+                        OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE;
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
-        assertEquals(forventetSamletBeskrivelse, this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_1, OsOppgaveOppretterTest.OS_MELDING_2)).get().beskrivelse);
-        assertEquals(forventetSamletBeskrivelse, this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_2, OsOppgaveOppretterTest.OS_MELDING_1)).get().beskrivelse);
+        assertThat(this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_2, OS_MELDING_1)).orElseThrow().beskrivelse).isEqualTo(forventetSamletBeskrivelse);
+        assertThat(this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_1, OS_MELDING_2)).orElseThrow().beskrivelse).isEqualTo(forventetSamletBeskrivelse);
     }
 
     @Test
@@ -114,17 +103,17 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_2, OsOppgaveOppretterTest.OS_MELDING_1)).get();
+        final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_2, OS_MELDING_1)).orElseThrow();
 
-        assertAll(
-                () -> assertTrue(oppgave.beskrivelse.contains(osMelding1Beregningsdato)),
-                () -> assertTrue(oppgave.beskrivelse.contains(osMelding2Beregningsdato)),
-                () -> assertTrue(oppgave.beskrivelse.indexOf(osMelding2Beregningsdato) < oppgave.beskrivelse.indexOf(osMelding1Beregningsdato))
-        );
+
+        assertThat(oppgave.beskrivelse)
+                .contains(osMelding1Beregningsdato)
+                .contains(osMelding2Beregningsdato)
+                .matches(s -> s.indexOf(osMelding2Beregningsdato) < (oppgave.beskrivelse.indexOf(osMelding1Beregningsdato)), "seneste beregningsdato skal komme først");
     }
 
     @Test
@@ -132,17 +121,18 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OsOppgaveOppretterTest.OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.osOppgaveOppretter.apply(Arrays.asList(OsOppgaveOppretterTest.OS_MELDING_1, OsOppgaveOppretterTest.OS_MELDING_2)).get();
+        final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_1, OS_MELDING_2)).orElseThrow();
 
-        assertAll(
-                () -> assertTrue(oppgave.beskrivelse.contains(osMelding1Beregningsdato)),
-                () -> assertTrue(oppgave.beskrivelse.contains(osMelding2Beregningsdato)),
-                () -> assertTrue(oppgave.beskrivelse.indexOf(osMelding2Beregningsdato) < oppgave.beskrivelse.indexOf(osMelding1Beregningsdato))
-        );
+
+        assertThat(oppgave.beskrivelse)
+                .contains(osMelding1Beregningsdato)
+                .contains(osMelding2Beregningsdato)
+                .matches(s -> s.indexOf(osMelding2Beregningsdato) < (oppgave.beskrivelse.indexOf(osMelding1Beregningsdato)), "seneste beregningsdato skal komme først");
+
     }
 
 
@@ -151,7 +141,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertFalse(this.osOppgaveOppretter.apply(Collections.emptyList()).isPresent());
+        assertFalse(this.osOppgaveOppretter.opprettOppgave(Collections.emptyList()).isPresent());
     }
 
     @Test
@@ -159,7 +149,7 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertFalse(this.osOppgaveOppretter.apply(Collections.singletonList(OsOppgaveOppretterTest.OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE)).isPresent());
+        assertFalse(this.osOppgaveOppretter.opprettOppgave(Collections.singletonList(OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE)).isPresent());
     }
 
     @Test
@@ -171,9 +161,9 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 "000000019400æ 8020         BA      10108000398            ");
 
         when(this.aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
+        final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(Collections.singletonList(osMelding)).orElseThrow();
 
-        assertTrue(oppgave.beskrivelse.contains("1940kr"));
+        assertThat(oppgave.beskrivelse).contains("1940kr");
     }
 
     @Test
@@ -185,8 +175,8 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 "000000019401æ 8020         BA      10108000398            ");
 
         when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.osOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
+        final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(Collections.singletonList(osMelding)).orElseThrow();
 
-        assertTrue(oppgave.beskrivelse.contains("1940kr"));
+        assertThat(oppgave.beskrivelse).contains("1940kr");
     }
 }

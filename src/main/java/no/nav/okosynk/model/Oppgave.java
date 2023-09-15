@@ -1,7 +1,5 @@
 package no.nav.okosynk.model;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.AbstractOppgaveOppretter;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -119,7 +117,6 @@ public class Oppgave {
     }
 
     public static class OppgaveBuilder {
-
         private LocalDate aktivFra;
         private LocalDate aktivTil;
         private String aktoerId;
@@ -247,27 +244,6 @@ public class Oppgave {
             return this;
         }
 
-        public OppgaveBuilder withGjelderIdResultat(final AbstractOppgaveOppretter.GjelderIdResultat gjelderIdResultat) {
-            switch (gjelderIdResultat.gjelderIdFelt()) {
-                case BNR:
-                    this.bnr = gjelderIdResultat.gjelderId();
-                    break;
-                case AKTORID:
-                    this.aktoerId = gjelderIdResultat.gjelderId();
-                    break;
-                case SAMHANDLER:
-                    this.samhandlernr = gjelderIdResultat.gjelderId();
-                    break;
-                case ORGANISASJON:
-                    this.orgnr = gjelderIdResultat.gjelderId();
-                    break;
-                case FEIL:
-                case INGEN_GJELDERID:
-                    break;
-            }
-            return this;
-        }
-
         public OppgaveBuilder withSameValuesAs(final Oppgave otherOppgave) {
             this.oppgaveId = otherOppgave.oppgaveId;
             this.folkeregisterIdent = otherOppgave.folkeregisterIdent;
@@ -287,7 +263,6 @@ public class Oppgave {
             this.lest = otherOppgave.lest;
             this.mappeId = otherOppgave.mappeId;
             this.saksbehandlerIdent = otherOppgave.ansvarligSaksbehandlerIdent;
-
             this.versjon = otherOppgave.versjon;
             this.sistEndret = otherOppgave.sistEndret;
             return this;

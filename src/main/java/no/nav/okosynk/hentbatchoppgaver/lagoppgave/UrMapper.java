@@ -1,8 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
+import no.nav.okosynk.model.Oppgave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 public class UrMapper implements IMeldingMapper<UrMelding> {
 
@@ -29,10 +30,10 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
 
         return groupMeldingerSomSkalBliOppgaver(meldinger)
                 .stream()
-                .map(this.urOppgaveOppretter)
+                .map(this.urOppgaveOppretter::opprettOppgave)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     Predicate<UrMelding> urMeldingSkalBliOppgave() {
@@ -42,21 +43,15 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
     Collection<List<UrMelding>> groupMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {
 
         final List<UrMelding> meldingerMedMappingRegel =
-                ufiltrerteUrMeldinger
-                        .stream()
+                ufiltrerteUrMeldinger.stream()
                         .filter(urMeldingSkalBliOppgave())
-                        .collect(Collectors.toList());
+                        .toList();
 
         logger.info("Antall meldinger som tilfredsstiller mappingregel: {}",
                 meldingerMedMappingRegel.size());
 
-        return meldingerMedMappingRegel
-                .stream()
-                .distinct()
-                .collect(
-                        Collectors
-                                .groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList())
-                )
+        return meldingerMedMappingRegel.stream().distinct()
+                .collect(groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new))
                 .values();
     }
 }

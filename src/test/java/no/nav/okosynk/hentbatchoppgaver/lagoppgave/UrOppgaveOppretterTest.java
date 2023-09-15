@@ -2,12 +2,11 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
-import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
+import no.nav.okosynk.model.Oppgave;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,12 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
@@ -65,31 +59,30 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 this.urOppgaveOppretter.lagSamletBeskrivelse(meldingsliste));
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    void applyReturnererOppgaveMedRiktigeVerdier(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
 
+    @Test
+    void applyReturnererOppgaveMedRiktigeVerdier() {
         enteringTestHeaderLogger.debug(null);
 
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
         when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
-        final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(UrOppgaveOppretterTest.UR_MELDING_1)).get();
-        assertAll(
-                () -> assertEquals("OKO_UR", oppgave.oppgavetypeKode),
-                () -> assertEquals("OKO", oppgave.fagomradeKode),
-                () -> assertNull(null, oppgave.behandlingstema),
-                () -> assertEquals("ae0218", oppgave.behandlingstype),
-                () -> assertEquals("LAV", oppgave.prioritetKode),
-                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;"), oppgave.beskrivelse),
-                () -> assertNotNull(oppgave.aktivFra),
-                () -> assertNotNull(oppgave.aktivTil),
-                () -> assertEquals("4151", oppgave.ansvarligEnhetId),
-                () -> assertFalse(oppgave.lest)
-        );
+        final Oppgave oppgave = this.urOppgaveOppretter.opprettOppgave(Collections.singletonList(UrOppgaveOppretterTest.UR_MELDING_1)).orElseThrow();
 
-        assertEquals(expectedAktoerId, oppgave.aktoerId);
-        assertEquals(null, oppgave.folkeregisterIdent);
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(oppgave.oppgavetypeKode).isEqualTo("OKO_UR");
+        softly.assertThat(oppgave.fagomradeKode).isEqualTo("OKO");
+        softly.assertThat(oppgave.behandlingstema).isNull();
+        softly.assertThat(oppgave.behandlingstype).isEqualTo("ae0218");
+        softly.assertThat(oppgave.prioritetKode).isEqualTo("LAV");
+        softly.assertThat(oppgave.beskrivelse).isEqualTo(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;"));
+        softly.assertThat(oppgave.aktivFra).isNotNull();
+        softly.assertThat(oppgave.aktivTil).isNotNull();
+        softly.assertThat(oppgave.ansvarligEnhetId).isEqualTo("4151");
+        softly.assertThat(oppgave.lest).isFalse();
+        softly.assertThat(oppgave.aktoerId).isEqualTo(expectedAktoerId);
+        softly.assertThat(oppgave.folkeregisterIdent).isNull();
+        softly.assertAll();
     }
 
     @Test
@@ -97,15 +90,14 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String forventetSamletBeskrivelse = new StringBuffer()
-                .append(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;"))
-                .append(UrOppgaveOppretter.getRecordSeparator())
-                .append(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE)
-                .toString();
+        final String forventetSamletBeskrivelse =
+                UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;") +
+                        UrOppgaveOppretter.getRecordSeparator() +
+                        UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE;
 
 
-        assertEquals(forventetSamletBeskrivelse, this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_1, UrOppgaveOppretterTest.UR_MELDING_2)).get().beskrivelse);
-        assertEquals(forventetSamletBeskrivelse, this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_2, UrOppgaveOppretterTest.UR_MELDING_1)).get().beskrivelse);
+        assertEquals(forventetSamletBeskrivelse, this.urOppgaveOppretter.opprettOppgave(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_1, UrOppgaveOppretterTest.UR_MELDING_2)).orElseThrow().beskrivelse);
+        assertEquals(forventetSamletBeskrivelse, this.urOppgaveOppretter.opprettOppgave(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_2, UrOppgaveOppretterTest.UR_MELDING_1)).orElseThrow().beskrivelse);
     }
 
     @Test
@@ -116,7 +108,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
         final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
 
-        final Oppgave oppgave = this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_2, UrOppgaveOppretterTest.UR_MELDING_1)).get();
+        final Oppgave oppgave = this.urOppgaveOppretter.opprettOppgave(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_2, UrOppgaveOppretterTest.UR_MELDING_1)).orElseThrow();
 
         assertAll(
                 () -> assertTrue(oppgave.beskrivelse.contains(urMelding1DatoPostert)),
@@ -133,7 +125,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
         final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
         final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
 
-        final Oppgave oppgave = this.urOppgaveOppretter.apply(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_1, UrOppgaveOppretterTest.UR_MELDING_2)).get();
+        final Oppgave oppgave = this.urOppgaveOppretter.opprettOppgave(Arrays.asList(UrOppgaveOppretterTest.UR_MELDING_1, UrOppgaveOppretterTest.UR_MELDING_2)).orElseThrow();
 
         assertAll(
                 () -> assertTrue(oppgave.beskrivelse.contains(urMelding1DatoPostert)),
@@ -147,12 +139,12 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertFalse(this.urOppgaveOppretter.apply(Collections.emptyList()).isPresent());
+        assertFalse(this.urOppgaveOppretter.opprettOppgave(Collections.emptyList()).isPresent());
     }
 
     @Test
     void applyReturnererTomOptionalForMeldingUtenMappingTilOppgave() {
-        assertFalse(this.urOppgaveOppretter.apply(Collections.singletonList(UrOppgaveOppretterTest.UR_MELDING_UTEN_MAPPING_TIL_OPPGAVE)).isPresent());
+        assertFalse(this.urOppgaveOppretter.opprettOppgave(Collections.singletonList(UrOppgaveOppretterTest.UR_MELDING_UTEN_MAPPING_TIL_OPPGAVE)).isPresent());
     }
 
     @Test
@@ -164,7 +156,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 "00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
         when(this.aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
+        final Oppgave oppgave = this.urOppgaveOppretter.opprettOppgave(Collections.singletonList(osMelding)).orElseThrow();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
     }
@@ -178,7 +170,7 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
                 "00000000019401æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
 
         when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
-        final Oppgave oppgave = this.urOppgaveOppretter.apply(Collections.singletonList(osMelding)).get();
+        final Oppgave oppgave = this.urOppgaveOppretter.opprettOppgave(Collections.singletonList(osMelding)).orElseThrow();
 
         assertTrue(oppgave.beskrivelse.contains("1940kr"));
     }

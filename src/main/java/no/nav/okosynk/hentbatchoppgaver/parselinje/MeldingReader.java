@@ -1,30 +1,22 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
+import lombok.Getter;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.MeldingUnreadableException;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MeldingReader<SPESIFIKKMELDINGTYPE extends AbstractMelding>
-    implements IMeldingReader<SPESIFIKKMELDINGTYPE> {
+import java.util.List;
+import java.util.function.Function;
+
+@Getter
+public class MeldingReader<T extends AbstractMelding>
+        implements IMeldingReader<T> {
 
     private static final Logger logger = LoggerFactory.getLogger(MeldingReader.class);
 
-    public Function<String, SPESIFIKKMELDINGTYPE> getSpesifikkMeldingCreator() {
-        return spesifikkMeldingCreator;
-    }
-
-    private final Function<String, SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator;
-
-    public int getLinjeNummer() {
-        return linjeNummer;
-    }
+    private final Function<String, T> spesifikkMeldingCreator;
 
     public void setLinjeNummer(int linjeNummer) {
         this.linjeNummer = linjeNummer;
@@ -33,31 +25,27 @@ public class MeldingReader<SPESIFIKKMELDINGTYPE extends AbstractMelding>
     private int linjeNummer;
 
     public MeldingReader(
-        final Function<String, SPESIFIKKMELDINGTYPE> spesifikkMeldingCreator
+            final Function<String, T> spesifikkMeldingCreator
     ) {
-       this.spesifikkMeldingCreator = spesifikkMeldingCreator;
-    }
-
-    private int preIncreaseLinjeNummer() {
-        return ++linjeNummer;
+        this.spesifikkMeldingCreator = spesifikkMeldingCreator;
     }
 
     @Override
-    public List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
-        final Stream<String> linjerMedUspesifikkeMeldinger
+    public List<T> opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
+            final List<String> linjerMedUspesifikkeMeldinger
     ) throws MeldingUnreadableException {
 
         setLinjeNummer(0);
-        List<SPESIFIKKMELDINGTYPE> spesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger = null;
+        List<T> spesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger = null;
         try {
             spesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger =
-                linjerMedUspesifikkeMeldinger.map(
-                    (final String melding) -> {
-                        preIncreaseLinjeNummer();
-                        return getSpesifikkMeldingCreator().apply(melding);
-                    }
-                )
-                .collect(Collectors.toList());
+                    linjerMedUspesifikkeMeldinger.stream().map(
+                                    (final String melding) -> {
+                                        ++linjeNummer;
+                                        return getSpesifikkMeldingCreator().apply(melding);
+                                    }
+                            )
+                            .toList();
         } catch (IncorrectMeldingFormatException e) {
             handterIncorrectMeldingFormatException(e);
         }
@@ -66,10 +54,10 @@ public class MeldingReader<SPESIFIKKMELDINGTYPE extends AbstractMelding>
     }
 
     private void handterIncorrectMeldingFormatException(
-        final IncorrectMeldingFormatException e
+            final IncorrectMeldingFormatException e
     ) throws MeldingUnreadableException {
-
-        logger.error(String.format("AbstractMelding på linje %d i inputfilen har feil format, og kan derfor ikke tolkes.", getLinjeNummer()), e);
+        String formatted = String.format("AbstractMelding på linje %d i inputfilen har feil format, og kan derfor ikke tolkes.", getLinjeNummer());
+        logger.error(formatted, e);
 
         throw new MeldingUnreadableException(e);
     }

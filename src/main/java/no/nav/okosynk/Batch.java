@@ -1,37 +1,41 @@
 package no.nav.okosynk;
 
-import no.nav.okosynk.exceptions.*;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
-import no.nav.okosynk.model.Oppgave;
-import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
-import no.nav.okosynk.metrics.AbstractBatchMetrics;
-import no.nav.okosynk.metrics.BatchMetricsFactory;
+import lombok.Getter;
+import lombok.NonNull;
+import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
-import no.nav.okosynk.comm.AzureAdAuthenticationClient;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
+import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
+import no.nav.okosynk.metrics.AbstractBatchMetrics;
+import no.nav.okosynk.metrics.BatchMetricsFactory;
+import no.nav.okosynk.model.Oppgave;
+import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
+import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Objects;
 
-public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
+import static java.util.Objects.requireNonNull;
+
+public class Batch<T extends AbstractMelding> {
 
     static final int UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT = 25000;
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
+    @Getter
     private final IOkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
-    private final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader;
-    private final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper;
+    private final IMeldingReader<T> spesifikkMeldingReader;
+    private final IMeldingMapper<T> spesifikkMapper;
     private BatchStatus batchStatus;
     private IMeldingLinjeFileReader uspesifikkMeldingLinjeReader;
     private OppgaveSynkroniserer oppgaveSynkroniserer;
@@ -39,8 +43,8 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     public Batch(
             final IOkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType,
-            final IMeldingReader<SPESIFIKKMELDINGTYPE> spesifikkMeldingReader,
-            final IMeldingMapper<SPESIFIKKMELDINGTYPE> spesifikkMapper) {
+            final IMeldingReader<T> spesifikkMeldingReader,
+            final IMeldingMapper<T> spesifikkMapper) {
 
         Validate.notNull(
                 okosynkConfiguration,
@@ -80,47 +84,42 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
     public void run() {
 
         final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
-        BatchStatus batchStatusLocal = BatchStatus.STARTED;
-        setBatchStatus(batchStatusLocal);
+        batchStatus = BatchStatus.STARTED;
         logger.info("Batch {} har startet.", getBatchName());
+        String prefix = "Exception received when reading input data when running " + getBatchName() + ". Status is set to ";
+        String postfix = ". The input data will not be removed.";
         try {
             final List<Oppgave> alleOppgaverLestFraBatchen = hentBatchOppgaver();
             logger.info("Hentet {} oppgvelinjer som skal behandles", alleOppgaverLestFraBatchen.size());
             final ConsumerStatistics consumerStatistics =
                     getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
 
-            // At this point in code the read and treat process has been successful,
-            // and the input file may be renamed:
-            batchStatusLocal =
-                    getUspesifikkMeldingLinjeReader().removeInputData()
-                            ?
-                            BatchStatus.ENDED_WITH_OK
-                            :
-                            BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
+            batchStatus = uspesifikkMeldingLinjeReader.removeInputData() ? BatchStatus.ENDED_WITH_OK
+                    : BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
 
             batchMetrics.setSuccessfulMetrics(consumerStatistics);
-        } catch (InputDataNotFoundBatchException e) {
-            batchStatusLocal = BatchStatus.ENDED_WITH_WARNING_INPUT_DATA_NOT_FOUND;
+        } catch (NotFoundOkosynkIoException e) {
+            batchStatus = BatchStatus.ENDED_WITH_WARNING_INPUT_DATA_NOT_FOUND;
             batchMetrics.setUnsuccessfulMetrics();
-            logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatusLocal + ".", e);
+            logger.error(prefix + batchStatus + ".", e);
         } catch (TooManyInputDataLinesBatchException e) {
-            batchStatusLocal = BatchStatus.ENDED_WITH_ERROR_TOO_MANY_INPUT_DATA_LINES;
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_TOO_MANY_INPUT_DATA_LINES;
             batchMetrics.setUnsuccessfulMetrics();
-            logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatusLocal + ".", e);
-        } catch (UninterpretableMeldingBatchException e) {
-            batchStatusLocal = BatchStatus.ENDED_WITH_ERROR_INPUT_DATA;
+            logger.error(prefix + batchStatus + ".", e);
+        } catch (MeldingUnreadableException e) {
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_INPUT_DATA;
             batchMetrics.setUnsuccessfulMetrics();
-            logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatusLocal + ". The input data will not be removed.", e);
-        } catch (ConfigurationBatchException e) {
-            batchStatusLocal = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
+            logger.error(prefix + batchStatus + postfix, e);
+        } catch (AuthenticationOkosynkIoException | NullPointerException e) {
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
             batchMetrics.setUnsuccessfulMetrics();
-            logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatusLocal + ". The input data will not be removed.", e);
+            logger.error(prefix + batchStatus + postfix, e);
         } catch (Exception e) {
-            batchStatusLocal = BatchStatus.ENDED_WITH_ERROR_GENERAL;
+            batchStatus = BatchStatus.ENDED_WITH_ERROR_GENERAL;
             batchMetrics.setUnsuccessfulMetrics();
-            logger.error("Exception received when reading input data when running " + getBatchName() + ". Status is set to " + batchStatusLocal + ". The input data will not be removed.", e);
+            logger.error(prefix + batchStatus + postfix, e);
         } finally {
-            setBatchStatus(batchStatusLocal);
+            setBatchStatus(batchStatus);
             batchMetrics.log();
         }
     }
@@ -137,20 +136,17 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         this.batchStatus = status;
     }
 
-    public IOkosynkConfiguration getOkosynkConfiguration() {
-        return okosynkConfiguration;
-    }
-
     private List<Oppgave> hentBatchOppgaver()
-            throws UninterpretableMeldingBatchException,
-            InputDataNotFoundBatchException,
-            GeneralBatchException,
-            IoBatchException,
-            TooManyInputDataLinesBatchException,
-            ConfigurationBatchException {
+            throws TooManyInputDataLinesBatchException,
+            NotFoundOkosynkIoException,
+            IoOkosynkIoException,
+            AuthenticationOkosynkIoException,
+            ConfigureOrInitializeOkosynkIoException,
+            MeldingUnreadableException {
 
         logger.debug("Entering Batch.hentBatchOppgaver...");
-        final List<String> linjerMedUspesifikkeMeldinger = hentLinjerMedUspesifikkeMeldinger();
+        final List<String> linjerMedUspesifikkeMeldinger = this.uspesifikkMeldingLinjeReader.read();
+
         final int actualnumberOfOppgaverRetrievedFromBatchInput = linjerMedUspesifikkeMeldinger.size();
         if (actualnumberOfOppgaverRetrievedFromBatchInput > UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT) {
             throw new TooManyInputDataLinesBatchException(
@@ -158,7 +154,7 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
                     UPPER_LIMIT_OF_OPPGAVER_RETRIEVED_FROM_BATCH_INPUT);
         }
         logger.debug("linjerMedUspesifikkeMeldinger.size(): {}", linjerMedUspesifikkeMeldinger.size());
-        final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger =
+        final List<T> spesifikkeMeldinger =
                 opprettSpesifikkeMeldinger(linjerMedUspesifikkeMeldinger);
         logger.info("Konverterer {} meldinger til oppgaver", spesifikkeMeldinger.size());
         final List<Oppgave> batchOppgaver = getSpesifikkMapper().lagOppgaver(spesifikkeMeldinger);
@@ -180,86 +176,28 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return batchType;
     }
 
-    private List<String> hentLinjerMedUspesifikkeMeldinger()
-            throws InputDataNotFoundBatchException,
-            IoBatchException,
-            GeneralBatchException,
-            ConfigurationBatchException {
-
-        logger.debug("Entering Batch.hentLinjerMedUspesifikkeMeldinger...");
-
-        List<String> linjerMedUspesifikkeMeldinger;
-        try {
-            Validate.notNull(
-                    getUspesifikkMeldingLinjeReader(),
-                    "The uspesifikkMeldingLinjeReader is not set."
-            );
-            linjerMedUspesifikkeMeldinger = getUspesifikkMeldingLinjeReader().read();
-            logger.info(
-                    "{} meldinger ble lest inn fra fil. Batch name: {}",
-                    linjerMedUspesifikkeMeldinger.size(),
-                    getBatchName());
-        } catch (IoOkosynkIoException e) {
-            throw new IoBatchException(e);
-        } catch (NotFoundOkosynkIoException e) {
-            throw new InputDataNotFoundBatchException(e);
-        } catch (AuthenticationOkosynkIoException | EncodingOkosynkIoException | NullPointerException e) {
-            throw new ConfigurationBatchException(e);
-        } catch (Exception e) {
-            throw new GeneralBatchException(e);
-        }
-
-        logger.debug("About to normally leave Batch.hentLinjerMedUspesifikkeMeldinger");
-
-        return linjerMedUspesifikkeMeldinger;
-    }
-
-    private List<SPESIFIKKMELDINGTYPE> opprettSpesifikkeMeldinger(
-            final List<String> linjerMedUspesifikkeMeldinger) throws UninterpretableMeldingBatchException {
+    private List<T> opprettSpesifikkeMeldinger(
+            final List<String> linjerMedUspesifikkeMeldinger) throws MeldingUnreadableException {
 
         logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
 
-        final List<SPESIFIKKMELDINGTYPE> spesifikkeMeldinger;
-        try {
-            spesifikkeMeldinger =
-                    getSpesifikkMeldingReader()
-                            .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
-                                    linjerMedUspesifikkeMeldinger.stream());
-        } catch (MeldingUnreadableException e) {
-            logger.error("Kunne ikke lese inn meldinger. Batch " + getBatchName() + " kan ikke fortsette.",
-                    e);
-            throw new UninterpretableMeldingBatchException(e);
-        }
+        final List<T> spesifikkeMeldinger;
+        spesifikkeMeldinger =
+                getSpesifikkMeldingReader()
+                        .opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(
+                                linjerMedUspesifikkeMeldinger);
+
 
         logger.debug("About to normally leave Batch.opprettSpesifikkeMeldinger");
 
         return spesifikkeMeldinger;
     }
 
-    private IMeldingLinjeFileReader getUspesifikkMeldingLinjeReader() {
-        return this.uspesifikkMeldingLinjeReader;
+    public void setUspesifikkMeldingLinjeReader(final @NonNull IMeldingLinjeFileReader uspesifikkMeldingLinjeReader) {
+        this.uspesifikkMeldingLinjeReader = requireNonNull(uspesifikkMeldingLinjeReader);
     }
 
-    public void setUspesifikkMeldingLinjeReader(final IMeldingLinjeFileReader uspesifikkMeldingLinjeReader) {
-
-        Validate.notNull(uspesifikkMeldingLinjeReader, "Trying to set my IMeldingLinjeFileReader instance to null");
-        Validate.validState(
-                Objects.equals(uspesifikkMeldingLinjeReader.getBatchType(), getBatchType()),
-                "Trying to set my IMeldingLinjeFileReader instance with"
-                        + " a batch type different from the one with which this batch is instantiatted with");
-
-        setBatchStatus(
-                (IMeldingLinjeFileReader.Status.OK.equals(uspesifikkMeldingLinjeReader.getStatus()))
-                        ?
-                        BatchStatus.READY
-                        :
-                        BatchStatus.ENDED_WITH_ERROR_GENERAL
-        );
-
-        this.uspesifikkMeldingLinjeReader = uspesifikkMeldingLinjeReader;
-    }
-
-    private IMeldingReader<SPESIFIKKMELDINGTYPE> getSpesifikkMeldingReader() {
+    private IMeldingReader<T> getSpesifikkMeldingReader() {
         return this.spesifikkMeldingReader;
     }
 
@@ -267,16 +205,11 @@ public class Batch<SPESIFIKKMELDINGTYPE extends AbstractMelding> {
         return oppgaveSynkroniserer;
     }
 
-    public void setOppgaveSynkroniserer(final OppgaveSynkroniserer oppgaveSynkroniserer) {
-
-        Validate.notNull(
-                oppgaveSynkroniserer,
-                "The parameter OppgaveSynkroniserer supplied is null");
-
-        this.oppgaveSynkroniserer = oppgaveSynkroniserer;
+    public void setOppgaveSynkroniserer(final @NonNull OppgaveSynkroniserer oppgaveSynkroniserer) {
+        this.oppgaveSynkroniserer = requireNonNull(oppgaveSynkroniserer);
     }
 
-    private IMeldingMapper<SPESIFIKKMELDINGTYPE> getSpesifikkMapper() {
+    private IMeldingMapper<T> getSpesifikkMapper() {
         return spesifikkMapper;
     }
 }

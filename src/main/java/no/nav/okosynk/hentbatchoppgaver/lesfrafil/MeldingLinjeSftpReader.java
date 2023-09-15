@@ -11,8 +11,10 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static java.util.Objects.requireNonNull;
+import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.ERROR;
+import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
 
 public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
 
@@ -21,23 +23,26 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
     private final JSch javaSecureChannel;
     private final Constants.BATCH_TYPE batchType;
     private final String fullyQualifiedInputFileName;
-    private Status status;
+    private FileReaderStatus status;
     final FtpSettings ftpSettings;
+    Session sftpSession = null;
+    ChannelSftp sftpChannel = null;
+    InputStream inputStream = null;
 
     public MeldingLinjeSftpReader(
             final FtpSettings ftpSettings,
             final Constants.BATCH_TYPE batchType
     ) {
-        this.status = IMeldingLinjeFileReader.Status.ERROR;
+        status = ERROR;
 
         if (ftpSettings == null) {
             throw new NullPointerException("okosynkConfiguration er null");
         }
-        this.status = IMeldingLinjeFileReader.Status.OK;
+        status = OK;
 
         this.ftpSettings = ftpSettings;
         this.fullyQualifiedInputFileName = ftpSettings.ftpHostUrl().getPath().replace('\\', File.separatorChar);
-        this.batchType = Objects.requireNonNull(batchType);
+        this.batchType = requireNonNull(batchType);
         this.javaSecureChannel = new JSch();
 
         String msg = "";
@@ -53,7 +58,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
             setStatusError();
         }
 
-        if (IMeldingLinjeFileReader.Status.ERROR.equals(getStatus())) {
+        if (ERROR.equals(getStatus())) {
             throw new IllegalArgumentException(msg);
         }
     }
@@ -64,52 +69,74 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
     }
 
     @Override
-    public Status getStatus() {
-        return this.status;
+    public FileReaderStatus getStatus() {
+        return status;
     }
 
     private void setStatusError() {
-        this.status = IMeldingLinjeFileReader.Status.ERROR;
+        this.status = ERROR;
     }
 
     @Override
     public List<String> read()
-            throws IoOkosynkIoException,
+            throws NotFoundOkosynkIoException,
+            IoOkosynkIoException,
             ConfigureOrInitializeOkosynkIoException,
-            AuthenticationOkosynkIoException,
-            NotFoundOkosynkIoException{
+            AuthenticationOkosynkIoException {
 
         final List<String> meldinger;
-        SftpResourceContainer resourceContainer = null;
+
         try {
-            resourceContainer = new SftpResourceContainer(javaSecureChannel);
-            meldinger = lesMeldingerFraFil(resourceContainer);
+            meldinger = lesMeldingerFraFil(javaSecureChannel);
         } finally {
-            if (resourceContainer != null) {
-                resourceContainer.free();
-            }
+            free();
         }
 
         return meldinger;
     }
 
+    private void free() {
+        try {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+
+            if (sftpSession != null) {
+                sftpSession.disconnect();
+            }
+
+            if (sftpChannel != null) {
+                sftpChannel.disconnect();
+            }
+        } catch (IOException e) {
+            logger.error("Could not clear file reader resources", e);
+        }
+    }
+
     @Override
     public boolean removeInputData() {
 
-        SftpResourceContainer resourceContainer = null;
         boolean inputFileWasSuccessfullyRenamed;
         try {
-            resourceContainer = new SftpResourceContainer(this.javaSecureChannel);
-            establishSftpResources(resourceContainer);
-            inputFileWasSuccessfullyRenamed = removeInputData(resourceContainer);
+            establishSftpResources(javaSecureChannel);
+            final ChannelSftp channelSftp = sftpChannel;
+            final String home = channelSftp.getHome();
+            final String inputFilePath = ftpSettings.ftpHostUrl().getPath();
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd'T'HH.mm.ss");
+            final LocalDateTime now = LocalDateTime.now();
+            final String formatDateTime = now.format(formatter);
+            final String toFileName = inputFilePath + "." + formatDateTime;
+            logger.debug("About to rename the input file.");
+            channelSftp.cd(home);
+            channelSftp.rename(inputFilePath, toFileName);
+            logger.info("The input file is successfully renamed.");
+            inputFileWasSuccessfullyRenamed = true;
+
         } catch (Exception e) {
             logger.error("Exception received when trying to rename the input file.", e);
-            resourceContainer = null;
             inputFileWasSuccessfullyRenamed = false;
         } finally {
-            if (resourceContainer != null) {
-                resourceContainer.free();
-            }
+            free();
         }
         return inputFileWasSuccessfullyRenamed;
     }
@@ -129,19 +156,19 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         );
     }
 
-    List<String> lesMeldingerFraFil(final SftpResourceContainer resourceContainer)
-            throws IoOkosynkIoException,
+    List<String> lesMeldingerFraFil(final JSch javaSecureChannel)
+            throws NotFoundOkosynkIoException,
+            IoOkosynkIoException,
             ConfigureOrInitializeOkosynkIoException,
-            AuthenticationOkosynkIoException,
-            NotFoundOkosynkIoException {
+            AuthenticationOkosynkIoException {
 
-        establishSftpResources(resourceContainer);
+        establishSftpResources(javaSecureChannel);
 
         final List<String> lines;
-        try (BufferedReader bufferedReader = createBufferedReader(resourceContainer)) {
-            lines = bufferedReader.lines().collect(Collectors.toList());
-        } catch (IoOkosynkIoException | NotFoundOkosynkIoException okosynkIoException) {
-            throw okosynkIoException;
+        try (BufferedReader bufferedReader = createBufferedReader()) {
+            lines = bufferedReader.lines().toList();
+        } catch (NotFoundOkosynkIoException notFoundException) {
+            throw notFoundException;
         } catch (Exception e) {
             final String msg =
                     "Could not read lines from buffered reader. " + System.lineSeparator() + this;
@@ -151,45 +178,12 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         return lines;
     }
 
-    private boolean removeInputData(
-            final SftpResourceContainer resourceContainer
-    ) {
-        boolean inputFileWasSuccessfullyRenamed;
-        try {
-            final ChannelSftp channelSftp = resourceContainer.getSftpChannel();
-            final String home = channelSftp.getHome();
-            final String inputFilePath = ftpSettings.ftpHostUrl().getPath();
-            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd'T'HH.mm.ss");
-            final LocalDateTime now = LocalDateTime.now();
-            final String formatDateTime = now.format(formatter);
-            final String toFileName = inputFilePath + "." + formatDateTime;
-            logger.debug("About to rename the input file.");
-            channelSftp.cd(home);
-            channelSftp.rename(inputFilePath, toFileName);
-            logger.info("The input file is successfully renamed.");
-            inputFileWasSuccessfullyRenamed = true;
-        } catch (Exception e) {
-            logger.warn("""
-                    Exception when trying to rename the (s)ftp input file. \
-                    Rename will not be done, \
-                    but the program will be exited. This implies that \
-                    the input file will be re-read the next time the batch is run, \
-                    unless it has been overwritten by a new one.
-                    """, e);
-            inputFileWasSuccessfullyRenamed = false;
-        }
-
-        return inputFileWasSuccessfullyRenamed;
-    }
-
-    private void establishSftpResources(final SftpResourceContainer sftpResourceContainer)
+    private void establishSftpResources(final JSch javaSecureChannel)
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException {
-
-        final Session sftpSession;
         try {
-            sftpSession = sftpResourceContainer.getJavaSecureChannel()
+            sftpSession = javaSecureChannel
                     .getSession(
                             ftpSettings.ftpUser(),
                             ftpSettings.ftpHostUrl().getHost(),
@@ -199,13 +193,11 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
             setStatusError();
             throw new ConfigureOrInitializeOkosynkIoException(msg, e);
         }
-        sftpResourceContainer.setSftpSession(sftpSession);
+        sftpSession.setConfig("StrictHostKeyChecking", "no");
+        sftpSession.setPassword(ftpSettings.ftpPassword());
 
-        sftpResourceContainer.getSftpSession().setConfig("StrictHostKeyChecking", "no");
-
-        sftpResourceContainer.getSftpSession().setPassword(ftpSettings.ftpPassword());
         try {
-            sftpResourceContainer.getSftpSession().connect();
+            sftpSession.connect();
         } catch (JSchException e) {
             final String msg = "Could not connect SFTP session. " + System.lineSeparator() + this;
             setStatusError();
@@ -217,8 +209,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         }
 
         try {
-            final Channel channel = sftpResourceContainer.getSftpSession().openChannel(JSCH_CHANNEL_TYPE_SFTP);
-            sftpResourceContainer.setSftpChannel((ChannelSftp) channel);
+            sftpChannel = (ChannelSftp) sftpSession.openChannel(JSCH_CHANNEL_TYPE_SFTP);
         } catch (JSchException e) {
             final String msg = "Could not run openChannel on SFTP session. " + System.lineSeparator() + this;
             setStatusError();
@@ -226,7 +217,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         }
 
         try {
-            sftpResourceContainer.getSftpChannel().connect();
+            sftpChannel.connect();
         } catch (JSchException e) {
             final String msg = "Could not connect to channel. " + System.lineSeparator() + this;
             setStatusError();
@@ -234,23 +225,19 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         }
     }
 
-    private BufferedReader createBufferedReader(final SftpResourceContainer sftpResourceContainer)
+    private BufferedReader createBufferedReader()
             throws EncodingOkosynkIoException,
             IoOkosynkIoException,
             NotFoundOkosynkIoException {
         try {
             logger.debug("About to acquire an InputStream from the batch input file...");
-            final InputStream inputStream =
-                    sftpResourceContainer
-                            .getSftpChannel()
-                            .get(fullyQualifiedInputFileName);
+            inputStream = sftpChannel.get(fullyQualifiedInputFileName);
             if (inputStream == null) {
                 final String msg =
                         "InputStream instance acquired from ChannelSftp is null, "
                                 + "which most probably is caused by the file not existing.";
                 throw new SftpException(ChannelSftp.SSH_FX_NO_SUCH_FILE, msg);
             }
-            sftpResourceContainer.setInputStream(inputStream);
         } catch (SftpException e) {
             final String msg;
             if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) {
@@ -260,13 +247,15 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
                 msg = "Could not acquire an input stream from the sftp channel.";
                 throw new IoOkosynkIoException(msg + System.lineSeparator() + this, e);
             }
-
         }
+        return new BufferedReader(setupInputStreamReader());
+    }
+
+    private InputStreamReader setupInputStreamReader() throws EncodingOkosynkIoException {
         final InputStreamReader inputStreamReader;
         try {
-
             inputStreamReader = new InputStreamReader(
-                    sftpResourceContainer.getInputStream(),
+                    inputStream,
                     ftpSettings.ftpCharsetName()
             );
         } catch (UnsupportedEncodingException e) {
@@ -276,8 +265,6 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
                             + this;
             throw new EncodingOkosynkIoException(msg, e);
         }
-
-        return new BufferedReader(inputStreamReader);
+        return inputStreamReader;
     }
-
 }

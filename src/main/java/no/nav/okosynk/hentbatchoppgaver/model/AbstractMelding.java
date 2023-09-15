@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import lombok.Getter;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingParser;
 
 import java.math.BigDecimal;
@@ -7,16 +8,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
-import static java.util.Arrays.asList;
-
 public abstract class AbstractMelding {
     protected static final String FIELD_SEPARATOR = System.lineSeparator();
-    public static final char TSS_PREFIX_1 = '8';
-    private static final char TSS_PREFIX_2 = '9';
-    private static final int ORGANISASJONSNUMMER_LENGDE = 9;
-    public static final String ORGANISASJON = "ORGANISASJON";
-    public static final String PERSON = "PERSON";
-    public static final String SAMHANDLER = "SAMHANDLER";
     public static final String FORSTE_FELTSEPARATOR = ";;   ";
 
     public static String formatAsNorwegianDate(final LocalDate dato) {
@@ -31,10 +24,7 @@ public abstract class AbstractMelding {
     public final String brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
     public static final String FELTSEPARATOR = ";   ";
 
-    public AbstractMeldingParser getParser() {
-        return parser;
-    }
-
+    @Getter
     private final AbstractMeldingParser parser;
 
     protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
@@ -52,16 +42,6 @@ public abstract class AbstractMelding {
     public String hentNettoBelopSomStreng() {
         final BigDecimal bd = BigDecimal.valueOf(this.totaltNettoBelop);
         return bd.toBigInteger().toString();
-    }
-
-    public String utledGjelderIdType() {
-        if (gjelderOrganisasjon()) {
-            return ORGANISASJON;
-        } else if (gjelderTss()) {
-            return SAMHANDLER;
-        } else {
-            return PERSON;
-        }
     }
 
     @Override
@@ -92,13 +72,4 @@ public abstract class AbstractMelding {
                 "behandlendeEnhet : " + behandlendeEnhet
         );
     }
-
-    private boolean gjelderTss() {
-        return asList(TSS_PREFIX_1, TSS_PREFIX_2).contains(this.gjelderId.trim().charAt(0));
-    }
-
-    private boolean gjelderOrganisasjon() {
-        return gjelderId.length() == ORGANISASJONSNUMMER_LENGDE;
-    }
-
 }
