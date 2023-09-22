@@ -65,5 +65,9 @@ spec:
         mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
       - kvPath: serviceuser/data/dev/srvokosynksftp
         mountPath: /secrets/serviceuser/okosynk/srvokosynksftp
+      - kvPath: serviceuser/data/dev/srvokosynk
+        mountPath: /secrets/serviceuser/okosynk/srvokosynk
+      - kvPath: kv/preprod/fss/okosynkos/privateKey
+        mountPath: /secrets/
     sidecar: true
 status: {}

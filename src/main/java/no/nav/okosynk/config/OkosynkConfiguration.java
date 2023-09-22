@@ -234,7 +234,10 @@ public class OkosynkConfiguration
                 new Tuple2("OSFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
                 new Tuple2("OSFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
                 new Tuple2("URFTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynksftp/username"),
-                new Tuple2("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password")
+                new Tuple2("URFTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynksftp/password"),
+                new Tuple2("FTPCREDENTIALS_USERNAME", "/secrets/serviceuser/okosynk/srvokosynk/username"),
+                new Tuple2("FTPCREDENTIALS_PASSWORD", "/secrets/serviceuser/okosynk/srvokosynk/password"),
+                new Tuple2("FTPCREDENTIALS_PRIVATE_KEY", "/secrets/privateKey")
         ).forEach(pair -> addVaultProperty(baseConfig, pair._1(), pair._2()));
         compositeConfiguration.addConfiguration(baseConfig);
     }
@@ -246,7 +249,8 @@ public class OkosynkConfiguration
         logger.info("About to add property {}, reading from file {} ", propertyKey, fileName);
         final String propertyValue = readStringFromFile(fileName);
         baseConfig.setProperty(propertyKey, propertyValue);
-        logger.info("Property {} now contains the value: {}", propertyKey, (propertyValue == null ? null : propertyKey.contains("PASSWORD") ? "***<something>***" : propertyValue));
+        logger.info("Property {} now contains the value: {}", propertyKey,
+                (propertyValue == null ? null : Stream.of("PASSWORD", "PRIVATE_KEY").anyMatch(propertyKey::contains) ? "***<something>***" : propertyValue));
     }
 
     private String readStringFromFile(final String fileName) {
