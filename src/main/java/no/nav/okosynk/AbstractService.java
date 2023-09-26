@@ -19,9 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
-import java.util.stream.Stream;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static no.nav.okosynk.exceptions.BatchStatus.ENDED_WITH_ERROR_GENERAL;
 import static no.nav.okosynk.exceptions.BatchStatus.READY;
 import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
@@ -104,23 +103,12 @@ public abstract class AbstractService<T extends AbstractMelding> {
             String formatted = "Using SFTP for %s, reading fullyQualifiedInputFileName: \"%s\"".formatted(this.getClass().getSimpleName(), uri.getPath());
             logger.info(formatted);
 
-            logger.info("Forsøker lesning av de tre nye variablene");
-
-            record Tuple(String key, String value){}
-
-            Stream.of("FTPCREDENTIALS_PRIVATE_KEY", "FTPCREDENTIALS_PRIVATE_KEY_PRIVATE_KEY",
-                            "FTPCREDENTIALS_USERNAME", "FTPCREDENTIALS_PASSWORD",
-                            "FTPCREDENTIALS_USERNAME_ALT", "FTPCREDENTIALS_PASSWORD_ALT")
-                    .map(s -> new Tuple(s, okosynkConfiguration.getString(s)))
-                    .forEach(t -> logger.info("Trying to access {}, lengde:{} ", t.key(), Objects.nonNull(t.value()) ? t.value().length() : "null")
-            );
-            logger.info("Ferdig med lesning av nye variabler");
-
             FtpSettings ftpSettings = new FtpSettings(
                     uri,
-                    okosynkConfiguration.getFtpUser(getBatchType()),
-                    okosynkConfiguration.getFtpPassword(getBatchType()),
-                    okosynkConfiguration.getFtpCharsetName(getBatchType(), "ISO8859_1"));
+                    okosynkConfiguration.getString("FTPCREDENTIALS_USERNAME"),
+                    okosynkConfiguration.getString("FTPCREDENTIALS_PASSWORD"),
+                    okosynkConfiguration.getString("FTPCREDENTIALS_PRIVATE_KEY"),
+                    ISO_8859_1);
 
             setMeldingLinjeReader(new MeldingLinjeSftpReader(ftpSettings, getBatchType()));
 

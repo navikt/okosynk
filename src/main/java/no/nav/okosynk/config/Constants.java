@@ -1,11 +1,11 @@
 package no.nav.okosynk.config;
 
+import lombok.Getter;
+
 public class Constants {
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY = "Nav-Consumer-Token";
-    public static final String HTTP_HEADER_ACCEPT_APPLICATION_JSON_VALUE = "application/json";
-    public static final String HTTP_HEADER_CONTENT_TYPE_TEXT_PLAIN_VALUE = "text/plain";
     public static final String HTTP_HEADER_NAV_CALL_ID_KEY = "Nav-Call-Id";
     public static final String HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY = "Content-Type";
     public static final String BATCH_MAX_NUMBER_OF_TRIES_KEY = "batch.max.number.of.tries";
@@ -33,8 +33,8 @@ public class Constants {
                 "srvbokosynk001",
                 "OKO_OS",
                 "OSFTPBASEURL_URL",
-                "OSFTPCREDENTIALS_USERNAME",
-                "OSFTPCREDENTIALS_PASSWORD",
+                "FTPCREDENTIALS_USERNAME",
+                "FTPCREDENTIALS_PASSWORD",
                 "OS_FTP_CHARSET",
                 "os_mapping_regler.properties",
                 "SRVBOKOSYNK001_PASSWORD",
@@ -46,24 +46,32 @@ public class Constants {
                 "srvbokosynk002",
                 "OKO_UR",
                 "URFTPBASEURL_URL",
-                "URFTPCREDENTIALS_USERNAME",
-                "URFTPCREDENTIALS_PASSWORD",
+                "FTPCREDENTIALS_USERNAME",
+                "FTPCREDENTIALS_PASSWORD",
                 "UR_FTP_CHARSET",
                 "ur_mapping_regler.properties",
                 "SRVBOKOSYNK002_PASSWORD",
                 "okosynk_ur_batch_alert"
         );
 
+        @Getter
         private final String name;
         private final String batchBrukerKey;
         private final String batchBrukerDefaultValue;
+        @Getter
         private final String oppgaveType;
+        @Getter
         private final String ftpHostUrlKey;
+        @Getter
         private final String ftpUserKey;
+        @Getter
         private final String ftpPasswordKey;
+        @Getter
         private final String ftpCharsetNameKey;
+        @Getter
         private final String mappingRulesPropertiesFileName;
         private final String batchBrukerPasswordKey;
+        @Getter
         private final String alertCollectorMetricName;
 
         BATCH_TYPE(
@@ -94,38 +102,6 @@ public class Constants {
 
         public String getConsumerStatisticsName() {
             return name() + " - " + getName();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getAlertCollectorMetricName() {
-            return this.alertCollectorMetricName;
-        }
-
-        public String getOppgaveType() {
-            return oppgaveType;
-        }
-
-        public String getFtpHostUrlKey() {
-            return ftpHostUrlKey;
-        }
-
-        public String getFtpUserKey() {
-            return ftpUserKey;
-        }
-
-        public String getFtpPasswordKey() {
-            return ftpPasswordKey;
-        }
-
-        public String getFtpCharsetNameKey() {
-            return ftpCharsetNameKey;
-        }
-
-        public String getMappingRulesPropertiesFileName() {
-            return mappingRulesPropertiesFileName;
         }
 
         String getBatchBrukerKey() {

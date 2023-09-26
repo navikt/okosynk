@@ -46,7 +46,7 @@ spec:
     - name: BATCH_MAX_NUMBER_OF_TRIES
       value: "3"
     - name: OSFTPBASEURL_URL
-      value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/OS.INPUT
+      value: sftp://b27drvl011.preprod.local:22/inbound/OS.INPUT
     - name: URFTPBASEURL_URL
       value: sftp://filmottak.preprod.local:22/home/srvokosynksftp/inbound/UR.INPUT
     - name: AZURE_APP_SCOPE_OPPGAVE

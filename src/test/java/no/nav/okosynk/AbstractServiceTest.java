@@ -1,9 +1,9 @@
 package no.nav.okosynk;
 
-import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import org.junit.jupiter.api.Test;
@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
@@ -62,6 +60,7 @@ public abstract class AbstractServiceTest {
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpHostUrlKey(), "lkjnlknkl");
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpUserKey(), "SomeDummyDude");
         getOkosynkConfiguration().setSystemProperty(service.getBatchType().getFtpPasswordKey(), "SomeDummyPwd");
+        getOkosynkConfiguration().setSystemProperty("FTPCREDENTIALS_PRIVATE_KEY", "SomeDummyKey");
         service.setAktoerClient(mockedAktoerClient);
 
         assertDoesNotThrow(service::run);

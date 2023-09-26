@@ -36,6 +36,7 @@ class UrServiceTest extends AbstractServiceTest {
         System.setProperty("URFTPBASEURL_URL", "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.testset_001.input");
         System.setProperty("URFTPCREDENTIALS_USERNAME", "someShitUserIdNotBeingUsedByNeitherThisOrThat");
         System.setProperty("URFTPCREDENTIALS_PASSWORD", "someShitPasswordNotBeingUsedByNeitherThisOrThat");
+        System.setProperty("FTPCREDENTIALS_PRIVATE_KEY", "somePrivacyKPlsThnx");
 
         final UrService mockedUrService = mock(UrService.class);
         when(mockedUrService.createAndConfigureBatch(any())).thenCallRealMethod();

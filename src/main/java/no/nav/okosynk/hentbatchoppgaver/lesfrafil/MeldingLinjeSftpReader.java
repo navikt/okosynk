@@ -1,9 +1,12 @@
 package no.nav.okosynk.hentbatchoppgaver.lesfrafil;
 
 import com.jcraft.jsch.*;
+import lombok.NonNull;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
-import org.apache.commons.lang3.StringUtils;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.AuthenticationOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.IoOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.NotFoundOkosynkIoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +22,6 @@ import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
 public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
 
     private static final Logger logger = LoggerFactory.getLogger(MeldingLinjeSftpReader.class);
-    private static final String JSCH_CHANNEL_TYPE_SFTP = "sftp";
-    private final JSch javaSecureChannel;
     private final Constants.BATCH_TYPE batchType;
     private final String fullyQualifiedInputFileName;
     private FileReaderStatus status;
@@ -30,37 +31,26 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
     InputStream inputStream = null;
 
     public MeldingLinjeSftpReader(
-            final FtpSettings ftpSettings,
+            final @NonNull FtpSettings ftpSettings,
             final Constants.BATCH_TYPE batchType
     ) {
-        status = ERROR;
-
-        if (ftpSettings == null) {
-            throw new NullPointerException("okosynkConfiguration er null");
-        }
-        status = OK;
-
+        this.status = OK;
         this.ftpSettings = ftpSettings;
         this.fullyQualifiedInputFileName = ftpSettings.ftpHostUrl().getPath().replace('\\', File.separatorChar);
         this.batchType = requireNonNull(batchType);
-        this.javaSecureChannel = new JSch();
+    }
 
-        String msg = "";
+    private JSch javaSecureChannel(final FtpSettings fs) throws JSchException {
+        JSch javaSecureChannel = new JSch();
+        logger.info(fs.privateKey());
+        String prvKey = fs.privateKey();
+        logger.info("prvKey.length() = " + prvKey.length());
+        logger.info("prvKey.lastLine = " + prvKey.lines().reduce((a, b) -> b).orElseGet(() -> "no lines in private key!"));
+        logger.info("prvKey start    = " + prvKey.substring(0, 40));
+        logger.info("prvKey end      = " + prvKey.substring(prvKey.length() - 40));
 
-        final String ftpUser = ftpSettings.ftpUser();
-        if (StringUtils.isBlank(ftpUser)) {
-            msg += System.lineSeparator() + "ftpUser er null eller tom: + " + ftpUser;
-            setStatusError();
-        }
-        final String ftpPassword = ftpSettings.ftpPassword();
-        if (StringUtils.isBlank(ftpPassword)) {
-            msg += System.lineSeparator() + "ftpPassword er null eller tom";
-            setStatusError();
-        }
-
-        if (ERROR.equals(getStatus())) {
-            throw new IllegalArgumentException(msg);
-        }
+        javaSecureChannel.addIdentity("srvOkosynk", fs.privateKey().getBytes(), null, null);
+        return javaSecureChannel;
     }
 
     @Override
@@ -87,7 +77,9 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         final List<String> meldinger;
 
         try {
-            meldinger = lesMeldingerFraFil(javaSecureChannel);
+            meldinger = lesMeldingerFraFil(javaSecureChannel(ftpSettings));
+        } catch (JSchException e) {
+            throw new ConfigureOrInitializeOkosynkIoException("Ugyldig privatnøkkel");
         } finally {
             free();
         }
@@ -118,7 +110,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
 
         boolean inputFileWasSuccessfullyRenamed;
         try {
-            establishSftpResources(javaSecureChannel);
+            establishSftpResources(javaSecureChannel(ftpSettings));
             final ChannelSftp channelSftp = sftpChannel;
             final String home = channelSftp.getHome();
             final String inputFilePath = ftpSettings.ftpHostUrl().getPath();
@@ -183,18 +175,17 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
             AuthenticationOkosynkIoException,
             IoOkosynkIoException {
         try {
-            sftpSession = javaSecureChannel
-                    .getSession(
-                            ftpSettings.ftpUser(),
-                            ftpSettings.ftpHostUrl().getHost(),
-                            ftpSettings.ftpHostUrl().getPort());
+            sftpSession = javaSecureChannel.getSession(
+                    ftpSettings.ftpUser(),
+                    ftpSettings.ftpHostUrl().getHost(),
+                    ftpSettings.ftpHostUrl().getPort());
         } catch (JSchException e) {
             final String msg = "Could not establish an sftp session. " + System.lineSeparator() + this;
             setStatusError();
             throw new ConfigureOrInitializeOkosynkIoException(msg, e);
         }
+        sftpSession.setConfig("PreferredAuthentications", "publickey");
         sftpSession.setConfig("StrictHostKeyChecking", "no");
-        sftpSession.setPassword(ftpSettings.ftpPassword());
 
         try {
             sftpSession.connect();
@@ -209,7 +200,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         }
 
         try {
-            sftpChannel = (ChannelSftp) sftpSession.openChannel(JSCH_CHANNEL_TYPE_SFTP);
+            sftpChannel = (ChannelSftp) sftpSession.openChannel("sftp");
         } catch (JSchException e) {
             final String msg = "Could not run openChannel on SFTP session. " + System.lineSeparator() + this;
             setStatusError();
@@ -226,8 +217,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
     }
 
     private BufferedReader createBufferedReader()
-            throws EncodingOkosynkIoException,
-            IoOkosynkIoException,
+            throws IoOkosynkIoException,
             NotFoundOkosynkIoException {
         try {
             logger.debug("About to acquire an InputStream from the batch input file...");
@@ -251,20 +241,7 @@ public class MeldingLinjeSftpReader implements IMeldingLinjeFileReader {
         return new BufferedReader(setupInputStreamReader());
     }
 
-    private InputStreamReader setupInputStreamReader() throws EncodingOkosynkIoException {
-        final InputStreamReader inputStreamReader;
-        try {
-            inputStreamReader = new InputStreamReader(
-                    inputStream,
-                    ftpSettings.ftpCharsetName()
-            );
-        } catch (UnsupportedEncodingException e) {
-            final String msg =
-                    "Could not acquire an InputStreamReader for the input stream. "
-                            + System.lineSeparator()
-                            + this;
-            throw new EncodingOkosynkIoException(msg, e);
-        }
-        return inputStreamReader;
+    private InputStreamReader setupInputStreamReader() {
+        return new InputStreamReader(inputStream, ftpSettings.ftpCharsetName());
     }
 }
