@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-public class OkosynkConfigurationTest {
+class OkosynkConfigurationTest {
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
 
@@ -141,7 +141,7 @@ public class OkosynkConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("foos")
-    public void testGetStringWithoutDefaultFirstPriorityKeyWithStringValueee(
+    void testGetStringWithoutDefaultFirstPriorityKeyWithStringValueee(
             final String secondPriorityKey,
             final String secondPriorityVal,
             final String firstPriorityKey,
@@ -474,7 +474,7 @@ public class OkosynkConfigurationTest {
 
     @ParameterizedTest
     @MethodSource("barfoos")
-    public void testGetBooleanFirstPriorityKeyWithStringValue(
+    void testGetBooleanFirstPriorityKeyWithStringValue(
             final String secondPriorityKey,
             final String secondPriorityVal,
             final Boolean defVal,
@@ -498,13 +498,14 @@ public class OkosynkConfigurationTest {
 
         final Boolean actualVal = okosynkConfiguration.getBoolean(secondPriorityKey, defVal);
 
-        final String msg = String.format(
-                System.lineSeparator()
-                        + "secondPriorityKey: %s, " + System.lineSeparator()
-                        + "secondPriorityVal: %s, " + System.lineSeparator()
-                        + "defVal           : %s, " + System.lineSeparator()
-                        + "firstPriorityKey : %s, " + System.lineSeparator()
-                        + "firstPriorityVal : %s  " + System.lineSeparator(),
+        final String msg = String.format("""
+                secondPriorityKey: %s
+                secondPriorityVal: %s
+                defVal           : %s
+                firstPriorityKey : %s
+                firstPriorityVal : %s
+                expected         : %s
+                """,
                 secondPriorityKey,
                 secondPriorityVal,
                 defVal,
@@ -517,7 +518,7 @@ public class OkosynkConfigurationTest {
     }
 
     @Test
-    public void testGetBooleanFirstPriorityKeyWithStringValuess() {
+    void testGetBooleanFirstPriorityKeyWithStringValuess() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -532,13 +533,11 @@ public class OkosynkConfigurationTest {
         okosynkConfiguration.clearSystemProperty(secondPriorityKey);
         okosynkConfiguration.setSystemProperty(secondPriorityKey, secondPriorityVal);
 
-        final Boolean actualTestBoolEnv003 = okosynkConfiguration.getBoolean(secondPriorityKey, defVal);
-
-        assertEquals(false, actualTestBoolEnv003);
+        assertFalse(okosynkConfiguration.getBoolean(secondPriorityKey, defVal));
     }
 
     @Test
-    public void testGetBooleanFirstPriorityKeyWithStringValuefoff() {
+    void testGetBooleanFirstPriorityKeyWithStringValuefoff() {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");

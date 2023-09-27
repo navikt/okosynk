@@ -44,10 +44,8 @@ spec:
       value: "300000"
     - name: BATCH_MAX_NUMBER_OF_TRIES
       value: "30"
-    - name: OSFTPBASEURL_URL
-      value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.input
-    - name: URFTPBASEURL_URL
-      value: sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/ur.input
+    - name: FTPBASEURL_URL
+      value: sftp://a01drvl100.adeo.no:22/inbound/os.input
     - name: AZURE_APP_SCOPE_OPPGAVE
       value: api://prod-fss.oppgavehandtering.oppgave/.default
     - name: SHOULD_RUN_OS_OR_UR
@@ -62,7 +60,7 @@ spec:
         mountPath: /secrets/serviceuser/okosynk/srvbokosynk001
       - kvPath: serviceuser/data/prod/srvbokosynk002
         mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
-      - kvPath: serviceuser/data/prod/srvokosynksftp
-        mountPath: /secrets/serviceuser/okosynk/srvokosynksftp
+      - kvPath: kv/prod/fss/okosynkos/sftpcredentials
+        mountPath: /secrets/sftpcredentials
     sidecar: true
 status: {}

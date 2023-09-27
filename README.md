@@ -51,7 +51,7 @@ til ditto ...testset_nnn...
 0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties`
 
 ## Testkjøring av batchen i dev
-1. Sjekk adressen(e) til inputfil(ene) i nais/app-preprod.yaml under `OSFTPBASEURL_URL` og/eller `URFTPBASEURL_URL`
+1. Sjekk adressen(e) til inputfil(ene) i nais/app-preprod.yaml under `FTPBASEURL_URL`
 0. Legg filene du ønsker å teste der, eller rename allerede kjørt(e) fil(er). (Etter en vellykka kjøring blir nemlig inputfilene renama med en timestamp)
 0. Start en batchkjøring som beskrevet annet sted i denne dokumentasjonen.
 
@@ -59,7 +59,7 @@ til ditto ...testset_nnn...
 ## Lokalt
 `mvn clean install`
 ## Preprod/Prod
-Ved innsjekking til master-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
+Ved innsjekking til main-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
 Dette skjer på GitHub vha. action-scriptene
 `<PROJECT ROOT>/.github/workflows/deploy-dev-prod.yaml` 
 og

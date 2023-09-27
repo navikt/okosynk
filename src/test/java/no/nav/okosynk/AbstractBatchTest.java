@@ -54,7 +54,6 @@ public abstract class AbstractBatchTest {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new NotFoundOkosynkIoException(null, null)).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -73,7 +72,6 @@ public abstract class AbstractBatchTest {
         enteringTestHeaderLogger.debug(null);
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader = mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new IoOkosynkIoException(null, null)).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -93,7 +91,6 @@ public abstract class AbstractBatchTest {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doThrow(new RuntimeException()).when(mockedUspesifikkMeldingLinjeReader).read();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -116,7 +113,6 @@ public abstract class AbstractBatchTest {
         doReturn(emptyList()).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
         doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final OppgaveSynkroniserer mockedOppgaveSynkroniserer = mock(OppgaveSynkroniserer.class);
         doReturn(ConsumerStatistics.zero(this.batch.getBatchType())).when(mockedOppgaveSynkroniserer).synkroniser(anyCollection());
@@ -136,7 +132,6 @@ public abstract class AbstractBatchTest {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
 
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
@@ -162,7 +157,6 @@ public abstract class AbstractBatchTest {
         enteringTestHeaderLogger.debug(null);
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader = mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         this.batch.setUspesifikkMeldingLinjeReader(mockedUspesifikkMeldingLinjeReader);
         doThrow(clazz).when(mockedUspesifikkMeldingLinjeReader).read();
         assertDoesNotThrow(() -> this.batch.run());
@@ -181,7 +175,6 @@ public abstract class AbstractBatchTest {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final List<String> inputDataLines = new ArrayList<>();
         for (
@@ -211,7 +204,6 @@ public abstract class AbstractBatchTest {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
 
         final List<String> inputDataLines = new ArrayList<>();
         inputDataLines.add("lknlknklnklnlkn");
@@ -238,8 +230,6 @@ public abstract class AbstractBatchTest {
         final List<String> inputDataLines = new ArrayList<>();
 
         inputDataLines.add(getValidLineOfInputData());
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(inputDataLines).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
 
@@ -270,7 +260,6 @@ public abstract class AbstractBatchTest {
         final List<String> inputDataLines = new ArrayList<>();
 
         inputDataLines.add(getValidLineOfInputData());
-        doReturn(getBatchType()).when(mockedUspesifikkMeldingLinjeReader).getBatchType();
         doReturn(inputDataLines).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(false).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
 

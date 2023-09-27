@@ -9,7 +9,7 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.MeldingLinjeSftpReader;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.TinyFtpReader;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 import no.nav.okosynk.metrics.AbstractAlertMetrics;
@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static no.nav.okosynk.config.Constants.*;
 import static no.nav.okosynk.exceptions.BatchStatus.ENDED_WITH_ERROR_GENERAL;
 import static no.nav.okosynk.exceptions.BatchStatus.READY;
 import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
@@ -98,19 +99,19 @@ public abstract class AbstractService<T extends AbstractMelding> {
         );
 
         if (meldingLinjeFileReader == null) {
-            URI uri = new URI(okosynkConfiguration.getFtpHostUrl(getBatchType()));
+            URI uri = new URI(okosynkConfiguration.getString(FTP_HOST_URL_KEY));
 
-            String formatted = "Using SFTP for %s, reading fullyQualifiedInputFileName: \"%s\"".formatted(this.getClass().getSimpleName(), uri.getPath());
-            logger.info(formatted);
+            logger.info("Using SFTP for {}, reading fullyQualifiedInputFileName: {}", this.getClass().getSimpleName(), uri.getPath());
 
             FtpSettings ftpSettings = new FtpSettings(
                     uri,
-                    okosynkConfiguration.getString("FTPCREDENTIALS_USERNAME"),
-                    okosynkConfiguration.getString("FTPCREDENTIALS_PASSWORD"),
-                    okosynkConfiguration.getString("FTPCREDENTIALS_PRIVATE_KEY"),
-                    ISO_8859_1);
+                    okosynkConfiguration.getString(FTP_USERNAME),
+                    okosynkConfiguration.getString(FTP_PRIVATEKEY),
+                    ISO_8859_1,
+                    okosynkConfiguration.getString(FTP_HOSTKEY)
+                    );
 
-            setMeldingLinjeReader(new MeldingLinjeSftpReader(ftpSettings, getBatchType()));
+            setMeldingLinjeReader(new TinyFtpReader(ftpSettings));
 
             meldingstypeBatch.setBatchStatus(
                     OK == meldingLinjeFileReader.getStatus() ? READY : ENDED_WITH_ERROR_GENERAL

@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lesfrafil;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.AuthenticationOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.IoOkosynkIoException;
@@ -19,6 +18,4 @@ public interface IMeldingLinjeFileReader {
     boolean removeInputData();
 
     FileReaderStatus getStatus();
-
-    Constants.BATCH_TYPE getBatchType();
 }

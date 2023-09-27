@@ -33,9 +33,8 @@ class OsServiceTest extends AbstractServiceTest {
         enteringTestHeaderLogger.debug(null);
 
         System.setProperty(Constants.REST_STS_URL_KEY, "https://security-token-service.nais.adeo.no/rest/v1/sts/token");
-        System.setProperty("OSFTPBASEURL_URL", "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.testset_001.input");
-        System.setProperty("OSFTPCREDENTIALS_USERNAME", "someShitUserIdNotBeingUsedByNeitherThisOrThat");
-        System.setProperty("OSFTPCREDENTIALS_PASSWORD", "someShitPasswordNotBeingUsedByNeitherThisOrThat");
+        System.setProperty(Constants.FTP_HOST_URL_KEY, "sftp://filmottak.adeo.no:22/home/srvokosynksftp/inbound/os.testset_001.input");
+        System.setProperty(Constants.FTP_USERNAME, "someShitUserIdNotBeingUsedByNeitherThisOrThat");
 
         final OsService mockedOsService = mock(OsService.class);
         when(mockedOsService.createAndConfigureBatch(any())).thenCallRealMethod();

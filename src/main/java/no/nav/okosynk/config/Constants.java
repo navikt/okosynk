@@ -21,6 +21,12 @@ public class Constants {
     public static final String X_CORRELATION_ID_HEADER_KEY = "X-Correlation-ID";
     public static final String SHOULD_RUN_OS_OR_UR_KEY = "SHOULD_RUN_OS_OR_UR";
 
+    public static final String FTP_HOST_URL_KEY = "FTPBASEURL_URL";
+    public static final String FTP_USERNAME = "FTPCREDENTIALS_USERNAME";
+    public static final String FTP_PRIVATEKEY = "FTPCREDENTIALS_PRIVATE_KEY";
+    public static final String FTP_HOSTKEY = "FTPCREDENTIALS_HOST_KEY";
+
+
     static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
@@ -32,10 +38,6 @@ public class Constants {
                 "SRVBOKOSYNK001_USERNAME",
                 "srvbokosynk001",
                 "OKO_OS",
-                "OSFTPBASEURL_URL",
-                "FTPCREDENTIALS_USERNAME",
-                "FTPCREDENTIALS_PASSWORD",
-                "OS_FTP_CHARSET",
                 "os_mapping_regler.properties",
                 "SRVBOKOSYNK001_PASSWORD",
                 "okosynk_os_batch_alert"
@@ -45,10 +47,6 @@ public class Constants {
                 "SRVBOKOSYNK002_USERNAME",
                 "srvbokosynk002",
                 "OKO_UR",
-                "URFTPBASEURL_URL",
-                "FTPCREDENTIALS_USERNAME",
-                "FTPCREDENTIALS_PASSWORD",
-                "UR_FTP_CHARSET",
                 "ur_mapping_regler.properties",
                 "SRVBOKOSYNK002_PASSWORD",
                 "okosynk_ur_batch_alert"
@@ -61,14 +59,6 @@ public class Constants {
         @Getter
         private final String oppgaveType;
         @Getter
-        private final String ftpHostUrlKey;
-        @Getter
-        private final String ftpUserKey;
-        @Getter
-        private final String ftpPasswordKey;
-        @Getter
-        private final String ftpCharsetNameKey;
-        @Getter
         private final String mappingRulesPropertiesFileName;
         private final String batchBrukerPasswordKey;
         @Getter
@@ -79,10 +69,6 @@ public class Constants {
                 final String batchBrukerKey,
                 final String batchBrukerDefaultValue,
                 final String oppgaveType,
-                final String ftpHostUrlKey,
-                final String ftpUserKey,
-                final String ftpPasswordKey,
-                final String ftpCharsetNameKey,
                 final String mappingRulesPropertiesFileName,
                 final String batchBrukerPasswordKey,
                 final String alertCollectorMetricName
@@ -91,10 +77,6 @@ public class Constants {
             this.batchBrukerKey = batchBrukerKey;
             this.batchBrukerDefaultValue = batchBrukerDefaultValue;
             this.oppgaveType = oppgaveType;
-            this.ftpHostUrlKey = ftpHostUrlKey;
-            this.ftpUserKey = ftpUserKey;
-            this.ftpPasswordKey = ftpPasswordKey;
-            this.ftpCharsetNameKey = ftpCharsetNameKey;
             this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
             this.batchBrukerPasswordKey = batchBrukerPasswordKey;
             this.alertCollectorMetricName = alertCollectorMetricName;
