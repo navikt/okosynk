@@ -8,6 +8,8 @@ jobs:
   build-project:
     name: deploy-dev-prod
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: checkout
         uses: actions/checkout@v3

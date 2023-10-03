@@ -8,6 +8,8 @@ jobs:
   deploy-alerts-dev:
     name: Deploy alarmer til dev
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
       - name: Sjekker ut kode
         uses: actions/checkout@v3
