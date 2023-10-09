@@ -6,10 +6,6 @@ public abstract class AbstractOkosynkIoException extends Exception {
     this(message, null);
   }
 
-  protected AbstractOkosynkIoException(final Throwable cause) {
-    this(null, cause);
-  }
-
   protected AbstractOkosynkIoException(
       final String message,
       final Throwable cause) {

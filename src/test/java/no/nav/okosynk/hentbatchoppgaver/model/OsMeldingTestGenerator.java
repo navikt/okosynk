@@ -6,30 +6,24 @@ import java.util.stream.Stream;
 
 public class OsMeldingTestGenerator {
 
-    private static String organisasjonGjelderId = OsMelding.ORGANISASJON_PREFIKS + "125240327022828640";
-    private static String personGjelderId = "10108000398022828640";
-    private static String tssGjelderId = AbstractMelding.TSS_PREFIX_1 + "1123270327022828640";
-
     private static final String OS_MELDING = "2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    06025800174            ";
 
     public static String withGjelderIdOrganiasjon() {
+        String organisasjonGjelderId = OsMelding.ORGANISASJON_PREFIKS + "125240327022828640";
         return organisasjonGjelderId + " " + OS_MELDING;
     }
 
     public static String withGjelderIdPerson() {
+        String personGjelderId = "10108000398022828640";
         return personGjelderId + " " + OS_MELDING;
-    }
-
-    public static String withGjelderIdTss() {
-        return tssGjelderId + " " + OS_MELDING;
     }
 
     public static Stream<Arguments> osMeldingAndExpectedProvider() {
         return Stream.of(
-                Arguments.of("10108000398", "PERSON", "10108000398024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
-                Arguments.of("80123240327", "SAMHANDLER", "80123240327024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
-                Arguments.of("90123240327", "SAMHANDLER", "90123240327024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
-                Arguments.of("123456789", "ORGANISASJON", "00123456789055209429 2010-12-222010-12-30RETUK231B3502010-12-012010-12-31000001456070H 8020         REFARBG 80000510102            ")
+                Arguments.of("10108000398", "AKTORID", /*...*/ "10108000398024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
+                Arguments.of("80123240327", "SAMHANDLER", /**/ "80123240327024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
+                Arguments.of("90123240327", "SAMHANDLER", /**/ "90123240327024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            "),
+                Arguments.of("123456789", "ORGANISASJON", /**/ "00123456789055209429 2010-12-222010-12-30RETUK231B3502010-12-012010-12-31000001456070H 8020         REFARBG 80000510102            ")
         );
     }
 
@@ -50,7 +44,7 @@ public class OsMeldingTestGenerator {
         public static final String behandleneEnhet = "8020";
 
         private static final String OS_MELDING = beregningsId + " " + beregningsdato + datoForStatus +
-                nyesteVentestatus +  brukerId + forsteFomIPeriode + sisteTomIPeriode + "000000012300æ " +
+                nyesteVentestatus + brukerId + forsteFomIPeriode + sisteTomIPeriode + "000000012300æ " +
                 behandleneEnhet + "         " + faggruppe + "    " + utbetalesTilId + "            ";
 
         public static String getMelding() {

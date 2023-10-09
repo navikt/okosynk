@@ -14,16 +14,13 @@ import org.slf4j.LoggerFactory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-class OsBatchTest extends AbstractBatchTest<OsMelding> {
+class OsBatchTest extends AbstractBatchTest {
 
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
 
     @BeforeEach
     void beforeEach() {
-
-        super.setMockedMeldingReader(mock(MeldingReader.class));
-        super.setMockedMeldingMapper(mock(OsMapper.class));
 
         super.setBatch(
                 new Batch<>(

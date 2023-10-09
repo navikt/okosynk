@@ -24,10 +24,10 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
 
         return groupMeldingerSomSkalBliOppgaver(meldinger)
                 .stream()
-                .map(this.osOppgaveOppretter)
+                .map(this.osOppgaveOppretter::opprettOppgave)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     Predicate<OsMelding> osMeldingSkalBliOppgave() {

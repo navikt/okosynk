@@ -3,7 +3,6 @@ package no.nav.okosynk.synkroniserer;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.config.IOkosynkConfiguration;
-import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
@@ -34,7 +33,6 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.anyCollection;
 import static org.mockito.Mockito.*;
 
 class OppgaveSynkronisererTest {
@@ -46,22 +44,16 @@ class OppgaveSynkronisererTest {
 
     public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
     private static final Constants.BATCH_TYPE BATCH_TYPE = Constants.BATCH_TYPE.OS;
-    private static final String OPPGAVEID_GSAK = "185587300";
     private static final String OPPGAVEID = "185587998";
-    private static final String BRUKERID_GSAK = "10108000398";
-    private static final String BRUKERID = "06025800174";
 
     private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
     private OppgaveRestClient mockedOppgaveRestClient;
-    private BatchStatus batchStatus;
 
     private static Stream<Arguments> provideEqualsRelatedValuesForOppgave() {
         return OppgaveTest.provideEqualsRelatedValuesForOppgave();
     }
-
-    // =========================================================================
 
     @BeforeEach
     void setUp() {
@@ -71,8 +63,6 @@ class OppgaveSynkronisererTest {
         mockedOppgaveRestClient = mock(OppgaveRestClient.class);
 
         this.oppgaveSynkronisererWithInjectedMocks = new OppgaveSynkroniserer(OppgaveSynkronisererTest.okosynkConfiguration, mockedOppgaveRestClient);
-
-        this.batchStatus = BatchStatus.STARTED;
 
         when(this.mockedOppgaveRestClient.finnOppgaver(anySet())).thenReturn(
                 // Just a placeholder:
@@ -94,12 +84,10 @@ class OppgaveSynkronisererTest {
         final IAktoerClient aktoerClient = mock(IAktoerClient.class);
         when(aktoerClient.hentGjeldendeAktoerId(any())).thenReturn(AktoerRespons.ok(expectedAktoerId));
 
-        final IOkosynkConfiguration mockedOkosynkConfiguration = mock(IOkosynkConfiguration.class);
         final String linjeMedUspesifikkMelding = expectedFolkeregisterIdent + "422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
         final IMeldingReader<OsMelding> meldingReader = new MeldingReader<>(OsMelding::new);
-        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding = meldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(new HashSet<String>() {{
-            add(linjeMedUspesifikkMelding);
-        }}.stream());
+        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
+                meldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(List.of(linjeMedUspesifikkMelding));
         final IMeldingMapper<OsMelding> spesifikkMapper = new OsMapper(aktoerClient);
         final Set<Oppgave> batchOppgaver = new HashSet<>(spesifikkMapper.lagOppgaver(spesifikkMeldingFraLinjeMedUspesifikkMelding));
 
@@ -117,8 +105,7 @@ class OppgaveSynkronisererTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        this.batchStatus = BatchStatus.STARTED;
-        this.oppgaveSynkronisererWithInjectedMocks.synkroniser(lagOppgaveliste(OPPGAVEID));
+        this.oppgaveSynkronisererWithInjectedMocks.synkroniser(lagOppgaveliste());
 
         final Set<Oppgave> funneOppgaver = new HashSet<>();
         verify(this.mockedOppgaveRestClient).finnOppgaver(funneOppgaver);
@@ -131,7 +118,7 @@ class OppgaveSynkronisererTest {
 
         this.oppgaveSynkronisererWithInjectedMocks = Mockito.spy(new OppgaveSynkroniserer(OppgaveSynkronisererTest.okosynkConfiguration, mockedOppgaveRestClient));
 
-        this.oppgaveSynkronisererWithInjectedMocks.synkroniser(lagOppgaveliste(OPPGAVEID));
+        this.oppgaveSynkronisererWithInjectedMocks.synkroniser(lagOppgaveliste());
 
         verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).ferdigstillOppgaver(anySet());
         verify(this.oppgaveSynkronisererWithInjectedMocks, times(1)).oppdaterOppgaver(anySet());
@@ -144,11 +131,11 @@ class OppgaveSynkronisererTest {
         enteringTestHeaderLogger.debug(null);
 
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
-        final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker(OPPGAVEID);
+        final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
         final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(OppgaveSynkroniserer.finnOppgaverSomSkalOppdateres(Collections.singleton(oppdatertOppgave), Collections.singleton(ikkeOppdatertOppgave)));
 
-        final ArgumentCaptor<Collection<Oppgave>> captor = forClass((Class) Collection.class);
+        final ArgumentCaptor<Collection<Oppgave>> captor = forClass(Collection.class);
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
         assertEquals(nyBeskrivelse, captor.getValue().iterator().next().beskrivelse);
     }
@@ -160,20 +147,19 @@ class OppgaveSynkronisererTest {
 
         final String lokalOppgaveBeskrivelse = "STATUS;;Dette skal beholdes";
         final String oppgaveBeskrivelseLestFraDatabasen = "ANNEN KODE;; Noen har endret på dette, det blir forkastet!";
-        final String expectedtBeskrivelse = lokalOppgaveBeskrivelse;
 
-        final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(OPPGAVEID, lokalOppgaveBeskrivelse);
+        final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(lokalOppgaveBeskrivelse);
         final Oppgave oppgaveLestFraDatabasen = new Oppgave.OppgaveBuilder().withSameValuesAs(lokalOppgave).withBeskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
-        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaver = this.oppgaveSynkronisererWithInjectedMocks.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
+        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaver = OppgaveSynkroniserer.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
 
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(oppgaver);
 
-        final ArgumentCaptor<Set<Oppgave>> captor = ArgumentCaptor.forClass((Class) Set.class);
+        final ArgumentCaptor<Set<Oppgave>> captor = forClass(Set.class);
 
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
 
         final String actualBeskrivelse = captor.getValue().iterator().next().beskrivelse;
-        assertEquals(expectedtBeskrivelse, actualBeskrivelse);
+        assertEquals(lokalOppgaveBeskrivelse, actualBeskrivelse);
     }
 
     @Test
@@ -184,13 +170,13 @@ class OppgaveSynkronisererTest {
         final String lokalOppgaveBeskrivelse = "Oppgavestatus;;Oppsummering av meldinger som er slått sammen på oppgaven";
         final String oppgaveBeskrivelseLestFraDatabasen = "ikke viktig;PESYS KODE IKKEMED;Noen har endret på dette, det blir forkastet!";
         final String expectedtBeskrivelse = "Oppgavestatus;PESYS KODE;Oppsummering av meldinger som er slått sammen på oppgaven";
-        final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(OPPGAVEID, lokalOppgaveBeskrivelse);
+        final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(lokalOppgaveBeskrivelse);
         final Oppgave oppgaveLestFraDatabasen = new Oppgave.OppgaveBuilder().withSameValuesAs(lokalOppgave).withBeskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
-        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaver = this.oppgaveSynkronisererWithInjectedMocks.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
+        final Set<OppgaveSynkroniserer.OppgaveOppdatering> oppgaver = OppgaveSynkroniserer.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
 
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(oppgaver);
 
-        final ArgumentCaptor<Set<Oppgave>> captor = ArgumentCaptor.forClass((Class) Set.class);
+        final ArgumentCaptor<Set<Oppgave>> captor = forClass(Set.class);
 
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
 
@@ -204,7 +190,7 @@ class OppgaveSynkronisererTest {
         enteringTestHeaderLogger.debug(null);
 
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
-        final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker(OPPGAVEID);
+        final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
         final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
 
         final OppgaveSynkroniserer.OppgaveOppdatering oppgaveOppdatering = new OppgaveSynkroniserer.OppgaveOppdatering(ikkeOppdatertOppgave, oppdatertOppgave);
@@ -219,7 +205,7 @@ class OppgaveSynkronisererTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        this.oppgaveSynkronisererWithInjectedMocks.opprettOppgaver(lagOppgaveliste(OPPGAVEID));
+        this.oppgaveSynkronisererWithInjectedMocks.opprettOppgaver(lagOppgaveliste());
 
         verify(this.mockedOppgaveRestClient).opprettOppgaver(anyCollection());
     }
@@ -236,13 +222,12 @@ class OppgaveSynkronisererTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final Oppgave oppgave = lagOppgaveMedBruker(OPPGAVEID);
+        final Oppgave oppgave = lagOppgaveMedBruker();
         final Oppgave oppgaveMedEndretOppgaveType = new Oppgave.OppgaveBuilder().withSameValuesAs(oppgave).withOppgavetypeKode(EKSTERN_OPPGAVETYPE_KODE).build();
-        final Set<Oppgave> oppgaverSomSkalFerdigstilles = this.oppgaveSynkronisererWithInjectedMocks.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgaveMedEndretOppgaveType));
+        final Set<Oppgave> oppgaverSomSkalFerdigstilles = OppgaveSynkroniserer.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgaveMedEndretOppgaveType));
 
         this.oppgaveSynkronisererWithInjectedMocks.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
 
-        final ArgumentCaptor<Set<Oppgave>> captor = ArgumentCaptor.forClass((Class) Set.class);
         verify(this.mockedOppgaveRestClient, times(0)).patchOppgaver(anySet(), anyBoolean());
     }
 
@@ -251,13 +236,12 @@ class OppgaveSynkronisererTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final Oppgave oppgave = lagOppgaveMedBruker(OPPGAVEID);
+        final Oppgave oppgave = lagOppgaveMedBruker();
 
-        final Set<Oppgave> oppgaverSomSkalFerdigstilles = this.oppgaveSynkronisererWithInjectedMocks.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgave));
+        final Set<Oppgave> oppgaverSomSkalFerdigstilles = OppgaveSynkroniserer.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgave));
 
         this.oppgaveSynkronisererWithInjectedMocks.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
 
-        final ArgumentCaptor<Collection<Oppgave>> captor = ArgumentCaptor.forClass((Class) List.class);
         verify(this.mockedOppgaveRestClient, times(1)).patchOppgaver(anySet(), anyBoolean());
     }
 
@@ -327,21 +311,19 @@ class OppgaveSynkronisererTest {
         assertEquals(expectedNumberOfOppgaverSomSkalOppdateres, oppgaverSomSkalOpprettes.size());
     }
 
-    private Set<Oppgave> lagOppgaveliste(String oppgaveId) {
+    private Set<Oppgave> lagOppgaveliste() {
         Set<Oppgave> oppgaveliste = new HashSet<>();
-        oppgaveliste.add(lagOppgaveMedBruker(oppgaveId));
+        oppgaveliste.add(lagOppgaveMedBruker());
 
         return oppgaveliste;
     }
 
-    private Oppgave lagOppgaveMedBruker(String oppgaveId) {
-        return lagOppgaveMedBeskrivelse(oppgaveId, "STATUS;;oppsummer meldinger slått sammen til en oppgave");
+    private Oppgave lagOppgaveMedBruker() {
+        return lagOppgaveMedBeskrivelse("STATUS;;oppsummer meldinger slått sammen til en oppgave");
     }
 
-    private Oppgave lagOppgaveMedBeskrivelse(final String oppgaveId, final String beskrivelse) {
+    private Oppgave lagOppgaveMedBeskrivelse(final String beskrivelse) {
 
-        final Oppgave oppgave = new Oppgave.OppgaveBuilder().withOppgaveId(oppgaveId).withOppgavetypeKode("OKO_OS").withFagomradeKode("BA").withPrioritetKode("LAV_OKO").withBeskrivelse(beskrivelse).withAnsvarligEnhetId("4151").withLest(false).withVersjon(1).withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36)).withAktivFra(LocalDate.of(1997, 2, 2)).withAktivTil(LocalDate.of(1997, 2, 9)).build();
-
-        return oppgave;
+        return new Oppgave.OppgaveBuilder().withOppgaveId(OppgaveSynkronisererTest.OPPGAVEID).withOppgavetypeKode("OKO_OS").withFagomradeKode("BA").withPrioritetKode("LAV_OKO").withBeskrivelse(beskrivelse).withAnsvarligEnhetId("4151").withLest(false).withVersjon(1).withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36)).withAktivFra(LocalDate.of(1997, 2, 2)).withAktivTil(LocalDate.of(1997, 2, 9)).build();
     }
 }

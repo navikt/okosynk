@@ -1,7 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
@@ -9,8 +7,6 @@ import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,15 +34,12 @@ class OsMapperTest {
     private static final String OS_MELDING_EFOG =
             "01017812345333374207 2019-02-132019-02-14AVVMK231B26E2018-10-012019-02-28000000090040æ 8020         EFOG    01017812345            ";
 
-    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
-
     private OsMapper osMapper;
     private OsMelding osMeldingSomSkalBliTilOppgave;
     private OsMelding annenOsMeldingSomSkalBliTilOppgave;
     private OsMelding osMeldingSomIkkeHarMapping;
     private OsMelding osMeldingEFOG;
-    private IAktoerClient aktoerRestClient = mock(IAktoerClient.class);
-    private boolean shouldConvertFolkeregisterIdentToAktoerId_saved = true;
+    private final IAktoerClient aktoerRestClient = mock(IAktoerClient.class);
 
     @BeforeEach
     void setUp() {
@@ -56,10 +50,9 @@ class OsMapperTest {
         osMeldingEFOG = new OsMelding(OS_MELDING_EFOG);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @Test
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med faggruppe \"EFOG\" som skal bli til oppgave.")
-    void lagUrOppgaveMedFaggruppeEFOG(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
+    void lagUrOppgaveMedFaggruppeEFOG() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -80,7 +73,7 @@ class OsMapperTest {
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
 
         assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
+        assertThat(oppgaver.get(0).folkeregisterIdent).isNull();
     }
 
     @Test
@@ -96,16 +89,16 @@ class OsMapperTest {
         List<Oppgave> oppgaver = osMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, annenOsMeldingSomSkalBliTilOppgave));
 
-        assertNotNull(oppgaver);
-        assertEquals(2, oppgaver.size());
-        assertEquals("1234", oppgaver.get(0).aktoerId);
-        assertEquals("123", oppgaver.get(1).aktoerId);
+        assertThat(oppgaver)
+                .isNotNull()
+                .hasSize(2)
+                .extracting(o -> o.aktoerId).contains("123", "1234");
     }
 
     @Test
     @DisplayName("lagOppgaver returnerer oppgave med ett innslag i beskrivelsen for hver statuskode")
     void lagFire() {
-        final List<OsMelding> FIRE = Stream.of(""+
+        final List<OsMelding> FIRE = Stream.of(
                         "05029745821495681278 2023-03-142023-03-14AVRKK231B2622022-12-012022-12-31000000059480æ 8020         ARBYT   05029745821            ",
                         "05029745821495681278 2023-03-142023-03-14AVAVK231B2622023-01-012023-01-31000000015040æ 8020         ARBYT   05029745821            ",
                         "05029745821495681278 2023-03-142023-03-14AVRKK231B2622023-01-012023-01-31000000153760æ 8020         ARBYT   05029745821            ",
@@ -119,18 +112,18 @@ class OsMapperTest {
         when(aktoerRestClient.hentGjeldendeAktoerId("05029745821")).thenReturn(AktoerRespons.ok("123"));
         List<Oppgave> oppgaver = osMapper.lagOppgaver(FIRE);
 
-        assertNotNull(oppgaver);
-
-        assertEquals(1, oppgaver.size());
-        Oppgave oppgave = oppgaver.get(0);
-        assertEquals(1, oppgave.beskrivelse.split("AVRK").length-1);
-        assertEquals(1, oppgave.beskrivelse.split("AVAV").length-1);
+        assertThat(oppgaver)
+                .isNotNull()
+                .hasSize(1)
+                .first()
+                .extracting(o -> o.beskrivelse)
+                .matches(b -> b.contains("AVRK"), "Skal inneholde AVRK")
+                .matches(b -> b.contains("AVAV"), "Skal inneholde AVAV");
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
+    @Test
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
-    void lagOsOppgaverFraOsMeldingListeReturnererEnOppgave(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
+    void lagOsOppgaverFraOsMeldingListeReturnererEnOppgave() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -146,7 +139,7 @@ class OsMapperTest {
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
         assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
+        assertThat(oppgaver.get(0).folkeregisterIdent).isNull();
     }
 
     @Test

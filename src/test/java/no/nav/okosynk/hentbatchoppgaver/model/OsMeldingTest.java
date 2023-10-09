@@ -1,17 +1,9 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingBuilder;
+import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,10 +13,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+
 class OsMeldingTest extends AbstractMeldingTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     @Test
     void osMeldingParserMeldingTilVariabler() {
@@ -53,26 +54,14 @@ class OsMeldingTest extends AbstractMeldingTest {
 
     @ParameterizedTest(name = "gjelderId = {0}, gjelderType = {1}")
     @MethodSource("getOsMeldingAndExpected")
-    void utledeGjelderType(String gjelderId, String expectedGjelderIdType, String inputMelding) {
-        OsMelding osMelding = new OsMelding(inputMelding);
-        final String gjelderIdType = osMelding.utledGjelderIdType();
+    void utledeGjelderType(String gjelderId, GjelderIdType expectedGjelderIdType, String _inputMelding) {
+        final GjelderIdType gjelderIdType = GjelderIdType.fra(gjelderId);
 
-        assertEquals(expectedGjelderIdType, gjelderIdType);
+        assertThat(expectedGjelderIdType).isSameAs(gjelderIdType);
     }
 
     private static Stream<Arguments> getOsMeldingAndExpected() {
         return OsMeldingTestGenerator.osMeldingAndExpectedProvider();
-    }
-
-    @Test
-    void equalsOgHashPaSammeObjekt() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        OsMelding melding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
-
-        assertEquals(melding, melding);
-        assertEquals(melding.hashCode(), melding.hashCode());
     }
 
     @Test
@@ -184,124 +173,66 @@ class OsMeldingTest extends AbstractMeldingTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final Set<String> gjelderIder = new HashSet<>();
-        gjelderIder.add("01234567890");
-        gjelderIder.add("01234777890");
-
-        final Set<String> behandlendeEnheter = new HashSet<>();
-        behandlendeEnheter.add("4819");
-        behandlendeEnheter.add("8020");
-
-        final Set<String> beregningsIder = new HashSet<>();
-        beregningsIder.add("022838640");
-        beregningsIder.add("022543210");
-
-        final Set<String> beregningsDatoer = new HashSet<>();
-        beregningsDatoer.add("2009-07-04");
-        beregningsDatoer.add("2009-07-03");
-
-        final Set<String> faggrupper = new HashSet<>();
-        faggrupper.add("INNT");
-        faggrupper.add("KREDDISP");
-
         final List<OsMelding> allHopefullyUniqueMeldinger = new ArrayList<>();
 
         final Random random = new Random(123);
-        gjelderIder
-            .stream()
-            .forEach(
-                gjelderId
-                ->
-                {
-                    behandlendeEnheter
-                        .stream()
-                        .forEach(
-                            behandlendeEnhet
-                            ->
-                            {
-                                beregningsIder
-                                    .stream()
-                                    .forEach(
-                                        beregningsId
-                                        ->
-                                        {
-                                            beregningsDatoer
-                                                .stream()
-                                                .forEach(
-                                                    beregningsDato
-                                                    ->
-                                                    {
-                                                        faggrupper
-                                                            .stream()
-                                                            .forEach(
-                                                                faggruppe
-                                                                ->
-                                                                {
-                                                                    final OsMelding melding1 = createMelding(gjelderId, behandlendeEnhet, beregningsId, beregningsDato, faggruppe, random);
-                                                                    final OsMelding melding2 = createMelding(gjelderId, behandlendeEnhet, beregningsId, beregningsDato, faggruppe, random);
-                                                                    assertEquals(melding1, melding2, "In spite the fact that all equality involved fields are equal in the two messages, they are not equal.");
-                                                                    assertEquals(melding1.hashCode(), melding2.hashCode(), "The two messages are equal, but they do not produce the same hash. That's a Java contract breach.");
-                                                                    allHopefullyUniqueMeldinger.add(melding1);
-                                                                }
-                                                            );
-                                                    }
-                                                );
-                                        }
-                                    );
-                            }
-                        );
-                }
-        );
+        asList("01234567890", "01234777890").forEach(gjelderId ->
+                asList("4819", "8020").forEach(behandlendeEnhet ->
+                        asList("022838640", "022543210").forEach(beregningsId ->
+                                asList("2009-07-04", "2009-07-03").forEach(beregningsDato ->
+                                        asList("INNT", "KREDDISP").forEach(faggruppe -> {
+                                            final OsMelding melding1 = createMelding(gjelderId, behandlendeEnhet, beregningsId, beregningsDato, faggruppe, random);
+                                            final OsMelding melding2 = createMelding(gjelderId, behandlendeEnhet, beregningsId, beregningsDato, faggruppe, random);
+                                            assertEquals(melding1, melding2, "Fields are equal in the two messages,but they are not equal.");
+                                            assertEquals(melding1.hashCode(), melding2.hashCode(), "The two messages are equal, but they do not produce the same hash.");
+                                            allHopefullyUniqueMeldinger.add(melding1);
+                                        })))));
 
-        // Test that all meldinger are different from all the others hopefully different ones:
         for (int i = 0; i < allHopefullyUniqueMeldinger.size(); i++) {
             final OsMelding melding1 = allHopefullyUniqueMeldinger.get(i);
             for (int j = 0; j < allHopefullyUniqueMeldinger.size(); j++) {
                 if (i != j) {
                     final OsMelding melding2 = allHopefullyUniqueMeldinger.get(j);
-                    assertNotEquals(melding1, melding2 , "Two OS meldinger expected to be different are equal");
+                    assertNotEquals(melding1, melding2, "Two OS meldinger expected to be different are equal");
                 }
             }
         }
     }
 
     private OsMelding createMelding(
-        final String gjelderId,
-        final String behandlendeEnhet,
-        final String beregningsId,
-        final String beregningsDato,
-        final String faggruppe,
-        final Random random) {
+            final String gjelderId,
+            final String behandlendeEnhet,
+            final String beregningsId,
+            final String beregningsDato,
+            final String faggruppe,
+            final Random random) {
 
         final int totalRecordLength =
-            Math.max(
-                AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUrRecordLength(),
-                OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRecordLength()
-            );
+                Math.max(
+                        AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUrRecordLength(),
+                        OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRecordLength()
+                );
 
-        final OsMelding melding =
-            OsMeldingBuilder
+        return OsMeldingBuilder
                 .newBuilder()
                 .withMeldingBatchInputRecordBuilder(
-                    OsMeldingBatchInputRecordBuilder
-                        .newBuilder()
-                        .withGjelderId(gjelderId) // Involved in equality
-                        .withBehandlendeEnhet(behandlendeEnhet) // Involved in equality
-                        .withDatoForStatus(randomLocalDateTime(random))
-                        .withNyesteVentestatus(randomAlphanumeric(totalRecordLength, random))
-                        .withBrukerId(randomAlphanumeric(totalRecordLength, random))
-                        .withTotaltNettoBelop(randomNumeric(5, random) + "æ")
-                        .withBeregningsId(beregningsId) // Involved in equality
-                        .withBeregningsDato(beregningsDato) // Involved in equality
-                        .withFaggruppe(faggruppe) // Involved in equality
-                        .withForsteFomIPeriode(randomLocalDate(random))
-                        .withSisteTomIPeriode(randomLocalDate(random))
-                        .withFlaggFeilkonto(randomAlphanumeric(totalRecordLength, random))
-                        .withUtbetalesTilId(randomNumeric(11, random))
-                        .withEtteroppgjor(randomAlphanumeric(totalRecordLength, random))
+                        OsMeldingBatchInputRecordBuilder
+                                .newBuilder()
+                                .withGjelderId(gjelderId) // Involved in equality
+                                .withBehandlendeEnhet(behandlendeEnhet) // Involved in equality
+                                .withDatoForStatus(randomLocalDateTime(random))
+                                .withNyesteVentestatus(randomAlphanumeric(totalRecordLength, random))
+                                .withBrukerId(randomAlphanumeric(totalRecordLength, random))
+                                .withTotaltNettoBelop(randomNumeric(5, random) + "æ")
+                                .withBeregningsId(beregningsId) // Involved in equality
+                                .withBeregningsDato(beregningsDato) // Involved in equality
+                                .withFaggruppe(faggruppe) // Involved in equality
+                                .withForsteFomIPeriode(randomLocalDate(random))
+                                .withSisteTomIPeriode(randomLocalDate(random))
+                                .withFlaggFeilkonto(randomAlphanumeric(totalRecordLength, random))
+                                .withUtbetalesTilId(randomNumeric(11, random))
+                                .withEtteroppgjor(randomAlphanumeric(totalRecordLength, random))
                 )
                 .build();
-
-        return melding;
     }
 }

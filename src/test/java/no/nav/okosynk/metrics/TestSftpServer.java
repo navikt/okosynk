@@ -4,11 +4,8 @@ import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.scp.server.ScpCommandFactory;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.UserAuthFactory;
-import org.apache.sshd.server.auth.password.PasswordAuthenticator;
-import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
 import org.apache.sshd.server.auth.password.UserAuthPasswordFactory;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
-import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.subsystem.SubsystemFactory;
 import org.apache.sshd.sftp.server.SftpSubsystemFactory;
 import org.slf4j.Logger;
@@ -32,26 +29,40 @@ import java.util.List;
  * <a href="https://dzone.com/articles/spring-integration-mock-0">Spring Integration Mock SftpServer Example</a>
  * <a href="https://stackoverflow.com/questions/3076443/java-sftp-server-library">Java SFTP server library?</a>
  */
-public class TestSftpServer
-        extends AbstractTestFtpServer {
+public class TestSftpServer {
 
+    public static final String FTP_TEST_SERVER_HOST_URI = "localhost";
+    public static final int FTP_TEST_SERVER_PORT = 2223;
+    public static final String FTP_TEST_SERVER_USER = "okosynkTestuser";
+    public static final String FTP_TEST_SERVER_PASSWORD = "X";
+    public static final String FTP_TEST_SERVER_HOME_DIRECTORY
+            = System.getProperty("user.dir");
     private static final Logger logger =
             LoggerFactory.getLogger(TestSftpServer.class);
 
-    private final SshServer sshServer;
-
     public TestSftpServer() {
 
-        super();
-
         logger.info(
-                System.lineSeparator() + System.lineSeparator()
-                        + "=================================================================" + System.lineSeparator()
-                        + System.lineSeparator()
+                """
+                                                
+                                                
+                        Test (S)FTP server about to be created
+                        ================================================================="
+                        FTP_TEST_SERVER_USER          : {}
+                        FTP_TEST_SERVER_PASSWORD      : {}
+                        FTP_TEST_SERVER_HOME_DIRECTORY: {}
+                        FTP_TEST_SERVER_HOST_URI      : {}
+                                                
+                                                
+                                                
+                        =================================================================
+                                                
+                                                
+                        """,
+                FTP_TEST_SERVER_USER, FTP_TEST_SERVER_PASSWORD, FTP_TEST_SERVER_HOME_DIRECTORY, FTP_TEST_SERVER_HOST_URI
         );
 
-        try {
-            final SshServer sshServer = SshServer.setUpDefaultServer();
+        try (SshServer sshServer = SshServer.setUpDefaultServer()) {
             sshServer.setPort(FTP_TEST_SERVER_PORT);
             sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider());
 
@@ -75,41 +86,15 @@ public class TestSftpServer
             virtualFileSystemFactory.setUserHomeDir(FTP_TEST_SERVER_USER, path);
             sshServer.setFileSystemFactory(virtualFileSystemFactory);
 
-            this.sshServer = sshServer;
-
             logger.info(
                     System.lineSeparator()
                             + "Test SFTP server successfully created" + System.lineSeparator()
                             + "==================================================================" + System.lineSeparator()
-                            + this.sshServer + System.lineSeparator()
+                            + sshServer + System.lineSeparator()
                             + System.lineSeparator()
             );
 
         } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void start() {
-        logger.info("Test SFTP server about to be started...");
-        try {
-            this.sshServer.start();
-            logger.info("Test SFTP server successfully started.");
-        } catch (Exception e) {
-            logger.error("Exception received when trying to start " + this.sshServer.getClass().getName());
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void stop() {
-        try {
-            logger.info("Test SFTP server about to be stopped...");
-            this.sshServer.stop();
-            logger.info("Test SFTP server successfully stopped.");
-        } catch (Exception e) {
-            logger.error("Exception received when trying to stop " + this.sshServer.getClass().getName());
             throw new RuntimeException(e);
         }
     }

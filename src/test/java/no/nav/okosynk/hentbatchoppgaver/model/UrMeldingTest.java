@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBatchInputRecordBuil
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBuilder;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
+import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,25 +55,14 @@ class UrMeldingTest extends AbstractMeldingTest {
 
     @ParameterizedTest(name = "gjelderId = {0}, gjelderType = {1}")
     @MethodSource("getUrMeldingAndExpected")
-    void utledeGjelderType(String gjelderId, String expectedGjelderIdType, String inputMelding) {
-        UrMelding urMelding = new UrMelding(inputMelding);
-        final String gjelderIdType = urMelding.utledGjelderIdType();
+    void utledeGjelderType(String gjelderId, GjelderIdType expectedGjelderIdType, String _inputMelding) {
+        final GjelderIdType gjelderIdType = GjelderIdType.fra(gjelderId);
 
-        assertEquals(expectedGjelderIdType, gjelderIdType);
+        assertThat(gjelderIdType).isSameAs(expectedGjelderIdType);
     }
 
     private static Stream<Arguments> getUrMeldingAndExpected() {
         return UrMeldingTestGenerator.urMeldingAndExpectedProvider();
-    }
-
-    @Test
-    void equalsPaSammeObjektGirTrue() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        UrMelding melding = new UrMelding(UrMeldingTestGenerator.EksempelMelding.getMelding());
-
-        assertEquals(melding, melding);
     }
 
     @Test

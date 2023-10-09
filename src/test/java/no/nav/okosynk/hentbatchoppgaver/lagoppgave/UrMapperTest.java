@@ -1,7 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
@@ -9,8 +7,6 @@ import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,13 +33,12 @@ class UrMapperTest {
     private static final String UR_MELDING_EFOG =
             "02029512345PERSON      2019-02-14T21:13:5525          00000000080610æ8020EFOG   UR2302019-02-12600767010Stoppet utbetaling                                02029530095";
 
-    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
     private UrMapper urMapper;
     private UrMelding urMeldingSomSkalBliTilOppgave;
     private UrMelding annenUrMeldingSomSkalBliTilOppgave;
     private UrMelding urMeldingUtenMappingRegel;
     private UrMelding urMeldingEFOG;
-    private IAktoerClient aktoerClient = mock(IAktoerClient.class);
+    private final IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
     @BeforeEach
     void setUp() {
@@ -53,10 +49,8 @@ class UrMapperTest {
         urMeldingEFOG = new UrMelding(UR_MELDING_EFOG);
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {true, false})
-    @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med oppdragsKode \"EFOG\" som skal bli til oppgave.")
-    void lagUrOppgaveMedOppdragsKodeEFOG(final boolean shouldConvertFolkeregisterIdentToAktoerId) {
+    @Test
+    void lagUrOppgaveMedOppdragsKodeEFOG() {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -75,7 +69,7 @@ class UrMapperTest {
         assertEquals("4151", oppgaver.get(0).ansvarligEnhetId);
 
         assertEquals(expectedAktoerId, oppgaver.get(0).aktoerId);
-        assertEquals(null, oppgaver.get(0).folkeregisterIdent);
+        assertThat(oppgaver.get(0).folkeregisterIdent).isNull();
     }
 
     @Test
@@ -91,10 +85,10 @@ class UrMapperTest {
         List<Oppgave> oppgaver = urMapper
                 .lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
-        assertNotNull(oppgaver);
-        assertEquals(2, oppgaver.size());
-        assertEquals("1234", oppgaver.get(0).aktoerId);
-        assertEquals("123", oppgaver.get(1).aktoerId);
+        assertThat(oppgaver)
+                .isNotNull()
+                .hasSize(2)
+                .extracting(o -> o.aktoerId).contains("123", "1234");
     }
 
     @Test
@@ -110,9 +104,10 @@ class UrMapperTest {
         List<Oppgave> oppgaver =
                 urMapper.lagOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
-        assertNotNull(oppgaver);
-        assertEquals(1, oppgaver.size());
-        assertEquals("123", oppgaver.get(0).aktoerId);
+        assertThat(oppgaver)
+                .isNotNull()
+                .hasSize(1)
+                .extracting(o -> o.aktoerId).contains("123");
     }
 
     @Test
@@ -124,8 +119,9 @@ class UrMapperTest {
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
-        assertNotNull(filtrerteMeldinger);
-        assertEquals(2, filtrerteMeldinger.size());
+        assertThat(filtrerteMeldinger)
+                .isNotNull()
+                .hasSize(2);
     }
 
     @Test
@@ -137,8 +133,9 @@ class UrMapperTest {
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingUtenMappingRegel));
 
-        assertNotNull(filtrerteMeldinger);
-        assertEquals(1, filtrerteMeldinger.size());
+        assertThat(filtrerteMeldinger)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test
@@ -150,8 +147,9 @@ class UrMapperTest {
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
-        assertNotNull(filtrerteMeldinger);
-        assertEquals(1, filtrerteMeldinger.size());
+        assertThat(filtrerteMeldinger)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test

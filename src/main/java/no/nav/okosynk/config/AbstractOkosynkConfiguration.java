@@ -2,18 +2,19 @@ package no.nav.okosynk.config;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.joining;
 
 public abstract class AbstractOkosynkConfiguration implements IOkosynkConfiguration {
 
     public static final String AZURE_APP_CLIENT_ID_KEY = "AZURE_APP_CLIENT_ID";
     public static final String PDL_URL_KEY = "PDL_URL";
 
-    public AbstractOkosynkConfiguration() {
+    protected AbstractOkosynkConfiguration() {
     }
 
     @Override
@@ -38,12 +39,7 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
 
     @Override
     public Collection<String> getOpprettetAvValuesForFinn(final Constants.BATCH_TYPE batchType) {
-        final Collection<String> opprettetAvValuesForFinn =
-                new ArrayList<String>() {{
-                    add(getBatchBruker(batchType));
-                    add(getNaisAppName());
-                }};
-        return Collections.unmodifiableCollection(opprettetAvValuesForFinn);
+        return unmodifiableList(asList(getBatchBruker(batchType), getNaisAppName()));
     }
 
     @Override
@@ -62,26 +58,6 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
     }
 
     @Override
-    public String getFtpHostUrl(final Constants.BATCH_TYPE batchType) {
-        return getString(batchType.getFtpHostUrlKey());
-    }
-
-    @Override
-    public String getFtpUser(final Constants.BATCH_TYPE batchType) {
-        return getString(batchType.getFtpUserKey());
-    }
-
-    @Override
-    public String getFtpPassword(final Constants.BATCH_TYPE batchType) {
-        return getString(batchType.getFtpPasswordKey());
-    }
-
-    @Override
-    public String getFtpCharsetName(final Constants.BATCH_TYPE batchType, final String ftpCharsetNameDefault) {
-        return getString(batchType.getFtpCharsetNameKey(), ftpCharsetNameDefault);
-    }
-
-    @Override
     public String getAzureAppWellKnownUrl() {
         return getRequiredString("AZURE_APP_WELL_KNOWN_URL");
     }
@@ -96,8 +72,9 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
         final String azureAppWellKnownUrl = getAzureAppWellKnownUrl();
         try {
             final URL azureAppTokenUrl = new URL(azureAppWellKnownUrl);
-            final String azureAppTokenUrlString = azureAppTokenUrl.getProtocol() + "://" + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/" + getAzureAppTenantId() + "/oauth2/v2.0/token";
-            return azureAppTokenUrlString;
+            return azureAppTokenUrl.getProtocol() + "://"
+                    + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/"
+                    + getAzureAppTenantId() + "/oauth2/v2.0/token";
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Exception received when trying to calculate the azureAppTokenUrl");
         }
@@ -115,7 +92,7 @@ public abstract class AbstractOkosynkConfiguration implements IOkosynkConfigurat
 
     @Override
     public String getAzureAppScopes() {
-        return Stream.of(getRequiredString("AZURE_APP_SCOPE_OPPGAVE")).collect(Collectors.joining(" "));
+        return Stream.of(getRequiredString("AZURE_APP_SCOPE_OPPGAVE")).collect(joining(" "));
     }
 
     @Override

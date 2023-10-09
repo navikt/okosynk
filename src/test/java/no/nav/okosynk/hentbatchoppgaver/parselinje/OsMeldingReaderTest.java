@@ -10,21 +10,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class OsMeldingReaderTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String INPUT_STRENG_FOR_OS_MELDING_MED_MAPPING_REGEL =
-        "10108000398022828640 2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    10108000398            ";
+            "10108000398022828640 2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    10108000398            ";
     private static final String INPUT_STRENG_FOR_OS_MELDING_UTEN_MAPPING_REGEL =
-        "06025800174029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         HELSEREF06025800174            ";
+            "06025800174029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         HELSEREF06025800174            ";
 
-    OsMeldingCreator osMeldingCreator = OsMelding::new;
+    Function<String, OsMelding> osMeldingCreator = OsMelding::new;
     MeldingReader<OsMelding> osMeldingReader;
 
     @BeforeEach
@@ -38,10 +38,10 @@ class OsMeldingReaderTest {
         enteringTestHeaderLogger.debug(null);
 
         List<OsMelding> osMeldinger =
-            osMeldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(lagOsMeldinger());
+                osMeldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(lagOsMeldinger());
 
         assertNotNull(osMeldinger);
-        assertEquals(lagOsMeldinger().count(), osMeldinger.size());
+        assertEquals(lagOsMeldinger().size(), osMeldinger.size());
     }
 
     @Test
@@ -50,7 +50,7 @@ class OsMeldingReaderTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        Stream<String> ugyldigStream = lagStreamMedUgyldigMelding();
+        List<String> ugyldigStream = lagStreamMedUgyldigMelding();
 
         assertThrows(MeldingUnreadableException.class, () -> osMeldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(ugyldigStream));
     }
@@ -68,23 +68,23 @@ class OsMeldingReaderTest {
 
     // =========================================================================
 
-    private Stream<String> lagStreamMedUgyldigMelding() {
+    private List<String> lagStreamMedUgyldigMelding() {
         List<String> ugyldigMeldingListe = new ArrayList<>();
         ugyldigMeldingListe.add("UGYLDIG_MELDING");
-        return ugyldigMeldingListe.stream();
+        return ugyldigMeldingListe;
     }
 
-    private Stream<String> lagOsMeldinger() {
+    private List<String> lagOsMeldinger() {
         List<String> osMeldinger = new ArrayList<>();
         osMeldinger.add(INPUT_STRENG_FOR_OS_MELDING_MED_MAPPING_REGEL);
         osMeldinger.add(INPUT_STRENG_FOR_OS_MELDING_UTEN_MAPPING_REGEL);
-        return osMeldinger.stream();
+        return osMeldinger;
     }
 
-    private Stream<String> lagOsMeldinger(final String input){
+    private List<String> lagOsMeldinger(final String input) {
         List<String> osMeldinger = new ArrayList<>();
         osMeldinger.add(input);
-        return osMeldinger.stream();
+        return osMeldinger;
 
     }
 }

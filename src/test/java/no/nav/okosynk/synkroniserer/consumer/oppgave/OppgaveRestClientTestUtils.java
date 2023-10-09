@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.FakeOkosynkConfiguration;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.*;
-import no.nav.okosynk.synkroniserer.consumer.security.AzureAdAuthenticationClient;
+import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;

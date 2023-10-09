@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import no.nav.okosynk.hentbatchoppgaver.model.OsMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
+import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,7 +26,7 @@ class OsMeldingParserTest {
 
     @ParameterizedTest(name = "gjelderId = {0}")
     @MethodSource("getOsMeldingAndExpected")
-    void parseGjelderId(String gjelderId, String gjelderIdType, String osmelding ) {
+    void parseGjelderId(String gjelderId, GjelderIdType _gjelderIdType, String osmelding ) {
         assertEquals(gjelderId, OS_MELDING_PARSER.parseGjelderId(osmelding));
     }
 

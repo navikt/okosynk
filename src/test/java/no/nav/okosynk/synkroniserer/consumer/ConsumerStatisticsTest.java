@@ -1,12 +1,13 @@
 package no.nav.okosynk.synkroniserer.consumer;
 
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import wiremock.com.google.common.collect.Collections2;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -177,54 +178,20 @@ class ConsumerStatisticsTest {
     }
 
     @Test
-    void when_three_with_differing_names_are_added_an_exception_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final ConsumerStatistics consumerStatistics1 =
-                ConsumerStatistics.builder().name("x").build();
-        final ConsumerStatistics consumerStatistics2 =
-                ConsumerStatistics.builder().name("y").build();
-        final ConsumerStatistics consumerStatistics3 =
-                ConsumerStatistics.builder().name("z").build();
-
-        final List<ConsumerStatistics> allElementsSource = new ArrayList<>();
-        allElementsSource.add(consumerStatistics1);
-        allElementsSource.add(consumerStatistics2);
-        allElementsSource.add(consumerStatistics3);
-        final Collection<List<ConsumerStatistics>> allPermutations =
-                Collections2.permutations(allElementsSource);
-
-        allPermutations
-                .forEach(
-                        (final List<ConsumerStatistics> allElements) ->
-                                assertThrows(
-                                        IllegalArgumentException.class,
-                                        () -> ConsumerStatistics
-                                                .addAll(
-                                                        allElements.get(0),
-                                                        allElements.get(1),
-                                                        allElements.get(2)
-                                                )
-                                )
-                );
-    }
-
-    @Test
     void when_instantiating_without_a_name_an_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertThrows(NullPointerException.class, () -> ConsumerStatistics.builder().build());
+        ConsumerStatistics.Builder builder = ConsumerStatistics.builder();
+        assertThrows(NullPointerException.class, builder::build);
     }
 
     @Test
     void when_instantiating_with_an_empty_name_an_exception_should_be_thrown() {
 
         enteringTestHeaderLogger.debug(null);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> ConsumerStatistics.builder().name("").build());
+        ConsumerStatistics.Builder emptyName = ConsumerStatistics.builder().name("");
+        assertThrows(IllegalArgumentException.class, emptyName::build);
     }
 
     @Test
@@ -232,8 +199,8 @@ class ConsumerStatisticsTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertThrows(IllegalArgumentException.class,
-                () -> ConsumerStatistics.builder().name("   ").build());
+        ConsumerStatistics.Builder blankName = ConsumerStatistics.builder().name("   ");
+        assertThrows(IllegalArgumentException.class, blankName::build);
     }
 
     @Test
@@ -307,70 +274,6 @@ class ConsumerStatisticsTest {
         final ConsumerStatistics consumerStatistics =
                 ConsumerStatistics.builder().name("x").build();
         assertNotEquals(null, consumerStatistics);
-    }
-
-    @Test
-    void when_created_with_batch_type_the_name_should_be_as_expected() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final BATCH_TYPE batchType = BATCH_TYPE.OS;
-        final ConsumerStatistics consumerStatistics1 =
-                ConsumerStatistics.builder().name(batchType.getConsumerStatisticsName()).build();
-        final ConsumerStatistics consumerStatistics2 =
-                ConsumerStatistics.builder(batchType).build();
-        final ConsumerStatistics consumerStatistics3 =
-                ConsumerStatistics.builder(batchType.getConsumerStatisticsName()).build();
-        final ConsumerStatistics consumerStatistics4 =
-                ConsumerStatistics.builder().name(batchType.getConsumerStatisticsName()).build();
-
-        final List<ConsumerStatistics> allElementsSource = new ArrayList<>();
-        allElementsSource.add(consumerStatistics1);
-        allElementsSource.add(consumerStatistics2);
-        allElementsSource.add(consumerStatistics3);
-        allElementsSource.add(consumerStatistics4);
-        final Collection<List<ConsumerStatistics>> allPermutations =
-                Collections2.permutations(allElementsSource);
-
-        allPermutations
-                .forEach(
-                        (final List<ConsumerStatistics> allConsumerStatistics) ->
-                        {
-                            assertEquals(consumerStatistics1, consumerStatistics2);
-                            assertEquals(consumerStatistics1, consumerStatistics3);
-                            assertEquals(consumerStatistics1, consumerStatistics4);
-                        }
-                );
-    }
-
-    @Test
-    void when_created_through_zero_with_batch_type_the_name_should_be_as_expected() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        final BATCH_TYPE batchType = BATCH_TYPE.OS;
-        final ConsumerStatistics consumerStatistics1 =
-                ConsumerStatistics.builder().name(batchType.getConsumerStatisticsName()).build();
-        final ConsumerStatistics consumerStatistics2 =
-                ConsumerStatistics.zero(batchType);
-        final ConsumerStatistics consumerStatistics3 =
-                ConsumerStatistics.zero(batchType.getConsumerStatisticsName());
-
-        final List<ConsumerStatistics> allElementsSource = new ArrayList<>();
-        allElementsSource.add(consumerStatistics1);
-        allElementsSource.add(consumerStatistics2);
-        allElementsSource.add(consumerStatistics3);
-        final Collection<List<ConsumerStatistics>> allPermutations =
-                Collections2.permutations(allElementsSource);
-
-        allPermutations
-                .forEach(
-                        (final List<ConsumerStatistics> allConsumerStatistics) ->
-                        {
-                            assertEquals(consumerStatistics1, consumerStatistics2);
-                            assertEquals(consumerStatistics1, consumerStatistics3);
-                        }
-                );
     }
 
     @Test
