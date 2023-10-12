@@ -1,7 +1,7 @@
 package no.nav.okosynk;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
@@ -10,7 +10,7 @@ import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 
 public class UrService extends AbstractService<UrMelding> {
 
-    public UrService(final IOkosynkConfiguration okosynkConfiguration) {
+    public UrService(final OkosynkConfiguration okosynkConfiguration) {
         super(Constants.BATCH_TYPE.UR, okosynkConfiguration);
     }
 

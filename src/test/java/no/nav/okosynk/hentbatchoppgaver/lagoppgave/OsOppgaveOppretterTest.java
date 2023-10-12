@@ -1,7 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +18,11 @@ import static java.util.Arrays.asList;
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
-class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
+class OsOppgaveOppretterTest {
 
     private static final Logger enteringTestHeaderLogger =
             LoggerFactory.getLogger("EnteringTestHeader");
@@ -29,11 +31,13 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
     private static final OsMelding OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF06025812345            ");
     private static final String OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "RETU;   1230kr;   beregningsdato/id:04.07.09/022828640;   periode:01.05.09-31.07.09;   feilkonto: ;   statusdato:26.09.09;   ;   UtbTil:10108000398;   K231B350";
     private static final String OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "AVVE;   7277kr;   beregningsdato/id:06.11.09/029568753;   periode:01.11.09-30.11.09;   feilkonto: ;   statusdato:30.11.09;   ;   UtbTil:06025812345;   X123456";
+    protected final OkosynkConfiguration okosynkConfiguration;
     private final OsOppgaveOppretter osOppgaveOppretter;
+    protected IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
     OsOppgaveOppretterTest() {
-        super(new FakeOkosynkConfiguration());
-        this.osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient);
+        okosynkConfiguration = mock(OkosynkConfiguration.class);
+        osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient);
     }
 
     @Test
@@ -179,4 +183,5 @@ class OsOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
 
         assertThat(oppgave.beskrivelse).contains("1940kr");
     }
+
 }

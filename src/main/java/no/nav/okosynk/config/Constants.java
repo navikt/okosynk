@@ -25,60 +25,42 @@ public class Constants {
     public static final String FTP_USERNAME = "FTPCREDENTIALS_USERNAME";
     public static final String FTP_PRIVATEKEY = "FTPCREDENTIALS_PRIVATE_KEY";
     public static final String FTP_HOSTKEY = "FTPCREDENTIALS_HOST_KEY";
-
-
+    public static final String OPPGAVE_USERNAME = "OPPGAVE_USERNAME";
+    public static final String OPPGAVE_PASSWORD = "OPPGAVE_PASSWORD";
     static final String DISABLE_METRICS_REPORT_EXT_KEY = "disable.metrics.report";
     static final String DISABLE_METRICS_REPORT_KEY = "DISABLE_METRICS_REPORT";
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
 
+    @Getter
     public enum BATCH_TYPE {
         OS(
                 "bokosynk001",
-                "SRVBOKOSYNK001_USERNAME",
-                "srvbokosynk001",
                 "OKO_OS",
                 "os_mapping_regler.properties",
-                "SRVBOKOSYNK001_PASSWORD",
                 "okosynk_os_batch_alert"
         ),
         UR(
                 "bokosynk002",
-                "SRVBOKOSYNK002_USERNAME",
-                "srvbokosynk002",
                 "OKO_UR",
                 "ur_mapping_regler.properties",
-                "SRVBOKOSYNK002_PASSWORD",
                 "okosynk_ur_batch_alert"
         );
 
-        @Getter
         private final String name;
-        private final String batchBrukerKey;
-        private final String batchBrukerDefaultValue;
-        @Getter
         private final String oppgaveType;
-        @Getter
         private final String mappingRulesPropertiesFileName;
-        private final String batchBrukerPasswordKey;
-        @Getter
         private final String alertCollectorMetricName;
 
         BATCH_TYPE(
                 final String name,
-                final String batchBrukerKey,
-                final String batchBrukerDefaultValue,
                 final String oppgaveType,
                 final String mappingRulesPropertiesFileName,
-                final String batchBrukerPasswordKey,
                 final String alertCollectorMetricName
         ) {
             this.name = name;
-            this.batchBrukerKey = batchBrukerKey;
-            this.batchBrukerDefaultValue = batchBrukerDefaultValue;
             this.oppgaveType = oppgaveType;
             this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
-            this.batchBrukerPasswordKey = batchBrukerPasswordKey;
             this.alertCollectorMetricName = alertCollectorMetricName;
         }
 
@@ -86,16 +68,5 @@ public class Constants {
             return name() + " - " + getName();
         }
 
-        String getBatchBrukerKey() {
-            return batchBrukerKey;
-        }
-
-        String getBatchBrukerDefaultValue() {
-            return batchBrukerDefaultValue;
-        }
-
-        String getBatchBrukerPasswordKey() {
-            return batchBrukerPasswordKey;
-        }
     }
 }

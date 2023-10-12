@@ -1,7 +1,7 @@
 package no.nav.okosynk;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class OsBatchTest extends AbstractBatchTest {
 
@@ -22,9 +23,12 @@ class OsBatchTest extends AbstractBatchTest {
     @BeforeEach
     void beforeEach() {
 
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME)).thenReturn("Executor");
+
         super.setBatch(
                 new Batch<>(
-                        this.getOkosynkConfiguration(),
+                        okosynkConfiguration,
                         Constants.BATCH_TYPE.OS,
                         new MeldingReader<>(OsMelding::new),
                         new OsMapper(mock(IAktoerClient.class))
@@ -51,7 +55,8 @@ class OsBatchTest extends AbstractBatchTest {
         enteringTestHeaderLogger.debug(null);
 
         MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class, () ->
                 new Batch<>(okosynkConfiguration, null, osMeldingMeldingReader, osMapper)
@@ -63,7 +68,8 @@ class OsBatchTest extends AbstractBatchTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () -> new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.OS, null, osMapper));
@@ -74,7 +80,8 @@ class OsBatchTest extends AbstractBatchTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
 
         assertThrows(

@@ -7,16 +7,16 @@ import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.Response;
+import no.nav.okosynk.comm.OidcStsClient;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PdlErrorJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PdlErrorResponseJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PostPdlHentIdenterResponseJson;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.FolkeregisterIdentNotFoundPdlException;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
-import no.nav.okosynk.comm.OidcStsClient;
 import no.nav.okosynk.synkroniserer.consumer.util.GraphQLUt;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.FolkeregisterIdentNotFoundPdlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.net.HttpURLConnection.HTTP_OK;
-import static no.nav.okosynk.config.Constants.AUTHORIZATION;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CALL_ID_KEY;
-import static no.nav.okosynk.config.Constants.HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY;
-import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
+import static no.nav.okosynk.config.Constants.*;
 
 public class PdlRestClient implements IAktoerClient {
 
@@ -35,17 +32,15 @@ public class PdlRestClient implements IAktoerClient {
     private static final String FILE_NAME_HENT_IDENTER_GRAPHQL_QUERY = "pdl/hentIdenter.graphql";
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final IOkosynkConfiguration okosynkConfiguration;
-    private final Constants.BATCH_TYPE batchType;
+    private final OkosynkConfiguration okosynkConfiguration;
     private OidcStsClient oidcStsClient;
 
     public PdlRestClient(
-            final IOkosynkConfiguration okosynkConfiguration,
+            final OkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType) {
         this.okosynkConfiguration = okosynkConfiguration;
-        this.batchType = batchType;
 
-        log.info("PDL REST client created. batchType: {}", this.batchType);
+        log.info("PDL REST client created. batchType: {}", batchType);
     }
 
     static String buildHentIdenterEntityAsString(final String ident) {
@@ -54,7 +49,7 @@ public class PdlRestClient implements IAktoerClient {
 
     private static PdlPersonIdentCollection hentAktivePdlIdenterFromPdl(
             final String folkeregisterIdent,
-            final IOkosynkConfiguration okosynkConfiguration,
+            final OkosynkConfiguration okosynkConfiguration,
             final String selfAuthenticationToken
     ) throws FolkeregisterIdentNotFoundPdlException {
         final String hentIdenterEntityAsStringPotentiallyWithNewLines =
@@ -62,63 +57,71 @@ public class PdlRestClient implements IAktoerClient {
         final String hentIdenterEntityAsString =
                 hentIdenterEntityAsStringPotentiallyWithNewLines.replace('\n', ' ');
 
-        final Client jerseyHttpClient = ClientBuilder.newBuilder().build();
-        final String pdlUrl = okosynkConfiguration.getPdlUrl();
-        final String correlationId = UUID.randomUUID().toString();
-        final Invocation invocation =
-                jerseyHttpClient
-                        .target(pdlUrl)
-                        .request()
-                        .header(AUTHORIZATION, "Bearer " + selfAuthenticationToken)
-                        .header(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, "Bearer " + selfAuthenticationToken)
-                        .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
-                        .header(X_CORRELATION_ID_HEADER_KEY, correlationId)
-                        .buildPost(Entity.json(hentIdenterEntityAsString));
-        log.debug("Henter identer fra pdl for folkeregisterIdent...");
-        final Response postHentIdenterResponse = invocation.invoke();
-        final String postHentIdenterResponseAsString = postHentIdenterResponse.readEntity(String.class);
-        final Collection<IdentJson> aktiveIdentJsons;
-        if (HTTP_OK == postHentIdenterResponse.getStatus()) {
-            try {
-                final PostPdlHentIdenterResponseJson postPdlHentIdenterResponseJson =
-                        PdlRestClient.objectMapper.readValue(postHentIdenterResponseAsString, PostPdlHentIdenterResponseJson.class);
-                if (postPdlHentIdenterResponseJson.getData().getHentIdenter() == null) {
-                    final PdlErrorResponseJson pdlErrorResponseJson =
-                            PdlRestClient.objectMapper.readValue(postHentIdenterResponseAsString, PdlErrorResponseJson.class);
-                    final Collection<PdlErrorJson> pdlErrorJsons = pdlErrorResponseJson.getErrors();
-                    if (pdlErrorJsons == null) {
-                        throw new IllegalStateException("Error when calling PDL. Response could not be parsed as an expected error message: " + postHentIdenterResponseAsString);
-                    } else {
-                        final boolean folkeregisterIdentNotFound =
-                                pdlErrorJsons
-                                        .stream()
-                                        .anyMatch(pdlErrorJson -> pdlErrorJson.getExtensions() != null && "not_found".equals(pdlErrorJson.getExtensions().getCode()));
-                        if (folkeregisterIdentNotFound) {
-                            throw new FolkeregisterIdentNotFoundPdlException();
-                        } else {
-                            throw new IllegalStateException("Error when calling PDL. pdlErrorResponseJson: " + pdlErrorResponseJson);
-                        }
-                    }
-                } else {
-                    aktiveIdentJsons = postPdlHentIdenterResponseJson
-                            .getData()
-                            .getHentIdenter()
-                            .getIdenter();
-                }
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException("Exception received when trying to parse the response", e);
-            }
 
-        } else {
-            final String msg = String.format("Feil ved kall mot PDL for folkeregisterIdentOrAktorId: %s, Status: %d, postHentIdenterResponseAsString: %s",
-                    folkeregisterIdent,
-                    postHentIdenterResponse.getStatus(),
-                    postHentIdenterResponseAsString);
-            log.error(msg); // Change to secureLog when secureLog is working
-            throw new IllegalStateException("Feil ved kall mot PDL");
+        final Collection<IdentJson> aktiveIdentJsons = new ArrayList<>();
+        try (final Client jerseyHttpClient = ClientBuilder.newBuilder().build()) {
+            final String pdlUrl = okosynkConfiguration.getPdlUrl();
+            final String correlationId = UUID.randomUUID().toString();
+            final Invocation invocation =
+                    jerseyHttpClient
+                            .target(pdlUrl)
+                            .request()
+                            .header(AUTHORIZATION, "Bearer " + selfAuthenticationToken)
+                            .header(HTTP_HEADER_NAV_CONSUMER_TOKEN_KEY, "Bearer " + selfAuthenticationToken)
+                            .header(HTTP_HEADER_NAV_CALL_ID_KEY, correlationId)
+                            .header(X_CORRELATION_ID_HEADER_KEY, correlationId)
+                            .buildPost(Entity.json(hentIdenterEntityAsString));
+            log.debug("Henter identer fra pdl for folkeregisterIdent...");
+            try (final Response postHentIdenterResponse = invocation.invoke()) {
+                final String postHentIdenterResponseAsString = postHentIdenterResponse.readEntity(String.class);
+                if (HTTP_OK == postHentIdenterResponse.getStatus()) {
+                    aktiveIdentJsons.addAll(getIdentJsons(postHentIdenterResponseAsString));
+                } else {
+                    final String msg = String.format("Feil ved kall mot PDL for folkeregisterIdentOrAktorId: %s, Status: %d, postHentIdenterResponseAsString: %s",
+                            folkeregisterIdent,
+                            postHentIdenterResponse.getStatus(),
+                            postHentIdenterResponseAsString);
+                    log.error(msg); // Change to secureLog when secureLog is working
+                    throw new IllegalStateException("Feil ved kall mot PDL");
+                }
+            }
         }
 
         return PdlRestClient.convertIdentJsonsToPdlPersonIdentCollection(aktiveIdentJsons);
+    }
+
+    private static Collection<IdentJson> getIdentJsons(String postHentIdenterResponseAsString) throws FolkeregisterIdentNotFoundPdlException {
+        final Collection<IdentJson> aktiveIdentJsons;
+        try {
+            final PostPdlHentIdenterResponseJson postPdlHentIdenterResponseJson =
+                    PdlRestClient.objectMapper.readValue(postHentIdenterResponseAsString, PostPdlHentIdenterResponseJson.class);
+            if (postPdlHentIdenterResponseJson.getData().getHentIdenter() == null) {
+                final PdlErrorResponseJson pdlErrorResponseJson =
+                        PdlRestClient.objectMapper.readValue(postHentIdenterResponseAsString, PdlErrorResponseJson.class);
+                final Collection<PdlErrorJson> pdlErrorJsons = pdlErrorResponseJson.getErrors();
+                if (pdlErrorJsons == null) {
+                    throw new IllegalStateException("Error when calling PDL. Response could not be parsed as an expected error message: " + postHentIdenterResponseAsString);
+                } else {
+                    final boolean folkeregisterIdentNotFound =
+                            pdlErrorJsons
+                                    .stream()
+                                    .anyMatch(pdlErrorJson -> pdlErrorJson.getExtensions() != null && "not_found".equals(pdlErrorJson.getExtensions().getCode()));
+                    if (folkeregisterIdentNotFound) {
+                        throw new FolkeregisterIdentNotFoundPdlException();
+                    } else {
+                        throw new IllegalStateException("Error when calling PDL. pdlErrorResponseJson: " + pdlErrorResponseJson);
+                    }
+                }
+            } else {
+                aktiveIdentJsons = postPdlHentIdenterResponseJson
+                        .getData()
+                        .getHentIdenter()
+                        .getIdenter();
+            }
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("Exception received when trying to parse the response", e);
+        }
+        return aktiveIdentJsons;
     }
 
     private static PdlPersonIdentCollection convertIdentJsonsToPdlPersonIdentCollection(final Collection<IdentJson> identJsons) {
@@ -150,10 +153,9 @@ public class PdlRestClient implements IAktoerClient {
     }
 
     private static OidcStsClient createOidcStsClient(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType
+            final OkosynkConfiguration okosynkConfiguration
     ) {
-        return new OidcStsClient(okosynkConfiguration, batchType);
+        return new OidcStsClient(okosynkConfiguration);
     }
 
     @Override
@@ -165,7 +167,7 @@ public class PdlRestClient implements IAktoerClient {
                     PdlRestClient.hentAktivePdlIdenterFromPdl(
                             folkeregisterIdent,
                             this.okosynkConfiguration,
-                            getOidcToken(this.okosynkConfiguration, this.batchType)
+                            getOidcToken(this.okosynkConfiguration)
                     );
 
             final String aktorId = pdlPersonIdentCollection
@@ -180,23 +182,11 @@ public class PdlRestClient implements IAktoerClient {
     }
 
     private String getOidcToken(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType
+            final OkosynkConfiguration okosynkConfiguration
     ) {
-
-        return getOidcStsClient(okosynkConfiguration, batchType).getOidcToken();
-    }
-
-    private OidcStsClient getOidcStsClient(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
-        if (this.oidcStsClient == null) {
-            setOidcStsClient(PdlRestClient.createOidcStsClient(okosynkConfiguration, batchType));
+        if (oidcStsClient == null) {
+            oidcStsClient = PdlRestClient.createOidcStsClient(okosynkConfiguration);
         }
-        return this.oidcStsClient;
-    }
-
-    private void setOidcStsClient(final OidcStsClient oidcStsClient) {
-        this.oidcStsClient = oidcStsClient;
+        return oidcStsClient.getOidcToken();
     }
 }

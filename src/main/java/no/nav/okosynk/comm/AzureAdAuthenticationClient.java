@@ -2,13 +2,9 @@ package no.nav.okosynk.comm;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
+import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -21,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,36 +26,29 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static no.nav.okosynk.config.Constants.HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY;
 
-/**
- * https://doc.nais.io/appendix/zero-trust/index.html
- * https://doc.nais.io/nais-application/application/
- * https://doc.nais.io/security/auth/
- * https://doc.nais.io/security/auth/azure-ad
- * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow
- * https://github.com/navikt/security-blueprints
- * https://github.com/navikt/security-blueprints/tree/master/examples/service-to-service/daemon-clientcredentials-tokensupport/src/main/java/no/nav/security/examples/tokensupport/clientcredentials
- * https://security.labs.nais.io/
- * https://security.labs.nais.io/pages/flows/oauth2/client_credentials.html
- * https://security.labs.nais.io/pages/guide/api-kall/maskin_til_maskin_uten_bruker.html
- * https://security.labs.nais.io/pages/idp/azure-ad.html#registrere-din-applikasjon-i-azure-ad
- */
 public class AzureAdAuthenticationClient {
 
     private static final Logger logger = LoggerFactory.getLogger(AzureAdAuthenticationClient.class);
 
-    private final static String GRANT_TYPE = "client_credentials";
+    private static final String GRANT_TYPE = "client_credentials";
 
-    final IOkosynkConfiguration okosynkConfiguration;
+    final OkosynkConfiguration okosynkConfiguration;
 
     AzureAdTokenSuccessResponseJson lastAzureAdTokenSuccessResponseJson = null;
     long lastAzureAdTokenSuccessResponseTimestampInMs = Long.MIN_VALUE;
 
-    public AzureAdAuthenticationClient(final IOkosynkConfiguration okosynkConfiguration) {
+    public AzureAdAuthenticationClient(final OkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
+    }
+
+    private static DefaultProxyRoutePlanner proxyRoutePlanner(URL httpPostProxyUrl) {
+        final HttpHost proxyHttpHost =
+                new HttpHost(httpPostProxyUrl.getHost(), httpPostProxyUrl.getPort(), httpPostProxyUrl.getProtocol());
+        return new DefaultProxyRoutePlanner(proxyHttpHost);
     }
 
     private static Map.Entry<Integer, String> httpPost(
@@ -66,35 +56,27 @@ public class AzureAdAuthenticationClient {
             final URL httpPostProxyUrl,
             final List<Map.Entry<String, String>> httpPostParameters,
             final List<Map.Entry<String, String>> httpPostHeaders
-    ) {
+    ) throws IOException {
         final Map.Entry<Integer, String> postResult;
-        try {
-            // ---------------------------------------------------------------------------------------------------------
-            final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(httpPostProviderUri);
-            // ---------------------------------------------------------------------------------------------------------
-            final CloseableHttpClient closeableHttpClient;
-            if (httpPostProxyUrl == null) {
-                closeableHttpClient = HttpClients.createDefault();
-            } else {
-                final HttpHost proxyHttpHost =
-                        new HttpHost(httpPostProxyUrl.getHost(), httpPostProxyUrl.getPort(), httpPostProxyUrl.getProtocol());
-                final DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxyHttpHost);
-                closeableHttpClient = HttpClients.custom().setRoutePlanner(routePlanner).build();
-            }
-            // ---------------------------------------------------------------------------------------------------------
-            final List<NameValuePair> convertedHttpPostParameters =
+        // ---------------------------------------------------------------------------------------------------------
+        final HttpEntityEnclosingRequestBase httpEntityEnclosingRequestBase = new HttpPost(httpPostProviderUri);
+        // ---------------------------------------------------------------------------------------------------------
+
+        try (
+                final CloseableHttpClient closeableHttpClient = (httpPostProxyUrl == null) ? HttpClients.createDefault()
+                        : HttpClients.custom().setRoutePlanner(proxyRoutePlanner(httpPostProxyUrl)).build()
+        ) {
+            final List<? extends NameValuePair> convertedHttpPostParameters =
                     httpPostParameters
                             .stream()
                             .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
-                            .collect(Collectors.toList());
+                            .toList();
             httpEntityEnclosingRequestBase.setEntity(new UrlEncodedFormEntity(convertedHttpPostParameters));
             httpPostHeaders
-                    .stream()
                     .forEach(
                             httpPostHeader ->
                                     httpEntityEnclosingRequestBase.addHeader(httpPostHeader.getKey(), httpPostHeader.getValue())
                     );
-            // ---------------------------------------------------------------------------------------------------------
             final CloseableHttpResponse closeableHttpResponse;
             final StatusLine statusLine;
             closeableHttpResponse = closeableHttpClient.execute(httpEntityEnclosingRequestBase);
@@ -103,16 +85,14 @@ public class AzureAdAuthenticationClient {
             final String postResponseEntityAsString = new BufferedReader(
                     new InputStreamReader(responseHttpEntity.getContent(), StandardCharsets.UTF_8))
                     .lines()
-                    .collect(Collectors.joining("\n"));
-            // ---------------------------------------------------------------------------------------------------------
+                    .collect(joining("\n"));
             postResult = ImmutablePair.of(statusLine.getStatusCode(), postResponseEntityAsString);
-        } catch (Throwable e) {
-            throw new IllegalStateException("Exception received when doing HTTP post", e);
         }
+
         return postResult;
     }
 
-    public String getToken() {
+    public String getToken() throws IOException {
 
         final String token;
         if (isLastAzureAdTokenExpired()) {
@@ -134,9 +114,8 @@ public class AzureAdAuthenticationClient {
             httpPostParameters.add(ImmutablePair.of("scope", okosynkConfiguration.getAzureAppScopes()));
             httpPostParameters.add(ImmutablePair.of("grant_type", AzureAdAuthenticationClient.GRANT_TYPE));
             // ---------------------------------------------------------------------------------------------------------
-            final List<Map.Entry<String, String>> httpPostHeaders = new ArrayList<Map.Entry<String, String>>() {{
-                add(ImmutablePair.of(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, "application/x-www-form-urlencoded"));
-            }};
+            final List<Map.Entry<String, String>> httpPostHeaders = List.of(
+                    ImmutablePair.of(HTTP_HEADER_CONTENT_TYPE_TOKEN_KEY, "application/x-www-form-urlencoded"));
             // ---------------------------------------------------------------------------------------------------------
             logger.info("About to acquire an Azure AD access token...");
             final Map.Entry<Integer, String> postResult =
@@ -179,13 +158,8 @@ public class AzureAdAuthenticationClient {
 
     private boolean isLastAzureAdTokenExpired() {
         final long marginInMs = 30000L;
-        final boolean isExpired =
-                (this.lastAzureAdTokenSuccessResponseJson == null)
-                        ||
-                        (
-                                ((System.currentTimeMillis() - this.lastAzureAdTokenSuccessResponseTimestampInMs + marginInMs) / 1000) >
-                                        this.lastAzureAdTokenSuccessResponseJson.getExtExpiresIn()
-                        );
-        return isExpired;
+        return (this.lastAzureAdTokenSuccessResponseJson == null) ||
+                ((System.currentTimeMillis() - this.lastAzureAdTokenSuccessResponseTimestampInMs + marginInMs) / 1000) >
+                        this.lastAzureAdTokenSuccessResponseJson.getExtExpiresIn();
     }
 }

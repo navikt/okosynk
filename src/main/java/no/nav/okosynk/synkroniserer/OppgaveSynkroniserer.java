@@ -1,13 +1,14 @@
 package no.nav.okosynk.synkroniserer;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
@@ -23,11 +24,11 @@ public class OppgaveSynkroniserer {
     private static final Logger logger =
             LoggerFactory.getLogger(OppgaveSynkroniserer.class);
 
-    private final IOkosynkConfiguration okosynkConfiguration;
+    private final OkosynkConfiguration okosynkConfiguration;
     private final OppgaveRestClient oppgaveRestClient;
 
     public OppgaveSynkroniserer(
-            final IOkosynkConfiguration okosynkConfiguration,
+            final OkosynkConfiguration okosynkConfiguration,
             final OppgaveRestClient oppgaveRestClient) {
 
         this.okosynkConfiguration = okosynkConfiguration;
@@ -93,8 +94,8 @@ public class OppgaveSynkroniserer {
 
     public ConsumerStatistics synkroniser(
             final Collection<Oppgave> alleOppgaverLestFraBatchenFuncParm
-    ) {
-        final String bruker = this.okosynkConfiguration.getBatchBruker(getBatchType());
+    ) throws IOException {
+        final String bruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);
 
         logger.info("Bruker {} forsøker å synkronisere {} oppgaver.", bruker,
                 alleOppgaverLestFraBatchenFuncParm.size());
@@ -137,7 +138,7 @@ public class OppgaveSynkroniserer {
 
     ConsumerStatistics ferdigstillOppgaver(final Set<Oppgave> oppgaver) {
 
-        final String bruker = this.okosynkConfiguration.getBatchBruker(getBatchType());
+        final String bruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);
         final String consumerStatisticsName = getBatchType().getConsumerStatisticsName();
         final ConsumerStatistics consumerStatistics;
         final String oppgaveType = getBatchType().getOppgaveType();
@@ -170,7 +171,7 @@ public class OppgaveSynkroniserer {
 
     ConsumerStatistics oppdaterOppgaver(final Set<OppgaveOppdatering> oppgaveOppdateringer) {
 
-        final String bruker = this.okosynkConfiguration.getBatchBruker(getBatchType());
+        final String bruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);
         final String consumerStatisticsName =
                 getBatchType().getConsumerStatisticsName();
 
@@ -194,9 +195,9 @@ public class OppgaveSynkroniserer {
         return consumerStatistics;
     }
 
-    ConsumerStatistics opprettOppgaver(final Set<Oppgave> oppgaver) {
+    ConsumerStatistics opprettOppgaver(final Set<Oppgave> oppgaver) throws IOException {
 
-        final String bruker = this.okosynkConfiguration.getBatchBruker(getBatchType());
+        final String bruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);
         final String consumerStatisticsName =
                 getBatchType().getConsumerStatisticsName();
 

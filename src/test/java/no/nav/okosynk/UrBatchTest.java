@@ -1,7 +1,7 @@
 package no.nav.okosynk;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
@@ -11,8 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class UrBatchTest extends AbstractBatchTest {
 
@@ -21,10 +24,14 @@ class UrBatchTest extends AbstractBatchTest {
 
     @BeforeEach
     void beforeEach() {
-
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("https://oppgave.nais.adeo.no/api/v1/oppgaver");
+        when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Executor");
+        when(okosynkConfiguration.getNaisAppName()).thenReturn("okosynkur");
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("http://www.oppgave.no");
         super.setBatch(
                 new Batch<>(
-                        this.getOkosynkConfiguration(),
+                        okosynkConfiguration,
                         Constants.BATCH_TYPE.UR,
                         new MeldingReader<>(UrMelding::new),
                         new UrMapper(mock(IAktoerClient.class))
@@ -55,7 +62,8 @@ class UrBatchTest extends AbstractBatchTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         MeldingReader<UrMelding> urMeldingMeldingReader = new MeldingReader<>(UrMelding::new);
         UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
@@ -74,7 +82,8 @@ class UrBatchTest extends AbstractBatchTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
@@ -88,7 +97,8 @@ class UrBatchTest extends AbstractBatchTest {
         enteringTestHeaderLogger.debug(null);
 
         MeldingReader<UrMelding> urMeldingMeldingReader = new MeldingReader<>(UrMelding::new);
-        IOkosynkConfiguration okosynkConfiguration = this.getOkosynkConfiguration();
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+
         assertThrows(
                 NullPointerException.class,
                 () ->

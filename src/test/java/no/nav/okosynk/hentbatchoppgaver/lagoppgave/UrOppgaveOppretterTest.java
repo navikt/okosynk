@@ -1,7 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import no.nav.okosynk.model.Oppgave;
 import org.assertj.core.api.SoftAssertions;
@@ -17,10 +18,11 @@ import java.util.List;
 
 import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
-class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
+class UrOppgaveOppretterTest {
 
     private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
     private static final UrMelding UR_MELDING_1 = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
@@ -28,11 +30,13 @@ class UrOppgaveOppretterTest extends AbstractOppgaveOppretterTest {
     private static final UrMelding UR_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8019ANDRUTBUR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
     private static final String UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "25;   Mottakers konto er oppgjort;   postert/bilagsnummer:21.01.11/342552558;   1940kr;   statusdato:28.01.11;   UtbTil:10108000398;";
     private static final String UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE = "25;   Feil bruk av KID/ugyldig KID;   postert/bilagsnummer:31.01.11/343296727;   30416kr;   statusdato:01.02.11;   UtbTil:00837873282;";
+    protected final OkosynkConfiguration okosynkConfiguration;
     private final UrOppgaveOppretter urOppgaveOppretter;
+    protected IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
     UrOppgaveOppretterTest() {
-        super(new FakeOkosynkConfiguration());
-        this.urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient);
+        okosynkConfiguration = mock(OkosynkConfiguration.class);
+        urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient);
     }
 
     @Test

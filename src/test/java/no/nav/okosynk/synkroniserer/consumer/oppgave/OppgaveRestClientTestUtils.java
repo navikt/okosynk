@@ -1,10 +1,10 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.okosynk.config.Constants.BATCH_TYPE;
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.*;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
+import no.nav.okosynk.config.Constants.BATCH_TYPE;
+import no.nav.okosynk.config.OkosynkConfiguration;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.json.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.HttpEntity;
@@ -23,6 +23,7 @@ import java.util.*;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -227,29 +228,38 @@ class OppgaveRestClientTestUtils {
         return mockedOppgaveRestClient;
     }
 
-    static OppgaveRestClient prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail() {
-
-        System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
+    static OppgaveRestClient prepareAMockedFinnOppgaveRestClientBaseThatDoesNotFail() throws IOException {
         final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
         when(mockedOppgaveRestClient.finnOppgaver(anySet())).thenCallRealMethod();
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
-        when(mockedOppgaveRestClient.getOkosynkConfiguration())
-                .thenReturn(new FakeOkosynkConfiguration());
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("https://oppgave.nais.adeo.no/api/v1/oppgaver");
+        when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Executor");
+        when(okosynkConfiguration.getNaisAppName()).thenReturn("okosynkur");
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("http://www.oppgave.no");
+        when(mockedOppgaveRestClient.getOkosynkConfiguration()).thenReturn(okosynkConfiguration);
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
 
         return mockedOppgaveRestClient;
     }
 
-    static OppgaveRestClient prepareAMockedOpprettOppgaverRestClientBaseThatDoesNotFail() {
+
+    static OppgaveRestClient prepareAMockedOpprettOppgaverRestClientBaseThatDoesNotFail() throws IOException {
 
         System.setProperty(OPPGAVE_URL_KEY, "https://oppgave.nais.adeo.no/api/v1/oppgaver");
         final OppgaveRestClient mockedOppgaveRestClient = mock(OppgaveRestClient.class);
         when(mockedOppgaveRestClient.opprettOppgaver(anyCollection())).thenCallRealMethod();
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
-        when(mockedOppgaveRestClient.getOkosynkConfiguration())
-                .thenReturn(new FakeOkosynkConfiguration());
+
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("https://oppgave.nais.adeo.no/api/v1/oppgaver");
+        when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Executor");
+        when(okosynkConfiguration.getNaisAppName()).thenReturn("okosynkur");
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("http://www.oppgave.no");
+
+        when(mockedOppgaveRestClient.getOkosynkConfiguration()).thenReturn(okosynkConfiguration);
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
 
         final AzureAdAuthenticationClient mockedAzureAdAuthenticationClient = mock(AzureAdAuthenticationClient.class);
@@ -266,7 +276,7 @@ class OppgaveRestClientTestUtils {
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
         when(mockedOppgaveRestClient.getOkosynkConfiguration())
-                .thenReturn(new FakeOkosynkConfiguration());
+                .thenReturn(mock(OkosynkConfiguration.class));
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
 
         return mockedOppgaveRestClient;
@@ -292,8 +302,14 @@ class OppgaveRestClientTestUtils {
         when(mockedOppgaveRestClient.opprettOppgaver(anyCollection())).thenCallRealMethod();
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
-        when(mockedOppgaveRestClient.getOkosynkConfiguration())
-                .thenReturn(new FakeOkosynkConfiguration());
+
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("https://oppgave.nais.adeo.no/api/v1/oppgaver");
+        when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Executor");
+        when(okosynkConfiguration.getNaisAppName()).thenReturn("okosynkur");
+        when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("http://www.oppgave.no");
+
+        when(mockedOppgaveRestClient.getOkosynkConfiguration()).thenReturn(okosynkConfiguration);
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
         when(mockedOppgaveRestClient.executeRequest(any(), any(HttpUriRequest.class)))
                 .thenReturn(OppgaveRestClientTestUtils.reponseWithErrorCodeGreaterThan400);
@@ -310,7 +326,7 @@ class OppgaveRestClientTestUtils {
         when(mockedOppgaveRestClient.getUsernamePasswordCredentials())
                 .thenReturn(new UsernamePasswordCredentials("someRubbishUser", "someRubbishPassword"));
         when(mockedOppgaveRestClient.getOkosynkConfiguration())
-                .thenReturn(new FakeOkosynkConfiguration());
+                .thenReturn(mock(OkosynkConfiguration.class));
         when(mockedOppgaveRestClient.getBatchType()).thenReturn(BATCH_TYPE.UR);
         when(mockedOppgaveRestClient.executeRequest(any(CloseableHttpClient.class), any(HttpUriRequest.class)))
                 .thenReturn(OppgaveRestClientTestUtils.reponseWithErrorCodeGreaterThan400);

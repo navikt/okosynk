@@ -37,7 +37,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -52,7 +52,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -67,7 +67,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -86,7 +86,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String expectedKey = "xyzXYZ";
         final String expectedValue = "TullOgTøysx";
@@ -151,7 +151,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         if (firstPriorityKey != null) {
             okosynkConfiguration.clearSystemProperty(firstPriorityKey);
@@ -228,7 +228,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String msg =
                 String.format(
@@ -275,7 +275,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String secondPriorityKey = "test_env_001";
         final String secondPriorityVal = "test_env_001_valx";
@@ -342,7 +342,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         if (firstPriorityKey != null) {
             okosynkConfiguration.clearSystemProperty(firstPriorityKey);
@@ -486,7 +486,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
         if (firstPriorityKey != null) {
             okosynkConfiguration.clearSystemProperty(firstPriorityKey);
         }
@@ -523,7 +523,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
         final String secondPriorityKey = "test_bool_env_003";
         final String secondPriorityVal = "false";
         final boolean defVal = false;
@@ -541,7 +541,7 @@ class OkosynkConfigurationTest {
         enteringTestHeaderLogger.debug(null);
 
         OkosynkConfiguration.createAndReplaceSingletonInstance("Tullefil");
-        final IOkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
+        final OkosynkConfiguration okosynkConfiguration = OkosynkConfiguration.getSingletonInstance();
 
         final String secondPriorityKey = "TEST_BOOL_ENV_001";
         final String secondPriorityVal = "true";

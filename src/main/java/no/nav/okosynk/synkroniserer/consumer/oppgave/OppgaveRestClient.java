@@ -5,14 +5,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import lombok.Getter;
+import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveRequestJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveResponseJson;
-import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -36,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static no.nav.okosynk.config.Constants.*;
 import static no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static org.apache.http.HttpHeaders.ACCEPT;
@@ -48,22 +50,24 @@ public class OppgaveRestClient {
 
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
     private final AzureAdAuthenticationClient azureAdAuthenticationClient;
-    private final IOkosynkConfiguration okosynkConfiguration;
+    private final OkosynkConfiguration okosynkConfiguration;
+    @Getter
     private final Constants.BATCH_TYPE batchType;
     private final CloseableHttpClient httpClient;
     private final UsernamePasswordCredentials credentials;
-    private static final String message = "Feilet ved kall mot Oppgave API";
+    private static final String MESSAGE = "Feilet ved kall mot Oppgave API";
 
     public OppgaveRestClient(
-            final IOkosynkConfiguration okosynkConfiguration,
+            final OkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType,
             final AzureAdAuthenticationClient azureAdAuthenticationClient) {
 
         this.okosynkConfiguration = okosynkConfiguration;
         this.batchType = batchType;
         this.azureAdAuthenticationClient = azureAdAuthenticationClient;
-        final String bruker = okosynkConfiguration.getBatchBruker(batchType);
-        final String brukerPassword = okosynkConfiguration.getBatchBrukerPassword(batchType);
+
+        final String bruker = okosynkConfiguration.getString(OPPGAVE_USERNAME);
+        final String brukerPassword = okosynkConfiguration.getString(OPPGAVE_PASSWORD);
         this.credentials = new UsernamePasswordCredentials(bruker, brukerPassword);
         this.httpClient = HttpClients.createDefault();
         log.info("OppgaveRestClient konfigurert for {}", batchType);
@@ -79,8 +83,7 @@ public class OppgaveRestClient {
             final String oppgaveUrl,
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
-    ) {
-
+    ) throws IOException {
         final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl);
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
@@ -91,7 +94,7 @@ public class OppgaveRestClient {
     }
 
     private static void addAzureAdAuthenticationHeader(
-            final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) {
+            final HttpRequestBase request, final AzureAdAuthenticationClient azureAdAuthenticationClient) throws IOException {
         final String azureAdAuthenticationToken = azureAdAuthenticationClient.getToken();
         request.addHeader(AUTHORIZATION, "Bearer " + azureAdAuthenticationToken);
     }
@@ -100,11 +103,12 @@ public class OppgaveRestClient {
         return this.azureAdAuthenticationClient;
     }
 
-    public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) {
+    public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) throws IOException {
 
+        String oppgaveUrl = getOkosynkConfiguration().getString(OPPGAVE_URL_KEY);
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY),
+                        oppgaveUrl,
                         HttpPost::new,
                         getAzureAdAuthenticationClient()
                 );
@@ -115,9 +119,7 @@ public class OppgaveRestClient {
         final List<PostOppgaveRequestJson> oppgaverSomIkkeErOpprettet = new ArrayList<>();
         final List<PostOppgaveRequestJson> postOppgaveRequestJsons =
                 oppgaver.stream()
-                        .map(
-                                oppgave ->
-                                {
+                        .map(oppgave -> {
                                     try {
                                         return OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(oppgave);
                                     } catch (OppgaveMapperException_MoreThanOneActorType |
@@ -126,7 +128,7 @@ public class OppgaveRestClient {
                                     }
                                 }
                         )
-                        .collect(Collectors.toList());
+                        .toList();
 
         postOppgaveRequestJsons.forEach(postOppgaveRequestJson -> {
             final String oppgaveJsonString;
@@ -141,24 +143,14 @@ public class OppgaveRestClient {
             try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
                 final StatusLine statusLine = response.getStatusLine();
                 if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-                    ErrorResponse errorResponse = null;
-                    try {
-                        errorResponse =
-                                objectMapper
-                                        .readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    } catch (JsonParseException jpe) {
-                        parseRawErrorAndThrow(response);
-                    }
-                    log.error("Feil oppstod under oppretting av oppgave: {}, Error response: {}",
-                            postOppgaveRequestJson,
-                            errorResponse);
+                    handleError(objectMapper, response, postOppgaveRequestJson);
                     oppgaverSomIkkeErOpprettet.add(postOppgaveRequestJson);
                 } else {
                     oppgaverSomErOpprettet.add(
                             objectMapper.readValue(response.getEntity().getContent(), PostOppgaveResponseJson.class));
                 }
             } catch (IOException e) {
-                throw new IllegalStateException(message, e);
+                throw new IllegalStateException(MESSAGE, e);
             }
         });
 
@@ -167,6 +159,18 @@ public class OppgaveRestClient {
                 .antallOppgaverSomMedSikkerhetErOpprettet(oppgaverSomErOpprettet.size())
                 .antallOppgaverSomMedSikkerhetIkkeErOpprettet(oppgaverSomIkkeErOpprettet.size())
                 .build();
+    }
+
+    private void handleError(ObjectMapper objectMapper, CloseableHttpResponse response, PostOppgaveRequestJson postOppgaveRequestJson) throws IOException {
+        ErrorResponse errorResponse = null;
+        try {
+            errorResponse = objectMapper.readValue(response.getEntity().getContent(), ErrorResponse.class);
+        } catch (JsonParseException jpe) {
+            parseRawErrorAndThrow(response);
+        }
+        log.error("Feil oppstod under oppretting av oppgave: {}, Error response: {}",
+                postOppgaveRequestJson,
+                errorResponse);
     }
 
     /**
@@ -221,13 +225,10 @@ public class OppgaveRestClient {
         }
     }
 
-    public Constants.BATCH_TYPE getBatchType() {
-        return this.batchType;
-    }
-
-    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) {
+    public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) throws IOException {
         final int bulkSize = 50;
-        final Collection<String> oppgaverOpprettetAvOkosynk = getOkosynkConfiguration().getOpprettetAvValuesForFinn(getBatchType());
+        final Collection<String> oppgaverOpprettetAvOkosynk =
+                asList(getOkosynkConfiguration().getString(OPPGAVE_USERNAME), getOkosynkConfiguration().getNaisAppName());
         final AtomicInteger atomicInteger = new AtomicInteger(oppgaverAccumulated.size());
         final String oppgavetype = getBatchType().getOppgaveType();
         int offset = 0;
@@ -253,7 +254,7 @@ public class OppgaveRestClient {
                                 return opprettetAvOkosynk;
                             })
                             .map(OppgaveMapper::mapFromFinnOppgaveResponseJsonToOppgave)
-                            .collect(Collectors.toList());
+                            .toList();
             oppgaverAccumulated.addAll(oppgaver);
             if (finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size() < bulkSize) {
                 break;
@@ -274,11 +275,11 @@ public class OppgaveRestClient {
                 .build();
     }
 
-    private void patchOppgave(Oppgave oppgave, boolean ferdigstill) {
+    private void patchOppgave(Oppgave oppgave, boolean ferdigstill) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY) + String.format("/%s", oppgave.oppgaveId),
+                        getOkosynkConfiguration().getString(OPPGAVE_URL_KEY) + String.format("/%s", oppgave.oppgaveId),
                         HttpPatch::new,
                         getAzureAdAuthenticationClient()
                 );
@@ -300,17 +301,21 @@ public class OppgaveRestClient {
         try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-                try {
-                    final ErrorResponse errorResponse =
-                            objectMapper.readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    log.error("Feil oppstod under patching av oppgave: {}", errorResponse);
-                    throw illegalStateExceptionFrom(errorResponse);
-                } catch (JsonParseException jpe) {
-                    parseRawErrorAndThrow(response);
-                }
+                handleError(objectMapper, response);
             }
         } catch (IOException e) {
-            throw new IllegalStateException(message, e);
+            throw new IllegalStateException(MESSAGE, e);
+        }
+    }
+
+    private void handleError(ObjectMapper objectMapper, CloseableHttpResponse response) throws IOException {
+        try {
+            final ErrorResponse errorResponse =
+                    objectMapper.readValue(response.getEntity().getContent(), ErrorResponse.class);
+            log.error("Feil oppstod under patching av oppgave: {}", errorResponse);
+            throw illegalStateExceptionFrom(errorResponse);
+        } catch (JsonParseException jpe) {
+            parseRawErrorAndThrow(response);
         }
     }
 
@@ -320,18 +325,18 @@ public class OppgaveRestClient {
         return httpClient.execute(request);
     }
 
-    IOkosynkConfiguration getOkosynkConfiguration() {
-        return this.okosynkConfiguration;
+    OkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
     }
 
     UsernamePasswordCredentials getUsernamePasswordCredentials() {
         return this.credentials;
     }
 
-    private FinnOppgaverResponseJson finnOppgaver(final int bulkSize, final int offset) {
+    private FinnOppgaverResponseJson finnOppgaver(final int bulkSize, final int offset) throws IOException {
         final URI uri;
         try {
-            uri = new URIBuilder(getOkosynkConfiguration().getRequiredString(OPPGAVE_URL_KEY))
+            uri = new URIBuilder(getOkosynkConfiguration().getString(OPPGAVE_URL_KEY))
                     .addParameter("tema", FAGOMRADE_OKONOMI_KODE)
                     .addParameter("opprettetAv", (getBatchType() == BATCH_TYPE.OS ? "okosynkos" : "okosynkur"))
                     .addParameter("statuskategori", "AAPEN")
@@ -350,14 +355,7 @@ public class OppgaveRestClient {
         try (final CloseableHttpResponse response = executeRequest(this.httpClient, request)) {
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() >= HttpStatus.SC_BAD_REQUEST) {
-                try {
-                    final ErrorResponse errorResponse = new ObjectMapper()
-                            .readValue(response.getEntity().getContent(), ErrorResponse.class);
-                    log.error("Feil oppsto under henting av oppgaver: {}", errorResponse);
-                    throw illegalStateExceptionFrom(errorResponse);
-                } catch (JsonParseException jpe) {
-                    parseRawErrorAndThrow(response);
-                }
+                handleError(response);
             }
 
             final String finnOppgaverResponseJsonEntityAsString =
@@ -370,10 +368,20 @@ public class OppgaveRestClient {
                     new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.readValue(finnOppgaverResponseJsonEntityAsString, FinnOppgaverResponseJson.class);
         } catch (IOException e) {
-            throw new IllegalStateException(message, e);
+            throw new IllegalStateException(MESSAGE, e);
         }
     }
 
+    private void handleError(CloseableHttpResponse response) throws IOException {
+        try {
+            final ErrorResponse errorResponse = new ObjectMapper()
+                    .readValue(response.getEntity().getContent(), ErrorResponse.class);
+            log.error("Feil oppsto under henting av oppgaver: {}", errorResponse);
+            throw illegalStateExceptionFrom(errorResponse);
+        } catch (JsonParseException jpe) {
+            parseRawErrorAndThrow(response);
+        }
+    }
 
     private void parseRawErrorAndThrow(
             final CloseableHttpResponse response

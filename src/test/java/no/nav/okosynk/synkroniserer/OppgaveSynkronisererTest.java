@@ -1,8 +1,7 @@
 package no.nav.okosynk.synkroniserer;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
@@ -25,6 +24,7 @@ import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -46,7 +46,7 @@ class OppgaveSynkronisererTest {
     private static final Constants.BATCH_TYPE BATCH_TYPE = Constants.BATCH_TYPE.OS;
     private static final String OPPGAVEID = "185587998";
 
-    private static final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
+    private static final OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
 
     private OppgaveSynkroniserer oppgaveSynkronisererWithInjectedMocks;
     private OppgaveRestClient mockedOppgaveRestClient;
@@ -56,7 +56,7 @@ class OppgaveSynkronisererTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
         logger.debug("About to create a new OppgaveSynkroniserer instance equipped with the mocked versions of OppgaveRestClient...");
 
@@ -101,7 +101,7 @@ class OppgaveSynkronisererTest {
     }
 
     @Test
-    void when_the_batch_is_started_when_synchronize_is_called_then_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() {
+    void when_the_batch_is_started_when_synchronize_is_called_then_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -112,7 +112,7 @@ class OppgaveSynkronisererTest {
     }
 
     @Test
-    void when_synkroniser_is_called_then_all_rest_client_methods_should_be_called_once() {
+    void when_synkroniser_is_called_then_all_rest_client_methods_should_be_called_once() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -201,7 +201,7 @@ class OppgaveSynkronisererTest {
     }
 
     @Test
-    void when_synkroniserers_opprett_is_called_then_the_rest_clients_opprett_should_also_be_called() {
+    void when_synkroniserers_opprett_is_called_then_the_rest_clients_opprett_should_also_be_called() throws IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -211,7 +211,7 @@ class OppgaveSynkronisererTest {
     }
 
     @Test
-    void when_synkroniserer_is_called_with_no_oppgaver_then_rest_client_should_not_be_called() {
+    void when_synkroniserer_is_called_with_no_oppgaver_then_rest_client_should_not_be_called() throws IOException {
         this.oppgaveSynkronisererWithInjectedMocks.opprettOppgaver(new HashSet<>());
 
         verify(this.mockedOppgaveRestClient, times(0)).opprettOppgaver(anySet());

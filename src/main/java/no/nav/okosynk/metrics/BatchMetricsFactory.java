@@ -1,9 +1,9 @@
 package no.nav.okosynk.metrics;
 
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.metrics.os.OsBatchMetrics;
 import no.nav.okosynk.metrics.ur.UrBatchMetrics;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 
 public class BatchMetricsFactory {
 
@@ -11,7 +11,7 @@ public class BatchMetricsFactory {
   }
 
   public static AbstractBatchMetrics get(
-      final IOkosynkConfiguration okosynkConfiguration,
+      final OkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE  batchType) {
 
     final AbstractBatchMetrics abstractBatchMetrics;

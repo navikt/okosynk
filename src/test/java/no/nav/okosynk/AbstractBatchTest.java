@@ -1,12 +1,13 @@
 package no.nav.okosynk;
 
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.FakeOkosynkConfiguration;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.AuthenticationOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.IoOkosynkIoException;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.NotFoundOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
@@ -20,13 +21,16 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
 import static no.nav.okosynk.hentbatchoppgaver.lesfrafil.FileReaderStatus.OK;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.*;
@@ -39,9 +43,6 @@ public abstract class AbstractBatchTest {
             LoggerFactory.getLogger("EnteringTestHeader");
 
     private Batch<? extends AbstractMelding> batch;
-
-    @Getter
-    private final IOkosynkConfiguration okosynkConfiguration = new FakeOkosynkConfiguration();
 
     @Test
     void when_batch_is_successfully_run_with_no_input_file_then_the_batch_status_should_be_set_to_warning_for_not_found_retries_exceeded()
@@ -104,15 +105,16 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException {
-
-        enteringTestHeaderLogger.debug(null);
+            NotFoundOkosynkIoException, IOException {
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
         doReturn(emptyList()).when(mockedUspesifikkMeldingLinjeReader).read();
         doReturn(true).when(mockedUspesifikkMeldingLinjeReader).removeInputData();
         doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
+
+        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Eurystheus");
 
         final OppgaveSynkroniserer mockedOppgaveSynkroniserer = mock(OppgaveSynkroniserer.class);
         doReturn(ConsumerStatistics.zero(this.batch.getBatchType())).when(mockedOppgaveSynkroniserer).synkroniser(anyCollection());
@@ -127,8 +129,6 @@ public abstract class AbstractBatchTest {
 
     @Test
     void when_batch_set_with_an_ok_initialized_uspesifikkMeldingLinjeReader_then_the_batch_status_should_be_set_to_ready() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final IMeldingLinjeFileReader mockedUspesifikkMeldingLinjeReader =
                 mock(IMeldingLinjeFileReader.class);
@@ -220,7 +220,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException {
+            NotFoundOkosynkIoException, IOException {
 
         enteringTestHeaderLogger.debug(null);
 
@@ -250,7 +250,7 @@ public abstract class AbstractBatchTest {
             throws ConfigureOrInitializeOkosynkIoException,
             AuthenticationOkosynkIoException,
             IoOkosynkIoException,
-            NotFoundOkosynkIoException {
+            NotFoundOkosynkIoException, IOException {
 
         enteringTestHeaderLogger.debug(null);
 

@@ -1,9 +1,9 @@
 package no.nav.okosynk.metrics;
 
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.metrics.os.OsAlertMetrics;
 import no.nav.okosynk.metrics.ur.UrAlertMetrics;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 
 public class AlertMetricsFactory {
 
@@ -11,7 +11,7 @@ public class AlertMetricsFactory {
   }
 
   public static AbstractAlertMetrics get(
-      final IOkosynkConfiguration okosynkConfiguration,
+      final OkosynkConfiguration okosynkConfiguration,
       final Constants.BATCH_TYPE  batchType) {
 
     final AbstractAlertMetrics abstractAlertMetrics;

@@ -2,7 +2,7 @@ package no.nav.okosynk;
 
 import lombok.Getter;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -32,7 +32,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
 
     @Getter
     private final Constants.BATCH_TYPE batchType;
-    private final IOkosynkConfiguration okosynkConfiguration;
+    private final OkosynkConfiguration okosynkConfiguration;
     private boolean shouldRun;
     @Getter
     private BatchStatus lastBatchStatus;
@@ -42,7 +42,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
 
     protected AbstractService(
             final Constants.BATCH_TYPE batchType,
-            final IOkosynkConfiguration okosynkConfiguration) {
+            final OkosynkConfiguration okosynkConfiguration) {
 
         this.batchType = batchType;
         this.okosynkConfiguration = okosynkConfiguration;
@@ -85,7 +85,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
     }
 
     public Batch<T> createAndConfigureBatch(
-            final IOkosynkConfiguration okosynkConfiguration)
+            final OkosynkConfiguration okosynkConfiguration)
             throws URISyntaxException {
 
         if (aktoerClient == null) {
@@ -126,7 +126,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
 
     protected abstract IMeldingMapper<T> createMeldingMapper(final IAktoerClient aktoerClient);
 
-    protected IOkosynkConfiguration getOkosynkConfiguration() {
+    protected OkosynkConfiguration getOkosynkConfiguration() {
         return this.okosynkConfiguration;
     }
 

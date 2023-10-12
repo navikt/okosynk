@@ -195,3 +195,29 @@ eller
     - `mvn versions:display-dependency-updates`
 - Sjekk innholdet i en pod:
     - `kubectl describe jobs okosynk-oor-manually-started-2021-06-30-12-16-ctm66`
+
+# Referanser
+
+[Zero trust](https://doc.nais.io/appendix/zero-trust/index.html)
+
+[Nais Application](https://doc.nais.io/nais-application/application/)
+
+[Auth](https://doc.nais.io/security/auth/)
+
+[Azure AD](https://doc.nais.io/security/auth/azure-ad)
+
+[OAuth2](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+
+[Security Blueprints](https://github.com/navikt/security-blueprints)
+
+[Client credentials](https://github.com/navikt/security-blueprints/tree/master/examples/service-to-service/daemon-clientcredentials-tokensupport/src/main/java/no/nav/security/examples/tokensupport/clientcredentials)
+
+[Security labs](https://security.labs.nais.io/)
+
+[Client Credentials](https://security.labs.nais.io/pages/flows/oauth2/client_credentials.html)
+
+[Maskin til maskin](https://security.labs.nais.io/pages/guide/api-kall/maskin_til_maskin_uten_bruker.html)
+
+[Registrere applikasjon i Azure AD](https://security.labs.nais.io/pages/idp/azure-ad.html#registrere-din-applikasjon-i-azure-ad)
+                                                                                                                                 
+[Metrics](https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics)

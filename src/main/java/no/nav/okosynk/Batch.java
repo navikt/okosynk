@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
@@ -32,7 +32,7 @@ public class Batch<T extends AbstractMelding> {
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
     @Getter
-    private final IOkosynkConfiguration okosynkConfiguration;
+    private final OkosynkConfiguration okosynkConfiguration;
     private final Constants.BATCH_TYPE batchType;
     private final IMeldingReader<T> spesifikkMeldingReader;
     private final IMeldingMapper<T> spesifikkMapper;
@@ -41,7 +41,7 @@ public class Batch<T extends AbstractMelding> {
     private OppgaveSynkroniserer oppgaveSynkroniserer;
 
     public Batch(
-            final IOkosynkConfiguration okosynkConfiguration,
+            final OkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType,
             final IMeldingReader<T> spesifikkMeldingReader,
             final IMeldingMapper<T> spesifikkMapper) {

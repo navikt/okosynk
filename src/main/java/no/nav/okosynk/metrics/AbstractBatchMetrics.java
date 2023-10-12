@@ -2,7 +2,7 @@ package no.nav.okosynk.metrics;
 
 import io.prometheus.client.Gauge;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +18,7 @@ public abstract class AbstractBatchMetrics extends AbstractMetrics {
   private final Gauge              lastSuccessGauge;
   private       ConsumerStatistics consumerStatistics = null;
 
-  /**
-   * Ref. setting 0: https://prometheus.io/docs/practices/instrumentation/#avoid-missing-metrics
-   * @param batchType
-   */
-  protected AbstractBatchMetrics(final IOkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
+  protected AbstractBatchMetrics(final OkosynkConfiguration okosynkConfiguration, final Constants.BATCH_TYPE batchType) {
 
     super(okosynkConfiguration, batchType);
 
@@ -82,13 +78,8 @@ public abstract class AbstractBatchMetrics extends AbstractMetrics {
   }
 
   public void log() {
-
     pushAdd();
-
-    logger.info(
-        "STATISTIKK: consumerStatistics ved avslutning av batchen: {}",
-        this.consumerStatistics.toString()
-    );
+    logger.info("STATISTIKK: consumerStatistics ved avslutning av batchen: {}", consumerStatistics);
   }
 
   private void setMetrics(final ConsumerStatistics consumerStatistics) {

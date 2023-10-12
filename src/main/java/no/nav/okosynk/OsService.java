@@ -1,7 +1,7 @@
 package no.nav.okosynk;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
@@ -10,7 +10,7 @@ import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 
 public class OsService extends AbstractService<OsMelding> {
 
-    public OsService(final IOkosynkConfiguration okosynkConfiguration) {
+    public OsService(final OkosynkConfiguration okosynkConfiguration) {
         super(Constants.BATCH_TYPE.OS, okosynkConfiguration);
     }
 
