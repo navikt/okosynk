@@ -13,8 +13,6 @@ import no.nav.okosynk.hentbatchoppgaver.lesfrafil.TinyFtpReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
-import no.nav.okosynk.metrics.AbstractAlertMetrics;
-import no.nav.okosynk.metrics.AlertMetricsFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,10 +77,6 @@ public abstract class AbstractService<T extends AbstractMelding> {
 
     public boolean shouldRun() {
         return this.shouldRun;
-    }
-
-    public AbstractAlertMetrics getAlertMetrics() {
-        return AlertMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
     }
 
     public Batch<T> createAndConfigureBatch(

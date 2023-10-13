@@ -12,7 +12,7 @@ public class UrAlertMetrics extends AbstractAlertMetrics {
     super(okosynkConfiguration, Constants.BATCH_TYPE.UR);
   }
 
-  public static UrAlertMetrics getSingletonInstance(
+  public static synchronized UrAlertMetrics getSingletonInstance(
       final OkosynkConfiguration okosynkConfiguration
   ) {
     if (singletonInstance == null) {
