@@ -57,9 +57,9 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: kv/preprod/fss/okosynkos/sftpcredentials
+      - kvPath: kv/preprod/fss/okosynkur/sftpcredentials
         mountPath: /secrets/sftpcredentials
-      - kvPath: kv/preprod/fss/okosynkos/oppgavecredentials
+      - kvPath: kv/preprod/fss/okosynkur/oppgavecredentials
         mountPath: /secrets/oppgavecredentials
     sidecar: true
 status: {}
