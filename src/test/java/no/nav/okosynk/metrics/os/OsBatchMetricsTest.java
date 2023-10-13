@@ -3,13 +3,15 @@ package no.nav.okosynk.metrics.os;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.metrics.AbstractBatchMetricsTest;
+import no.nav.okosynk.metrics.BatchMetrics;
+import no.nav.okosynk.metrics.BatchMetricsTest;
 import no.nav.okosynk.config.Constants;
 import org.junit.jupiter.api.Test;
 
-class OsBatchMetricsTest extends AbstractBatchMetricsTest {
+class OsBatchMetricsTest extends BatchMetricsTest {
 
   OsBatchMetricsTest() {
     super(Constants.BATCH_TYPE.OS);
@@ -18,8 +20,10 @@ class OsBatchMetricsTest extends AbstractBatchMetricsTest {
   @Test
   void when_instantiated_then_the_batch_type_should_be_correct() {
 
-    final OsBatchMetrics batchMetrics =
-        assertDoesNotThrow(() -> OsBatchMetrics.getSingletonInstance(mock(OkosynkConfiguration.class)));
+    OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+    when (okosynkConfiguration.getBatchType()).thenReturn(Constants.BATCH_TYPE.OS);
+
+    final BatchMetrics batchMetrics = assertDoesNotThrow(() -> new BatchMetrics(okosynkConfiguration));
 
     assertEquals(Constants.BATCH_TYPE.OS, batchMetrics.getBatchType());
   }

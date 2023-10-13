@@ -4,7 +4,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
-import no.nav.okosynk.metrics.AlertMetricsFactory;
+import no.nav.okosynk.metrics.AlertMetrics;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,7 +148,7 @@ public class CliMain {
             }
         } while (true);
 
-        services.forEach(service -> AlertMetricsFactory.get(service.getOkosynkConfiguration(), service.getBatchType())
+        services.forEach(service -> AlertMetrics.getSingletonInstance(service.getOkosynkConfiguration())
                 .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
         );
     }

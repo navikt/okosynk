@@ -284,4 +284,9 @@ public class OkosynkConfiguration {
         }
         return content;
     }
+
+    public BATCH_TYPE getBatchType() {
+        return getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY).equals(Constants.BATCH_TYPE.OS.name()) ? BATCH_TYPE.OS : BATCH_TYPE.UR;
+    }
+
 }

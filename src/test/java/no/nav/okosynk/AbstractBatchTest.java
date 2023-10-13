@@ -114,6 +114,8 @@ public abstract class AbstractBatchTest {
         doReturn(OK).when(mockedUspesifikkMeldingLinjeReader).getStatus();
 
         OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
+        when(okosynkConfiguration.getBatchType()).thenReturn(getBatchType());
+
         when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Eurystheus");
 
         final OppgaveSynkroniserer mockedOppgaveSynkroniserer = mock(OppgaveSynkroniserer.class);

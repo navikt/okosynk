@@ -12,8 +12,7 @@ import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.*;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
-import no.nav.okosynk.metrics.AbstractBatchMetrics;
-import no.nav.okosynk.metrics.BatchMetricsFactory;
+import no.nav.okosynk.metrics.BatchMetrics;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
@@ -42,17 +41,12 @@ public class Batch<T extends AbstractMelding> {
 
     public Batch(
             final OkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType,
             final IMeldingReader<T> spesifikkMeldingReader,
             final IMeldingMapper<T> spesifikkMapper) throws ConfigureOrInitializeOkosynkIoException {
 
         Validate.notNull(
                 okosynkConfiguration,
                 "The parameter okosynkConfiguration supplied is null");
-
-        Validate.notNull(
-                batchType,
-                "The parameter batchType supplied is null");
 
         Validate.notNull(
                 spesifikkMeldingReader,
@@ -65,7 +59,7 @@ public class Batch<T extends AbstractMelding> {
         this.setBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL);
 
         this.okosynkConfiguration = okosynkConfiguration;
-        this.batchType = batchType;
+        this.batchType = okosynkConfiguration.getBatchType();
         this.spesifikkMeldingReader = spesifikkMeldingReader;
         this.oppgaveSynkroniserer =
                 new OppgaveSynkroniserer(
@@ -83,7 +77,7 @@ public class Batch<T extends AbstractMelding> {
 
     public void run() {
 
-        final AbstractBatchMetrics batchMetrics = BatchMetricsFactory.get(getOkosynkConfiguration(), getBatchType());
+        final BatchMetrics batchMetrics = new BatchMetrics(getOkosynkConfiguration());
         batchStatus = BatchStatus.STARTED;
         logger.info("Batch {} har startet.", getBatchName());
         String prefix = "Exception received when reading input data when running " + getBatchName() + ". Status is set to ";

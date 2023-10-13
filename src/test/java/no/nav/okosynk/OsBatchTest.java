@@ -26,11 +26,10 @@ class OsBatchTest extends AbstractBatchTest {
 
         OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
         when(okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME)).thenReturn("Executor");
-
+        when(okosynkConfiguration.getBatchType()).thenReturn(Constants.BATCH_TYPE.OS);
         super.setBatch(
                 new Batch<>(
                         okosynkConfiguration,
-                        Constants.BATCH_TYPE.OS,
                         new MeldingReader<>(OsMelding::new),
                         new OsMapper(mock(IAktoerClient.class))
                 )
@@ -46,21 +45,7 @@ class OsBatchTest extends AbstractBatchTest {
         OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
-                        new Batch<>(null, Constants.BATCH_TYPE.OS, osMeldingMeldingReader, osMapper)
-        );
-    }
-
-    @Test
-    void when_batch_is_created_with_null_batch_type_then_a_npe_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        MeldingReader<OsMelding> osMeldingMeldingReader = new MeldingReader<>(OsMelding::new);
-        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
-
-        OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
-        assertThrows(NullPointerException.class, () ->
-                new Batch<>(okosynkConfiguration, null, osMeldingMeldingReader, osMapper)
+                        new Batch<>(null, osMeldingMeldingReader, osMapper)
         );
     }
 
@@ -73,7 +58,7 @@ class OsBatchTest extends AbstractBatchTest {
 
         OsMapper osMapper = new OsMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
-                () -> new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.OS, null, osMapper));
+                () -> new Batch<>(okosynkConfiguration, null, osMapper));
     }
 
     @Test
@@ -90,7 +75,6 @@ class OsBatchTest extends AbstractBatchTest {
                 () ->
                         new Batch<>(
                                 okosynkConfiguration,
-                                Constants.BATCH_TYPE.OS,
                                 osMeldingMeldingReader,
                                 null
                         )

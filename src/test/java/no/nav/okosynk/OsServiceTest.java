@@ -84,6 +84,7 @@ class OsServiceTest {
         when(okosynkConfiguration.getString(Constants.FTP_PRIVATEKEY)).thenReturn("SomeDummyKey");
         when(okosynkConfiguration.getString(Constants.FTP_HOST_URL_KEY)).thenReturn("lkjnlknkl");
         when(okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME)).thenReturn("Executor");
+        when (okosynkConfiguration.getBatchType()).thenReturn(BATCH_TYPE.OS);
         service.setAktoerClient(mockedAktoerClient);
 
         assertDoesNotThrow(service::run);

@@ -30,10 +30,10 @@ class UrBatchTest extends AbstractBatchTest {
         when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Executor");
         when(okosynkConfiguration.getNaisAppName()).thenReturn("okosynkur");
         when(okosynkConfiguration.getString(OPPGAVE_URL_KEY)).thenReturn("http://www.oppgave.no");
+        when(okosynkConfiguration.getBatchType()).thenReturn(Constants.BATCH_TYPE.UR);
         super.setBatch(
                 new Batch<>(
                         okosynkConfiguration,
-                        Constants.BATCH_TYPE.UR,
                         new MeldingReader<>(UrMelding::new),
                         new UrMapper(mock(IAktoerClient.class))
                 )
@@ -51,27 +51,6 @@ class UrBatchTest extends AbstractBatchTest {
                 () ->
                         new Batch<>(
                                 null,
-                                Constants.BATCH_TYPE.UR,
-                                urMeldingMeldingReader,
-                                urMapper
-                        )
-        );
-    }
-
-    @Test
-    void when_batch_is_created_with_null_batch_type_then_a_npe_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
-
-        MeldingReader<UrMelding> urMeldingMeldingReader = new MeldingReader<>(UrMelding::new);
-        UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
-        assertThrows(NullPointerException.class,
-                () ->
-                        new Batch<>(
-                                okosynkConfiguration,
-                                null,
                                 urMeldingMeldingReader,
                                 urMapper
                         )
@@ -88,7 +67,7 @@ class UrBatchTest extends AbstractBatchTest {
         UrMapper urMapper = new UrMapper(mock(IAktoerClient.class));
         assertThrows(NullPointerException.class,
                 () ->
-                        new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.UR, null, urMapper)
+                        new Batch<>(okosynkConfiguration, null, urMapper)
         );
     }
 
@@ -103,7 +82,7 @@ class UrBatchTest extends AbstractBatchTest {
         assertThrows(
                 NullPointerException.class,
                 () ->
-                        new Batch<>(okosynkConfiguration, Constants.BATCH_TYPE.UR, urMeldingMeldingReader, null)
+                        new Batch<>(okosynkConfiguration,  urMeldingMeldingReader, null)
         );
     }
 

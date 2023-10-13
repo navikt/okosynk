@@ -87,6 +87,7 @@ class UrServiceTest {
         when(okosynkConfiguration.getString(FTP_PRIVATEKEY)).thenReturn("SomeDummyKey");
         when(okosynkConfiguration.getString(FTP_HOST_URL_KEY)).thenReturn("lkjnlknkl");
         when(okosynkConfiguration.getString(OPPGAVE_USERNAME)).thenReturn("Tavernkeeper");
+        when(okosynkConfiguration.getBatchType()).thenReturn(BATCH_TYPE.UR);
 
         AbstractService<? extends AbstractMelding> service = new UrService(okosynkConfiguration);
 

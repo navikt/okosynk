@@ -88,7 +88,6 @@ public abstract class AbstractService<T extends AbstractMelding> {
         }
         final Batch<T> meldingstypeBatch = new Batch<>(
                 okosynkConfiguration,
-                getBatchType(),
                 createMeldingReader(),
                 createMeldingMapper(aktoerClient)
         );
