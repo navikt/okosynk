@@ -15,7 +15,7 @@ public class AlertMetricsFactory {
       final Constants.BATCH_TYPE  batchType) {
 
     final AbstractAlertMetrics abstractAlertMetrics;
-    if (Constants.BATCH_TYPE.UR.equals(batchType)) {
+    if (Constants.BATCH_TYPE.UR == batchType) {
       abstractAlertMetrics = UrAlertMetrics.getSingletonInstance(okosynkConfiguration);
     } else {
       abstractAlertMetrics = OsAlertMetrics.getSingletonInstance(okosynkConfiguration);
