@@ -29,12 +29,18 @@ spec:
   secureLogs:
     enabled: true
   env:
+    - name: FTPBASEURL_URL
+      value: sftp://b27drvl011.preprod.local:22/inbound/UR.INPUT
     - name: OPPGAVE_URL
       value: https://oppgave.nais.preprod.local/api/v1/oppgaver
+    - name: PDL_URL
+      value: https://pdl-api-q1.dev.intern.nav.no/graphql
     - name: REST_STS_URL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/token
     - name: SECURITYTOKENSERVICE_URL
       value: https://sts-q3.preprod.local/SecurityTokenServiceProvider/
+    - name: AZURE_APP_SCOPE_OPPGAVE
+      value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
     - name: PUSH_GATEWAY_ADDRESS
       value: prometheus-pushgateway.nais-system:9091
     - name: FILE_READER_RETRY_WAIT_TIME_IN_MS
@@ -45,23 +51,15 @@ spec:
       value: "30000"
     - name: BATCH_MAX_NUMBER_OF_TRIES
       value: "3"
-    - name: FTPBASEURL_URL
-      value: sftp://b27drvl011.preprod.local:22/inbound/UR.INPUT
-    - name: AZURE_APP_SCOPE_OPPGAVE
-      value: api://dev-fss.oppgavehandtering.oppgave-q1/.default
     - name: SHOULD_RUN_OS_OR_UR
       value: UR
-    - name: PDL_URL
-      value: https://pdl-api-q1.dev.intern.nav.no/graphql
 
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/dev/srvbokosynk001
-        mountPath: /secrets/serviceuser/okosynk/srvbokosynk001
-      - kvPath: serviceuser/data/dev/srvbokosynk002
-        mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
-      - kvPath: kv/preprod/fss/okosynkur/sftpcredentials
+      - kvPath: kv/preprod/fss/okosynkos/sftpcredentials
         mountPath: /secrets/sftpcredentials
+      - kvPath: kv/preprod/fss/okosynkos/oppgavecredentials
+        mountPath: /secrets/oppgavecredentials
     sidecar: true
 status: {}
