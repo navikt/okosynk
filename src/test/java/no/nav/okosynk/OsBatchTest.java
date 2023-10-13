@@ -4,6 +4,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ class OsBatchTest extends AbstractBatchTest {
             LoggerFactory.getLogger("EnteringTestHeader");
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws ConfigureOrInitializeOkosynkIoException {
 
         OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
         when(okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME)).thenReturn("Executor");

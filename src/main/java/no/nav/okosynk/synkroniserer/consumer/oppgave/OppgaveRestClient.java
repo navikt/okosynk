@@ -9,6 +9,7 @@ import lombok.Getter;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
@@ -60,7 +61,7 @@ public class OppgaveRestClient {
     public OppgaveRestClient(
             final OkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType,
-            final AzureAdAuthenticationClient azureAdAuthenticationClient) {
+            final AzureAdAuthenticationClient azureAdAuthenticationClient) throws ConfigureOrInitializeOkosynkIoException {
 
         this.okosynkConfiguration = okosynkConfiguration;
         this.batchType = batchType;
@@ -68,7 +69,11 @@ public class OppgaveRestClient {
 
         final String bruker = okosynkConfiguration.getString(OPPGAVE_USERNAME);
         final String brukerPassword = okosynkConfiguration.getString(OPPGAVE_PASSWORD);
-        this.credentials = new UsernamePasswordCredentials(bruker, brukerPassword);
+        try{
+            this.credentials = new UsernamePasswordCredentials(bruker, brukerPassword);
+        } catch (IllegalArgumentException e) {
+            throw new ConfigureOrInitializeOkosynkIoException(e.getMessage());
+        }
         this.httpClient = HttpClients.createDefault();
         log.info("OppgaveRestClient konfigurert for {}", batchType);
     }

@@ -6,6 +6,7 @@ import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ class OsServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(OsServiceTest.class);
 
     @Test
-    void when_a_batch_is_created_it_should_not_be_null() throws URISyntaxException {
+    void when_a_batch_is_created_it_should_not_be_null() throws URISyntaxException, ConfigureOrInitializeOkosynkIoException {
 
         OkosynkConfiguration okosynkConfiguration = mock(OkosynkConfiguration.class);
 

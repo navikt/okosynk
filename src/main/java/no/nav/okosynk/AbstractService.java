@@ -10,6 +10,7 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.TinyFtpReader;
+import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 import no.nav.okosynk.metrics.AbstractAlertMetrics;
@@ -58,7 +59,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
             }
             batch.run();
             batchStatus = batch.getBatchStatus();
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | ConfigureOrInitializeOkosynkIoException e) {
             batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
         } finally {
             setLastBatchStatus(batchStatus);
@@ -86,7 +87,7 @@ public abstract class AbstractService<T extends AbstractMelding> {
 
     public Batch<T> createAndConfigureBatch(
             final OkosynkConfiguration okosynkConfiguration)
-            throws URISyntaxException {
+            throws URISyntaxException, ConfigureOrInitializeOkosynkIoException {
 
         if (aktoerClient == null) {
             setAktoerClient(new PdlRestClient(getOkosynkConfiguration(), getBatchType()));

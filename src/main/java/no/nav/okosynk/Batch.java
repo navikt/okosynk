@@ -44,7 +44,7 @@ public class Batch<T extends AbstractMelding> {
             final OkosynkConfiguration okosynkConfiguration,
             final Constants.BATCH_TYPE batchType,
             final IMeldingReader<T> spesifikkMeldingReader,
-            final IMeldingMapper<T> spesifikkMapper) {
+            final IMeldingMapper<T> spesifikkMapper) throws ConfigureOrInitializeOkosynkIoException {
 
         Validate.notNull(
                 okosynkConfiguration,
