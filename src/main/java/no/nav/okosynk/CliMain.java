@@ -15,17 +15,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class CliMain {
-
     private static final Logger logger = LoggerFactory.getLogger(CliMain.class);
-
     private static final String CLI_PROGRAM_NAME = "java -jar okosynk.jar";
-
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_KEY = "p";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_LONG_KEY = "propFile";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_DESCRIPTION = "The name of a file from which the application should read properties";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_ARG_NAME = "applicationPropertiesFileName";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE = "okosynk.properties";
-
     private static final String CLI_HELP_KEY = "h";
     private static final String CLI_HELP_LONG_KEY = "help";
     private static final String CLI_HELP_DESCRIPTION = "Print this message";

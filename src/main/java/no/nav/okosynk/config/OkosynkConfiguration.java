@@ -1,6 +1,13 @@
 package no.nav.okosynk.config;
 
-import no.nav.okosynk.config.homemade.*;
+import no.nav.okosynk.config.homemade.BaseConfiguration;
+import no.nav.okosynk.config.homemade.CompositeConfiguration;
+import no.nav.okosynk.config.homemade.Configuration;
+import no.nav.okosynk.config.homemade.ConfigurationException;
+import no.nav.okosynk.config.homemade.Configurations;
+import no.nav.okosynk.config.homemade.EnvironmentConfiguration;
+import no.nav.okosynk.config.homemade.Quintet;
+import no.nav.okosynk.config.homemade.SystemConfiguration;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +23,19 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.joining;
-import static no.nav.okosynk.config.Constants.*;
+import static no.nav.okosynk.config.Constants.BATCH_TYPE;
+import static no.nav.okosynk.config.Constants.DISABLE_METRICS_REPORT_EXT_KEY;
+import static no.nav.okosynk.config.Constants.DISABLE_METRICS_REPORT_KEY;
+import static no.nav.okosynk.config.Constants.FTP_HOSTKEY;
+import static no.nav.okosynk.config.Constants.FTP_PRIVATEKEY;
+import static no.nav.okosynk.config.Constants.FTP_USERNAME;
+import static no.nav.okosynk.config.Constants.NAV_TRUSTSTORE_PASSWORD_KEY;
+import static no.nav.okosynk.config.Constants.NAV_TRUSTSTORE_PATH_KEY;
+import static no.nav.okosynk.config.Constants.OPPGAVE_PASSWORD;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
+import static no.nav.okosynk.config.Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY;
+import static no.nav.okosynk.config.Constants.TILLAT_MOCK_PROPERTY_EXT_KEY;
+import static no.nav.okosynk.config.Constants.TILLAT_MOCK_PROPERTY_KEY;
 
 public class OkosynkConfiguration {
 
@@ -28,22 +47,17 @@ public class OkosynkConfiguration {
     private final CompositeConfiguration compositeConfigurationForSecondPriority = new CompositeConfiguration();
     private final SystemConfiguration systemConfiguration;
 
-    private OkosynkConfiguration(
-            final String applicationPropertiesFileName) {
+    private OkosynkConfiguration(final String applicationPropertiesFileName) {
 
         this.systemConfiguration = new SystemConfiguration();
         this.compositeConfigurationForSecondPriority.addConfiguration(systemConfiguration);
-
         this.compositeConfigurationForFirstPriority.addConfiguration(new EnvironmentConfiguration());
         addVaultProperties(compositeConfigurationForFirstPriority);
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
 
         try {
             this.compositeConfigurationForSecondPriority
-                    .addConfiguration(
-                            new Configurations()
-                                    .properties(new File(applicationPropertiesFileName))
-                    );
+                    .addConfiguration(new Configurations().properties(new File(applicationPropertiesFileName)));
             logger.info("Konfigurasjon lastet fra {}", applicationPropertiesFileName);
         } catch (ConfigurationException e) {
             logger.info("Fant ikke {}", applicationPropertiesFileName);
@@ -52,10 +66,7 @@ public class OkosynkConfiguration {
         final String pomPropertiesFileName = "properties-from-pom.properties";
         try {
             this.compositeConfigurationForSecondPriority
-                    .addConfiguration(
-                            new Configurations()
-                                    .properties(new File(pomPropertiesFileName))
-                    );
+                    .addConfiguration(new Configurations().properties(new File(pomPropertiesFileName)));
             logger.info("Konfigurasjon lastet fra {}", pomPropertiesFileName);
         } catch (ConfigurationException e) {
             logger.info("Fant ikke {}", pomPropertiesFileName);
@@ -66,17 +77,14 @@ public class OkosynkConfiguration {
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    public static void createAndReplaceSingletonInstance(
-            final String applicationPropertiesFileName) {
+    public static void createAndReplaceSingletonInstance(final String applicationPropertiesFileName) {
 
         if (applicationPropertiesFileName == null) {
             final String msg = "The parameter applicationPropertiesFileName is null";
             logger.error(msg);
             throw new NullPointerException(msg);
         }
-
-        OkosynkConfiguration.singleton =
-                new OkosynkConfiguration(applicationPropertiesFileName);
+        OkosynkConfiguration.singleton = new OkosynkConfiguration(applicationPropertiesFileName);
     }
 
     public static OkosynkConfiguration getSingletonInstance() {
@@ -202,6 +210,7 @@ public class OkosynkConfiguration {
     private String convertToFirstPriorityKey(final String originalKey) {
         return originalKey.toUpperCase().replace('.', '_');
     }
+
     public String getNaisAppName() {
         return getRequiredString(Constants.NAIS_APP_NAME_KEY);
     }
