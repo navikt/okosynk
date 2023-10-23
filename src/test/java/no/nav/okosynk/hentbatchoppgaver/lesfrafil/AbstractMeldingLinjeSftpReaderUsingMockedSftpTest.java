@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
-import static no.nav.okosynk.metrics.TestSftpServer.FTP_TEST_SERVER_USER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
@@ -18,7 +17,7 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
         assertThrows(AuthenticationOkosynkIoException.class,
                 () -> new TinyFtpReader(new FtpSettings(
                         new URI("dsfgdfg"),
-                        FTP_TEST_SERVER_USER,
+                        "okosynkTestuser",
                         "enPrivatnøkkel",
                         StandardCharsets.ISO_8859_1,
                         "noskapin"
