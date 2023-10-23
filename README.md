@@ -195,6 +195,8 @@ eller
     - `mvn versions:display-dependency-updates`
 - Sjekk innholdet i en pod:
     - `kubectl describe jobs okosynk-oor-manually-started-2021-06-30-12-16-ctm66`
+- Loggen på en pen måte:
+    - Pipe loggoutputen inn i `sed -n '/ENTERING OKOSYNK/,/OKOSYNK ABOUT TO EXIT/p'|jq -r '.logger_name + "\t " + .message'|column -t -s $'\t'`
 
 # Referanser
 
