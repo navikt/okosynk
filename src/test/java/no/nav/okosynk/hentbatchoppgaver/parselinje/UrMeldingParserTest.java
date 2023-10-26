@@ -136,7 +136,7 @@ class UrMeldingParserTest {
 
         String tomStreng = "";
 
-        assertThrows(IncorrectMeldingFormatException.class, () -> UR_MELDING_PARSER.trimmedSubstring(tomStreng, 0, 1));
+        assertThrows(IncorrectMeldingFormatException.class, () -> Util.trimmedSubstring(tomStreng, 0, 1));
     }
 
     @Test
@@ -146,7 +146,7 @@ class UrMeldingParserTest {
 
         String ugyldigDato = "UGYLDIG DATO";
 
-        assertThrows(IncorrectMeldingFormatException.class, () -> UR_MELDING_PARSER.parseDatoMedKlokkeslett(ugyldigDato));
+        assertThrows(IncorrectMeldingFormatException.class, () -> Util.parseDatoMedKlokkeslett(ugyldigDato));
     }
 
     @Test
@@ -156,6 +156,6 @@ class UrMeldingParserTest {
 
         String ugyldigDato = "UGYLDIG DATO";
 
-        assertThrows(IncorrectMeldingFormatException.class, () -> UR_MELDING_PARSER.parseDatoUtenKlokkeslett(ugyldigDato));
+        assertThrows(IncorrectMeldingFormatException.class, () -> Util.parseDatoUtenKlokkeslett(ugyldigDato));
     }
 }

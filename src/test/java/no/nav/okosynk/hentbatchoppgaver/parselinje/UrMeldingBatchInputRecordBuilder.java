@@ -10,13 +10,13 @@ public class UrMeldingBatchInputRecordBuilder
     extends AbstractMeldingBatchInputRecordBuilder<UrMeldingBatchInputRecordBuilder, UrMelding> {
 
     private enum SUB_FIELD_DEF {
-        GJELDER_ID_TYPE(UrMeldingFormat.GJELDER_ID_TYPE_KOLONNE_START, UrMeldingFormat.GJELDER_ID_TYPE_KOLONNE_SLUTT),
-        OPPDRAGS_KODE(UrMeldingFormat.OPPDRAGS_KODE_KOLONNE_START, UrMeldingFormat.OPPDRAGS_KODE_KOLONNE_SLUTT),
-        DATO_POSTERT(UrMeldingFormat.DATO_POSTERT_KOLONNE_START, UrMeldingFormat.DATO_POSTERT_KOLONNE_SLUTT),
-        KILDE(UrMeldingFormat.KILDE_KOLONNE_START, UrMeldingFormat.KILDE_KOLONNE_SLUTT),
-        BILAGS_ID(UrMeldingFormat.BILAGS_ID_KOLONNE_START, UrMeldingFormat.BILAGS_ID_KOLONNE_SLUTT),
-        ARSAKS_TEKST(UrMeldingFormat.ARSAKS_TEKST_KOLONNE_START, UrMeldingFormat.ARSAKS_TEKST_KOLONNE_SLUTT),
-        MOTTAKER_ID(UrMeldingFormat.MOTTAKER_ID_KOLONNE_START, UrMeldingFormat.MOTTAKER_ID_KOLONNE_SLUTT)
+        GJELDER_ID_TYPE(UrMeldingFormat.GJELDER_ID_TYPE_START, UrMeldingFormat.GJELDER_ID_TYPE_SLUTT),
+        OPPDRAGS_KODE(UrMeldingFormat.OPPDRAGS_KODE_START, UrMeldingFormat.OPPDRAGS_KODE_SLUTT),
+        DATO_POSTERT(UrMeldingFormat.DATO_POSTERT_START, UrMeldingFormat.DATO_POSTERT_SLUTT),
+        KILDE(UrMeldingFormat.KILDE_START, UrMeldingFormat.KILDE_SLUTT),
+        BILAGS_ID(UrMeldingFormat.BILAGS_ID_START, UrMeldingFormat.BILAGS_ID_SLUTT),
+        ARSAKS_TEKST(UrMeldingFormat.ARSAKS_TEKST_START, UrMeldingFormat.ARSAKS_TEKST_SLUTT),
+        MOTTAKER_ID(UrMeldingFormat.MOTTAKER_ID_START, UrMeldingFormat.MOTTAKER_ID_SLUTT)
         ;
 
         public static int getRecordLength() {

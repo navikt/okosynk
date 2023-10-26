@@ -7,17 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class AbstractMeldingBatchInputRecordBuilder<
-        MELDINGSBUILDERTYPE extends AbstractMeldingBatchInputRecordBuilder<MELDINGSBUILDERTYPE, MELDINGSTYPE>,
-        MELDINGSTYPE        extends AbstractMelding
+        T extends AbstractMeldingBatchInputRecordBuilder<T, U>,
+        U extends AbstractMelding
     > {
 
     public enum SUPER_FIELD_DEF {
-        GJELDER_ID(OsMeldingFormat.GJELDER_ID_START, OsMeldingFormat.GJELDER_ID_SLUTT, UrMeldingFormat.GJELDER_ID_KOLONNE_START, UrMeldingFormat.GJELDER_ID_KOLONNE_SLUTT),
-        BEHANDLENDE_ENHET(OsMeldingFormat.BEHANDLENDE_ENHET_START, OsMeldingFormat.BEHANDLENDE_ENHET_SLUTT, UrMeldingFormat.BEHANDLENDE_ENHET_KOLONNE_START, UrMeldingFormat.BEHANDLENDE_ENHET_KOLONNE_SLUTT),
-        DATO_FOR_STATUS(OsMeldingFormat.DATO_FOR_STATUS_START, OsMeldingFormat.DATO_FOR_STATUS_SLUTT, UrMeldingFormat.DATO_FOR_STATUS_KOLONNE_START, UrMeldingFormat.DATO_FOR_STATUS_KOLONNE_SLUTT),
-        NYESTE_VENTESTATUS(OsMeldingFormat.NYESTE_VENTESTATUS_START, OsMeldingFormat.NYESTE_VENTESTATUS_SLUTT, UrMeldingFormat.NYESTE_VENTESTATUS_KOLONNE_START, UrMeldingFormat.NYESTE_VENTESTATUS_KOLONNE_SLUTT),
-        BRUKER_ID(OsMeldingFormat.BRUKER_ID_START, OsMeldingFormat.BRUKER_ID_SLUTT, UrMeldingFormat.BRUKER_ID_KOLONNE_START, UrMeldingFormat.BRUKER_ID_KOLONNE_SLUTT),
-        TOTALT_NETTO_BELOP(OsMeldingFormat.TOTALT_NETTO_BELOP_START, OsMeldingFormat.TOTALT_NETTO_BELOP_SLUTT, UrMeldingFormat.TOTALT_NETTO_BELOP_KOLONNE_START, UrMeldingFormat.TOTALT_NETTO_BELOP_KOLONNE_SLUTT),
+        GJELDER_ID(OsMeldingFormat.GJELDER_ID_START, OsMeldingFormat.GJELDER_ID_SLUTT, UrMeldingFormat.GJELDER_ID_START, UrMeldingFormat.GJELDER_ID_SLUTT),
+        BEHANDLENDE_ENHET(OsMeldingFormat.BEHANDLENDE_ENHET_START, OsMeldingFormat.BEHANDLENDE_ENHET_SLUTT, UrMeldingFormat.BEHANDLENDE_ENHET_START, UrMeldingFormat.BEHANDLENDE_ENHET_SLUTT),
+        DATO_FOR_STATUS(OsMeldingFormat.DATO_FOR_STATUS_START, OsMeldingFormat.DATO_FOR_STATUS_SLUTT, UrMeldingFormat.DATO_FOR_STATUS_START, UrMeldingFormat.DATO_FOR_STATUS_SLUTT),
+        NYESTE_VENTESTATUS(OsMeldingFormat.NYESTE_VENTESTATUS_START, OsMeldingFormat.NYESTE_VENTESTATUS_SLUTT, UrMeldingFormat.NYESTE_VENTESTATUS_START, UrMeldingFormat.NYESTE_VENTESTATUS_SLUTT),
+        BRUKER_ID(OsMeldingFormat.BRUKER_ID_START, OsMeldingFormat.BRUKER_ID_SLUTT, UrMeldingFormat.BRUKER_ID_START, UrMeldingFormat.BRUKER_ID_SLUTT),
+        TOTALT_NETTO_BELOP(OsMeldingFormat.TOTALT_NETTO_BELOP_START, OsMeldingFormat.TOTALT_NETTO_BELOP_SLUTT, UrMeldingFormat.TOTALT_NETTO_BELOP_START, UrMeldingFormat.TOTALT_NETTO_BELOP_SLUTT),
         ;
 
         public int getStartPosInOs() {
@@ -36,10 +36,6 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
             return endPosInUr;
         }
 
-        public static int getOsRecordLength() {
-            return OS_RECORD_LENGTH;
-        }
-
         public static int getUrRecordLength() {
             return UR_RECORD_LENGTH;
         }
@@ -49,25 +45,18 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
         private final int startPosInUr;
         private final int endPosInUr;
 
-        private static final int OS_RECORD_LENGTH =
-            Arrays
-                .stream(SUPER_FIELD_DEF.values())
-                .mapToInt(superFieldDef -> superFieldDef.getEndPosInOs())
-                .max()
-                .getAsInt();
-
         private static final int UR_RECORD_LENGTH =
             Arrays
                 .stream(SUPER_FIELD_DEF.values())
-                .mapToInt(superFieldDef -> superFieldDef.getEndPosInUr())
+                .mapToInt(SUPER_FIELD_DEF::getEndPosInUr)
                 .max()
                 .getAsInt();
 
-        private SUPER_FIELD_DEF(
-            final int startPosInOs,
-            final int endPosInOs,
-            final int startPosInUr,
-            final int endPosInUr) {
+        SUPER_FIELD_DEF(
+                final int startPosInOs,
+                final int endPosInOs,
+                final int startPosInUr,
+                final int endPosInUr) {
 
             this.startPosInOs = startPosInOs;
             this.endPosInOs = endPosInOs;
@@ -80,33 +69,33 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
 
     protected abstract String build();
 
-    public MELDINGSBUILDERTYPE withGjelderId(final String val) {
+    public T withGjelderId(final String val) {
         superFields.put(SUPER_FIELD_DEF.GJELDER_ID, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 
-    public MELDINGSBUILDERTYPE withBehandlendeEnhet(final String val) {
+    public T withBehandlendeEnhet(final String val) {
         superFields.put(SUPER_FIELD_DEF.BEHANDLENDE_ENHET, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 
-    public MELDINGSBUILDERTYPE withDatoForStatus(final String val) {
+    public T withDatoForStatus(final String val) {
         superFields.put(SUPER_FIELD_DEF.DATO_FOR_STATUS, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 
-    public MELDINGSBUILDERTYPE withNyesteVentestatus(final String val) {
+    public T withNyesteVentestatus(final String val) {
         superFields.put(SUPER_FIELD_DEF.NYESTE_VENTESTATUS, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 
-    public MELDINGSBUILDERTYPE withBrukerId(final String val) {
+    public T withBrukerId(final String val) {
         superFields.put(SUPER_FIELD_DEF.BRUKER_ID, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 
-    public MELDINGSBUILDERTYPE withTotaltNettoBelop(final String val) {
+    public T withTotaltNettoBelop(final String val) {
         superFields.put(SUPER_FIELD_DEF.TOTALT_NETTO_BELOP, val);
-        return (MELDINGSBUILDERTYPE)this;
+        return (T)this;
     }
 }

@@ -1,13 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.time.LocalDate;
-import java.util.stream.Stream;
-
 import no.nav.okosynk.hentbatchoppgaver.model.OsMeldingTestGenerator;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
 import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,17 +9,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class OsMeldingParserTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String OS_MELDING = "10108000398024544313 2009-08-072009-09-26RETUK231B3502009-08-012009-08-31000000004100æ 8020         KORTTID 10108000398            ";
     private static final OsMeldingParser OS_MELDING_PARSER = new OsMeldingParser();
 
     @ParameterizedTest(name = "gjelderId = {0}")
     @MethodSource("getOsMeldingAndExpected")
-    void parseGjelderId(String gjelderId, GjelderIdType _gjelderIdType, String osmelding ) {
+    void parseGjelderId(String gjelderId, GjelderIdType _gjelderIdType, String osmelding) {
         assertEquals(gjelderId, OS_MELDING_PARSER.parseGjelderId(osmelding));
     }
 
@@ -135,33 +133,4 @@ class OsMeldingParserTest {
         assertEquals("", OS_MELDING_PARSER.parseEtteroppgjor(OS_MELDING));
     }
 
-    @Test
-    void trimmedSubstringKasterMeldingFormatExceptionForUgyldigSubstring() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        String tomStreng = "";
-
-        assertThrows(IncorrectMeldingFormatException.class, () -> OS_MELDING_PARSER.trimmedSubstring(tomStreng, 0, 1));
-    }
-
-    @Test
-    void parseDatoMedKlokkeslettKasterMeldingFormatExceptionForUgyldigDato() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        String ugyldigDato = "UGYLDIG DATO";
-
-        assertThrows(IncorrectMeldingFormatException.class, () -> OS_MELDING_PARSER.parseDatoMedKlokkeslett(ugyldigDato));
-    }
-
-    @Test
-    void parseDatoUtenKlokkeslettKasterMeldingFormatExceptionForUgyldigDato() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        String ugyldigDato = "UGYLDIG DATO";
-
-        assertThrows(IncorrectMeldingFormatException.class, () -> OS_MELDING_PARSER.parseDatoUtenKlokkeslett(ugyldigDato));
-    }
 }

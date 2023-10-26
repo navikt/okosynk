@@ -1,20 +1,10 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Stream;
-
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBuilder;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,10 +14,22 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.joining;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 class UrMeldingTest extends AbstractMeldingTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     @Test
     void urMeldingParserMeldingTilVariabler() {
@@ -71,7 +73,7 @@ class UrMeldingTest extends AbstractMeldingTest {
         enteringTestHeaderLogger.debug(null);
 
         final UrMelding melding =
-            new UrMelding(UrMeldingTestGenerator.EksempelMelding.getMelding());
+                new UrMelding(UrMeldingTestGenerator.EksempelMelding.getMelding());
 
         assertEquals(melding.hashCode(), melding.hashCode());
     }
@@ -196,91 +198,32 @@ class UrMeldingTest extends AbstractMeldingTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final Set<String> gjelderIder = new HashSet<>();
-        gjelderIder.add("00154567893");
-        gjelderIder.add("01874777894");
-
-        final Set<String> behandlendeEnheter = new HashSet<>();
-        behandlendeEnheter.add("4819");
-        behandlendeEnheter.add("8020");
-
-        final Set<String> gjelderIdTyper = new HashSet<>();
-        gjelderIdTyper.add("PERSON");
-        gjelderIdTyper.add("SAMHANDLER");
-        gjelderIdTyper.add("ORGANISASJON");
-
-        final Set<String> oppdragsKoder = new HashSet<>();
-        oppdragsKoder.add("ANDRUTB");
-        oppdragsKoder.add("BA");
-        /*
-        The following codes test OK,
-        but they are removed of performance
-        reasons. (Number of permutations)
-        oppdragsKoder.add("GHBATCH");
-        oppdragsKoder.add("GS");
-        oppdragsKoder.add("INNT");
-        oppdragsKoder.add("KORTTID");
-        oppdragsKoder.add("KREDREF");
-        oppdragsKoder.add("KS");
-        oppdragsKoder.add("PEN");
-        oppdragsKoder.add("REFARBG");
-        oppdragsKoder.add("REFUTG");
-        oppdragsKoder.add("SKATOPP");
-        oppdragsKoder.add("SRPOST");
-        oppdragsKoder.add("SUBATCH");
-        oppdragsKoder.add("URKLUTB");
-        oppdragsKoder.add("YSBATCH");
-        */
-
-        /*
-        The following codes do not test ok om melding differences.
-        That's probably OK.
-        However, the equality method is somewhat complicated... :-)
-        They are not in the ur_mapping_regler.properties,
-        which means they are treated by the same "NAVEnhet".
-        oppdragsKoder.add("BEBATCH");
-        oppdragsKoder.add("BRBATCH");
-        oppdragsKoder.add("PRED");
-        */
-
-        final Set<String> datoerPostert = new HashSet<>();
-        datoerPostert.add("2011-01-21");
-        datoerPostert.add("2015-03-17");
+        final List<String> gjelderIder = asList("00154567893", "01874777894");
+        final List<String> behandlendeEnheter = asList("4819", "8020");
+        final List<String> gjelderIdTyper = asList("PERSON", "SAMHANDLER", "ORGANISASJON");
+        final List<String> oppdragsKoder = asList("ANDRUTB", "BA");
+        final List<String> datoerPostert = asList("2011-01-21", "2015-03-17");
 
         final List<UrMelding> allHopefullyUniqueMeldinger = new ArrayList<>();
 
         final Random random = new Random(711);
-        gjelderIder
-            .forEach(
-                gjelderId
-                ->
-                        behandlendeEnheter
-                            .forEach(
-                                behandlendeEnhet
-                                ->
-                                        gjelderIdTyper
-                                            .forEach(
-                                                gjelderIdType
-                                                ->
-                                                        oppdragsKoder
-                                                            .forEach(
-                                                                oppdragsKode
-                                                                ->
-                                                                        datoerPostert
-                                                                            .forEach(
-                                                                                datoPostert
-                                                                                ->
-                                                                                {
-                                                                                    final UrMelding melding1 = createMelding(gjelderId, behandlendeEnhet, gjelderIdType, oppdragsKode, datoPostert, random);
-                                                                                    final UrMelding melding2 = createMelding(gjelderId, behandlendeEnhet, gjelderIdType, oppdragsKode, datoPostert, random);
-                                                                                    assertEquals(melding1, melding2, "In spite the fact that all equality involved fields are equal in the two messages, they are not equal.");
-                                                                                    assertEquals(melding1.hashCode(), melding2.hashCode(), "The two messages are equal, but they do not produce the same hash. That's a Java contract breach.");
-                                                                                    allHopefullyUniqueMeldinger.add(melding1);
-                                                                                })
-                                                            )
-                                            )
-                        )
-            );
+        for (String gjelderId : gjelderIder) {
+            for (String behandlendeEnhet : behandlendeEnheter) {
+                for (String gjelderIdType : gjelderIdTyper) {
+                    for (String oppdragsKode : oppdragsKoder) {
+                        for (String datoPostert : datoerPostert) {
+                            final UrMelding melding1 = createMelding(gjelderId, behandlendeEnhet, gjelderIdType, oppdragsKode, datoPostert, random);
+                            final UrMelding melding2 = createMelding(gjelderId, behandlendeEnhet, gjelderIdType, oppdragsKode, datoPostert, random);
+                            System.out.println("likhetsgreier(melding1) = " + likhetsgreier(melding1));
+                            System.out.println("likhetsgreier(melding2) = " + likhetsgreier(melding2));
+                            assertEquals(melding1, melding2, "In spite the fact that all equality involved fields are equal in the two messages, they are not equal.");
+                            assertEquals(melding1.hashCode(), melding2.hashCode(), "The two messages are equal, but they do not produce the same hash. That's a Java contract breach.");
+                            allHopefullyUniqueMeldinger.add(melding1);
+                        }
+                    }
+                }
+            }
+        }
 
         // Test that all meldinger are different from all the others hopefully different ones:
         for (int i = 0; i < allHopefullyUniqueMeldinger.size(); i++) {
@@ -288,53 +231,59 @@ class UrMeldingTest extends AbstractMeldingTest {
             for (int j = 0; j < allHopefullyUniqueMeldinger.size(); j++) {
                 if (i != j) {
                     final UrMelding melding2 = allHopefullyUniqueMeldinger.get(j);
-                    assertNotEquals(melding1, melding2 ,
-                        "Two UR meldinger expected to be different are equal" + System.lineSeparator() + System.lineSeparator() +
-                        "melding1:" + System.lineSeparator() +
-                        "=========" + System.lineSeparator() +
-                        melding1.toString() + System.lineSeparator() + System.lineSeparator() +
-                        "melding2:" + System.lineSeparator() +
-                        "========" + System.lineSeparator() +
-                        melding2.toString() + System.lineSeparator() + System.lineSeparator()
+                    assertNotEquals(melding1, melding2,
+                            "Two UR meldinger expected to be different are equal" + System.lineSeparator() + System.lineSeparator() +
+                                    "melding1:" + System.lineSeparator() +
+                                    "=========" + System.lineSeparator() +
+                                    melding1.toString() + System.lineSeparator() + System.lineSeparator() +
+                                    "melding2:" + System.lineSeparator() +
+                                    "========" + System.lineSeparator() +
+                                    melding2.toString() + System.lineSeparator() + System.lineSeparator()
                     );
                 }
             }
         }
     }
 
+    private String likhetsgreier(UrMelding melding1) {
+        return Stream.of(melding1.gjelderId, melding1.gjelderIdType, melding1.oppdragsKode, melding1.datoPostert, melding1.navEnhet())
+                .map(Object::toString)
+                .collect(joining(", "));
+    }
+
     private UrMelding createMelding(
-        final String gjelderId,
-        final String behandlendeEnhet,
-        final String gjelderIdType,
-        final String oppdragsKode,
-        final String datoPostert,
-        final Random random) {
+            final String gjelderId,
+            final String behandlendeEnhet,
+            final String gjelderIdType,
+            final String oppdragsKode,
+            final String datoPostert,
+            final Random random) {
 
         final int totalRecordLength =
-            Math.max(
-                AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUrRecordLength(),
-                OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRecordLength()
-            );
+                Math.max(
+                        AbstractMeldingBatchInputRecordBuilder.SUPER_FIELD_DEF.getUrRecordLength(),
+                        OsMeldingBatchInputRecordBuilder.SUB_FIELD_DEF.getRecordLength()
+                );
 
         return UrMeldingBuilder
-            .newBuilder()
-            .withMeldingBatchInputRecordBuilder(
-                UrMeldingBatchInputRecordBuilder
-                    .newBuilder()
-                    .withGjelderId(gjelderId) // Involved in equality
-                    .withBehandlendeEnhet(behandlendeEnhet) // Involved in equality
-                    .withDatoForStatus(AbstractMeldingTest.randomLocalDateTime(random))
-                    .withNyesteVentestatus(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
-                    .withBrukerId(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
-                    .withTotaltNettoBelop(AbstractMeldingTest.randomNumeric(5, random) + "æ")
-                    .withGjelderIdType(gjelderIdType) // Involved in equality
-                    .withOppdragsKode(oppdragsKode) // Involved in equality
-                    .withDatoPostert(datoPostert) // Involved in equality
-                    .withKilde(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
-                    .withBilagsId(AbstractMeldingTest.randomNumeric(totalRecordLength, random))
-                    .withArsaksTekst(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
-                    .withMottakerId(AbstractMeldingTest.randomNumeric(11, random))
-            )
-            .build();
+                .newBuilder()
+                .withMeldingBatchInputRecordBuilder(
+                        UrMeldingBatchInputRecordBuilder
+                                .newBuilder()
+                                .withGjelderId(gjelderId) // Involved in equality
+                                .withBehandlendeEnhet(behandlendeEnhet) // Involved in equality
+                                .withDatoForStatus(AbstractMeldingTest.randomLocalDateTime(random))
+                                .withNyesteVentestatus(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
+                                .withBrukerId(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
+                                .withTotaltNettoBelop(AbstractMeldingTest.randomNumeric(5, random) + "æ")
+                                .withGjelderIdType(gjelderIdType) // Involved in equality
+                                .withOppdragsKode(oppdragsKode) // Involved in equality
+                                .withDatoPostert(datoPostert) // Involved in equality
+                                .withKilde(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
+                                .withBilagsId(AbstractMeldingTest.randomNumeric(totalRecordLength, random))
+                                .withArsaksTekst(AbstractMeldingTest.randomAlphanumeric(totalRecordLength, random))
+                                .withMottakerId(AbstractMeldingTest.randomNumeric(11, random))
+                )
+                .build();
     }
 }

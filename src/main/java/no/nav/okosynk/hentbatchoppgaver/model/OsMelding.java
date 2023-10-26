@@ -1,7 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
-import no.nav.okosynk.model.GjelderIdType;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -26,7 +25,7 @@ public class OsMelding extends AbstractMelding {
 
         super(osMelding, new OsMeldingParser());
 
-        final OsMeldingParser parser = (OsMeldingParser)getParser();
+        final OsMeldingParser parser = (OsMeldingParser) getParser();
 
         this.faggruppe = parser.parseFaggruppe(osMelding);
         this.beregningsId = parser.parseBeregningsId(osMelding);
@@ -41,7 +40,7 @@ public class OsMelding extends AbstractMelding {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), super.behandlendeEnhet, this.beregningsId, this.beregningsDato, this.faggruppe, GjelderIdType.fra(this.gjelderId));
+        return Objects.hash(super.gjelderId, super.behandlendeEnhet, this.beregningsId, this.beregningsDato, this.faggruppe);
     }
 
     @Override
@@ -51,39 +50,40 @@ public class OsMelding extends AbstractMelding {
             return true;
         }
 
-        if (!super.equals(other)) {
-            return false;
-        }
-
         if (!(other instanceof OsMelding otherAsOsMelding)) {
             return false;
         }
 
-        final AbstractMelding otherAsAbstractMelding = (AbstractMelding)other;
+        if (this.getClass() != other.getClass()) {
+            return false;
+        }
+
+        if (!this.gjelderId.equals(otherAsOsMelding.gjelderId)) {
+            return false;
+        }
+        final AbstractMelding otherAsAbstractMelding = (AbstractMelding) other;
 
         return
-            super.behandlendeEnhet.equals(otherAsAbstractMelding.behandlendeEnhet)
-            &&
-            this.beregningsId.equals(otherAsOsMelding.beregningsId)
-            &&
-            this.beregningsDato.equals(otherAsOsMelding.beregningsDato)
-            &&
-            this.faggruppe.equals(otherAsOsMelding.faggruppe)
-            &&
-            GjelderIdType.fra(this.gjelderId) == GjelderIdType.fra(otherAsAbstractMelding.gjelderId);
+                super.behandlendeEnhet.equals(otherAsAbstractMelding.behandlendeEnhet)
+                        &&
+                        this.beregningsId.equals(otherAsOsMelding.beregningsId)
+                        &&
+                        this.beregningsDato.equals(otherAsOsMelding.beregningsDato)
+                        &&
+                        this.faggruppe.equals(otherAsOsMelding.faggruppe);
     }
 
     @Override
     public String toString() {
 
         return super.toString() + FIELD_SEPARATOR +
-           "faggruppe            : " + faggruppe + FIELD_SEPARATOR +
-           "beregningsId         : " + beregningsId + FIELD_SEPARATOR +
-           "beregningsDato       : " + beregningsDato + FIELD_SEPARATOR +
-           "forsteFomIPeriode    : " + forsteFomIPeriode + FIELD_SEPARATOR +
-           "sisteTomIPeriode     : " + sisteTomIPeriode + FIELD_SEPARATOR +
-           "flaggFeilkonto       : " + flaggFeilkonto + FIELD_SEPARATOR +
-           "utbetalesTilId       : " + utbetalesTilId + FIELD_SEPARATOR +
-           "etteroppgjor         : " + etteroppgjor;
+                "faggruppe            : " + faggruppe + FIELD_SEPARATOR +
+                "beregningsId         : " + beregningsId + FIELD_SEPARATOR +
+                "beregningsDato       : " + beregningsDato + FIELD_SEPARATOR +
+                "forsteFomIPeriode    : " + forsteFomIPeriode + FIELD_SEPARATOR +
+                "sisteTomIPeriode     : " + sisteTomIPeriode + FIELD_SEPARATOR +
+                "flaggFeilkonto       : " + flaggFeilkonto + FIELD_SEPARATOR +
+                "utbetalesTilId       : " + utbetalesTilId + FIELD_SEPARATOR +
+                "etteroppgjor         : " + etteroppgjor;
     }
 }

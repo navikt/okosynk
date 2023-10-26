@@ -5,6 +5,7 @@ import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 public class UrMelding extends AbstractMelding {
 
@@ -33,7 +34,7 @@ public class UrMelding extends AbstractMelding {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.gjelderIdType, this.oppdragsKode, this.datoPostert, new UrMappingRegelRepository().finnRegel(this));
+        return Objects.hash(this.gjelderId, this.gjelderIdType, this.oppdragsKode, this.datoPostert, this.navEnhet());
     }
 
     @Override
@@ -43,15 +44,13 @@ public class UrMelding extends AbstractMelding {
             return true;
         }
 
-        if (!super.equals(other)) {
-            return false;
-        }
-
         if (!(other instanceof UrMelding otherAsUrMelding)) {
             return false;
         }
 
         return
+            this.gjelderId.equals(otherAsUrMelding.gjelderId)
+                &&
             this.gjelderIdType.equals(otherAsUrMelding.gjelderIdType)
             &&
             this.oppdragsKode.equals(otherAsUrMelding.oppdragsKode)
@@ -75,25 +74,12 @@ public class UrMelding extends AbstractMelding {
     }
 
     private boolean skalTilSammeNavEnhet(final UrMelding other) {
+        return navEnhet().equals(other.navEnhet());
+    }
 
+    Optional<String> navEnhet() {
         final UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
-
-        return urMappingRegelRepository
-                .finnRegel(this)
-                .map(
-                    regel
-                    ->
-                    regel.ansvarligEnhetId
-                )
-                .equals(
-                    urMappingRegelRepository
-                        .finnRegel(other)
-                        .map(
-                            otherRegel
-                            ->
-                            otherRegel.ansvarligEnhetId
-                        )
-                );
+        return urMappingRegelRepository.finnRegel(this).map(regel -> regel.ansvarligEnhetId);
     }
 
 }

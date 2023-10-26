@@ -1,12 +1,11 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import lombok.Getter;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingParser;
+import no.nav.okosynk.hentbatchoppgaver.parselinje.Meldingparser;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 public abstract class AbstractMelding {
     protected static final String FIELD_SEPARATOR = System.lineSeparator();
@@ -25,12 +24,10 @@ public abstract class AbstractMelding {
     public static final String FELTSEPARATOR = ";   ";
 
     @Getter
-    private final AbstractMeldingParser parser;
+    private final Meldingparser parser;
 
-    protected AbstractMelding(final String melding, final AbstractMeldingParser parser) {
-
+    protected AbstractMelding(final String melding, final Meldingparser parser) {
         this.parser = parser;
-
         this.behandlendeEnhet = parser.parseBehandlendeEnhet(melding);
         this.gjelderId = parser.parseGjelderId(melding);
         this.datoForStatus = parser.parseDatoForStatus(melding);
@@ -42,34 +39,5 @@ public abstract class AbstractMelding {
     public String hentNettoBelopSomStreng() {
         final BigDecimal bd = BigDecimal.valueOf(this.totaltNettoBelop);
         return bd.toBigInteger().toString();
-    }
-
-    @Override
-    public boolean equals(final Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (!(other instanceof AbstractMelding otherAsAbstractMelding)) {
-            return false;
-        }
-        return this.gjelderId.equals(otherAsAbstractMelding.gjelderId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.gjelderId);
-    }
-
-    @Override
-    public String toString() {
-        return String.join(FIELD_SEPARATOR,
-                super.toString(),
-                "totaltNettoBelop : " + totaltNettoBelop,
-                "gjelderId        : " + gjelderId,
-                "datoForStatus    : " + datoForStatus,
-                "nyesteVentestatus: " + nyesteVentestatus,
-                "brukerId         : " + brukerId,
-                "behandlendeEnhet : " + behandlendeEnhet
-        );
     }
 }
