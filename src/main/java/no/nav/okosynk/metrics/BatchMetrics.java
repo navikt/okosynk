@@ -19,7 +19,7 @@ public class BatchMetrics extends AbstractMetrics {
 
     public BatchMetrics(final OkosynkConfiguration okosynkConfiguration) {
 
-        super(okosynkConfiguration);
+        super(okosynkConfiguration.getPrometheusAddress("prometheus-pushgateway.nais-system:9091"), okosynkConfiguration.getBatchType());
 
         this.oppgaverOpprettetGauge =
                 Gauge

@@ -3,7 +3,6 @@ package no.nav.okosynk;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
 import no.nav.okosynk.metrics.AlertMetrics;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -120,31 +119,24 @@ public class CliMain {
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
         final OkosynkConfiguration okosynkConfigurationLocal = createOkosynkConfiguration();
-        final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
+        final Collection<Service> services = new ArrayList<>();
 
-        if (okosynkConfigurationLocal.getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY).equals(Constants.BATCH_TYPE.OS.name())) {
-            logger.info("Running OS");
-            services.add(new OsService(okosynkConfigurationLocal));
-        }
-        if (okosynkConfigurationLocal.getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY).equals(Constants.BATCH_TYPE.UR.name())) {
-            logger.info("Running UR");
-            services.add(new UrService(okosynkConfigurationLocal));
-        }
+        services.add(new Service(okosynkConfigurationLocal));
 
         final int sleepTimeBetweenRunsInMs = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_RETRY_WAIT_TIME_IN_MS_KEY);
         final int maxNumberOfRuns = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_MAX_NUMBER_OF_TRIES_KEY);
         int actualNumberOfRuns = 0;
         do {
             logger.info("About to run the batch(es) for the {}. time ...", actualNumberOfRuns + 1);
-            services.stream().filter(AbstractService::shouldRun).forEach(this::runOneBatch);
-            if (++actualNumberOfRuns < maxNumberOfRuns && services.stream().anyMatch(AbstractService::shouldRun)) {
+            services.stream().filter(Service::shouldRun).forEach(this::runOneBatch);
+            if (++actualNumberOfRuns < maxNumberOfRuns && services.stream().anyMatch(Service::shouldRun)) {
                 retrySleep(actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
             } else {
                 break;
             }
         } while (true);
 
-        services.forEach(service -> AlertMetrics.getSingletonInstance(service.getOkosynkConfiguration())
+        services.forEach(service -> AlertMetrics.getSingletonInstance(okosynkConfiguration.getPrometheusAddress("prometheus-pushgateway.nais-system:9091"), okosynkConfiguration.getBatchType())
                 .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
         );
     }
@@ -172,7 +164,7 @@ public class CliMain {
         logger.info("I will try re-running the batch(es)...");
     }
 
-    private void runOneBatch(final AbstractService<? extends AbstractMelding> service) {
+    private void runOneBatch(final Service service) {
         final String batchName = service.getBatchType().getName();
         logger.info("About to run batch {}...", batchName);
         final BatchStatus batchStatus = service.run();

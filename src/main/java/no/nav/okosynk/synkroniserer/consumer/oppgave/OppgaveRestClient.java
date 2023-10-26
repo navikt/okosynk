@@ -60,11 +60,10 @@ public class OppgaveRestClient {
 
     public OppgaveRestClient(
             final OkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType,
             final AzureAdAuthenticationClient azureAdAuthenticationClient) throws ConfigureOrInitializeOkosynkIoException {
 
         this.okosynkConfiguration = okosynkConfiguration;
-        this.batchType = batchType;
+        this.batchType = okosynkConfiguration.getBatchType();
         this.azureAdAuthenticationClient = azureAdAuthenticationClient;
 
         final String bruker = okosynkConfiguration.getString(OPPGAVE_USERNAME);
@@ -75,7 +74,7 @@ public class OppgaveRestClient {
             throw new ConfigureOrInitializeOkosynkIoException(e.getMessage());
         }
         this.httpClient = HttpClients.createDefault();
-        log.info("OppgaveRestClient konfigurert for {}", batchType);
+        log.info("OppgaveRestClient konfigurert for {}", this.batchType);
     }
 
     private static void addCorrelationIdToRequest(final AbstractHttpMessage request) {

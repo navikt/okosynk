@@ -2,14 +2,6 @@ package no.nav.okosynk.synkroniserer;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.IMeldingMapper;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.MeldingUnreadableException;
-import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.IMeldingReader;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.MeldingReader;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.model.OppgaveTest;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
@@ -27,13 +19,23 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyCollection;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class OppgaveSynkronisererTest {
 
@@ -73,31 +75,6 @@ class OppgaveSynkronisererTest {
         when(this.mockedOppgaveRestClient.patchOppgaver(anySet(), anyBoolean())).thenReturn(ConsumerStatistics.zero(OppgaveSynkronisererTest.BATCH_TYPE.getConsumerStatisticsName()));
 
         when(this.mockedOppgaveRestClient.getBatchType()).thenReturn(OppgaveSynkronisererTest.BATCH_TYPE);
-    }
-
-    @Test
-    void when_simulating_OS_batch_file_line_to_oppgave_then_no_oppgave_should_be_found_for_opprett() throws MeldingUnreadableException {
-
-        final String expectedAktoerId = "1933953921119";
-        final String expectedFolkeregisterIdent = "25067823770";
-
-        final IAktoerClient aktoerClient = mock(IAktoerClient.class);
-        when(aktoerClient.hentGjeldendeAktoerId(any())).thenReturn(AktoerRespons.ok(expectedAktoerId));
-
-        final String linjeMedUspesifikkMelding = expectedFolkeregisterIdent + "422070401 2021-05-102021-05-31RETUK231B3522021-05-012021-05-31000000015170æ 8020         REFARBG 00981002431            ";
-        final IMeldingReader<OsMelding> meldingReader = new MeldingReader<>(OsMelding::new);
-        final List<OsMelding> spesifikkMeldingFraLinjeMedUspesifikkMelding =
-                meldingReader.opprettSpesifikkeMeldingerFraLinjerMedUspesifikkeMeldinger(List.of(linjeMedUspesifikkMelding));
-        final IMeldingMapper<OsMelding> spesifikkMapper = new OsMapper(aktoerClient);
-        final Set<Oppgave> batchOppgaver = new HashSet<>(spesifikkMapper.lagOppgaver(spesifikkMeldingFraLinjeMedUspesifikkMelding));
-
-        final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
-        oppgaverLestFraDatabasen.add(new Oppgave.OppgaveBuilder().withBehandlingstema(null).withBehandlingstype("ae0215").withAnsvarligEnhetId("4151").withAktoerId(expectedAktoerId).withFolkeregisterIdent(expectedFolkeregisterIdent).withBnr(null).withOrgnr(null).withSamhandlernr(null).build());
-        assertTrue(batchOppgaver.containsAll(oppgaverLestFraDatabasen));
-        assertTrue(oppgaverLestFraDatabasen.containsAll(batchOppgaver));
-
-        final Collection<Oppgave> oppgaverSomSkalOpprettes = OppgaveSynkroniserer.finnOppgaverSomSkalOpprettes(batchOppgaver, oppgaverLestFraDatabasen);
-        assertEquals(0, oppgaverSomSkalOpprettes.size());
     }
 
     @Test

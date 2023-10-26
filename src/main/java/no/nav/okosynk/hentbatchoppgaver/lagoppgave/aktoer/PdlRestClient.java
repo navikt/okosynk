@@ -8,7 +8,6 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation;
 import jakarta.ws.rs.core.Response;
 import no.nav.okosynk.comm.OidcStsClient;
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PdlErrorJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PdlErrorResponseJson;
@@ -35,12 +34,9 @@ public class PdlRestClient implements IAktoerClient {
     private final OkosynkConfiguration okosynkConfiguration;
     private OidcStsClient oidcStsClient;
 
-    public PdlRestClient(
-            final OkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
+    public PdlRestClient(final OkosynkConfiguration okosynkConfiguration) {
         this.okosynkConfiguration = okosynkConfiguration;
-
-        log.info("PDL REST client created. batchType: {}", batchType);
+        log.info("PDL REST client created. batchType: {}", okosynkConfiguration.getBatchType());
     }
 
     static String buildHentIdenterEntityAsString(final String ident) {

@@ -4,7 +4,6 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.PushGateway;
 import lombok.Getter;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.OkosynkConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,17 +19,12 @@ abstract class AbstractMetrics {
     private final CollectorRegistry collectorRegistry;
     private final PushGateway pushGateway;
 
-    protected AbstractMetrics(
-            final OkosynkConfiguration okosynkConfiguration) {
-
-        final String localpushGatewayEndpointNameAndPort =
-                okosynkConfiguration
-                        .getPrometheusAddress("prometheus-pushgateway.nais-system:9091");
+    protected AbstractMetrics(String prometheusaddress, Constants.BATCH_TYPE batchType) {
 
         final CollectorRegistry localcollectorRegistry = new CollectorRegistry();
         localcollectorRegistry.clear();
-        this.batchType = okosynkConfiguration.getBatchType();
-        this.pushGatewayEndpointNameAndPort = localpushGatewayEndpointNameAndPort;
+        this.batchType = batchType;
+        this.pushGatewayEndpointNameAndPort = prometheusaddress;
         this.collectorRegistry = localcollectorRegistry;
         this.pushGateway = new PushGateway(this.pushGatewayEndpointNameAndPort);
     }

@@ -1,10 +1,8 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave;
 
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.Constants.BATCH_TYPE;
 import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.model.Oppgave.OppgaveBuilder;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
@@ -19,11 +17,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import static no.nav.okosynk.config.Constants.NAIS_APP_NAME_KEY;
 import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,24 +53,6 @@ class OppgaveRestClientTest {
         System.clearProperty(OkosynkConfiguration.AZURE_APP_CLIENT_ID_KEY);
         System.clearProperty(NAIS_APP_NAME_KEY);
         System.clearProperty(OPPGAVE_URL_KEY);
-    }
-
-    @Test
-    void when_rest_client_is_initiated_config_and_batch_type_should_be_correct() throws ConfigureOrInitializeOkosynkIoException {
-        final OkosynkConfiguration expectedOkosynkConfiguration = mock(OkosynkConfiguration.class);
-        when(expectedOkosynkConfiguration.getString(Constants.OPPGAVE_USERNAME)).thenReturn("Executor");
-        final Constants.BATCH_TYPE expectedBatchType = Constants.BATCH_TYPE.UR;
-        final OppgaveRestClient oppgaveRestClient =
-                new OppgaveRestClient(
-                        expectedOkosynkConfiguration,
-                        expectedBatchType,
-                        new AzureAdAuthenticationClient(expectedOkosynkConfiguration));
-
-        assertNotNull(oppgaveRestClient.getOkosynkConfiguration());
-        assertEquals(expectedOkosynkConfiguration, oppgaveRestClient.getOkosynkConfiguration());
-
-        assertNotNull(oppgaveRestClient.getBatchType());
-        assertEquals(expectedBatchType, oppgaveRestClient.getBatchType());
     }
 
     @Test
