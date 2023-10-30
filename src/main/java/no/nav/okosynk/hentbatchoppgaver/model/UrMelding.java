@@ -1,13 +1,27 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
-public class UrMelding extends AbstractMelding {
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseArsaksTekst;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBehandlendeEnhet;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBilagsId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBrukerId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseDatoForStatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseDatoPostert;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseGjelderId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseGjelderIdType;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseKilde;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseMottakerId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseNyesteVentestatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseOppdragsKode;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseTotaltNettoBelop;
+
+public class UrMelding extends Melding {
 
     public final String oppdragsKode;
     public final String gjelderIdType;
@@ -19,17 +33,20 @@ public class UrMelding extends AbstractMelding {
 
     public UrMelding(final String urMelding) {
 
-        super(urMelding, new UrMeldingParser());
+        super(parseBehandlendeEnhet(urMelding),
+                parseBrukerId(urMelding),
+                parseDatoForStatus(urMelding),
+                parseGjelderId(urMelding),
+                parseNyesteVentestatus(urMelding),
+                parseTotaltNettoBelop(urMelding));
 
-        final UrMeldingParser parser = (UrMeldingParser)getParser();
-
-        this.oppdragsKode = parser.parseOppdragsKode(urMelding);
-        this.gjelderIdType = parser.parseGjelderIdType(urMelding);
-        this.datoPostert = parser.parseDatoPostert(urMelding);
-        this.kilde = parser.parseKilde(urMelding);
-        this.bilagsId = parser.parseBilagsId(urMelding);
-        this.arsaksTekst = parser.parseArsaksTekst(urMelding);
-        this.mottakerId = parser.parseMottakerId(urMelding);
+        this.oppdragsKode = parseOppdragsKode(urMelding);
+        this.gjelderIdType = parseGjelderIdType(urMelding);
+        this.datoPostert = parseDatoPostert(urMelding);
+        this.kilde = parseKilde(urMelding);
+        this.bilagsId = parseBilagsId(urMelding);
+        this.arsaksTekst = parseArsaksTekst(urMelding);
+        this.mottakerId = parseMottakerId(urMelding);
     }
 
     @Override
@@ -48,38 +65,39 @@ public class UrMelding extends AbstractMelding {
             return false;
         }
 
-        return
-            this.gjelderId.equals(otherAsUrMelding.gjelderId)
-                &&
-            this.gjelderIdType.equals(otherAsUrMelding.gjelderIdType)
-            &&
-            this.oppdragsKode.equals(otherAsUrMelding.oppdragsKode)
-            &&
-            this.datoPostert.equals(otherAsUrMelding.datoPostert)
-            &&
-            skalTilSammeNavEnhet(otherAsUrMelding)
-            ;
+        return this.gjelderId/*........*/.equals(otherAsUrMelding.gjelderId)
+                && this.gjelderIdType/**/.equals(otherAsUrMelding.gjelderIdType)
+                && this.oppdragsKode/*.*/.equals(otherAsUrMelding.oppdragsKode)
+                && this.datoPostert/*..*/.equals(otherAsUrMelding.datoPostert)
+                && navEnhet()/*........*/.equals(otherAsUrMelding.navEnhet());
     }
 
     @Override
     public String toString() {
-        return super.toString() + FIELD_SEPARATOR +
-           "oppdragsKode     : " + oppdragsKode + FIELD_SEPARATOR +
-           "gjelderIdType    : " + gjelderIdType + FIELD_SEPARATOR +
-           "datoPostert      : " + datoPostert + FIELD_SEPARATOR +
-           "kilde            : " + kilde + FIELD_SEPARATOR +
-           "bilagsId         : " + bilagsId + FIELD_SEPARATOR +
-           "arsaksTekst      : " + arsaksTekst + FIELD_SEPARATOR +
-           "mottakerId       : " + mottakerId;
-    }
-
-    private boolean skalTilSammeNavEnhet(final UrMelding other) {
-        return navEnhet().equals(other.navEnhet());
+        return String.join(FIELD_SEPARATOR, super.toString(),
+                "oppdragsKode     : " + oppdragsKode,
+                "gjelderIdType    : " + gjelderIdType,
+                "datoPostert      : " + datoPostert,
+                "kilde            : " + kilde,
+                "bilagsId         : " + bilagsId,
+                "arsaksTekst      : " + arsaksTekst,
+                "mottakerId       : " + mottakerId);
     }
 
     Optional<String> navEnhet() {
         final UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
         return urMappingRegelRepository.finnRegel(this).map(regel -> regel.ansvarligEnhetId);
+    }
+
+    public UrBeskrivelseInfo urBeskrivelseInfo() {
+        return new UrBeskrivelseInfo(nyesteVentestatus,
+                arsaksTekst,
+                datoPostert,
+                bilagsId,
+                hentNettoBelopSomStreng(),
+                datoForStatus,
+                mottakerId,
+                brukerId);
     }
 
 }

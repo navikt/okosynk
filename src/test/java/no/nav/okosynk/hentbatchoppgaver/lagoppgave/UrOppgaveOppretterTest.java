@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,8 +45,8 @@ class UrOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
         assertAll(
-                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new UrBeskrivelseInfo(UrOppgaveOppretterTest.UR_MELDING_1).lagBeskrivelse()),
-                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, new UrBeskrivelseInfo(UrOppgaveOppretterTest.UR_MELDING_2).lagBeskrivelse())
+                () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_1.urBeskrivelseInfo().lagBeskrivelse()),
+                () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_2.urBeskrivelseInfo().lagBeskrivelse())
         );
     }
 

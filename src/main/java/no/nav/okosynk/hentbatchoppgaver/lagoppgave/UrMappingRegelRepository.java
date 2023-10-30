@@ -13,6 +13,6 @@ public class UrMappingRegelRepository
   @Override
   protected String createMappingRegelKey(final UrMelding urMelding) {
 
-    return settSammenNokkel(urMelding.oppdragsKode, urMelding.behandlendeEnhet);
+    return settSammenNokkel(urMelding.oppdragsKode, urMelding.getBehandlendeEnhet());
   }
 }

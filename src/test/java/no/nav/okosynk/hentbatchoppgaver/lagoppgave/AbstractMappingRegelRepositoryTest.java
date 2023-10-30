@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.util.Optional;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractMappingRegelRepositoryTest<MT extends AbstractMelding>  {
+public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
 
   private static final Logger enteringTestHeaderLogger =
       LoggerFactory.getLogger("EnteringTestHeader");

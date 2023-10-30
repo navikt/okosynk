@@ -28,7 +28,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
 
     @Override
     protected String summerOgKonsolider(List<UrMelding> urMeldings) {
-        return urMeldings.stream().map(UrBeskrivelseInfo::new)
+        return urMeldings.stream().map(UrMelding::urBeskrivelseInfo)
                 .reduce(UrBeskrivelseInfo::pluss)
                 .map(UrBeskrivelseInfo::lagBeskrivelse).orElse("");
     }

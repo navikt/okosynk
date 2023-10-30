@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.formatAsNorwegianDate;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
@@ -46,8 +46,8 @@ class OsOppgaveOppretterTest {
         enteringTestHeaderLogger.debug(null);
 
 
-        assertThat(new OsBeskrivelseInfo(OS_MELDING_1).lagBeskrivelse()).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
-        assertThat(new OsBeskrivelseInfo(OS_MELDING_2).lagBeskrivelse()).isEqualTo(OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
+        assertThat(OS_MELDING_1.osBeskrivelseInfo().lagBeskrivelse()).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
+        assertThat(OS_MELDING_2.osBeskrivelseInfo().lagBeskrivelse()).isEqualTo(OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
     }
 
     @Test
@@ -107,8 +107,8 @@ class OsOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_2, OS_MELDING_1)).orElseThrow();
@@ -125,8 +125,8 @@ class OsOppgaveOppretterTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.beregningsDato);
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.beregningsDato);
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_1, OS_MELDING_2)).orElseThrow();

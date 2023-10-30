@@ -12,8 +12,8 @@ public class UrMeldingFunksjonelleAggregeringsKriterier {
 
     public UrMeldingFunksjonelleAggregeringsKriterier(UrMelding urMelding) {
         UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
-        this.gjelderId = urMelding.gjelderId;
-        this.gjelderIdType = GjelderIdType.fra(urMelding.gjelderId).toString();
+        this.gjelderId = urMelding.getGjelderId();
+        this.gjelderIdType = GjelderIdType.fra(urMelding.getGjelderId()).toString();
         this.ansvarligEnhetId = urMappingRegelRepository.finnRegel(urMelding).map(t -> t.ansvarligEnhetId).orElse(null);
         this.oppdragsKode = urMelding.oppdragsKode;
     }

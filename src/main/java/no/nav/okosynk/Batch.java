@@ -16,7 +16,7 @@ import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitiali
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.IoOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.NotFoundOkosynkIoException;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.TooManyInputDataLinesBatchException;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import no.nav.okosynk.metrics.BatchMetrics;
@@ -131,7 +131,7 @@ public class Batch {
             throw new TooManyInputDataLinesBatchException(linjer.size(), MAX_ANTALL_LINJER);
         }
         logger.debug("linjer.size(): {}", linjer.size());
-        final List<? extends AbstractMelding> meldinger = parseLinjer(linjer);
+        final List<? extends Melding> meldinger = parseLinjer(linjer);
         logger.info("Konverterer {} meldinger til oppgaver", meldinger.size());
 
         List<Oppgave> batchOppgaver = new ArrayList<>();
@@ -158,9 +158,9 @@ public class Batch {
         return batchOppgaver;
     }
 
-    private List<? extends AbstractMelding> parseLinjer(final List<String> linjer) {
+    private List<? extends Melding> parseLinjer(final List<String> linjer) {
         logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
-        Function<? super String, ? extends AbstractMelding> mapper = (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) ? OsMelding::new : UrMelding::new;
+        Function<? super String, ? extends Melding> mapper = (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) ? OsMelding::new : UrMelding::new;
         return linjer.stream().map(mapper).toList();
     }
 

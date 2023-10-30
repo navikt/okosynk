@@ -23,14 +23,14 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     @Override
     protected Comparator<OsMelding> getMeldingComparator() {
-        return comparing(osMelding -> osMelding.beregningsDato, reverseOrder());
+        return comparing(OsMelding::getBeregningsDato, reverseOrder());
     }
 
     @Override
     protected String summerOgKonsolider(List<OsMelding> osMeldings) {
         return osMeldings.stream()
                 .sorted(this.getMeldingComparator())
-                .map(OsBeskrivelseInfo::new)
+                .map(OsMelding::osBeskrivelseInfo)
                 .reduce(OsBeskrivelseInfo::pluss)
                 .map(OsBeskrivelseInfo::lagBeskrivelse).orElse("");
     }

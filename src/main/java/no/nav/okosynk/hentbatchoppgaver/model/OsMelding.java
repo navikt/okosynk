@@ -1,41 +1,61 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import lombok.Getter;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseBehandlendeEnhet;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseBeregningsDato;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseBeregningsId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseBrukerId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseDatoForStatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseEtteroppgjor;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseFaggruppe;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseForsteFomIPeriode;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseGjelderId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseNyesteVentestatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseSisteTomIPeriode;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseTotaltNettoBelop;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseUtbetalesTilId;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
-public class OsMelding extends AbstractMelding {
+public class OsMelding extends Melding {
 
     static final String ORGANISASJON_PREFIKS = "00";
     private static final String FLAGG_FEILKONTO_DEFAULT = " ";
 
-    public final String faggruppe;
-    public final String beregningsId;
-    public final LocalDate beregningsDato;
-    public final LocalDate forsteFomIPeriode;
-    public final LocalDate sisteTomIPeriode;
-    public final String flaggFeilkonto;
-    public final String utbetalesTilId;
-    public final String etteroppgjor;
+    @Getter
+    final String faggruppe;
+    final String beregningsId;
+    @Getter
+    final LocalDate beregningsDato;
+    final LocalDate forsteFomIPeriode;
+    final LocalDate sisteTomIPeriode;
+    final String flaggFeilkonto;
+    final String utbetalesTilId;
+    final String etteroppgjor;
 
     public OsMelding(final String osMelding) {
+        super(parseBehandlendeEnhet(osMelding),
+                parseBrukerId(osMelding),
+                parseDatoForStatus(osMelding),
+                parseGjelderId(osMelding),
+                parseNyesteVentestatus(osMelding),
+                parseTotaltNettoBelop(osMelding));
 
-        super(osMelding, new OsMeldingParser());
-
-        final OsMeldingParser parser = (OsMeldingParser) getParser();
-
-        this.faggruppe = parser.parseFaggruppe(osMelding);
-        this.beregningsId = parser.parseBeregningsId(osMelding);
-        this.beregningsDato = parser.parseBeregningsDato(osMelding);
-        this.forsteFomIPeriode = parser.parseForsteFomIPeriode(osMelding);
-        this.sisteTomIPeriode = parser.parseSisteTomIPeriode(osMelding);
-        final String flaggFeilkontoParsed = parser.parseFlaggFeilkonto(osMelding);
-        this.flaggFeilkonto = isEmpty(flaggFeilkontoParsed) ? FLAGG_FEILKONTO_DEFAULT : flaggFeilkontoParsed;
-        this.utbetalesTilId = parser.parseUtbetalesTilId(osMelding);
-        this.etteroppgjor = parser.parseEtteroppgjor(osMelding);
+        this.faggruppe = parseFaggruppe(osMelding);
+        this.beregningsId = parseBeregningsId(osMelding);
+        this.beregningsDato = parseBeregningsDato(osMelding);
+        this.forsteFomIPeriode = parseForsteFomIPeriode(osMelding);
+        this.sisteTomIPeriode = parseSisteTomIPeriode(osMelding);
+        this.flaggFeilkonto = Optional.of(osMelding).map(OsMeldingParser::parseFlaggFeilkonto)
+                .filter(f -> !isEmpty(f)).orElse(FLAGG_FEILKONTO_DEFAULT);
+        this.utbetalesTilId = parseUtbetalesTilId(osMelding);
+        this.etteroppgjor = parseEtteroppgjor(osMelding);
     }
 
     @Override
@@ -45,7 +65,6 @@ public class OsMelding extends AbstractMelding {
 
     @Override
     public boolean equals(final Object other) {
-
         if (this == other) {
             return true;
         }
@@ -54,36 +73,40 @@ public class OsMelding extends AbstractMelding {
             return false;
         }
 
-        if (this.getClass() != other.getClass()) {
-            return false;
-        }
-
-        if (!this.gjelderId.equals(otherAsOsMelding.gjelderId)) {
-            return false;
-        }
-        final AbstractMelding otherAsAbstractMelding = (AbstractMelding) other;
-
-        return
-                super.behandlendeEnhet.equals(otherAsAbstractMelding.behandlendeEnhet)
-                        &&
-                        this.beregningsId.equals(otherAsOsMelding.beregningsId)
-                        &&
-                        this.beregningsDato.equals(otherAsOsMelding.beregningsDato)
-                        &&
-                        this.faggruppe.equals(otherAsOsMelding.faggruppe);
+        return this.getClass() == other.getClass()
+                && this.gjelderId.equals(otherAsOsMelding.gjelderId)
+                && this.behandlendeEnhet.equals(otherAsOsMelding.behandlendeEnhet)
+                && this.beregningsId.equals(otherAsOsMelding.beregningsId)
+                && this.beregningsDato.equals(otherAsOsMelding.beregningsDato)
+                && this.faggruppe.equals(otherAsOsMelding.faggruppe);
     }
 
     @Override
     public String toString() {
-
-        return super.toString() + FIELD_SEPARATOR +
-                "faggruppe            : " + faggruppe + FIELD_SEPARATOR +
-                "beregningsId         : " + beregningsId + FIELD_SEPARATOR +
-                "beregningsDato       : " + beregningsDato + FIELD_SEPARATOR +
-                "forsteFomIPeriode    : " + forsteFomIPeriode + FIELD_SEPARATOR +
-                "sisteTomIPeriode     : " + sisteTomIPeriode + FIELD_SEPARATOR +
-                "flaggFeilkonto       : " + flaggFeilkonto + FIELD_SEPARATOR +
-                "utbetalesTilId       : " + utbetalesTilId + FIELD_SEPARATOR +
-                "etteroppgjor         : " + etteroppgjor;
+        return String.join(FIELD_SEPARATOR, super.toString(),
+                "faggruppe            : " + faggruppe,
+                "beregningsId         : " + beregningsId,
+                "beregningsDato       : " + beregningsDato,
+                "forsteFomIPeriode    : " + forsteFomIPeriode,
+                "sisteTomIPeriode     : " + sisteTomIPeriode,
+                "flaggFeilkonto       : " + flaggFeilkonto,
+                "utbetalesTilId       : " + utbetalesTilId,
+                "etteroppgjor         : " + etteroppgjor);
     }
+
+    public OsBeskrivelseInfo osBeskrivelseInfo() {
+        return new OsBeskrivelseInfo(
+                nyesteVentestatus,
+                hentNettoBelopSomStreng(),
+                beregningsId,
+                beregningsDato,
+                forsteFomIPeriode,
+                sisteTomIPeriode,
+                flaggFeilkonto,
+                datoForStatus,
+                Optional.ofNullable(etteroppgjor).orElse(""),
+                utbetalesTilId,
+                brukerId);
+    }
+
 }

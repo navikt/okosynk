@@ -13,6 +13,6 @@ public class OsMappingRegelRepository
   @Override
   protected String createMappingRegelKey(final OsMelding osMelding) {
 
-    return settSammenNokkel(osMelding.faggruppe, osMelding.behandlendeEnhet);
+    return settSammenNokkel(osMelding.getFaggruppe(), osMelding.getBehandlendeEnhet());
   }
 }

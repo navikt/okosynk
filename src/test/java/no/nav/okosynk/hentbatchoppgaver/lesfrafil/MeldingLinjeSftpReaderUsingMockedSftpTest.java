@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lesfrafil;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.AuthenticationOkosynkIoException;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
+class MeldingLinjeSftpReaderUsingMockedSftpTest {
 
     @Test
     void when_connect_fails_then_a_correct_OkosynkIoException_should_be_thrown() {
@@ -23,7 +22,5 @@ public abstract class AbstractMeldingLinjeSftpReaderUsingMockedSftpTest {
                         "noskapin"
                 )).read());
     }
-
-    protected abstract Constants.BATCH_TYPE getBatchType();
 
 }

@@ -6,11 +6,11 @@ import java.util.Optional;
 import java.util.Properties;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractMappingRegelRepository<MT extends AbstractMelding> {
+public abstract class AbstractMappingRegelRepository<T extends Melding> {
 
   private static final Logger logger = LoggerFactory
       .getLogger(AbstractMappingRegelRepository.class);
@@ -25,7 +25,6 @@ public abstract class AbstractMappingRegelRepository<MT extends AbstractMelding>
   private static final int BEHANDLINGSTEMA_INDEKS = 0;
   private static final int BEHANDLINGSTYPE_INDEKS = 1;
   private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
-
   private final Constants.BATCH_TYPE batchType;
 
   protected AbstractMappingRegelRepository(final Constants.BATCH_TYPE batchType) {
@@ -44,7 +43,7 @@ public abstract class AbstractMappingRegelRepository<MT extends AbstractMelding>
     return batchType.getMappingRulesPropertiesFileName();
   }
 
-  public Optional<MappingRegel> finnRegel(final MT melding) {
+  public Optional<MappingRegel> finnRegel(final T melding) {
 
     final String mappingRegelKey = createMappingRegelKey(melding);
 
@@ -83,7 +82,7 @@ public abstract class AbstractMappingRegelRepository<MT extends AbstractMelding>
     return String.join(Character.toString(NOKKEL_SKILLETEGN), nokkelFelter);
   }
 
-  protected abstract String createMappingRegelKey(final MT melding);
+  protected abstract String createMappingRegelKey(final T melding);
 
   void loadMappingRulesProperties(final String mappingRulesPropertiesFileName)
       throws IOException {

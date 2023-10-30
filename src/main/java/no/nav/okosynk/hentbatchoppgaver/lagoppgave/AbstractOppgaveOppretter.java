@@ -2,7 +2,7 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import no.nav.okosynk.model.GjelderIdType;
 import no.nav.okosynk.model.Oppgave;
 import org.slf4j.Logger;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.FELTSEPARATOR;
-import static no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding.FORSTE_FELTSEPARATOR;
+import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
+import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FORSTE_FELTSEPARATOR;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> {
+public abstract class AbstractOppgaveOppretter<T extends Melding> {
     private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
 
     private final AbstractMappingRegelRepository<T> mappingRegelRepository;
@@ -48,24 +48,24 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> {
 
         Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder();
 
-        switch (GjelderIdType.fra(melding.gjelderId)) {
+        switch (GjelderIdType.fra(melding.getGjelderId())) {
             case BNR:
-                oppgaveBuilder.withBnr(melding.gjelderId);
+                oppgaveBuilder.withBnr(melding.getGjelderId());
                 break;
             case SAMHANDLER:
-                oppgaveBuilder.withSamhandlernr(melding.gjelderId);
+                oppgaveBuilder.withSamhandlernr(melding.getGjelderId());
                 break;
             case ORGANISASJON:
-                oppgaveBuilder.withOrgnr(melding.gjelderId);
+                oppgaveBuilder.withOrgnr(melding.getGjelderId());
                 break;
             case AKTORID:
                 try {
-                    final AktoerRespons aktoerRespons = this.aktoerClient.hentGjeldendeAktoerId(melding.gjelderId);
+                    final AktoerRespons aktoerRespons = this.aktoerClient.hentGjeldendeAktoerId(melding.getGjelderId());
                     if (isNotBlank(aktoerRespons.getFeilmelding())) {
                         log.warn(
                                 "Fikk feilmelding under henting av gjeldende aktørid for fnr/dnr angitt i inputfil, hopper over melding. - {}",
                                 aktoerRespons.getFeilmelding());
-                        secureLog.warn("Kunne ikke hente aktørid for: {}", melding.gjelderId);
+                        secureLog.warn("Kunne ikke hente aktørid for: {}", melding.getGjelderId());
                     } else {
                         oppgaveBuilder.withAktoerId(aktoerRespons.getAktoerId());
                     }
@@ -96,7 +96,7 @@ public abstract class AbstractOppgaveOppretter<T extends AbstractMelding> {
 
     public String lagSamletBeskrivelse(final List<T> meldinger) {
         return meldinger.stream()
-                .collect(groupingBy(m -> m.nyesteVentestatus + m.hashCode(), LinkedHashMap::new, Collectors.toList()))
+                .collect(groupingBy(m -> m.getNyesteVentestatus() + m.hashCode(), LinkedHashMap::new, Collectors.toList()))
                 .values().stream()
                 .map(this::summerOgKonsolider)
                 .collect(joining(getRecordSeparator()))

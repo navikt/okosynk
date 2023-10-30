@@ -1,10 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
-import java.util.stream.Stream;
-
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
 import no.nav.okosynk.model.GjelderIdType;
@@ -15,18 +10,23 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 class UrMeldingParserTest {
 
     private static final Logger enteringTestHeaderLogger =
-        LoggerFactory.getLogger("EnteringTestHeader");
+            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String UR_MELDING = "10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398";
-    private static final UrMeldingParser UR_MELDING_PARSER = new UrMeldingParser();
 
     @ParameterizedTest(name = "gjelderId = {0}")
     @MethodSource("getUrMeldingAndExpected")
-    void parseGjelderId(String gjelderId, GjelderIdType _gjelderIdType, String urMelding ) {
-        assertEquals(gjelderId, UR_MELDING_PARSER.parseGjelderId(urMelding));
+    void parseGjelderId(String gjelderId, GjelderIdType _gjelderIdType, String urMelding) {
+        assertEquals(gjelderId, UrMeldingParser.parseGjelderId(urMelding));
     }
 
     private static Stream<Arguments> getUrMeldingAndExpected() {
@@ -38,7 +38,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("25", UR_MELDING_PARSER.parseNyesteVentestatus(UR_MELDING));
+        assertEquals("25", UrMeldingParser.parseNyesteVentestatus(UR_MELDING));
     }
 
     @Test
@@ -46,7 +46,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("", UR_MELDING_PARSER.parseBrukerId(UR_MELDING));
+        assertEquals("", UrMeldingParser.parseBrukerId(UR_MELDING));
     }
 
     @Test
@@ -54,7 +54,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals(1940.0, UR_MELDING_PARSER.parseTotaltNettoBelop(UR_MELDING));
+        assertEquals(1940.0, UrMeldingParser.parseTotaltNettoBelop(UR_MELDING));
     }
 
     @Test
@@ -62,7 +62,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("8020", UR_MELDING_PARSER.parseBehandlendeEnhet(UR_MELDING));
+        assertEquals("8020", UrMeldingParser.parseBehandlendeEnhet(UR_MELDING));
     }
 
     @Test
@@ -70,7 +70,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals(LocalDate.of(2011, 1, 28), UR_MELDING_PARSER.parseDatoForStatus(UR_MELDING));
+        assertEquals(LocalDate.of(2011, 1, 28), UrMeldingParser.parseDatoForStatus(UR_MELDING));
     }
 
     @Test
@@ -78,7 +78,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("PERSON", UR_MELDING_PARSER.parseGjelderIdType(UR_MELDING));
+        assertEquals("PERSON", UrMeldingParser.parseGjelderIdType(UR_MELDING));
     }
 
     @Test
@@ -86,7 +86,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("INNT", UR_MELDING_PARSER.parseOppdragsKode(UR_MELDING));
+        assertEquals("INNT", UrMeldingParser.parseOppdragsKode(UR_MELDING));
     }
 
     @Test
@@ -94,7 +94,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("UR230", UR_MELDING_PARSER.parseKilde(UR_MELDING));
+        assertEquals("UR230", UrMeldingParser.parseKilde(UR_MELDING));
     }
 
     @Test
@@ -102,7 +102,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals(LocalDate.of(2011, 1, 21), UR_MELDING_PARSER.parseDatoPostert(UR_MELDING));
+        assertEquals(LocalDate.of(2011, 1, 21), UrMeldingParser.parseDatoPostert(UR_MELDING));
     }
 
     @Test
@@ -110,7 +110,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("342552558", UR_MELDING_PARSER.parseBilagsId(UR_MELDING));
+        assertEquals("342552558", UrMeldingParser.parseBilagsId(UR_MELDING));
     }
 
     @Test
@@ -118,7 +118,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("Mottakers konto er oppgjort", UR_MELDING_PARSER.parseArsaksTekst(UR_MELDING));
+        assertEquals("Mottakers konto er oppgjort", UrMeldingParser.parseArsaksTekst(UR_MELDING));
     }
 
     @Test
@@ -126,7 +126,7 @@ class UrMeldingParserTest {
 
         enteringTestHeaderLogger.debug(null);
 
-        assertEquals("10108000398", UR_MELDING_PARSER.parseMottakerId(UR_MELDING));
+        assertEquals("10108000398", UrMeldingParser.parseMottakerId(UR_MELDING));
     }
 
     @Test

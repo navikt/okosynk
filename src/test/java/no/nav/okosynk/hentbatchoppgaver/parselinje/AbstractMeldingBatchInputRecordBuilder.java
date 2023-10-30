@@ -1,6 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import lombok.Getter;
+import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,9 +9,10 @@ import java.util.Map;
 
 public abstract class AbstractMeldingBatchInputRecordBuilder<
         T extends AbstractMeldingBatchInputRecordBuilder<T, U>,
-        U extends AbstractMelding
+        U extends Melding
     > {
 
+    @Getter
     public enum SUPER_FIELD_DEF {
         GJELDER_ID(OsMeldingFormat.GJELDER_ID_START, OsMeldingFormat.GJELDER_ID_SLUTT, UrMeldingFormat.GJELDER_ID_START, UrMeldingFormat.GJELDER_ID_SLUTT),
         BEHANDLENDE_ENHET(OsMeldingFormat.BEHANDLENDE_ENHET_START, OsMeldingFormat.BEHANDLENDE_ENHET_SLUTT, UrMeldingFormat.BEHANDLENDE_ENHET_START, UrMeldingFormat.BEHANDLENDE_ENHET_SLUTT),
@@ -19,22 +21,6 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
         BRUKER_ID(OsMeldingFormat.BRUKER_ID_START, OsMeldingFormat.BRUKER_ID_SLUTT, UrMeldingFormat.BRUKER_ID_START, UrMeldingFormat.BRUKER_ID_SLUTT),
         TOTALT_NETTO_BELOP(OsMeldingFormat.TOTALT_NETTO_BELOP_START, OsMeldingFormat.TOTALT_NETTO_BELOP_SLUTT, UrMeldingFormat.TOTALT_NETTO_BELOP_START, UrMeldingFormat.TOTALT_NETTO_BELOP_SLUTT),
         ;
-
-        public int getStartPosInOs() {
-            return startPosInOs;
-        }
-
-        public int getEndPosInOs() {
-            return endPosInOs;
-        }
-
-        public int getStartPosInUr() {
-            return startPosInUr;
-        }
-
-        public int getEndPosInUr() {
-            return endPosInUr;
-        }
 
         public static int getUrRecordLength() {
             return UR_RECORD_LENGTH;
@@ -50,7 +36,7 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
                 .stream(SUPER_FIELD_DEF.values())
                 .mapToInt(SUPER_FIELD_DEF::getEndPosInUr)
                 .max()
-                .getAsInt();
+                .orElse(0);
 
         SUPER_FIELD_DEF(
                 final int startPosInOs,

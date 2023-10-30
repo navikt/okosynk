@@ -12,10 +12,10 @@ public class OsMeldingFunksjonelleAggregeringsKriterier {
 
     public OsMeldingFunksjonelleAggregeringsKriterier(OsMelding osMelding) {
         OsMappingRegelRepository osMappingRegelRepository = new OsMappingRegelRepository();
-        this.gjelderId = osMelding.gjelderId;
-        this.gjelderIdType = GjelderIdType.fra(osMelding.gjelderId);
+        this.gjelderId = osMelding.getGjelderId();
+        this.gjelderIdType = GjelderIdType.fra(osMelding.getGjelderId());
         this.ansvarligEnhetId = osMappingRegelRepository.finnRegel(osMelding).map(t -> t.ansvarligEnhetId).orElse(null);
-        this.faggruppe = osMelding.faggruppe;
+        this.faggruppe = osMelding.getFaggruppe();
     }
 
     @Override
