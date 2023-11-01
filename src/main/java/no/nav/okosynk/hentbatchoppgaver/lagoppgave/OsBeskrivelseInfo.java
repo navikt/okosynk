@@ -2,11 +2,11 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
 
 import static java.util.Collections.max;
 import static java.util.Collections.min;
+import static java.util.Comparator.naturalOrder;
+import static java.util.List.of;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
 import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
 
@@ -45,8 +45,8 @@ public class OsBeskrivelseInfo {
                         .add(new BigDecimal(osBeskrivelseInfo.hentNettoBelopSomStreng)).toString(),
                 this.beregningsId,
                 this.beregningsDato,
-                min(List.of(this.forsteFomIPeriode, osBeskrivelseInfo.forsteFomIPeriode), Comparator.naturalOrder()),
-                max(List.of(this.sisteTomIPeriode, osBeskrivelseInfo.sisteTomIPeriode), Comparator.naturalOrder()),
+                min(of(this.forsteFomIPeriode, osBeskrivelseInfo.forsteFomIPeriode), naturalOrder()),
+                max(of(this.sisteTomIPeriode, osBeskrivelseInfo.sisteTomIPeriode), naturalOrder()),
                 this.flaggFeilkonto,
                 this.datoForStatus,
                 this.etteroppgjor,

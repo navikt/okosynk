@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +27,8 @@ class UrMapperTest {
             LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String UR_MELDING_SOM_GJELDER_TSS = "89095112345PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
+    private static final String UR_MELDING_SOM_GJELDER_TSS2 = "89095112345PERSON      2011-02-01T06:11:4625          00000000033490æ8020UTPOST UR2302011-02-31343285958Kredit kontonummer ugyldig                        00963702833";
+    private static final String UR_MELDING_SOM_GJELDER_TSS3 = "89095112345PERSON      2011-02-01T06:11:4625          00000000033590æ8020UTPOST UR2302011-03-31343285958Kredit kontonummer ugyldig                        00963702833";
     private static final String UR_MELDING_UTEN_MAPPING_REGEL = "00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8019ANDRUTBUR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282";
     private static final String UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL = "10108000398PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
     private static final String ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL = "05073512345PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
@@ -146,6 +149,20 @@ class UrMapperTest {
 
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
+
+        assertThat(filtrerteMeldinger)
+                .isNotNull()
+                .hasSize(1);
+    }
+
+    @Test
+    @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en UR-melding hvis den får inn to meldinger som er like")
+    void treUlikeMeldingerSomHarSammeGjelderIdEnhetOgOppdragskodeBlirSlattSammenTilEn() {
+
+        enteringTestHeaderLogger.debug(null);
+
+        Collection<List<UrMelding>> filtrerteMeldinger = urMapper
+                .groupMeldingerSomSkalBliOppgaver(Stream.of(UR_MELDING_SOM_GJELDER_TSS, UR_MELDING_SOM_GJELDER_TSS2, UR_MELDING_SOM_GJELDER_TSS3).map(UrMelding::new).toList());
 
         assertThat(filtrerteMeldinger)
                 .isNotNull()
