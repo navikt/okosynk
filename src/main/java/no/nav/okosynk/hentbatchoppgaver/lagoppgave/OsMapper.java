@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
@@ -12,10 +13,10 @@ import java.util.stream.Collectors;
 
 public class OsMapper implements IMeldingMapper<OsMelding> {
     private final OsOppgaveOppretter osOppgaveOppretter;
-    private final OsMappingRegelRepository osMappingRegelRepository;
+    private final Mappingregelverk osMappingRegelRepository;
 
     public OsMapper(final IAktoerClient aktoerClient) {
-        this.osMappingRegelRepository = new OsMappingRegelRepository();
+        this.osMappingRegelRepository = new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
         this.osOppgaveOppretter = new OsOppgaveOppretter(osMappingRegelRepository, aktoerClient);
     }
 

@@ -1,7 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrBeskrivelseInfo;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -85,7 +86,7 @@ public class UrMelding extends Melding {
     }
 
     Optional<String> navEnhet() {
-        final UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
+        final Mappingregelverk urMappingRegelRepository = new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
         return urMappingRegelRepository.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(regel -> regel.ansvarligEnhetId);
     }
 

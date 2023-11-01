@@ -15,7 +15,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     private static final int ANTALL_DAGER_FRIST = 7;
 
     OsOppgaveOppretter(
-            final OsMappingRegelRepository mappingRegelRepository,
+            final Mappingregelverk mappingRegelRepository,
             final IAktoerClient aktoerClient) {
 
         super(mappingRegelRepository, aktoerClient);

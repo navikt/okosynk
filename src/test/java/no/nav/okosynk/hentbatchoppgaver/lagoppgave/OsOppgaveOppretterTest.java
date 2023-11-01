@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -37,7 +38,7 @@ class OsOppgaveOppretterTest {
 
     OsOppgaveOppretterTest() {
         okosynkConfiguration = mock(OkosynkConfiguration.class);
-        osOppgaveOppretter = new OsOppgaveOppretter(new OsMappingRegelRepository(), this.aktoerClient);
+        osOppgaveOppretter = new OsOppgaveOppretter(new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName()), this.aktoerClient);
     }
 
     @Test

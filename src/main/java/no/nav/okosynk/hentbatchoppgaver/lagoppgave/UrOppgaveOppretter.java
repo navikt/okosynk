@@ -15,7 +15,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
     private static final int ANTALL_DAGER_FRIST = 3;
 
     UrOppgaveOppretter(
-            final UrMappingRegelRepository mappingRegelRepository,
+            final Mappingregelverk mappingRegelRepository,
             final IAktoerClient aktoerClient) {
 
         super(mappingRegelRepository, aktoerClient);

@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +9,10 @@ import java.io.InputStream;
 import java.util.Optional;
 import java.util.Properties;
 
-public abstract class AbstractMappingRegelRepository {
+public class Mappingregelverk {
 
     private static final Logger logger = LoggerFactory
-            .getLogger(AbstractMappingRegelRepository.class);
+            .getLogger(Mappingregelverk.class);
 
     private Properties getMappingRulesProperties() {
         return mappingRulesProperties;
@@ -25,22 +24,15 @@ public abstract class AbstractMappingRegelRepository {
     private static final int BEHANDLINGSTEMA_INDEKS = 0;
     private static final int BEHANDLINGSTYPE_INDEKS = 1;
     private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
-    private final Constants.BATCH_TYPE batchType;
+    private final String mappingRulesPropertiesFileName;
 
-    protected AbstractMappingRegelRepository(final Constants.BATCH_TYPE batchType) {
-
-        final String mappingRulesPropertiesFileName =
-                AbstractMappingRegelRepository.getMappingRulesPropertiesFileName(batchType);
+    public Mappingregelverk(final String mappingRulesPropertiesFileName) {
+        this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
         try {
             loadMappingRulesProperties(mappingRulesPropertiesFileName);
         } catch (IOException e) {
             handterIOException(e);
         }
-        this.batchType = batchType;
-    }
-
-    private static String getMappingRulesPropertiesFileName(final Constants.BATCH_TYPE batchType) {
-        return batchType.getMappingRulesPropertiesFileName();
     }
 
     public Optional<MappingRegel> finnRegel(final String mappingRegelKey) {
@@ -76,10 +68,6 @@ public abstract class AbstractMappingRegelRepository {
         return optionalMappingRegel;
     }
 
-    protected String settSammenNokkel(final String... nokkelFelter) {
-        return String.join(Character.toString(NOKKEL_SKILLETEGN), nokkelFelter);
-    }
-
     void loadMappingRulesProperties(final String mappingRulesPropertiesFileName)
             throws IOException {
 
@@ -97,7 +85,7 @@ public abstract class AbstractMappingRegelRepository {
         logger.error(
                 "Problemer oppsto under innlesning av mappingRulesProperties filen {}. "
                         + "Applikasjonen er ute av stand til å håndtere batch som benytter seg av denne filen.",
-                getMappingRulesPropertiesFileName(this.batchType), e);
+                mappingRulesPropertiesFileName, e);
 
         throw new UleseligMappingfilException(e);
     }

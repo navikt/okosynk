@@ -15,12 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
+public abstract class MappingregelverkTest<MT extends Melding>  {
 
   private static final Logger enteringTestHeaderLogger =
       LoggerFactory.getLogger("EnteringTestHeader");
 
-  protected AbstractMappingRegelRepository mappingRegelRepository;
+  protected Mappingregelverk mappingRegelRepository;
   protected MT meldingSomSkalBliTilOppgave;
   protected MT meldingUtenMappingRegel;
   protected MT meldingWithoutBehandlingsTema;

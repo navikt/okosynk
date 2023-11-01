@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -36,7 +37,7 @@ class UrOppgaveOppretterTest {
 
     UrOppgaveOppretterTest() {
         okosynkConfiguration = mock(OkosynkConfiguration.class);
-        urOppgaveOppretter = new UrOppgaveOppretter(new UrMappingRegelRepository(), this.aktoerClient);
+        urOppgaveOppretter = new UrOppgaveOppretter(new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName()), this.aktoerClient);
     }
 
     @Test
