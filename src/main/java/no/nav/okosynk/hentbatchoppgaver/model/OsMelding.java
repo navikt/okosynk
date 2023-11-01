@@ -109,4 +109,9 @@ public class OsMelding extends Melding {
                 brukerId);
     }
 
+    @Override
+    public String regelnøkkel(){
+        return String.join(",", faggruppe, behandlendeEnhet);
+    }
+
 }

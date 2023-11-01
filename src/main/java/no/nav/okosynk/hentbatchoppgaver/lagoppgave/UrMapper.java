@@ -37,7 +37,7 @@ public class UrMapper implements IMeldingMapper<UrMelding> {
     }
 
     Predicate<UrMelding> urMeldingSkalBliOppgave() {
-        return urMelding -> urMappingRegelRepository.finnRegel(urMelding).isPresent();
+        return urMelding -> urMappingRegelRepository.finnRegel(urMelding.regelnøkkel()).isPresent();
     }
 
     Collection<List<UrMelding>> groupMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {

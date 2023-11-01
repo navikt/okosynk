@@ -13,6 +13,6 @@ public record OsMeldingFunksjonelleAggregeringsKriterier(
         this(osMelding.getFaggruppe(),
                 osMelding.getGjelderId(),
                 GjelderIdType.fra(osMelding.getGjelderId()),
-                new OsMappingRegelRepository().finnRegel(osMelding).map(t -> t.ansvarligEnhetId).orElse(null));
+                new OsMappingRegelRepository().finnRegel(osMelding.regelnøkkel()).map(t -> t.ansvarligEnhetId).orElse(null));
     }
 }

@@ -86,7 +86,7 @@ public class UrMelding extends Melding {
 
     Optional<String> navEnhet() {
         final UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
-        return urMappingRegelRepository.finnRegel(this).map(regel -> regel.ansvarligEnhetId);
+        return urMappingRegelRepository.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(regel -> regel.ansvarligEnhetId);
     }
 
     public UrBeskrivelseInfo urBeskrivelseInfo() {
@@ -98,6 +98,11 @@ public class UrMelding extends Melding {
                 datoForStatus,
                 mottakerId,
                 brukerId);
+    }
+
+    @Override
+    public String regelnøkkel() {
+        return String.join(",", oppdragsKode, behandlendeEnhet);
     }
 
 }

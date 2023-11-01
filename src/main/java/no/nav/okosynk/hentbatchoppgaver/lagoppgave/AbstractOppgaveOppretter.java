@@ -21,13 +21,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public abstract class AbstractOppgaveOppretter<T extends Melding> {
     private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
 
-    private final AbstractMappingRegelRepository<T> mappingRegelRepository;
+    private final AbstractMappingRegelRepository mappingRegelRepository;
     private final IAktoerClient aktoerClient;
 
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
     protected AbstractOppgaveOppretter(
-            final AbstractMappingRegelRepository<T> mappingRegelRepository,
+            final AbstractMappingRegelRepository mappingRegelRepository,
             final IAktoerClient aktoerClient) {
 
         this.mappingRegelRepository = mappingRegelRepository;
@@ -43,7 +43,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
         if (meldinger.isEmpty()) return Optional.empty();
 
         T melding = meldinger.get(0);
-        MappingRegel mappingregel = this.mappingRegelRepository.finnRegel(melding).orElse(null);
+        MappingRegel mappingregel = this.mappingRegelRepository.finnRegel(melding.regelnøkkel()).orElse(null);
         if (Objects.isNull(mappingregel)) return Optional.empty();
 
         Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder();

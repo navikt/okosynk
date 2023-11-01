@@ -31,7 +31,7 @@ public class OsMapper implements IMeldingMapper<OsMelding> {
     }
 
     Predicate<OsMelding> osMeldingSkalBliOppgave() {
-        return osMelding -> osMappingRegelRepository.finnRegel(osMelding).isPresent();
+        return osMelding -> osMappingRegelRepository.finnRegel(osMelding.regelnøkkel()).isPresent();
     }
 
     Collection<List<OsMelding>> groupMeldingerSomSkalBliOppgaver(

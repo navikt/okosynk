@@ -20,7 +20,7 @@ public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
   private static final Logger enteringTestHeaderLogger =
       LoggerFactory.getLogger("EnteringTestHeader");
 
-  protected AbstractMappingRegelRepository<MT> mappingRegelRepository;
+  protected AbstractMappingRegelRepository mappingRegelRepository;
   protected MT meldingSomSkalBliTilOppgave;
   protected MT meldingUtenMappingRegel;
   protected MT meldingWithoutBehandlingsTema;
@@ -35,7 +35,7 @@ public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
     enteringTestHeaderLogger.debug(null);
 
     final Optional<MappingRegel> mappingRegel =
-        this.mappingRegelRepository.finnRegel(this.meldingSomSkalBliTilOppgave);
+        this.mappingRegelRepository.finnRegel(this.meldingSomSkalBliTilOppgave.regelnøkkel());
 
     assertTrue(mappingRegel.isPresent(), "Mapping mangler");
     assertAll("Mapping skal ha riktige verdier",
@@ -51,7 +51,7 @@ public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
     enteringTestHeaderLogger.debug(null);
 
     final Optional<MappingRegel> mappingRegel =
-        mappingRegelRepository.finnRegel(meldingUtenMappingRegel);
+        mappingRegelRepository.finnRegel(meldingUtenMappingRegel.regelnøkkel());
 
     assertFalse(mappingRegel.isPresent(), "Mapping ble funnet for oppgave som ikke skal mappes");
   }
@@ -109,7 +109,7 @@ public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
     enteringTestHeaderLogger.debug(null);
 
     final Optional<MappingRegel> actualOptionalMappingRegel =
-      this.mappingRegelRepository.finnRegel(this.meldingWithoutBehandlingsTema);
+      this.mappingRegelRepository.finnRegel(this.meldingWithoutBehandlingsTema.regelnøkkel());
 
     assertFalse(actualOptionalMappingRegel.isPresent());
   }
@@ -119,8 +119,8 @@ public abstract class AbstractMappingRegelRepositoryTest<MT extends Melding>  {
 
     enteringTestHeaderLogger.debug(null);
 
-    final Optional<MappingRegel> actualOptionalMappingRegel =
-        this.mappingRegelRepository.finnRegel(this.meldingWithoutAnsvarligEnhetId);
+    final Optional<MappingRegel> actualOptionalMappingRegel = this.mappingRegelRepository.finnRegel(
+            this.meldingWithoutAnsvarligEnhetId.regelnøkkel());
 
     assertFalse(actualOptionalMappingRegel.isPresent());
   }

@@ -29,4 +29,6 @@ public abstract class Melding {
         final BigDecimal bd = BigDecimal.valueOf(this.totaltNettoBelop);
         return bd.toBigInteger().toString();
     }
+
+    public abstract String regelnøkkel();
 }
