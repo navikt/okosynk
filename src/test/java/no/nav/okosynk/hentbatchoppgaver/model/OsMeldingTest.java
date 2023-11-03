@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,17 +18,15 @@ import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class OsMeldingTest extends AbstractMeldingTest {
 
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
 
     @Test
     void osMeldingParserMeldingTilVariabler() {
-
-        enteringTestHeaderLogger.debug(null);
 
         OsMelding melding = new OsMelding(OsMeldingTestGenerator.OsMeldingForPerson.getMelding());
 
@@ -67,8 +63,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     void equalsNullObjektGirFalse() {
 
-        enteringTestHeaderLogger.debug(null);
-
         OsMelding melding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
 
         assertNotEquals(null, melding);
@@ -76,8 +70,6 @@ class OsMeldingTest extends AbstractMeldingTest {
 
     @Test
     void equalsAnnetObjektGirFalse() {
-
-        enteringTestHeaderLogger.debug(null);
 
         OsMelding melding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
         String annetObjekt = "";
@@ -87,8 +79,6 @@ class OsMeldingTest extends AbstractMeldingTest {
 
     @Test
     void equalsAnnenGjelderIdTypeGirFalse() {
-
-        enteringTestHeaderLogger.debug(null);
 
         OsMelding personMelding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
         OsMelding organisasjonMelding = new OsMelding(OsMeldingTestGenerator.withGjelderIdOrganiasjon());
@@ -100,8 +90,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     @DisplayName("Fjern desimaler i hentNettoBelopSomStreng når totalt nettobelop er et heltall")
     void fjernDesimalerNarNettoBelopErEtHeltall() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String osMeldingInput = "10108000398012345678 2010-10-102010-10-26RETUK231B3502009-05-012009-07-310000000" +
                 "12300æ 8020         INNT    10108000398            ";
@@ -116,8 +104,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     @DisplayName("Fjern desimaler i hentNettoBelopSomStreng når totalt nettobelop har desimaler")
     void fjernDesimalerNarNettoBelopHarDesimaler() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String osMeldingInput = "10108000398012345678 2010-10-102010-10-26RETUK231B3502009-05-012009-07-310000000" +
                 "12306æ 8020         INNT    10108000398            ";
@@ -134,8 +120,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     void equalsLikMeldingGirTrue() {
 
-        enteringTestHeaderLogger.debug(null);
-
         OsMelding personMelding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
         OsMelding organisasjonMelding = new OsMelding(OsMeldingTestGenerator.withGjelderIdPerson());
 
@@ -145,8 +129,6 @@ class OsMeldingTest extends AbstractMeldingTest {
 
     @Test
     void settDefaultPaFlaggFeilkontoTilEtMellomrom() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String osMeldingInput = "10108000398012345678 2010-10-102010-10-26RETUK231B3502009-05-012009-07-310000000" +
                 "12306æ 8020         INNT    10108000398            ";
@@ -158,8 +140,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     void brukFlaggFeilkontoFraInputStringIOsMeldingHvisDenFinnes() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String osMeldingInput = "10108000398012345678 2010-10-102010-10-26RETUK231B3502009-05-012009-07-310000000" +
                 "12306æJ8020         INNT    10108000398            ";
         final OsMelding melding = new OsMelding(osMeldingInput);
@@ -170,8 +150,6 @@ class OsMeldingTest extends AbstractMeldingTest {
     @Test
     @DisplayName("Assert that all equal meldinger hash to the same value")
     void test_that_all_equal_meldinger_hash_to_the_same_value() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final List<OsMelding> allHopefullyUniqueMeldinger = new ArrayList<>();
 

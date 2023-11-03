@@ -1,17 +1,16 @@
 package no.nav.okosynk.synkroniserer.consumer.oppgave;
 
+import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaveResponseJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveRequestJson;
-import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.testutils.RandUt;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,18 +21,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OppgaveMapperUnitTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final Random random = new Random(76786);
 
@@ -312,9 +310,6 @@ class OppgaveMapperUnitTest {
     @ParameterizedTest
     @ValueSource(chars = {'A', 'B', 'N', 'O', 'S'})
     void when_mapping_from_oppgave_to_PostOppgaveRequestJson_then_all_fields_should_have_expected_values(final char aktorType) throws OppgaveMapperException_MoreThanOneActorType, OppgaveMapperException_AktivTilFraNull {
-
-        enteringTestHeaderLogger.debug(null);
-
         final Oppgave expectedOppgave =
                 new Oppgave.OppgaveBuilder()
                         .withAktivFra(OppgaveMapperUnitTest.generateAktivDato())
@@ -342,43 +337,46 @@ class OppgaveMapperUnitTest {
 
         final PostOppgaveRequestJson actualPostOppgaveRequestJson = OppgaveMapper.mapFromFinnOppgaveResponseJsonToOppgave(expectedOppgave);
 
-        assertEquals(OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE, actualPostOppgaveRequestJson.getOpprettetAvEnhetsnr(), "opprettetAvEnhetsnr");
-        assertEquals(expectedOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter), actualPostOppgaveRequestJson.getAktivDato(), "aktivFra");
-        assertEquals(expectedOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter), actualPostOppgaveRequestJson.getFristFerdigstillelse(), "fristFerdigstillelse");
-        assertEquals(expectedOppgave.aktoerId, actualPostOppgaveRequestJson.getAktoerId(), "aktoerId");
-        assertEquals(expectedOppgave.ansvarligEnhetId, actualPostOppgaveRequestJson.getTildeltEnhetsnr(), "tildeltEnhetsnr");
-        assertEquals(expectedOppgave.behandlingstema, actualPostOppgaveRequestJson.getBehandlingstema(), "behandlingstema");
-        assertEquals(expectedOppgave.behandlingstype, actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
-        assertEquals(expectedOppgave.beskrivelse, actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
-        assertEquals(expectedOppgave.bnr, actualPostOppgaveRequestJson.getBnr(), "bnr");
-        assertEquals(expectedOppgave.oppgavetypeKode, actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
-        assertEquals(expectedOppgave.orgnr, actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
-        assertEquals(expectedOppgave.prioritetKode, actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");
-        assertEquals(expectedOppgave.samhandlernr, actualPostOppgaveRequestJson.getSamhandlernr(), "samhandlernr");
-
-        assertNull(actualPostOppgaveRequestJson.getBehandlesAvApplikasjon(), "behandlesAvApplikasjon");
-        assertNull(actualPostOppgaveRequestJson.getEndretAv(), "endretAv");
-        assertNull(actualPostOppgaveRequestJson.getEndretAvEnhetsnr(), "endretAvEnhetsnr");
-        assertNull(actualPostOppgaveRequestJson.getEndretTidspunkt(), "endretTidspunkt");
-        assertNull(actualPostOppgaveRequestJson.getFerdigstiltTidspunkt(), "ferdigstiltTidspunkt");
-        assertNull(actualPostOppgaveRequestJson.getId(), "id");
-        assertNull(actualPostOppgaveRequestJson.getJournalpostId(), "journalpostId");
-        assertNull(actualPostOppgaveRequestJson.getJournalpostkilde(), "journalpostkilde");
-        assertNull(actualPostOppgaveRequestJson.getMappeId(), "mappeId");
-        assertNull(actualPostOppgaveRequestJson.getMetadata(), "metadata");
-        assertNull(actualPostOppgaveRequestJson.getOpprettetAv(), "opprettetAv");
-        assertNull(actualPostOppgaveRequestJson.getOpprettetTidspunkt(), "opprettetTidspunkt");
-        assertNull(actualPostOppgaveRequestJson.getSaksreferanse(), "saksreferanse");
-        assertNull(actualPostOppgaveRequestJson.getStatus(), "status");
-        assertNull(actualPostOppgaveRequestJson.getTilordnetRessurs(), "tilordnetRessurs");
-        assertNull(actualPostOppgaveRequestJson.getVersjon(), "versjon");
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(expectedOppgave.aktivFra.format(OppgaveMapperUnitTest.dateFormatter)).isEqualTo(actualPostOppgaveRequestJson.getAktivDato(), "aktivFra");
+        softly.assertThat(expectedOppgave.aktivTil.format(OppgaveMapperUnitTest.dateFormatter)).isEqualTo(actualPostOppgaveRequestJson.getFristFerdigstillelse(), "fristFerdigstillelse");
+        softly.assertThat(OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE).isEqualTo(actualPostOppgaveRequestJson.getOpprettetAvEnhetsnr(), "opprettetAvEnhetsnr");
+        if (aktorType == 'A')
+            softly.assertThat(expectedOppgave.aktoerId).isEqualTo(actualPostOppgaveRequestJson.getAktoerId(), "aktoerId");
+        softly.assertThat(expectedOppgave.ansvarligEnhetId).isEqualTo(actualPostOppgaveRequestJson.getTildeltEnhetsnr(), "tildeltEnhetsnr");
+        softly.assertThat(expectedOppgave.behandlingstema).isEqualTo(actualPostOppgaveRequestJson.getBehandlingstema(), "behandlingstema");
+        softly.assertThat(expectedOppgave.behandlingstype).isEqualTo(actualPostOppgaveRequestJson.getBehandlingstype(), "behandlingstype");
+        softly.assertThat(expectedOppgave.beskrivelse).isEqualTo(actualPostOppgaveRequestJson.getBeskrivelse(), "beskrivelse");
+        if (aktorType == 'B')
+            softly.assertThat(expectedOppgave.bnr).isEqualTo(actualPostOppgaveRequestJson.getBnr(), "bnr");
+        softly.assertThat(expectedOppgave.oppgavetypeKode).isEqualTo(actualPostOppgaveRequestJson.getOppgavetype(), "oppgavetypeKode");
+        if (aktorType == 'O')
+            softly.assertThat(expectedOppgave.orgnr).isEqualTo(actualPostOppgaveRequestJson.getOrgnr(), "orgnr");
+        softly.assertThat(expectedOppgave.prioritetKode).isEqualTo(actualPostOppgaveRequestJson.getPrioritet(), "prioritetKode");
+        if (aktorType == 'S')
+            softly.assertThat(expectedOppgave.samhandlernr).isEqualTo(actualPostOppgaveRequestJson.getSamhandlernr(), "samhandlernr");
+        softly.assertThat(asList(actualPostOppgaveRequestJson.getBehandlesAvApplikasjon(),
+                actualPostOppgaveRequestJson.getEndretAv(),
+                actualPostOppgaveRequestJson.getEndretAvEnhetsnr(),
+                actualPostOppgaveRequestJson.getEndretTidspunkt(),
+                actualPostOppgaveRequestJson.getFerdigstiltTidspunkt(),
+                actualPostOppgaveRequestJson.getId(),
+                actualPostOppgaveRequestJson.getJournalpostId(),
+                actualPostOppgaveRequestJson.getJournalpostkilde(),
+                actualPostOppgaveRequestJson.getMappeId(),
+                actualPostOppgaveRequestJson.getMetadata(),
+                actualPostOppgaveRequestJson.getOpprettetAv(),
+                actualPostOppgaveRequestJson.getOpprettetTidspunkt(),
+                actualPostOppgaveRequestJson.getSaksreferanse(),
+                actualPostOppgaveRequestJson.getStatus(),
+                actualPostOppgaveRequestJson.getTilordnetRessurs(),
+                actualPostOppgaveRequestJson.getVersjon())).allMatch(Objects::isNull);
+        softly.assertAll();
     }
 
     @ParameterizedTest
     @MethodSource("provideActorTypeCombinations")
     void when_more_than_one_actorType_is_set_then_an_exception_should_be_thrown(final Set<Character> actorTypes) {
-
-        enteringTestHeaderLogger.debug(null);
 
         final Oppgave expectedOppgave =
                 new Oppgave.OppgaveBuilder()
@@ -398,8 +396,6 @@ class OppgaveMapperUnitTest {
     @ValueSource(chars = {'F', 'T', 'B'})
     void when_aktivFra_or_aktivTil_is_null_then_an_exception_should_be_thrown(final char fieldIndicator) {
 
-        enteringTestHeaderLogger.debug(null);
-
         final Oppgave expectedOppgave =
                 new Oppgave.OppgaveBuilder()
                         .withAktivFra(fieldIndicator == 'F' || fieldIndicator == 'B' ? null : LocalDate.of(1970 + random.nextInt(51), 1 + random.nextInt(12), 1 + random.nextInt(28)))
@@ -416,8 +412,6 @@ class OppgaveMapperUnitTest {
             final LocalDateTime opprettetTidspunkt,
             final LocalDateTime endretTidspunkt
     ) {
-
-        enteringTestHeaderLogger.debug(null);
 
         final FinnOppgaveResponseJson expectedFinnOppgaveResponseJson = new FinnOppgaveResponseJson();
 

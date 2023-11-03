@@ -4,16 +4,11 @@ import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class UrMeldingFunksjonelleAggregeringsKriterierTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
 
     private UrMeldingFunksjonelleAggregeringsKriterier urMeldingFunksjonelleAggregeringsKriterier;
     private UrMelding urMelding;
@@ -24,21 +19,8 @@ class UrMeldingFunksjonelleAggregeringsKriterierTest {
     }
 
     @Test
-    @DisplayName("Når man sender inn samme UrMeldingFunksjonelleAggregeringsKriterier-objekt til equals-metoden skal disse være like")
-    void sammeObjektErLike() {
-
-        enteringTestHeaderLogger.debug(null);
-
-        urMeldingFunksjonelleAggregeringsKriterier = new UrMeldingFunksjonelleAggregeringsKriterier(urMelding);
-
-        assertEquals(urMeldingFunksjonelleAggregeringsKriterier, urMeldingFunksjonelleAggregeringsKriterier, "Det samme objektet er ikke likt seg selv");
-    }
-
-    @Test
     @DisplayName("Når man sender inn to UrMeldingFunksjonelleAggregeringsKriterier-objekt med samme verdier til equals-metoden skal disse være like")
     void objekterMedLiktInneholdErLike() {
-
-        enteringTestHeaderLogger.debug(null);
 
         urMeldingFunksjonelleAggregeringsKriterier = new UrMeldingFunksjonelleAggregeringsKriterier(urMelding);
 
@@ -48,8 +30,6 @@ class UrMeldingFunksjonelleAggregeringsKriterierTest {
     @Test
     @DisplayName("Når man sender inn to UrMeldingFunksjonelleAggregeringsKriterier-objekt med ulik gjelderId til equals-metoden skal disse ikke være like")
     void objekterMedForskjelligGjelderIdErLike() {
-
-        enteringTestHeaderLogger.debug(null);
 
         urMeldingFunksjonelleAggregeringsKriterier = new UrMeldingFunksjonelleAggregeringsKriterier(urMelding);
 

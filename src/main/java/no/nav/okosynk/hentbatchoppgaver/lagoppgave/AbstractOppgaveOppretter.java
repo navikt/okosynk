@@ -78,16 +78,16 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
                 .withOppgavetypeKode(oppgaveTypeKode())
                 .withFagomradeKode("OKO")
                 .withBehandlingstema(
-                        isNotBlank(mappingregel.behandlingstema) ? mappingregel.behandlingstema : null
+                        isNotBlank(mappingregel.behandlingstema()) ? mappingregel.behandlingstema() : null
                 )
                 .withBehandlingstype(
-                        isNotBlank(mappingregel.behandlingstype) ? mappingregel.behandlingstype : null
+                        isNotBlank(mappingregel.behandlingstype()) ? mappingregel.behandlingstype() : null
                 )
                 .withPrioritetKode("LAV")
                 .withBeskrivelse(lagSamletBeskrivelse(meldinger))
                 .withAktivFra(LocalDate.now())
                 .withAktivTil(LocalDate.now().plusDays(antallDagerFrist()))
-                .withAnsvarligEnhetId(mappingregel.ansvarligEnhetId)
+                .withAnsvarligEnhetId(mappingregel.ansvarligEnhetId())
                 .withLest(false)
                 .withAntallMeldinger(meldinger.size())
                 .build());

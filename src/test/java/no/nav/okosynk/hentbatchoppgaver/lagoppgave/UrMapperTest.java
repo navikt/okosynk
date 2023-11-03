@@ -8,23 +8,23 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class UrMapperTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String UR_MELDING_SOM_GJELDER_TSS = "89095112345PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
     private static final String UR_MELDING_SOM_GJELDER_TSS2 = "89095112345PERSON      2011-02-01T06:11:4625          00000000033490æ8020UTPOST UR2302011-02-31343285958Kredit kontonummer ugyldig                        00963702833";
@@ -36,7 +36,7 @@ class UrMapperTest {
     private static final String UR_MELDING_EFOG =
             "02029512345PERSON      2019-02-14T21:13:5525          00000000080610æ8020EFOG   UR2302019-02-12600767010Stoppet utbetaling                                02029530095";
 
-    private UrMapper urMapper;
+    private UrOppgaveOppretter urMapper;
     private UrMelding urMeldingSomSkalBliTilOppgave;
     private UrMelding annenUrMeldingSomSkalBliTilOppgave;
     private UrMelding urMeldingUtenMappingRegel;
@@ -45,7 +45,7 @@ class UrMapperTest {
 
     @BeforeEach
     void setUp() {
-        urMapper = new UrMapper(this.aktoerClient);
+        urMapper = new UrOppgaveOppretter(this.aktoerClient);
         urMeldingSomSkalBliTilOppgave = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         annenUrMeldingSomSkalBliTilOppgave = new UrMelding(ANNEN_UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         urMeldingUtenMappingRegel = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);
@@ -54,8 +54,6 @@ class UrMapperTest {
 
     @Test
     void lagUrOppgaveMedOppdragsKodeEFOG() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Mockito.reset(aktoerClient);
 
@@ -79,8 +77,6 @@ class UrMapperTest {
     @DisplayName("lagOppgaver returnerer to oppgaver hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void lagUrOppgaverFraUrMeldingListeReturnererToOppgaver() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Mockito.reset(aktoerClient);
 
         when(aktoerClient.hentGjeldendeAktoerId("10108000398")).thenReturn(AktoerRespons.ok("123"));
@@ -97,8 +93,6 @@ class UrMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
     void lagUrOppgaverFraUrMeldingListeReturnererEnOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Mockito.reset(aktoerClient);
 
@@ -117,8 +111,6 @@ class UrMapperTest {
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med to UR-meldinger hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void hentMeldingerSomSkalBliUrOppgaverReturnererToMeldinger() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, annenUrMeldingSomSkalBliTilOppgave));
 
@@ -130,8 +122,6 @@ class UrMapperTest {
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en UR-melding hvis den får inn to meldinger der kun en skal bli til oppgaver")
     void hentMeldingerSomSkalBliUrOppgaverReturnererEnMelding() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingUtenMappingRegel));
@@ -145,8 +135,6 @@ class UrMapperTest {
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en UR-melding hvis den får inn to meldinger som er like")
     void hentMeldingerSomSkalBliUrOppgaverReturnererEnMeldingHvisInputErLike() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(urMeldingSomSkalBliTilOppgave, urMeldingSomSkalBliTilOppgave));
 
@@ -157,23 +145,22 @@ class UrMapperTest {
 
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en UR-melding hvis den får inn to meldinger som er like")
-    void treUlikeMeldingerSomHarSammeGjelderIdEnhetOgOppdragskodeBlirSlattSammenTilEn() {
-
-        enteringTestHeaderLogger.debug(null);
-
+    void treUlikeMeldingerSomHarSammeGjelderIdEnhetOgOppdragskodeBlirRegnetSomBareEn() {
         Collection<List<UrMelding>> filtrerteMeldinger = urMapper
                 .groupMeldingerSomSkalBliOppgaver(Stream.of(UR_MELDING_SOM_GJELDER_TSS, UR_MELDING_SOM_GJELDER_TSS2, UR_MELDING_SOM_GJELDER_TSS3).map(UrMelding::new).toList());
 
         assertThat(filtrerteMeldinger)
                 .isNotNull()
-                .hasSize(1);
+                .hasSize(1)
+                .extracting(List::getFirst)
+                .extracting(m -> m.datoPostert)
+                .containsOnlyOnce(LocalDate.parse("2011-01-31"));
+
     }
 
     @Test
     @DisplayName("UR-melding som gjelder TSS skal bli til oppgave")
     void urMeldingGjelderTssOgDetSkalOpprettesOppgaveForSamhandlere() {
-
-        enteringTestHeaderLogger.debug(null);
 
         UrMelding urMeldingSomGjelderTss = new UrMelding(UR_MELDING_SOM_GJELDER_TSS);
 
@@ -184,16 +171,12 @@ class UrMapperTest {
     @DisplayName("UR-melding som mangler mappingregel skal ikke bli til oppgave")
     void urMeldingUtenMapping() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertFalse(urMapper.urMeldingSkalBliOppgave().test(urMeldingUtenMappingRegel), "AbstractMelding som mangler mappingregel blir oppgave");
     }
 
     @Test
     @DisplayName("UR-melding som ikke gjelder TSS og har en mappingregel skal bli til oppgave")
     void urMeldingSomSkalBliTilOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
 
         assertTrue(urMapper.urMeldingSkalBliOppgave().test(urMeldingSomSkalBliTilOppgave),
                 "Det blir ikke oppgave for melding som ikke gjelder TSS og som har mappingregel");
@@ -202,8 +185,6 @@ class UrMapperTest {
     @Test
     @DisplayName("Map UR-melding som er organisasjon og ikke gjelder TSS til Oppgave")
     void MapOsMeldingOrganisasjonTilOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
 
         UrMelding urMelding = new UrMelding(MELDING_ORGANISASJON_MED_MAPPING_REGEL);
 

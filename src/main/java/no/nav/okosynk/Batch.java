@@ -6,8 +6,8 @@ import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMapper;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMapper;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsOppgaveOppretter;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrOppgaveOppretter;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
@@ -138,10 +138,10 @@ public class Batch {
 
         PdlRestClient pdlRestClient = new PdlRestClient(okosynkConfiguration);
         if (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) {
-            OsMapper osMapper = new OsMapper(pdlRestClient);
+            OsOppgaveOppretter osMapper = new OsOppgaveOppretter(pdlRestClient);
             batchOppgaver.addAll(osMapper.lagOppgaver(meldinger.stream().map(m -> (OsMelding) m).toList()));
         } else /* batchtype is UR */ {
-            UrMapper urMapper = new UrMapper(pdlRestClient);
+            UrOppgaveOppretter urMapper = new UrOppgaveOppretter(pdlRestClient);
             batchOppgaver.addAll(urMapper.lagOppgaver(meldinger.stream().map(m -> (UrMelding) m).toList()));
         }
 

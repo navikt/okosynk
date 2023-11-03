@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
@@ -14,10 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DesimaltallParserTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
-
     @ParameterizedTest(name = "parsedResult of {1} = {0}")
     @MethodSource("getParsedAndFlatfilNumber")
     void parseGirRiktigResultat(double expected, String flatFilTall) {
@@ -26,8 +20,6 @@ class DesimaltallParserTest {
 
     @Test
     void parseKasterMeldingFormatExceptionHvisSisteTegnErUgyldig() {
-
-        enteringTestHeaderLogger.debug(null);
 
         assertThrows(IncorrectMeldingFormatException.class, () -> {
             String strengMedUgyldigSisteTegn = "0000000009009";
@@ -43,8 +35,6 @@ class DesimaltallParserTest {
     @Test
     void parseKasterMeldingFormatExceptionForStrengSomIkkeRepresentererEtBelop() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertThrows(IncorrectMeldingFormatException.class, () -> {
             String strengSomIkkeRepresentererEtBelop = "abcdefg19660P";
             Util.parseDouble(strengSomIkkeRepresentererEtBelop);
@@ -53,8 +43,6 @@ class DesimaltallParserTest {
 
     @Test
     void parseFungererForStorsteMuligeTall() {
-
-        enteringTestHeaderLogger.debug(null);
 
         assertEquals(99999999999.99, Util.parseDouble("999999999999I"));
     }

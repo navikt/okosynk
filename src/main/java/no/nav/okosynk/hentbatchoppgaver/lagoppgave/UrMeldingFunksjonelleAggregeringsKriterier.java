@@ -12,9 +12,12 @@ public record UrMeldingFunksjonelleAggregeringsKriterier(
 ) {
     public UrMeldingFunksjonelleAggregeringsKriterier(UrMelding urMelding) {
         this(urMelding.getGjelderId(),
+
                 GjelderIdType.fra(urMelding.getGjelderId()).toString(),
+
                 new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName())
-                        .finnRegel(urMelding.regelnøkkel()).map(t -> t.ansvarligEnhetId).orElse(null),
+                        .finnRegel(urMelding.regelnøkkel()).map(MappingRegel::ansvarligEnhetId).orElse(null),
+
                 urMelding.oppdragsKode);
     }
 }

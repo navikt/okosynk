@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -9,8 +8,6 @@ import no.nav.okosynk.model.Oppgave;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,14 +15,16 @@ import java.util.Collections;
 import java.util.List;
 
 import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("ConstantConditions")
 class UrOppgaveOppretterTest {
 
-    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
     private static final UrMelding UR_MELDING_1 = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
     private static final UrMelding UR_MELDING_2 = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8020INNT   UR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
     private static final UrMelding UR_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new UrMelding("00837873282ORGANISASJON2011-02-01T06:11:4625          00000000304160æ8019ANDRUTBUR2302011-01-31343296727Feil bruk av KID/ugyldig KID                      00837873282");
@@ -37,14 +36,11 @@ class UrOppgaveOppretterTest {
 
     UrOppgaveOppretterTest() {
         okosynkConfiguration = mock(OkosynkConfiguration.class);
-        urOppgaveOppretter = new UrOppgaveOppretter(new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName()), this.aktoerClient);
+        urOppgaveOppretter = new UrOppgaveOppretter(this.aktoerClient);
     }
 
     @Test
     void lagBeskrivelseLagerForventetBeskrivelse() {
-
-        enteringTestHeaderLogger.debug(null);
-
         assertAll(
                 () -> assertEquals(UrOppgaveOppretterTest.UR_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_1.urBeskrivelseInfo().lagBeskrivelse()),
                 () -> assertEquals(UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE, UrOppgaveOppretterTest.UR_MELDING_2.urBeskrivelseInfo().lagBeskrivelse())
@@ -54,8 +50,6 @@ class UrOppgaveOppretterTest {
     @Test
     @DisplayName("De to første tegnene i beskrivelsen skal være feltseparatorer for å unngå å skrive over beskrivelse")
     void toForsteTegnIBeskrivelseErFeltseparatorer() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final List<UrMelding> meldingsliste = new ArrayList<>();
         meldingsliste.add(UrOppgaveOppretterTest.UR_MELDING_1);
@@ -67,7 +61,6 @@ class UrOppgaveOppretterTest {
 
     @Test
     void applyReturnererOppgaveMedRiktigeVerdier() {
-        enteringTestHeaderLogger.debug(null);
 
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
@@ -93,8 +86,6 @@ class UrOppgaveOppretterTest {
     @Test
     void applyLagerRiktigSamletBeskrivelseGittFlereUrMeldinger() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String forventetSamletBeskrivelse =
                 UR_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("25;", "25;;") +
                         UrOppgaveOppretter.getRecordSeparator() +
@@ -107,8 +98,6 @@ class UrOppgaveOppretterTest {
 
     @Test
     void applySortererSamletBeskrivelseMedNyesteDatoPostertForstDersomNyesteDatoLeggesInnForst() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
         final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
@@ -125,8 +114,6 @@ class UrOppgaveOppretterTest {
     @Test
     void applySortererSamletBeskrivelseMedNyesteDatoPostertForstDersomNyesteDatoLeggesInnSist() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String urMelding1DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_1.datoPostert);
         final String urMelding2DatoPostert = formatAsNorwegianDate(UrOppgaveOppretterTest.UR_MELDING_2.datoPostert);
 
@@ -142,8 +129,6 @@ class UrOppgaveOppretterTest {
     @Test
     void applyReturnererTomOptionalForTomListe() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertFalse(this.urOppgaveOppretter.opprettOppgave(Collections.emptyList()).isPresent());
     }
 
@@ -154,8 +139,6 @@ class UrOppgaveOppretterTest {
 
     @Test
     void brukBelopIHeleKronerIBeskrivelsesFeltet() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");
@@ -168,8 +151,6 @@ class UrOppgaveOppretterTest {
 
     @Test
     void fjernDesimalerFraNettoBelopIBeskrivelsesFeltet() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final UrMelding osMelding = new UrMelding("10108000398PERSON      2011-01-28T18:25:5825          " +
                 "00000000019401æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398");

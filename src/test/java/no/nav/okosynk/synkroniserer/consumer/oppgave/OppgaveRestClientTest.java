@@ -12,8 +12,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -33,8 +31,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OppgaveRestClientTest {
-
-    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -117,8 +113,6 @@ class OppgaveRestClientTest {
     void when_finnOppgaver_finds_bulkSize_number_of_oppgaver_then_no_exception_should_be_thrown_and_the_return_value_should_contain_a_correct_report()
             throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding50Oppgaver();
         AzureAdAuthenticationClient mockedAzureAdAuthenticationClient = mock(AzureAdAuthenticationClient.class);
@@ -138,8 +132,6 @@ class OppgaveRestClientTest {
     @Test
     void when_finnOppgaver_finds_one_oppgave_more_than_bulkSize_then_no_exception_should_be_thrown_and_the_return_value_should_contain_a_correct_report()
             throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInFinding51Oppgaver();
@@ -177,8 +169,6 @@ class OppgaveRestClientTest {
     void when_opprettOppgaver_gets_zero_oppgaver_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         final OppgaveRestClient oppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOppgaveRestClientThatSucceedsInCreatingZeroOppgaver();
 
@@ -195,8 +185,6 @@ class OppgaveRestClientTest {
     @Test
     void when_opprettOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         final Random random = new Random(38762486);
 
@@ -238,8 +226,6 @@ class OppgaveRestClientTest {
 
     @Test
     void when_opprettOppgaver_rest_call_fails_with_an_http_code_greater_than_400_then_the_result_should_reflect_it() throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedOpprettOppgaveRestClientThatFailsWithAnHttpCodeGreaterThan400();
@@ -284,16 +270,12 @@ class OppgaveRestClientTest {
     void when_patchOppgaver_gets_zero_oppgaver_for_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         when_patchOppgaver_gets_zero_oppgaver_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(true);
     }
 
     @Test
     void when_patchOppgaver_gets_zero_oppgaver_for_non_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         when_patchOppgaver_gets_zero_oppgaver_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(false);
     }
@@ -302,8 +284,6 @@ class OppgaveRestClientTest {
     void when_patchOppgaver_gets_one_oppgave_for_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         when_patchOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(true);
     }
 
@@ -311,16 +291,12 @@ class OppgaveRestClientTest {
     void when_patchOppgaver_gets_one_oppgave_for_non_ferdigstilling_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number()
             throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         when_patchOppgaver_gets_one_oppgave_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(false);
     }
 
     @Test
     void when_patchOppgaver_rest_call_fails_with_an_http_code_greater_than_400_then_the_result_should_reflect_it()
             throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         final OppgaveRestClient mockedOppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedPatchOppgaverRestClientThatFailsWithAnHttpCodeGreaterThan400();
@@ -364,8 +340,6 @@ class OppgaveRestClientTest {
 
     private void when_patchOppgaver_gets_zero_oppgaver_then_no_exception_should_be_thrown_and_the_result_should_reflect_the_number(final boolean shouldFerdigstille)
             throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         final OppgaveRestClient oppgaveRestClient =
                 OppgaveRestClientTestUtils.prepareAMockedPatchRestClientThatSucceedsInCreatingZeroOppgaver();

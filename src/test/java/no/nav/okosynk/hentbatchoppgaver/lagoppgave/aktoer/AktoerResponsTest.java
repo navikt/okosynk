@@ -1,38 +1,29 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class AktoerResponsTest {
 
-  private static final Logger enteringTestHeaderLogger =
-      LoggerFactory.getLogger("EnteringTestHeader");
+    @Test
+    void when_creating_an_ok_object_then_the_id_should_be_set_but_not_feilmelding() {
 
-  @Test
-  void when_creating_an_ok_object_then_the_id_should_be_set_but_not_feilmelding() {
+        final String expectedAktoerId = "I1";
+        final AktoerRespons aktoerRespons = AktoerRespons.ok(expectedAktoerId);
 
-    enteringTestHeaderLogger.debug(null);
+        assertEquals(expectedAktoerId, aktoerRespons.getAktoerId());
+        assertNull(aktoerRespons.getFeilmelding());
+    }
 
-    final String expectedAktoerId = "I1";
-    final AktoerRespons aktoerRespons = AktoerRespons.ok(expectedAktoerId);
+    @Test
+    void when_creating_a_feil_object_then_the_id_should_not_be_set_but_the_feilmelding() {
 
-    assertEquals(expectedAktoerId, aktoerRespons.getAktoerId());
-    assertEquals(null, aktoerRespons.getFeilmelding());
-  }
+        final String expectedFeilmelding = "abc 123uuu.";
+        final AktoerRespons aktoerRespons = AktoerRespons.feil(expectedFeilmelding);
 
-  @Test
-  void when_creating_a_feil_object_then_the_id_should_not_be_set_but_the_feilmelding() {
-
-    enteringTestHeaderLogger.debug(null);
-
-    final String expectedFeilmelding = "abc 123uuu.";
-    final AktoerRespons aktoerRespons = AktoerRespons.feil(expectedFeilmelding);
-
-    assertEquals(expectedFeilmelding, aktoerRespons.getFeilmelding());
-    assertNull(aktoerRespons.getAktoerId());
-  }
+        assertEquals(expectedFeilmelding, aktoerRespons.getFeilmelding());
+        assertNull(aktoerRespons.getAktoerId());
+    }
 }

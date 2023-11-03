@@ -1,23 +1,18 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AktoerIdentTest {
 
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
-
     @Test
     void when_setting_feilmelding_gruppe_then_the_same_value_should_be_obtained_when_getting_it() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final AktoerIdent aktoerIdent = new AktoerIdent();
         final String expectedFeilmelding = "Abc 67 +09777//.";
@@ -27,8 +22,6 @@ class AktoerIdentTest {
 
     @Test
     void when_setting_identer_gruppe_then_the_same_values_should_be_obtained_when_getting_it() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final AktoerIdent aktoerIdent = new AktoerIdent();
 

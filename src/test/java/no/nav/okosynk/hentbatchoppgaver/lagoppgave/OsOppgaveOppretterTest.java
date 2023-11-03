@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -8,8 +7,6 @@ import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +22,6 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("ConstantConditions")
 class OsOppgaveOppretterTest {
 
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
     private static final OsMelding OS_MELDING_1 = new OsMelding("10108000398022828640 2009-07-042009-09-26RETUK231B3502009-05-012009-07-31000000012300æ 8020         INNT    10108000398            ");
     private static final OsMelding OS_MELDING_2 = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8020         INNT    06025812345            ");
     private static final OsMelding OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE = new OsMelding("06025812345029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF06025812345            ");
@@ -38,15 +33,11 @@ class OsOppgaveOppretterTest {
 
     OsOppgaveOppretterTest() {
         okosynkConfiguration = mock(OkosynkConfiguration.class);
-        osOppgaveOppretter = new OsOppgaveOppretter(new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName()), this.aktoerClient);
+        osOppgaveOppretter = new OsOppgaveOppretter(this.aktoerClient);
     }
 
     @Test
     void lagBeskrivelseLagerForventetBeskrivelse() {
-
-        enteringTestHeaderLogger.debug(null);
-
-
         assertThat(OS_MELDING_1.osBeskrivelseInfo().lagBeskrivelse()).isEqualTo(OS_MELDING_1_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
         assertThat(OS_MELDING_2.osBeskrivelseInfo().lagBeskrivelse()).isEqualTo(OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE);
     }
@@ -54,9 +45,6 @@ class OsOppgaveOppretterTest {
     @Test
     @DisplayName("De to første tegnene i beskrivelsen skal være feltseparatorer for å unngå å skrive over beskrivelse")
     void toForsteTegnIBeskrivelseErFeltseparatorer() {
-
-        enteringTestHeaderLogger.debug(null);
-
         List<OsMelding> meldingsliste = new ArrayList<>();
         meldingsliste.add(OS_MELDING_1);
 
@@ -65,9 +53,6 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applyReturnererOppgaveMedRiktigeVerdier() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final String expectedFolkeregisterIdent = "10108000398";
         final String expectedAktoerId = "123";
         when(this.aktoerClient.hentGjeldendeAktoerId(expectedFolkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
@@ -90,9 +75,6 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applyLagerRiktigSamletBeskrivelseGittFlereOsMeldinger() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final String forventetSamletBeskrivelse =
                 OS_MELDING_2_FORVENTET_BESKRIVELSE_FRA_LAG_BESKRIVELSE.replaceFirst("AVVE;", "AVVE;;") +
                         OsOppgaveOppretter.getRecordSeparator() +
@@ -105,9 +87,6 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applySortererSamletBeskrivelseMedNyesteBeregningsDatoForstDersomNyesteDatoLeggesInnForst() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
         final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
 
@@ -123,9 +102,6 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applySortererSamletBeskrivelseMedNyesteBeregningsDatoForstDersomNyesteDatoLeggesInnSist() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
         final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
 
@@ -143,25 +119,16 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applyReturnererTomOptionalForTomListe() {
-
-        enteringTestHeaderLogger.debug(null);
-
         assertFalse(this.osOppgaveOppretter.opprettOppgave(Collections.emptyList()).isPresent());
     }
 
     @Test
     void applyReturnererTomOptionalForMeldingUtenMappingTilOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
-
         assertFalse(this.osOppgaveOppretter.opprettOppgave(Collections.singletonList(OS_MELDING_UTEN_MAPPING_TIL_OPPGAVE)).isPresent());
     }
 
     @Test
     void brukBelopIHeleKronerIBeskrivelsesFeltet() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019400æ 8020         BA      10108000398            ");
 
@@ -173,9 +140,6 @@ class OsOppgaveOppretterTest {
 
     @Test
     void fjernDesimalerFraNettoBelopIBeskrivelsesFeltet() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final OsMelding osMelding = new OsMelding("10108000398012345678 2015-07-212015-07-22AVVED133832 2015-07-012015-07-31" +
                 "000000019401æ 8020         BA      10108000398            ");
 

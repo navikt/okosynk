@@ -40,8 +40,6 @@ import static org.mockito.Mockito.when;
 class OppgaveSynkronisererTest {
 
     private static final Logger logger = LoggerFactory.getLogger(OppgaveSynkronisererTest.class);
-    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
-
     private static final Random random = new Random(18766876876L);
 
     public static final String EKSTERN_OPPGAVETYPE_KODE = "OKO_UTB";
@@ -80,8 +78,6 @@ class OppgaveSynkronisererTest {
     @Test
     void when_the_batch_is_started_when_synchronize_is_called_then_service_calls_to_patchOppgave_or_opprettOppgaver_should_be_made() throws IOException {
 
-        enteringTestHeaderLogger.debug(null);
-
         this.oppgaveSynkronisererWithInjectedMocks.synkroniser(lagOppgaveliste());
 
         final Set<Oppgave> funneOppgaver = new HashSet<>();
@@ -90,8 +86,6 @@ class OppgaveSynkronisererTest {
 
     @Test
     void when_synkroniser_is_called_then_all_rest_client_methods_should_be_called_once() throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         this.oppgaveSynkronisererWithInjectedMocks = Mockito.spy(new OppgaveSynkroniserer(OppgaveSynkronisererTest.okosynkConfiguration, mockedOppgaveRestClient));
 
@@ -105,8 +99,6 @@ class OppgaveSynkronisererTest {
     @Test
     void when_beskrivelse_is_updated_then_it_should_be_reflected_in_the_resulting_oppgaver_som_skal_oppdateres() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
         final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
         final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
@@ -119,8 +111,6 @@ class OppgaveSynkronisererTest {
 
     @Test
     void when_batch_beskrivelse_differs_from_database_and_db_has_no_code_then_the_batch_beskrivelse_should_override() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String lokalOppgaveBeskrivelse = "STATUS;;Dette skal beholdes";
         final String oppgaveBeskrivelseLestFraDatabasen = "ANNEN KODE;; Noen har endret på dette, det blir forkastet!";
@@ -142,8 +132,6 @@ class OppgaveSynkronisererTest {
     @Test
     void when_batch_beskrivelse_differs_from_database_and_db_has_code_then_the_batch_beskrivelse_should_override_with_code_from_the_db_inserted() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String lokalOppgaveBeskrivelse = "Oppgavestatus;;Oppsummering av meldinger som er slått sammen på oppgaven";
         final String oppgaveBeskrivelseLestFraDatabasen = "ikke viktig;PESYS KODE IKKEMED;Noen har endret på dette, det blir forkastet!";
         final String expectedtBeskrivelse = "Oppgavestatus;PESYS KODE;Oppsummering av meldinger som er slått sammen på oppgaven";
@@ -164,8 +152,6 @@ class OppgaveSynkronisererTest {
     @Test
     void when_synkronisators_oppdater_is_called_then_the_rest_client_should_be_called_with_oppgaver_that_should_be_pathed() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
         final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
         final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
@@ -179,8 +165,6 @@ class OppgaveSynkronisererTest {
 
     @Test
     void when_synkroniserers_opprett_is_called_then_the_rest_clients_opprett_should_also_be_called() throws IOException {
-
-        enteringTestHeaderLogger.debug(null);
 
         this.oppgaveSynkronisererWithInjectedMocks.opprettOppgaver(lagOppgaveliste());
 
@@ -196,9 +180,6 @@ class OppgaveSynkronisererTest {
 
     @Test
     void when_batch_indicates_changed_oppgavetype_then_the_oppgave_should_not_be_ferdigstilt() {
-
-        enteringTestHeaderLogger.debug(null);
-
         final Oppgave oppgave = lagOppgaveMedBruker();
         final Oppgave oppgaveMedEndretOppgaveType = new Oppgave.OppgaveBuilder().withSameValuesAs(oppgave).withOppgavetypeKode(EKSTERN_OPPGAVETYPE_KODE).build();
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = OppgaveSynkroniserer.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgaveMedEndretOppgaveType));
@@ -210,8 +191,6 @@ class OppgaveSynkronisererTest {
 
     @Test
     void when_batch_indicates_not_changed_oppgavetype_then_the_oppgave_should_be_ferdigstilt() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final Oppgave oppgave = lagOppgaveMedBruker();
 

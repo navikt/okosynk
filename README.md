@@ -18,37 +18,6 @@ men de er konfigurert forskjellig.
 Miljø-variabelen SHOULD_RUN_OS_OR_UR styrer dette, og den kan ha verdiene "OS" eller "UR".
 
 # Testkjøring av batchen
-## Lokal testkjøring av batchen
-Her beskrives den enkle og frittstående varianten hvor aksessen til providerne er mocka. 
-De mocka requestene og responsene blir logget til konsollet. 
-
-### Lokal testkjøring av batchen out-of-the-box 
-0. Fra kommandolinja, kjør:
-    1. `./copyInputFiles.sh` (1) (2)
-    0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_001.properties` (3)
-       
-(1) Antar her at applikasjonen er kompilert og testa vellykka med `mvn clean install`
-
-(2) I og med at batchen renamer inputfilene, må disse regenereres, og det kan f.eks. gjøres med denne kommandoen (du kan selvfølgelig finne på en smartere og raskere måte å gjøre akkurat dét på)
-
-(3) Den varianten du ønsker å kjøre avgjøres av innholdet i miljø-variabelen SHOULD_RUN_OS_OR_UR, som kan ha verdiene OS eller UR 
-
-(4) Dette kan med hell kjøres innafra IDE-en, noe som vel er å foretrekke når man bedriver utvikling der. I så fall, kjør run eller debug på no.nav.okosynk.metrics.CliMainWithTestScope. Regenerering av input-filer som nevnt ovenfor gjelder selvsagt også før kjøring i IDE-en.
-
-### Lokal testkjøring av batchen med skreddersøm
-- Kopiér og rename følgende filer...
-    - ... src/test/resources/__files/stsResponse.testset_001.json
-    - ... src/test/resources/__files/oppgaveResponseFinnOppgaver.testset_001.json
-    - ... src/test/resources/__files/oppgaveResponseOpprettOppgaver.testset_001.json
-    - ... src/test/resources/__files/oppgaveResponsePatchOppgaver.testset_001.json
-    - ... src/test/resources/application-test.testset_001.properties
-    - ... src/test/resources/os.testset_001.input
-    - ... src/test/resources/ur.testset_001.input
-
-til ditto ...testset_nnn...
-1. Endre innholdet i ...testset_nnn...-filene slik at de reflekterer det du spesifikt trenger å teste og at slik at det blir konsistens i test-dataene
-0. `./copyInputFiles.sh`
-0. `java -ea -jar target/okosynk-local-test-run.jar --propFile application-test.testset_nnn.properties`
 
 ## Testkjøring av batchen i dev
 1. Sjekk adressen(e) til inputfil(ene) i nais/app-preprod.yaml under `FTPBASEURL_URL`
@@ -60,11 +29,14 @@ til ditto ...testset_nnn...
 `mvn clean install`
 ## Preprod/Prod
 Ved innsjekking til main-greina på GitHub bygges og deployeres okosynk implisitt til både preprod og prod.
-Dette skjer på GitHub vha. action-scriptene
+Dette skjer på GitHub vha. action-scriptet
 `<PROJECT ROOT>/.github/workflows/deploy-dev-prod.yaml` 
-og
-`<PROJECT ROOT>/.github/workflows/issue-deploy.yml`.
- Hvis dette ikke er ønskelig, bør man vurdere å arbeide på en egen grein.
+Hvis dette ikke er ønskelig, bør man vurdere å arbeide på en egen grein.
+
+Oppretter man en egen grein, vil ingenting skje før man oppretter en pull request, 
+Det anbefales at man setter denne til Draft, slik at man bygger og kjører tester hver gang man pusher til branchen.
+
+Ønsker man så å teste ut endringen i dev kjører man `<PROJECT ROOT>/.github/workflows/manuell-deploy-dev.yml`.
 
 # Sjekk hvordan det står til i drift
 
@@ -75,7 +47,7 @@ kubectl config set-context <riktig cluster> --namespace=<riktig namespace> (<rik
 
 Ved å kjøre
 
-`kubectl get cronjobs`
+`kubectl get cronjobs`  
 
 får man en liste over alle cronjobs i dette
 namespacet, og okosynkos/ur skal være blant dem.
@@ -140,7 +112,9 @@ Når status er "Completed", gikk jobben bra. "Age" viser når
 hver pod begynte å kjøre. Hvis vi skal sjekke loggene til den siste pod-en, kan vi
 kjøre
 
-`kubectl logs okosynkos-1626667200-4rgvn okosynk`
+`kubectl logs okosynkos-1626667200-4rgvn okosynkos`
+eller
+`kubectl logs okosynkur-1626667200-4rgvn okosynkur`
 eller
 `kubectl logs okosynkos-1626667200-4rgvn vks-sidecar`
 eller
@@ -195,7 +169,7 @@ eller
     - `mvn versions:display-dependency-updates`
 - Sjekk innholdet i en pod:
     - `kubectl describe jobs okosynk-oor-manually-started-2021-06-30-12-16-ctm66`
-- Loggen på en pen måte:
+- Loggen til Okosynk på en pen måte:
     - Pipe loggoutputen inn i `sed -n '/ENTERING OKOSYNK/,/OKOSYNK ABOUT TO EXIT/p'|jq -r '.logger_name + "\t " + .message'|column -t -s $'\t'`
 
 # Referanser

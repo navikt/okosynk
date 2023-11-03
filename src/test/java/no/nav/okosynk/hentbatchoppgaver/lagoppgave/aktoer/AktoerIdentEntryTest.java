@@ -1,102 +1,89 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class AktoerIdentEntryTest {
 
-  private static final Logger enteringTestHeaderLogger =
-      LoggerFactory.getLogger("EnteringTestHeader");
+    @Test
+    void when_setting_the_ident_then_the_same_value_should_be_obtained_when_getting_it() {
 
-  @Test
-  void when_setting_the_ident_then_the_same_value_should_be_obtained_when_getting_it() {
+        final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
+        final String expectedIdent = "abc123";
+        aktoerIdentEntry.setIdent(expectedIdent);
 
-    enteringTestHeaderLogger.debug(null);
+        assertEquals(expectedIdent, aktoerIdentEntry.getIdent());
+    }
 
-    final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
-    final String expectedIdent = "abc123";
-    aktoerIdentEntry.setIdent(expectedIdent);
+    @Test
+    void when_setting_ident_gruppe_then_the_same_value_should_be_obtained_when_getting_it() {
 
-    assertEquals(expectedIdent, aktoerIdentEntry.getIdent());
-  }
+        final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
+        final String expectedIdentgruppe = "123xyzABC-";
+        aktoerIdentEntry.setIdentgruppe(expectedIdentgruppe);
 
-  @Test
-  void when_setting_ident_gruppe_then_the_same_value_should_be_obtained_when_getting_it() {
+        assertEquals(expectedIdentgruppe, aktoerIdentEntry.getIdentgruppe());
+    }
 
-    enteringTestHeaderLogger.debug(null);
+    @Test
+    void when_setting_gjeldende_then_the_same_value_should_be_obtained_when_getting_it() {
 
-    final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
-    final String expectedIdentgruppe = "123xyzABC-";
-    aktoerIdentEntry.setIdentgruppe(expectedIdentgruppe);
+        final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
+        final boolean expectedGjeldende_gjeldende = true;
+        aktoerIdentEntry.setGjeldende(expectedGjeldende_gjeldende);
 
-    assertEquals(expectedIdentgruppe, aktoerIdentEntry.getIdentgruppe());
-  }
+        assertEquals(expectedGjeldende_gjeldende, aktoerIdentEntry.isGjeldende());
 
-  @Test
-  void when_setting_gjeldende_then_the_same_value_should_be_obtained_when_getting_it() {
+        final boolean expectedGjeldende_not_gjeldende = false;
+        aktoerIdentEntry.setGjeldende(expectedGjeldende_not_gjeldende);
 
-    enteringTestHeaderLogger.debug(null);
+        assertEquals(expectedGjeldende_not_gjeldende, aktoerIdentEntry.isGjeldende());
+    }
 
-    final AktoerIdentEntry aktoerIdentEntry = new AktoerIdentEntry();
-    final boolean expectedGjeldende_gjeldende = true;
-    aktoerIdentEntry.setGjeldende(expectedGjeldende_gjeldende);
+    @Test
+    void when_ident_is_equal_to_the_other_ident_then_the_objects_equal_and_not_otherwise() {
 
-    assertEquals(expectedGjeldende_gjeldende, aktoerIdentEntry.isGjeldende());
+        final AktoerIdentEntry aktoerIdentEntry1a = new AktoerIdentEntry();
+        aktoerIdentEntry1a.setIdent("x1");
+        aktoerIdentEntry1a.setIdentgruppe("G1");
+        aktoerIdentEntry1a.setGjeldende(true);
 
-    final boolean expectedGjeldende_not_gjeldende = false;
-    aktoerIdentEntry.setGjeldende(expectedGjeldende_not_gjeldende);
+        assertThat(aktoerIdentEntry1a).isNotNull();
+        assertThat(aktoerIdentEntry1a.toString()).isNotEmpty();
 
-    assertEquals(expectedGjeldende_not_gjeldende, aktoerIdentEntry.isGjeldende());
-  }
+        final AktoerIdentEntry aktoerIdentEntry1b = new AktoerIdentEntry();
+        aktoerIdentEntry1b.setIdent("x1");
+        aktoerIdentEntry1b.setIdentgruppe("G1b");
+        aktoerIdentEntry1b.setGjeldende(false);
 
-  @Test
-  void when_ident_is_equal_to_the_other_ident_then_the_objects_equal_and_not_otherwise() {
+        assertEquals(aktoerIdentEntry1a, aktoerIdentEntry1b);
 
-    enteringTestHeaderLogger.debug(null);
+        final AktoerIdentEntry aktoerIdentEntry2 = new AktoerIdentEntry();
+        aktoerIdentEntry2.setIdent("x2");
+        aktoerIdentEntry2.setIdentgruppe("G2");
+        aktoerIdentEntry2.setGjeldende(false);
 
-    final AktoerIdentEntry aktoerIdentEntry1a = new AktoerIdentEntry();
-    aktoerIdentEntry1a.setIdent("x1");
-    aktoerIdentEntry1a.setIdentgruppe("G1");
-    aktoerIdentEntry1a.setGjeldende(true);
+        assertNotEquals(aktoerIdentEntry1a, aktoerIdentEntry2);
+        assertNotEquals(aktoerIdentEntry1b, aktoerIdentEntry2);
 
-    assertNotEquals(aktoerIdentEntry1a, null);
-    assertNotEquals(aktoerIdentEntry1a, "");
-    assertEquals(aktoerIdentEntry1a, aktoerIdentEntry1a);
+        final AktoerIdentEntry aktoerIdentEntry3 = new AktoerIdentEntry();
+        aktoerIdentEntry2.setIdent(null);
+        aktoerIdentEntry2.setIdentgruppe("G3");
+        aktoerIdentEntry2.setGjeldende(false);
 
-    final AktoerIdentEntry aktoerIdentEntry1b = new AktoerIdentEntry();
-    aktoerIdentEntry1b.setIdent("x1");
-    aktoerIdentEntry1b.setIdentgruppe("G1b");
-    aktoerIdentEntry1b.setGjeldende(false);
+        assertNotEquals(aktoerIdentEntry3, aktoerIdentEntry3);
+        assertNotEquals(aktoerIdentEntry1a, aktoerIdentEntry3);
+        assertNotEquals(aktoerIdentEntry1b, aktoerIdentEntry3);
+        assertNotEquals(aktoerIdentEntry2, aktoerIdentEntry3);
 
-    assertEquals(aktoerIdentEntry1a, aktoerIdentEntry1b);
+        final AktoerIdentEntry aktoerIdentEntry4 = new AktoerIdentEntry();
+        aktoerIdentEntry2.setIdent(null);
+        aktoerIdentEntry2.setIdentgruppe("G4");
+        aktoerIdentEntry2.setGjeldende(true);
 
-    final AktoerIdentEntry aktoerIdentEntry2 = new AktoerIdentEntry();
-    aktoerIdentEntry2.setIdent("x2");
-    aktoerIdentEntry2.setIdentgruppe("G2");
-    aktoerIdentEntry2.setGjeldende(false);
-
-    assertNotEquals(aktoerIdentEntry1a, aktoerIdentEntry2);
-    assertNotEquals(aktoerIdentEntry1b, aktoerIdentEntry2);
-
-    final AktoerIdentEntry aktoerIdentEntry3 = new AktoerIdentEntry();
-    aktoerIdentEntry2.setIdent(null);
-    aktoerIdentEntry2.setIdentgruppe("G3");
-    aktoerIdentEntry2.setGjeldende(false);
-
-    assertNotEquals(aktoerIdentEntry3, aktoerIdentEntry3);
-    assertNotEquals(aktoerIdentEntry1a, aktoerIdentEntry3);
-    assertNotEquals(aktoerIdentEntry1b, aktoerIdentEntry3);
-    assertNotEquals(aktoerIdentEntry2, aktoerIdentEntry3);
-
-    final AktoerIdentEntry aktoerIdentEntry4 = new AktoerIdentEntry();
-    aktoerIdentEntry2.setIdent(null);
-    aktoerIdentEntry2.setIdentgruppe("G4");
-    aktoerIdentEntry2.setGjeldende(true);
-
-    assertNotEquals(aktoerIdentEntry3, aktoerIdentEntry4);
-  }
+        assertNotEquals(aktoerIdentEntry3, aktoerIdentEntry4);
+    }
 }

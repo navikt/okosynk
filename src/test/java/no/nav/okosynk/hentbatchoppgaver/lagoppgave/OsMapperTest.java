@@ -8,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,13 +16,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OsMapperTest {
-
-    private static final Logger enteringTestHeaderLogger = LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final String OS_MELDING_SOM_GJELDER_TSS = "80000437552017087784 2009-04-012009-06-24RETUK231B3502009-03-012009-03-31000000005000æ 4819         PEN     80000437552            ";
     private static final String OS_MELDING_SOM_IKKE_HAR_MAPPING = "10108000398029568753 2009-11-062009-11-30AVVEX123456 2009-11-012009-11-30000000072770æ 8019         HELSEREF10108000398            ";
@@ -34,7 +34,7 @@ class OsMapperTest {
     private static final String OS_MELDING_EFOG =
             "01017812345333374207 2019-02-132019-02-14AVVMK231B26E2018-10-012019-02-28000000090040æ 8020         EFOG    01017812345            ";
 
-    private OsMapper osMapper;
+    private OsOppgaveOppretter osMapper;
     private OsMelding osMeldingSomSkalBliTilOppgave;
     private OsMelding annenOsMeldingSomSkalBliTilOppgave;
     private OsMelding osMeldingSomIkkeHarMapping;
@@ -43,7 +43,7 @@ class OsMapperTest {
 
     @BeforeEach
     void setUp() {
-        osMapper = new OsMapper(this.aktoerRestClient);
+        osMapper = new OsOppgaveOppretter(this.aktoerRestClient);
         osMeldingSomSkalBliTilOppgave = new OsMelding(OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         annenOsMeldingSomSkalBliTilOppgave = new OsMelding(ANNEN_OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         osMeldingSomIkkeHarMapping = new OsMelding(OS_MELDING_SOM_IKKE_HAR_MAPPING);
@@ -54,17 +54,13 @@ class OsMapperTest {
     @DisplayName("lagOppgaver returnerer én oppgave hvis den får inn én melding med faggruppe \"EFOG\" som skal bli til oppgave.")
     void lagUrOppgaveMedFaggruppeEFOG() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Mockito.reset(aktoerRestClient);
 
         final String expectedfFlkeregisterIdent = "01017812345";
         final String expectedAktoerId = "123";
         when(aktoerRestClient.hentGjeldendeAktoerId(expectedfFlkeregisterIdent)).thenReturn(AktoerRespons.ok(expectedAktoerId));
 
-        final List<Oppgave> oppgaver =
-                osMapper
-                        .lagOppgaver(lagMeldinglisteMedEttElement(osMeldingEFOG));
+        final List<Oppgave> oppgaver = osMapper.lagOppgaver(lagMeldinglisteMedEttElement(osMeldingEFOG));
 
         assertNotNull(oppgaver);
         assertEquals(1, oppgaver.size());
@@ -79,8 +75,6 @@ class OsMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer to oppgaver hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void lagOsOppgaverFraOsMeldingListeReturnererToOppgaver() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Mockito.reset(aktoerRestClient);
 
@@ -105,7 +99,6 @@ class OsMapperTest {
                         "05029745821495681278 2023-03-142023-03-14AVAVK231B2622023-02-012023-03-31000000216490æ 8020         ARBYT   05029745821            ")
                 .map(OsMelding::new)
                 .collect(Collectors.toList());
-        enteringTestHeaderLogger.debug(null);
 
         Mockito.reset(aktoerRestClient);
 
@@ -124,8 +117,6 @@ class OsMapperTest {
     @Test
     @DisplayName("lagOppgaver returnerer en oppgave hvis den får inn to meldinger som er like")
     void lagOsOppgaverFraOsMeldingListeReturnererEnOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Mockito.reset(aktoerRestClient);
 
@@ -146,8 +137,6 @@ class OsMapperTest {
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med to OS-meldinger hvis den får inn to meldinger som skal bli til oppgaver og som ikke er like")
     void hentMeldingerSomSkalBliOsOppgaverReturnererToMeldinger() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, annenOsMeldingSomSkalBliTilOppgave));
 
@@ -159,8 +148,6 @@ class OsMapperTest {
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en OS-melding hvis den får inn to meldinger der kun en skal bli til oppgaver")
     void hentMeldingerSomSkalBliOsOppgaverReturnererEnMelding() {
 
-        enteringTestHeaderLogger.debug(null);
-
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomIkkeHarMapping));
 
@@ -171,8 +158,6 @@ class OsMapperTest {
     @Test
     @DisplayName("hentMeldingerSomSkalBliOppgaver returnerer en samling med en OS-melding hvis den får inn to meldinger som er like")
     void hentMeldingerSomSkalBliOsOppgaverReturnererEnMeldingHvisInputErLike() {
-
-        enteringTestHeaderLogger.debug(null);
 
         Collection<List<OsMelding>> filtrerteMeldinger = osMapper
                 .groupMeldingerSomSkalBliOppgaver(lagMeldinglisteMedToElementer(osMeldingSomSkalBliTilOppgave, osMeldingSomSkalBliTilOppgave));
@@ -186,8 +171,6 @@ class OsMapperTest {
     @DisplayName("OS-melding som gjelder TSS skal bli til oppgave")
     void osMeldingGjelderTssOgDetSkalOpprettesOppgaveForSamhandlere() {
 
-        enteringTestHeaderLogger.debug(null);
-
         OsMelding osMeldingSomGjelderTss = new OsMelding(OS_MELDING_SOM_GJELDER_TSS);
 
         assertTrue(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomGjelderTss), "AbstractMelding som gjelder TSS blir ikke oppgave");
@@ -197,16 +180,12 @@ class OsMapperTest {
     @DisplayName("OS-melding som mangler mapping skal ikke bli til oppgave")
     void osMeldingUtenMapping() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertFalse(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomIkkeHarMapping), "AbstractMelding som mangler mapping blir oppgave");
     }
 
     @Test
     @DisplayName("OS-melding som ikke gjelder TSS og har mapping skal bli til oppgave")
     void osMeldingSomSkalBliTilOppgave() {
-
-        enteringTestHeaderLogger.debug(null);
         assertTrue(osMapper.osMeldingSkalBliOppgave().test(osMeldingSomSkalBliTilOppgave),
                 "Det blir ikke oppgave for melding som ikke gjelder TSS og som har mapping");
     }
