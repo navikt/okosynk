@@ -1,7 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import lombok.Getter;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsBeskrivelseInfo;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
 
 import java.time.LocalDate;
@@ -24,7 +24,6 @@ import static no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser.parseU
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 public class OsMelding extends Melding {
-
     static final String ORGANISASJON_PREFIKS = "00";
     private static final String FLAGG_FEILKONTO_DEFAULT = " ";
 

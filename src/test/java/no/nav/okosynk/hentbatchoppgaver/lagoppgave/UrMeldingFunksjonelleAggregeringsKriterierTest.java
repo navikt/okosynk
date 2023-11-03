@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -2,6 +2,8 @@ package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
 

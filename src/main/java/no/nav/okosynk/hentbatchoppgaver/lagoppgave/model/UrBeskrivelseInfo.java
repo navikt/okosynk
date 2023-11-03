@@ -1,4 +1,4 @@
-package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

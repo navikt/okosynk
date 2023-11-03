@@ -1,9 +1,9 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.MappingRegel;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrBeskrivelseInfo;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -32,6 +32,7 @@ public class UrMelding extends Melding {
     public final String bilagsId;
     public final String arsaksTekst;
     public final String mottakerId;
+    public final Optional<String> navEnhet;
 
     public UrMelding(final String urMelding) {
 
@@ -49,11 +50,12 @@ public class UrMelding extends Melding {
         this.bilagsId = parseBilagsId(urMelding);
         this.arsaksTekst = parseArsaksTekst(urMelding);
         this.mottakerId = parseMottakerId(urMelding);
+        this.navEnhet = navEnhet();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.gjelderId, this.gjelderIdType, this.oppdragsKode, this.datoPostert, this.navEnhet());
+        return Objects.hash(this.gjelderId, this.gjelderIdType, this.oppdragsKode, this.datoPostert, this.navEnhet);
     }
 
     @Override
@@ -66,11 +68,11 @@ public class UrMelding extends Melding {
             return false;
         }
 
-        return this.gjelderId/*........*/.equals(otherAsUrMelding.gjelderId)
-                && this.gjelderIdType/**/.equals(otherAsUrMelding.gjelderIdType)
-                && this.oppdragsKode/*.*/.equals(otherAsUrMelding.oppdragsKode)
-                && this.datoPostert/*..*/.equals(otherAsUrMelding.datoPostert)
-                && navEnhet()/*........*/.equals(otherAsUrMelding.navEnhet());
+        return this.gjelderId/*...*/.equals(otherAsUrMelding.gjelderId)
+                && gjelderIdType/**/.equals(otherAsUrMelding.gjelderIdType)
+                && oppdragsKode/*.*/.equals(otherAsUrMelding.oppdragsKode)
+                && datoPostert/*..*/.equals(otherAsUrMelding.datoPostert)
+                && navEnhet/*.....*/.equals(otherAsUrMelding.navEnhet);
     }
 
     @Override

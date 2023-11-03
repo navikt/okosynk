@@ -1,6 +1,7 @@
-package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
+package no.nav.okosynk.hentbatchoppgaver.lagoppgave.model;
 
 import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import no.nav.okosynk.model.GjelderIdType;
 

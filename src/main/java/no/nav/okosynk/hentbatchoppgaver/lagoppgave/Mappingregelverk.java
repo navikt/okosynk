@@ -1,6 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,16 +11,13 @@ import java.util.Optional;
 import java.util.Properties;
 
 public class Mappingregelverk {
-
-    private static final Logger logger = LoggerFactory
-            .getLogger(Mappingregelverk.class);
+    private static final Logger logger = LoggerFactory.getLogger(Mappingregelverk.class);
 
     private Properties getMappingRulesProperties() {
         return mappingRulesProperties;
     }
 
     private final Properties mappingRulesProperties = new Properties();
-
     private static final char NOKKEL_SKILLETEGN = ',';
     private static final int BEHANDLINGSTEMA_INDEKS = 0;
     private static final int BEHANDLINGSTYPE_INDEKS = 1;
@@ -44,28 +42,13 @@ public class Mappingregelverk {
         final Optional<String> ansvarligEnhetId =
                 finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
 
-        final Optional<MappingRegel> optionalMappingRegel;
-        if (
-                behandlingstema.isPresent()
-                        &&
-                        behandlingstype.isPresent()
-                        &&
-                        ansvarligEnhetId.isPresent()) {
-
-            optionalMappingRegel =
-                    Optional
-                            .of(
-                                    new MappingRegel(
-                                            behandlingstema.get(),
-                                            behandlingstype.get(),
-                                            ansvarligEnhetId.get()
-                                    )
-                            );
-        } else {
-            optionalMappingRegel = Optional.empty();
-        }
-
-        return optionalMappingRegel;
+        return (behandlingstema.isEmpty() || behandlingstype.isEmpty() || ansvarligEnhetId.isEmpty()) ? Optional.empty()
+                : Optional.of(
+                new MappingRegel(
+                        behandlingstema.orElseThrow(),
+                        behandlingstype.orElseThrow(),
+                        ansvarligEnhetId.orElseThrow()
+                ));
     }
 
     void loadMappingRulesProperties(final String mappingRulesPropertiesFileName)

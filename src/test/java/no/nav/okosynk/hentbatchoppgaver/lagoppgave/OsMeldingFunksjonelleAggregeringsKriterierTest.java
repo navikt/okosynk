@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMeldingTestGenerator;
 import org.junit.jupiter.api.BeforeEach;
