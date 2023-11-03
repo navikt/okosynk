@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class MappingregelverkTest<MT extends Melding> {
 
-    protected Mappingregelverk mappingRegelRepository;
     protected MT meldingSomSkalBliTilOppgave;
     protected MT meldingUtenMappingRegel;
     protected MT meldingWithoutBehandlingsTema;
@@ -25,10 +23,10 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     protected String expectedBehandlingstype;
     protected String expectedAnsvarligenhet_id;
 
+
     @Test
     void when_melding_should_be_mapped_to_oppgave_then_correct_mappingregel_should_be_found() {
-        final Optional<MappingRegel> mappingRegel =
-                this.mappingRegelRepository.finnRegel(this.meldingSomSkalBliTilOppgave.regelnøkkel());
+        final Optional<MappingRegel> mappingRegel = Mappingregelverk.finnRegel(this.meldingSomSkalBliTilOppgave.regelnøkkel());
 
         assertTrue(mappingRegel.isPresent(), "Mapping mangler");
         assertAll("Mapping skal ha riktige verdier",
@@ -42,7 +40,7 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     void when_melding_should_not_be_mapped_to_oppgave_then_no_mappingregel_should_be_found() {
 
         final Optional<MappingRegel> mappingRegel =
-                mappingRegelRepository.finnRegel(meldingUtenMappingRegel.regelnøkkel());
+                Mappingregelverk.finnRegel(meldingUtenMappingRegel.regelnøkkel());
 
         assertFalse(mappingRegel.isPresent(), "Mapping ble funnet for oppgave som ikke skal mappes");
     }
@@ -51,14 +49,8 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     void when_mapping_properties_file_does_not_exist_then_an_io_exception_should_be_thrown() {
 
         final String fileName = "RubbishFileNameForNonExistingFile";
-        final IOException actualIoException =
-                assertThrows(
-                        IOException.class,
-                        () ->
-                                this
-                                        .mappingRegelRepository
-                                        .loadMappingRulesProperties(fileName)
-                );
+
+        final IOException actualIoException = assertThrows(IOException.class, () -> Mappingregelverk.init(fileName));
 
         final String expectedMessage = "Kunne ikke lese fra mappingRulesProperties filen " + fileName;
 
@@ -66,34 +58,16 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     }
 
     @Test
-    void when_handling_an_io_exception_then_an_UleseligMappingfilException_should_be_thrown() {
-
-        final String expectedMessage = "Kxxxc ";
-        IOException e = new IOException(expectedMessage);
-        final UleseligMappingfilException actualUleseligMappingfilException =
-                assertThrows(
-                        UleseligMappingfilException.class,
-                        () ->
-                                this
-                                        .mappingRegelRepository
-                                        .handterIOException(e)
-                );
-
-        assertEquals(IOException.class, actualUleseligMappingfilException.getCause().getClass());
-        assertEquals(expectedMessage, actualUleseligMappingfilException.getCause().getMessage());
-    }
-
-    @Test
     void when_melding_is_null_then_trying_to_find_its_MappingRegel_should_throw_a_NullPointerException() {
 
-        assertThrows(NullPointerException.class, () -> this.mappingRegelRepository.finnRegel(null));
+        assertThrows(NullPointerException.class, () -> Mappingregelverk.finnRegel(null));
     }
 
     @Test
     void when_behandlinsTema_is_missing_then_no_MappingRegel_should_be_found() {
 
         final Optional<MappingRegel> actualOptionalMappingRegel =
-                this.mappingRegelRepository.finnRegel(this.meldingWithoutBehandlingsTema.regelnøkkel());
+                Mappingregelverk.finnRegel(this.meldingWithoutBehandlingsTema.regelnøkkel());
 
         assertFalse(actualOptionalMappingRegel.isPresent());
     }
@@ -101,9 +75,7 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     @Test
     void when_expectedAnsvarligenhetId_is_missing_then_no_MappingRegel_should_be_found() {
 
-        final Optional<MappingRegel> actualOptionalMappingRegel = this.mappingRegelRepository.finnRegel(
-                this.meldingWithoutAnsvarligEnhetId.regelnøkkel());
-
-        assertFalse(actualOptionalMappingRegel.isPresent());
+        assertFalse(Mappingregelverk.finnRegel(
+                this.meldingWithoutAnsvarligEnhetId.regelnøkkel()).isPresent());
     }
 }

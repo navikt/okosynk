@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,12 +44,13 @@ class OsMapperTest {
     private final IAktoerClient aktoerRestClient = mock(IAktoerClient.class);
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         osMapper = new OsOppgaveOppretter(this.aktoerRestClient);
         osMeldingSomSkalBliTilOppgave = new OsMelding(OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         annenOsMeldingSomSkalBliTilOppgave = new OsMelding(ANNEN_OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING);
         osMeldingSomIkkeHarMapping = new OsMelding(OS_MELDING_SOM_IKKE_HAR_MAPPING);
         osMeldingEFOG = new OsMelding(OS_MELDING_EFOG);
+        Mappingregelverk.init(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
     }
 
     @Test

@@ -6,6 +6,8 @@ import no.nav.okosynk.hentbatchoppgaver.lagoppgave.MappingregelverkTest;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import org.junit.jupiter.api.BeforeEach;
 
+import java.io.IOException;
+
 class OsMappingRegelRepositoryTest extends MappingregelverkTest<OsMelding> {
 
     private static final String OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL = "02029912345000000002 2008-10-102008-10-10NEG A123B1232008-11-012008-11-30000000001600å 4151         GS      02029912345            ";
@@ -18,9 +20,9 @@ class OsMappingRegelRepositoryTest extends MappingregelverkTest<OsMelding> {
     private static final String EXPECTED_ANSVARLIGENHET_ID = "4151";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
-        super.mappingRegelRepository         = new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
+        Mappingregelverk.init(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
         super.meldingSomSkalBliTilOppgave    = new OsMelding(OS_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         super.meldingUtenMappingRegel        = new OsMelding(OS_MELDING_UTEN_MAPPING_REGEL);
         super.meldingWithoutBehandlingsTema  = new OsMelding(OS_MELDING_UTEN_BEHANDLINGSTEMA);

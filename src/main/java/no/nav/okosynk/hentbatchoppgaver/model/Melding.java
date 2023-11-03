@@ -16,7 +16,12 @@ public abstract class Melding {
     @Getter final String nyesteVentestatus;
     final double totaltNettoBelop;
 
-    protected Melding(String behandlendeEnhet, String brukerId, LocalDate datoForStatus, String gjelderId, String nyesteVentestatus, double totaltNettoBelop) {
+    protected Melding(String behandlendeEnhet,
+                      String brukerId,
+                      LocalDate datoForStatus,
+                      String gjelderId,
+                      String nyesteVentestatus,
+                      double totaltNettoBelop) {
         this.behandlendeEnhet = behandlendeEnhet;
         this.brukerId = brukerId;
         this.datoForStatus = datoForStatus;

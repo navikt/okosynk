@@ -4,6 +4,7 @@ import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.FtpSettings;
@@ -13,6 +14,7 @@ import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitiali
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -51,9 +53,10 @@ public class Service {
             if (batch == null) {
                 setBatch(createAndConfigureBatch(okosynkConfiguration));
             }
+            Mappingregelverk.init(batchType.getMappingRulesPropertiesFileName());
             batch.run();
             batchStatus = batch.getBatchStatus();
-        } catch (URISyntaxException | ConfigureOrInitializeOkosynkIoException e) {
+        } catch (IOException | URISyntaxException | ConfigureOrInitializeOkosynkIoException e) {
             batchStatus = BatchStatus.ENDED_WITH_ERROR_CONFIGURATION;
         } finally {
             setLastBatchStatus(batchStatus);

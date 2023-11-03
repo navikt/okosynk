@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsMeldingFunksjonelleAggregeringsKriterier;
@@ -20,7 +19,7 @@ import static java.util.Comparator.reverseOrder;
 public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
 
     public OsOppgaveOppretter(final IAktoerClient aktoerClient) {
-        super(new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName()), aktoerClient);
+        super(aktoerClient);
     }
 
     private static final String OPPGAVETYPE_KODE = "OKO_OS";
@@ -49,6 +48,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     protected int antallDagerFrist() {
         return ANTALL_DAGER_FRIST;
     }
+
     public List<Oppgave> lagOppgaver(final List<OsMelding> meldinger) {
         return groupMeldingerSomSkalBliOppgaver(meldinger)
                 .stream()
@@ -59,8 +59,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     }
 
     Predicate<OsMelding> osMeldingSkalBliOppgave() {
-        return osMelding -> new Mappingregelverk(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName())
-                .finnRegel(osMelding.regelnøkkel()).isPresent();
+        return osMelding -> Mappingregelverk.finnRegel(osMelding.regelnøkkel()).isPresent();
     }
 
     Collection<List<OsMelding>> groupMeldingerSomSkalBliOppgaver(

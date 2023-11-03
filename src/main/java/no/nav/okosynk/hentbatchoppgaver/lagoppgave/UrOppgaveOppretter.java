@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrMeldingFunksjonelleAggregeringsKriterier;
@@ -25,7 +24,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
     private static final int ANTALL_DAGER_FRIST = 3;
 
     public UrOppgaveOppretter(final IAktoerClient aktoerClient) {
-        super(new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName()), aktoerClient);
+        super(aktoerClient);
     }
 
     @Override
@@ -39,10 +38,12 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
                 .reduce(UrBeskrivelseInfo::pluss)
                 .map(UrBeskrivelseInfo::lagBeskrivelse).orElse("");
     }
+
     @Override
     protected String oppgaveTypeKode() {
         return OPPGAVETYPE_KODE;
     }
+
     @Override
     protected int antallDagerFrist() {
         return ANTALL_DAGER_FRIST;
@@ -59,7 +60,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
     }
 
     Predicate<UrMelding> urMeldingSkalBliOppgave() {
-        return urMelding -> new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName()).finnRegel(urMelding.regelnøkkel()).isPresent();
+        return urMelding -> Mappingregelverk.finnRegel(urMelding.regelnøkkel()).isPresent();
     }
 
     Collection<List<UrMelding>> groupMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {

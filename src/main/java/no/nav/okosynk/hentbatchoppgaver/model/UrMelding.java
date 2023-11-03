@@ -1,8 +1,7 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
 
 import java.time.LocalDate;
@@ -88,8 +87,7 @@ public class UrMelding extends Melding {
     }
 
     Optional<String> navEnhet() {
-        final Mappingregelverk urMappingRegelRepository = new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
-        return urMappingRegelRepository.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(MappingRegel::ansvarligEnhetId);
+        return Mappingregelverk.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(MappingRegel::ansvarligEnhetId);
     }
 
     public UrBeskrivelseInfo urBeskrivelseInfo() {

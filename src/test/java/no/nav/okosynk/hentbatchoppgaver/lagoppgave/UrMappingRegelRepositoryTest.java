@@ -4,6 +4,8 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import org.junit.jupiter.api.BeforeEach;
 
+import java.io.IOException;
+
 class UrMappingRegelRepositoryTest extends MappingregelverkTest<UrMelding> {
 
     private static final String UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL = "10108000398PERSON      2011-02-01T06:11:4625          00000000033390æ8020UTPOST UR2302011-01-31343285958Kredit kontonummer ugyldig                        00963702833";
@@ -16,9 +18,9 @@ class UrMappingRegelRepositoryTest extends MappingregelverkTest<UrMelding> {
     private static final String EXPECTED_ANSVARLIGENHET_ID = "4151";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
 
-        super.mappingRegelRepository         = new Mappingregelverk(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
+        Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
         super.meldingSomSkalBliTilOppgave    = new UrMelding(UR_MELDING_SOM_IKKE_GJELDER_TSS_OG_HAR_MAPPING_REGEL);
         super.meldingUtenMappingRegel        = new UrMelding(UR_MELDING_UTEN_MAPPING_REGEL);
         super.meldingWithoutBehandlingsTema  = new UrMelding(UR_MELDING_UTEN_BEHANDLINGSTEMA);

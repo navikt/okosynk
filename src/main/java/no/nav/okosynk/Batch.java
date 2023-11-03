@@ -6,6 +6,7 @@ import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsOppgaveOppretter;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrOppgaveOppretter;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -122,7 +124,8 @@ public class Batch {
             NotFoundOkosynkIoException,
             IoOkosynkIoException,
             AuthenticationOkosynkIoException,
-            ConfigureOrInitializeOkosynkIoException {
+            ConfigureOrInitializeOkosynkIoException,
+            IOException {
 
         logger.debug("Entering Batch.hentBatchOppgaver...");
         final List<String> linjer = this.fileReader.read();
@@ -138,9 +141,11 @@ public class Batch {
 
         PdlRestClient pdlRestClient = new PdlRestClient(okosynkConfiguration);
         if (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) {
+            Mappingregelverk.init(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
             OsOppgaveOppretter osMapper = new OsOppgaveOppretter(pdlRestClient);
             batchOppgaver.addAll(osMapper.lagOppgaver(meldinger.stream().map(m -> (OsMelding) m).toList()));
         } else /* batchtype is UR */ {
+            Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
             UrOppgaveOppretter urMapper = new UrOppgaveOppretter(pdlRestClient);
             batchOppgaver.addAll(urMapper.lagOppgaver(meldinger.stream().map(m -> (UrMelding) m).toList()));
         }

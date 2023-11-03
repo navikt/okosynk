@@ -1,9 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.exceptions.UleseligMappingfilException;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,36 +8,28 @@ import java.util.Optional;
 import java.util.Properties;
 
 public class Mappingregelverk {
-    private static final Logger logger = LoggerFactory.getLogger(Mappingregelverk.class);
-
-    private Properties getMappingRulesProperties() {
-        return mappingRulesProperties;
+    private Mappingregelverk() {
     }
 
-    private final Properties mappingRulesProperties = new Properties();
     private static final char NOKKEL_SKILLETEGN = ',';
     private static final int BEHANDLINGSTEMA_INDEKS = 0;
     private static final int BEHANDLINGSTYPE_INDEKS = 1;
     private static final int ANSVARLIG_ENHET_ID_INDEKS = 2;
-    private final String mappingRulesPropertiesFileName;
+    private static final Properties mappingRules = new Properties();
 
-    public Mappingregelverk(final String mappingRulesPropertiesFileName) {
-        this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
+    public static void init(final String mappingRulesPropertiesFileName) throws IOException {
+        final InputStream inputStream = Mappingregelverk.class.getClassLoader().getResourceAsStream(mappingRulesPropertiesFileName);
         try {
-            loadMappingRulesProperties(mappingRulesPropertiesFileName);
-        } catch (IOException e) {
-            handterIOException(e);
+            mappingRules.load(inputStream);
+        } catch (NullPointerException e) {
+            throw new IOException("Kunne ikke lese fra mappingRulesProperties filen " + mappingRulesPropertiesFileName);
         }
     }
 
-    public Optional<MappingRegel> finnRegel(final String mappingRegelKey) {
-
-        final Optional<String> behandlingstema =
-                finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTEMA_INDEKS);
-        final Optional<String> behandlingstype =
-                finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTYPE_INDEKS);
-        final Optional<String> ansvarligEnhetId =
-                finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
+    public static Optional<MappingRegel> finnRegel(final String mappingRegelKey) {
+        final Optional<String> behandlingstema = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTEMA_INDEKS);
+        final Optional<String> behandlingstype = finnVerdiPaIndeks(mappingRegelKey, BEHANDLINGSTYPE_INDEKS);
+        final Optional<String> ansvarligEnhetId = finnVerdiPaIndeks(mappingRegelKey, ANSVARLIG_ENHET_ID_INDEKS);
 
         return (behandlingstema.isEmpty() || behandlingstype.isEmpty() || ansvarligEnhetId.isEmpty()) ? Optional.empty()
                 : Optional.of(
@@ -51,38 +40,8 @@ public class Mappingregelverk {
                 ));
     }
 
-    void loadMappingRulesProperties(final String mappingRulesPropertiesFileName)
-            throws IOException {
-
-        final InputStream inputStream =
-                this.getClass().getClassLoader().getResourceAsStream(mappingRulesPropertiesFileName);
-        if (inputStream == null) {
-            throw new IOException(
-                    "Kunne ikke lese fra mappingRulesProperties filen " + mappingRulesPropertiesFileName);
-        }
-        this.mappingRulesProperties.load(inputStream);
-    }
-
-    void handterIOException(IOException e) {
-
-        logger.error(
-                "Problemer oppsto under innlesning av mappingRulesProperties filen {}. "
-                        + "Applikasjonen er ute av stand til å håndtere batch som benytter seg av denne filen.",
-                mappingRulesPropertiesFileName, e);
-
-        throw new UleseligMappingfilException(e);
-    }
-
-    private Optional<String> finnVerdiPaIndeks(final String sammensattNokkel, final int indeks) {
-
-        final Optional<String> sammensatteVerdierOptional =
-                Optional.ofNullable(getMappingRulesProperties().getProperty(sammensattNokkel));
-
-        return sammensatteVerdierOptional
-                .map(
-                        (final String sammensatteVerdier)
-                                ->
-                                sammensatteVerdier.split(Character.toString(NOKKEL_SKILLETEGN))[indeks]
-                );
+    private static Optional<String> finnVerdiPaIndeks(final String sammensattNokkel, final int indeks) {
+        final Optional<String> sammensatteVerdierOptional = Optional.ofNullable(mappingRules.getProperty(sammensattNokkel));
+        return sammensatteVerdierOptional.map(v -> v.split(Character.toString(NOKKEL_SKILLETEGN))[indeks]);
     }
 }
