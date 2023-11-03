@@ -1,17 +1,21 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMeldingTestGenerator;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.AbstractMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBatchInputRecordBuilder;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingBuilder;
 import no.nav.okosynk.model.GjelderIdType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -25,6 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class UrMeldingTest extends AbstractMeldingTest {
 
+    @BeforeAll
+    static void init() throws IOException {
+        Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
+    }
     @Test
     void urMeldingParserMeldingTilVariabler() {
 

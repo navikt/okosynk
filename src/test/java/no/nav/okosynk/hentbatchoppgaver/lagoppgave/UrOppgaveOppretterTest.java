@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -9,6 +10,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +36,8 @@ class UrOppgaveOppretterTest {
     private final UrOppgaveOppretter urOppgaveOppretter;
     protected IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
-    UrOppgaveOppretterTest() {
+    UrOppgaveOppretterTest() throws IOException {
+        Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
         okosynkConfiguration = mock(OkosynkConfiguration.class);
         urOppgaveOppretter = new UrOppgaveOppretter(this.aktoerClient);
     }

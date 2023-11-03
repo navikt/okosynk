@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
@@ -8,6 +9,7 @@ import no.nav.okosynk.model.Oppgave;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,9 +33,10 @@ class OsOppgaveOppretterTest {
     private final OsOppgaveOppretter osOppgaveOppretter;
     protected IAktoerClient aktoerClient = mock(IAktoerClient.class);
 
-    OsOppgaveOppretterTest() {
+    OsOppgaveOppretterTest() throws IOException {
         okosynkConfiguration = mock(OkosynkConfiguration.class);
         osOppgaveOppretter = new OsOppgaveOppretter(this.aktoerClient);
+        Mappingregelverk.init(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
     }
 
     @Test
