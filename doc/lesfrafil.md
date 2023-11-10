@@ -51,10 +51,10 @@ Blanke tegn på starten og slutten av hver variabel blir trimmet bort.
 
 ## Flere "like" meldinger fra OS
 I listen over Meldinger som produseres, blir Meldinger som har samme 
-* GjelderId, 
-* Behandlende enhet, 
-* Beregningsid, 
-* Beregningsdato og 
+* GjelderId 
+* Behandlende enhet 
+* Beregningsid
+* Beregningsdato 
 * Faggruppe
 
 ansett som duplikate Meldinger siden klassene har equals- og hashCodefunksjoner som bare bryr seg om disse verdiene. I lister med flere av disse telles de bare en gang, 
@@ -62,11 +62,11 @@ de forsvinner i visse operasjoner etc.
 - [ ] TODO: Sjekke om disse equals og hashCode-funksjonene har noen betydning lengre etter at det ble innført kode for å vise flere faggrupper og om det faktisk er meningen at det skal fungere slik
 
 ## "Like" meldinger fra UR
-* GjelderId,
-* gjelderIdType
-* oppdragsKode
-* datoPostert
-* navEnhet
+* GjelderId
+* GjelderIdType
+* OppdragsKode
+* DatoPostert
+* NavEnhet
 
 Å finne navEnhet er et relativt tungt kall som går inn til Mappingregelverk for å finne enhet. 
 Equals og hashcode blir brukt ofte bak kulissene av Java. Dette kan påvirke ytelsen mye.
@@ -90,4 +90,6 @@ Meldingens tidligste forsteFomIPeriode og seneste sisteTomIPeriode med samme Nye
 Se OsBeskrivelseInfo.
 
 ## Samlet beskrivelse UR
-Se UrBeskrivelseInfo
+Ingen logikk, alle feltene skrives ut.
+Se UrBeskrivelseInfo.
+

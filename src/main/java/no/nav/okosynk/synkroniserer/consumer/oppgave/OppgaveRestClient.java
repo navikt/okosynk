@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.hentbatchoppgaver.lesfrafil.exceptions.ConfigureOrInitializeOkosynkIoException;
 import no.nav.okosynk.model.Oppgave;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.json.FinnOppgaverResponseJson;
@@ -18,7 +16,13 @@ import no.nav.okosynk.synkroniserer.consumer.oppgave.json.PostOppgaveResponseJso
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,13 +37,19 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static no.nav.okosynk.config.Constants.*;
+import static no.nav.okosynk.config.Constants.AUTHORIZATION;
+import static no.nav.okosynk.config.Constants.BATCH_TYPE;
+import static no.nav.okosynk.config.Constants.X_CORRELATION_ID_HEADER_KEY;
 import static no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveStatus.FERDIGSTILT;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -51,28 +61,24 @@ public class OppgaveRestClient {
 
     private static final String FAGOMRADE_OKONOMI_KODE = "OKO";
     private final AzureAdAuthenticationClient azureAdAuthenticationClient;
-    private final OkosynkConfiguration okosynkConfiguration;
+    private final URI oppgaveUri;
+    private final String naisAppName;
     @Getter
     private final Constants.BATCH_TYPE batchType;
     private final CloseableHttpClient httpClient;
     private final UsernamePasswordCredentials credentials;
     private static final String MESSAGE = "Feilet ved kall mot Oppgave API";
 
-    public OppgaveRestClient(
-            final OkosynkConfiguration okosynkConfiguration,
-            final AzureAdAuthenticationClient azureAdAuthenticationClient) throws ConfigureOrInitializeOkosynkIoException {
-
-        this.okosynkConfiguration = okosynkConfiguration;
-        this.batchType = okosynkConfiguration.getBatchType();
+    public OppgaveRestClient(UsernamePasswordCredentials credentials,
+                             URI oppgaveUri,
+                             String naisAppName,
+                             BATCH_TYPE batchType,
+                             AzureAdAuthenticationClient azureAdAuthenticationClient) {
+        this.credentials = credentials;
+        this.oppgaveUri = oppgaveUri;
+        this.naisAppName = naisAppName;
+        this.batchType = batchType;
         this.azureAdAuthenticationClient = azureAdAuthenticationClient;
-
-        final String bruker = okosynkConfiguration.getString(OPPGAVE_USERNAME);
-        final String brukerPassword = okosynkConfiguration.getString(OPPGAVE_PASSWORD);
-        try{
-            this.credentials = new UsernamePasswordCredentials(bruker, brukerPassword);
-        } catch (IllegalArgumentException e) {
-            throw new ConfigureOrInitializeOkosynkIoException(e.getMessage());
-        }
         this.httpClient = HttpClients.createDefault();
         log.info("OppgaveRestClient konfigurert for {}", this.batchType);
     }
@@ -84,11 +90,11 @@ public class OppgaveRestClient {
     }
 
     private static HttpEntityEnclosingRequestBase createOppgaveRequestBase(
-            final String oppgaveUrl,
+            final URI oppgaveUrl,
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) throws IOException {
-        final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl);
+        final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl.getPath());
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
@@ -109,10 +115,9 @@ public class OppgaveRestClient {
 
     public ConsumerStatistics opprettOppgaver(final Collection<Oppgave> oppgaver) throws IOException {
 
-        String oppgaveUrl = getOkosynkConfiguration().getString(OPPGAVE_URL_KEY);
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        oppgaveUrl,
+                        oppgaveUri,
                         HttpPost::new,
                         getAzureAdAuthenticationClient()
                 );
@@ -231,14 +236,12 @@ public class OppgaveRestClient {
 
     public ConsumerStatistics finnOppgaver(final Set<Oppgave> oppgaverAccumulated) throws IOException {
         final int bulkSize = 50;
-        final Collection<String> oppgaverOpprettetAvOkosynk =
-                asList(getOkosynkConfiguration().getString(OPPGAVE_USERNAME), getOkosynkConfiguration().getNaisAppName());
+        final Collection<String> oppgaverOpprettetAvOkosynk = asList(credentials.getUserName(), naisAppName);
         final AtomicInteger atomicInteger = new AtomicInteger(oppgaverAccumulated.size());
         final String oppgavetype = getBatchType().getOppgaveType();
         int offset = 0;
         log.info("Starter søk og evt. inkrementell henting av oppgaver av type: {}", oppgavetype);
-        FinnOppgaverResponseJson finnOppgaverResponseJson =
-                this.finnOppgaver(bulkSize, offset);
+        FinnOppgaverResponseJson finnOppgaverResponseJson = this.finnOppgaver(bulkSize, offset);
         log.info(
                 "Fant {} oppgaver av oppgaver av type: {}",
                 finnOppgaverResponseJson.getAntallTreffTotalt(), oppgavetype
@@ -279,11 +282,11 @@ public class OppgaveRestClient {
                 .build();
     }
 
-    private void patchOppgave(Oppgave oppgave, boolean ferdigstill) throws IOException {
+    private void patchOppgave(Oppgave oppgave, boolean ferdigstill) throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        getOkosynkConfiguration().getString(OPPGAVE_URL_KEY) + String.format("/%s", oppgave.oppgaveId),
+                        new URI(oppgaveUri.getPath() + String.format("/%s", oppgave.oppgaveId)),
                         HttpPatch::new,
                         getAzureAdAuthenticationClient()
                 );
@@ -329,18 +332,10 @@ public class OppgaveRestClient {
         return httpClient.execute(request);
     }
 
-    OkosynkConfiguration getOkosynkConfiguration() {
-        return okosynkConfiguration;
-    }
-
-    UsernamePasswordCredentials getUsernamePasswordCredentials() {
-        return this.credentials;
-    }
-
     private FinnOppgaverResponseJson finnOppgaver(final int bulkSize, final int offset) throws IOException {
         final URI uri;
         try {
-            uri = new URIBuilder(getOkosynkConfiguration().getString(OPPGAVE_URL_KEY))
+            uri = new URIBuilder(oppgaveUri)
                     .addParameter("tema", FAGOMRADE_OKONOMI_KODE)
                     .addParameter("opprettetAv", (getBatchType() == BATCH_TYPE.OS ? "okosynkos" : "okosynkur"))
                     .addParameter("statuskategori", "AAPEN")

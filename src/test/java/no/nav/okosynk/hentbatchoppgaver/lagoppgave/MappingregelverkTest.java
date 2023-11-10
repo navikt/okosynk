@@ -26,7 +26,7 @@ public abstract class MappingregelverkTest<MT extends Melding> {
 
     @Test
     void when_melding_should_be_mapped_to_oppgave_then_correct_mappingregel_should_be_found() {
-        final Optional<MappingRegel> mappingRegel = Mappingregelverk.finnRegel(this.meldingSomSkalBliTilOppgave.regelnøkkel());
+        final Optional<MappingRegel> mappingRegel = Mappingregelverk.finnRegel(this.meldingSomSkalBliTilOppgave.ruleKey());
 
         assertTrue(mappingRegel.isPresent(), "Mapping mangler");
         assertAll("Mapping skal ha riktige verdier",
@@ -40,7 +40,7 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     void when_melding_should_not_be_mapped_to_oppgave_then_no_mappingregel_should_be_found() {
 
         final Optional<MappingRegel> mappingRegel =
-                Mappingregelverk.finnRegel(meldingUtenMappingRegel.regelnøkkel());
+                Mappingregelverk.finnRegel(meldingUtenMappingRegel.ruleKey());
 
         assertFalse(mappingRegel.isPresent(), "Mapping ble funnet for oppgave som ikke skal mappes");
     }
@@ -67,7 +67,7 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     void when_behandlinsTema_is_missing_then_no_MappingRegel_should_be_found() {
 
         final Optional<MappingRegel> actualOptionalMappingRegel =
-                Mappingregelverk.finnRegel(this.meldingWithoutBehandlingsTema.regelnøkkel());
+                Mappingregelverk.finnRegel(this.meldingWithoutBehandlingsTema.ruleKey());
 
         assertFalse(actualOptionalMappingRegel.isPresent());
     }
@@ -76,6 +76,6 @@ public abstract class MappingregelverkTest<MT extends Melding> {
     void when_expectedAnsvarligenhetId_is_missing_then_no_MappingRegel_should_be_found() {
 
         assertFalse(Mappingregelverk.finnRegel(
-                this.meldingWithoutAnsvarligEnhetId.regelnøkkel()).isPresent());
+                this.meldingWithoutAnsvarligEnhetId.ruleKey()).isPresent());
     }
 }

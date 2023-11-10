@@ -26,15 +26,21 @@ import no.nav.okosynk.synkroniserer.OppgaveSynkroniserer;
 import no.nav.okosynk.synkroniserer.consumer.ConsumerStatistics;
 import no.nav.okosynk.synkroniserer.consumer.oppgave.OppgaveRestClient;
 import org.apache.commons.lang3.Validate;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
+import static no.nav.okosynk.config.Constants.OPPGAVE_PASSWORD;
+import static no.nav.okosynk.config.Constants.OPPGAVE_URL_KEY;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
 
 public class Batch {
 
@@ -54,16 +60,24 @@ public class Batch {
                 "The parameter okosynkConfiguration supplied is null");
 
         this.setBatchStatus(BatchStatus.ENDED_WITH_ERROR_GENERAL);
-
         this.okosynkConfiguration = okosynkConfiguration;
-        this.oppgaveSynkroniserer =
-                new OppgaveSynkroniserer(
-                        okosynkConfiguration,
-                        new OppgaveRestClient(
-                                okosynkConfiguration,
-                                new AzureAdAuthenticationClient(okosynkConfiguration)
-                        )
-                );
+        try {
+            this.oppgaveSynkroniserer =
+                    new OppgaveSynkroniserer(
+                            okosynkConfiguration.getString(OPPGAVE_USERNAME),
+                            new OppgaveRestClient(
+                                    new UsernamePasswordCredentials(
+                                            okosynkConfiguration.getString(OPPGAVE_USERNAME),
+                                            okosynkConfiguration.getString(OPPGAVE_PASSWORD)),
+                                    new URI(okosynkConfiguration.getString(OPPGAVE_URL_KEY)),
+                                    okosynkConfiguration.getNaisAppName(),
+                                    okosynkConfiguration.getBatchType(),
+                                    new AzureAdAuthenticationClient(okosynkConfiguration)
+                            )
+                    );
+        } catch (IllegalArgumentException | URISyntaxException e) {
+            throw new ConfigureOrInitializeOkosynkIoException(e.getMessage());
+        }
 
         this.setBatchStatus(BatchStatus.READY);
     }

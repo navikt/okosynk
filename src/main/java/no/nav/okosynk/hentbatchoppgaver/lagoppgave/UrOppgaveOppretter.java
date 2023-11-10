@@ -1,8 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.AggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.model.UrMelding;
 import no.nav.okosynk.model.Oppgave;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
     }
 
     Predicate<UrMelding> urMeldingSkalBliOppgave() {
-        return urMelding -> Mappingregelverk.finnRegel(urMelding.regelnøkkel()).isPresent();
+        return urMelding -> Mappingregelverk.finnRegel(urMelding.ruleKey()).isPresent();
     }
 
     Collection<List<UrMelding>> groupMeldingerSomSkalBliOppgaver(final List<UrMelding> ufiltrerteUrMeldinger) {
@@ -73,7 +73,7 @@ public class UrOppgaveOppretter extends AbstractOppgaveOppretter<UrMelding> {
         logger.info("Antall UR-meldinger som tilfredsstiller mappingregel: {}", meldingerMedMappingRegel.size());
 
         return meldingerMedMappingRegel.stream().distinct()
-                .collect(groupingBy(UrMeldingFunksjonelleAggregeringsKriterier::new))
+                .collect(groupingBy(AggregeringsKriterier::new))
                 .values();
     }
 

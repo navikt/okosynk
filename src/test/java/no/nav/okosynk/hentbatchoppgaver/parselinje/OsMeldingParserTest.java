@@ -46,7 +46,6 @@ class OsMeldingParserTest {
 
     @Test
     void parseTotaltNettoBelop() {
-
         assertEquals(410.0, OsMeldingParser.parseTotaltNettoBelop(OS_MELDING));
     }
 

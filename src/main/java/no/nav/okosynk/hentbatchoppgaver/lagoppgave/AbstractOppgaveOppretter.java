@@ -10,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -39,7 +43,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
         if (meldinger.isEmpty()) return Optional.empty();
 
         T melding = meldinger.get(0);
-        MappingRegel mappingregel = Mappingregelverk.finnRegel(melding.regelnøkkel()).orElse(null);
+        MappingRegel mappingregel = Mappingregelverk.finnRegel(melding.ruleKey()).orElse(null);
         if (Objects.isNull(mappingregel)) return Optional.empty();
 
         Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder();

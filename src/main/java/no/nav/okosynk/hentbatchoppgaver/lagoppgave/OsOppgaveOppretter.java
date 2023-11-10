@@ -1,8 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.AggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsMeldingFunksjonelleAggregeringsKriterier;
 import no.nav.okosynk.hentbatchoppgaver.model.OsMelding;
 import no.nav.okosynk.model.Oppgave;
 
@@ -59,7 +59,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
     }
 
     Predicate<OsMelding> osMeldingSkalBliOppgave() {
-        return osMelding -> Mappingregelverk.finnRegel(osMelding.regelnøkkel()).isPresent();
+        return osMelding -> Mappingregelverk.finnRegel(osMelding.ruleKey()).isPresent();
     }
 
     Collection<List<OsMelding>> groupMeldingerSomSkalBliOppgaver(
@@ -68,7 +68,7 @@ public class OsOppgaveOppretter extends AbstractOppgaveOppretter<OsMelding> {
         return ufiltrerteOsMeldinger
                 .stream()
                 .filter(osMeldingSkalBliOppgave())
-                .collect(Collectors.groupingBy(OsMeldingFunksjonelleAggregeringsKriterier::new, Collectors.toList()))
+                .collect(Collectors.groupingBy(AggregeringsKriterier::new, Collectors.toList()))
                 .values();
     }
 }

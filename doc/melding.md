@@ -33,6 +33,11 @@ classDiagram
         +String mottakerId
     }
 ```
+```mermaid
+stateDiagram-v2
+    
+```
+
 
 
 

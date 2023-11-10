@@ -23,11 +23,13 @@ public class Util {
         }
     }
 
-    private Util() {}
+    private Util() {
+    }
+
     private static final DateTimeFormatter DATO_FORMAT_UTEN_KLOKKESLETT =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static final DateTimeFormatter DATO_FORMAT_MED_KLOKKESLETT =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     public static String trimmedSubstring(String s, int start, int end) {
         try {

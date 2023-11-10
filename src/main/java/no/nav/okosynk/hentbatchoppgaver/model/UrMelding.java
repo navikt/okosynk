@@ -31,7 +31,7 @@ public class UrMelding extends Melding {
     public final String bilagsId;
     public final String arsaksTekst;
     public final String mottakerId;
-    public final Optional<String> navEnhet;
+    public final String navEnhet;
 
     public UrMelding(final String urMelding) {
 
@@ -49,7 +49,7 @@ public class UrMelding extends Melding {
         this.bilagsId = parseBilagsId(urMelding);
         this.arsaksTekst = parseArsaksTekst(urMelding);
         this.mottakerId = parseMottakerId(urMelding);
-        this.navEnhet = navEnhet();
+        this.navEnhet = navEnhet().orElse(null);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class UrMelding extends Melding {
                 && gjelderIdType/**/.equals(otherAsUrMelding.gjelderIdType)
                 && oppdragsKode/*.*/.equals(otherAsUrMelding.oppdragsKode)
                 && datoPostert/*..*/.equals(otherAsUrMelding.datoPostert)
-                && navEnhet/*.....*/.equals(otherAsUrMelding.navEnhet);
+                && (Objects.equals(navEnhet, otherAsUrMelding.navEnhet));
     }
 
     @Override
@@ -102,8 +102,13 @@ public class UrMelding extends Melding {
     }
 
     @Override
-    public String regelnøkkel() {
+    public String ruleKey() {
         return String.join(",", oppdragsKode, behandlendeEnhet);
+    }
+
+    @Override
+    public String faggruppeEllerOppdragskode() {
+        return oppdragsKode;
     }
 
 }

@@ -35,5 +35,7 @@ public abstract class Melding {
         return bd.toBigInteger().toString();
     }
 
-    public abstract String regelnøkkel();
+    public abstract String ruleKey();
+
+    public abstract String faggruppeEllerOppdragskode();
 }
