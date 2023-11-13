@@ -69,8 +69,8 @@ public record OppgaveSynkroniserer(String username, OppgaveRestClient oppgaveRes
         final ConsumerStatistics consumerStatistics;
         final String oppgaveType = oppgaveRestClient.getBatchType().getOppgaveType();
         final Predicate<Oppgave> harUendretOppgaveType = oppgave -> Objects
-                .equals(oppgave.oppgavetypeKode, oppgaveType);
-        final Predicate<Oppgave> ikkeNyligEndret = oppgave -> Optional.ofNullable(oppgave.sistEndret)
+                .equals(oppgave.oppgavetypeKode(), oppgaveType);
+        final Predicate<Oppgave> ikkeNyligEndret = oppgave -> Optional.ofNullable(oppgave.sistEndret())
                 .filter(d -> d.isBefore(LocalDateTime.now().minusHours(8)))
                 .isPresent();
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = oppgaver.stream()

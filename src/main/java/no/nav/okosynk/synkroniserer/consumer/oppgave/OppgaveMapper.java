@@ -27,28 +27,28 @@ public class OppgaveMapper {
         final PostOppgaveRequestJson postOppgaveRequestJson = new PostOppgaveRequestJson();
 
         final int numberOfActorTypes =
-                Stream.of(oppgave.aktoerId, oppgave.bnr, oppgave.folkeregisterIdent, oppgave.orgnr, oppgave.samhandlernr)
+                Stream.of(oppgave.aktoerId(), oppgave.bnr(), oppgave.folkeregisterIdent(), oppgave.orgnr(), oppgave.samhandlernr())
                         .map(actor -> actor == null ? 0 : 1)
                         .reduce(0, Integer::sum);
         if (numberOfActorTypes > 1) {
             throw new OppgaveMapperException_MoreThanOneActorType();
-        } else if (oppgave.aktivFra == null || oppgave.aktivTil == null) {
+        } else if (oppgave.aktivFra() == null || oppgave.aktivTil() == null) {
             throw new OppgaveMapperException_AktivTilFraNull();
         } else {
-            postOppgaveRequestJson.setAktivDato(oppgave.aktivFra.format(formatter));
-            postOppgaveRequestJson.setAktoerId(oppgave.aktoerId);
-            postOppgaveRequestJson.setBehandlingstema(oppgave.behandlingstema);
-            postOppgaveRequestJson.setBehandlingstype(oppgave.behandlingstype);
-            postOppgaveRequestJson.setBeskrivelse(oppgave.beskrivelse);
-            postOppgaveRequestJson.setBnr(oppgave.bnr);
-            postOppgaveRequestJson.setFristFerdigstillelse(oppgave.aktivTil.format(formatter));
-            postOppgaveRequestJson.setOppgavetype(oppgave.oppgavetypeKode);
+            postOppgaveRequestJson.setAktivDato(oppgave.aktivFra().format(formatter));
+            postOppgaveRequestJson.setAktoerId(oppgave.aktoerId());
+            postOppgaveRequestJson.setBehandlingstema(oppgave.behandlingstema());
+            postOppgaveRequestJson.setBehandlingstype(oppgave.behandlingstype());
+            postOppgaveRequestJson.setBeskrivelse(oppgave.beskrivelse());
+            postOppgaveRequestJson.setBnr(oppgave.bnr());
+            postOppgaveRequestJson.setFristFerdigstillelse(oppgave.aktivTil().format(formatter));
+            postOppgaveRequestJson.setOppgavetype(oppgave.oppgavetypeKode());
             postOppgaveRequestJson.setOpprettetAvEnhetsnr(ENHET_ID_FOR_ANDRE_EKSTERNE);
-            postOppgaveRequestJson.setOrgnr(oppgave.orgnr);
-            postOppgaveRequestJson.setPrioritet(oppgave.prioritetKode);
-            postOppgaveRequestJson.setSamhandlernr(oppgave.samhandlernr);
-            postOppgaveRequestJson.setTema(oppgave.fagomradeKode);
-            postOppgaveRequestJson.setTildeltEnhetsnr(oppgave.ansvarligEnhetId);
+            postOppgaveRequestJson.setOrgnr(oppgave.orgnr());
+            postOppgaveRequestJson.setPrioritet(oppgave.prioritetKode());
+            postOppgaveRequestJson.setSamhandlernr(oppgave.samhandlernr());
+            postOppgaveRequestJson.setTema(oppgave.fagomradeKode());
+            postOppgaveRequestJson.setTildeltEnhetsnr(oppgave.ansvarligEnhetId());
         }
 
         return postOppgaveRequestJson;
@@ -64,37 +64,32 @@ public class OppgaveMapper {
                         :
                         identer
                                 .stream()
-                                .filter(identJson_inner -> ((identJson_inner != null) && IdentGruppeV2.FOLKEREGISTERIDENT.equals(identJson_inner.getGruppe())))
+                                .filter(identJsonInner -> ((identJsonInner != null) && IdentGruppeV2.FOLKEREGISTERIDENT.equals(identJsonInner.getGruppe())))
                                 .findAny()
                                 .orElse(new IdentJson(null, null))
                                 .getIdent();
 
-        return new Oppgave.OppgaveBuilder()
-                .withOppgaveId(finnOppgaveResponseJson.getId())
-                .withOppgavetypeKode(finnOppgaveResponseJson.getOppgavetype())
-                .withFagomradeKode(finnOppgaveResponseJson.getTema())
-                .withBehandlingstema(finnOppgaveResponseJson.getBehandlingstema())
-                .withBehandlingstype(finnOppgaveResponseJson.getBehandlingstype())
-                .withPrioritetKode(finnOppgaveResponseJson.getPrioritet())
-                .withBeskrivelse(finnOppgaveResponseJson.getBeskrivelse())
-                .withAktivFra(
-                        isNotBlank(finnOppgaveResponseJson.getAktivDato()) ? LocalDate.parse(finnOppgaveResponseJson.getAktivDato()) : null)
-                .withAktivTil(isNotBlank(finnOppgaveResponseJson.getFristFerdigstillelse()) ?
-                        LocalDate.parse(finnOppgaveResponseJson.getFristFerdigstillelse()) : null
-                )
-                .withAnsvarligEnhetId(finnOppgaveResponseJson.getTildeltEnhetsnr())
-                .withLest(finnOppgaveResponseJson.getStatus() != OppgaveStatus.OPPRETTET)
-                .withVersjon(finnOppgaveResponseJson.getVersjon())
-                .withSistEndret(
-                        ofNullable(finnOppgaveResponseJson.getEndretTidspunkt()).orElse(finnOppgaveResponseJson.getOpprettetTidspunkt())
-                )
-                .withMappeId(finnOppgaveResponseJson.getMappeId())
-                .withAnsvarligSaksbehandlerIdent(finnOppgaveResponseJson.getTilordnetRessurs())
-                .withAktoerId(finnOppgaveResponseJson.getAktoerId())
-                .withFolkeregisterIdent(folkeregisterIdent)
-                .withSamhandlernr(finnOppgaveResponseJson.getSamhandlernr())
-                .withOrgnr(finnOppgaveResponseJson.getOrgnr())
-                .withBnr(finnOppgaveResponseJson.getBnr())
+        return Oppgave.builder()
+                .oppgaveId(finnOppgaveResponseJson.getId())
+                .oppgavetypeKode(finnOppgaveResponseJson.getOppgavetype())
+                .fagomradeKode(finnOppgaveResponseJson.getTema())
+                .behandlingstema(finnOppgaveResponseJson.getBehandlingstema())
+                .behandlingstype(finnOppgaveResponseJson.getBehandlingstype())
+                .prioritetKode(finnOppgaveResponseJson.getPrioritet())
+                .beskrivelse(finnOppgaveResponseJson.getBeskrivelse())
+                .aktivFra(isNotBlank(finnOppgaveResponseJson.getAktivDato()) ? LocalDate.parse(finnOppgaveResponseJson.getAktivDato()) : null)
+                .aktivTil(isNotBlank(finnOppgaveResponseJson.getFristFerdigstillelse()) ? LocalDate.parse(finnOppgaveResponseJson.getFristFerdigstillelse()) : null)
+                .ansvarligEnhetId(finnOppgaveResponseJson.getTildeltEnhetsnr())
+                .lest(finnOppgaveResponseJson.getStatus() != OppgaveStatus.OPPRETTET)
+                .versjon(finnOppgaveResponseJson.getVersjon())
+                .sistEndret(ofNullable(finnOppgaveResponseJson.getEndretTidspunkt()).orElse(finnOppgaveResponseJson.getOpprettetTidspunkt()))
+                .mappeId(finnOppgaveResponseJson.getMappeId())
+                .ansvarligSaksbehandlerIdent(finnOppgaveResponseJson.getTilordnetRessurs())
+                .aktoerId(finnOppgaveResponseJson.getAktoerId())
+                .folkeregisterIdent(folkeregisterIdent)
+                .samhandlernr(finnOppgaveResponseJson.getSamhandlernr())
+                .orgnr(finnOppgaveResponseJson.getOrgnr())
+                .bnr(finnOppgaveResponseJson.getBnr())
 
                 .build();
     }

@@ -7,8 +7,7 @@ import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OsOppgaveOppretter;
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrOppgaveOppretter;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.OppgaveOppretter;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerUt;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.PdlRestClient;
 import no.nav.okosynk.hentbatchoppgaver.lesfrafil.IMeldingLinjeFileReader;
@@ -148,27 +147,19 @@ public class Batch {
             throw new TooManyInputDataLinesBatchException(linjer.size(), MAX_ANTALL_LINJER);
         }
         logger.debug("linjer.size(): {}", linjer.size());
-        final List<? extends Melding> meldinger = parseLinjer(linjer);
+        final List<Melding> meldinger = parseLinjer(linjer);
         logger.info("Konverterer {} meldinger til oppgaver", meldinger.size());
 
-        List<Oppgave> batchOppgaver = new ArrayList<>();
-
         PdlRestClient pdlRestClient = new PdlRestClient(okosynkConfiguration);
-        if (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) {
-            Mappingregelverk.init(Constants.BATCH_TYPE.OS.getMappingRulesPropertiesFileName());
-            OsOppgaveOppretter osMapper = new OsOppgaveOppretter(pdlRestClient);
-            batchOppgaver.addAll(osMapper.lagOppgaver(meldinger.stream().map(m -> (OsMelding) m).toList()));
-        } else /* batchtype is UR */ {
-            Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
-            UrOppgaveOppretter urMapper = new UrOppgaveOppretter(pdlRestClient);
-            batchOppgaver.addAll(urMapper.lagOppgaver(meldinger.stream().map(m -> (UrMelding) m).toList()));
-        }
+        Mappingregelverk.init(okosynkConfiguration.getBatchType().getMappingRulesPropertiesFileName());
+
+        List<Oppgave> batchOppgaver = new ArrayList<>(new OppgaveOppretter(pdlRestClient).lagOppgaver(meldinger));
 
         batchOppgaver
                 .stream()
-                .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.folkeregisterIdent))
+                .filter(batchOppgave -> AktoerUt.isDnr(batchOppgave.folkeregisterIdent()))
                 .forEach(batchOppgave ->
-                        secureLog.info("dnr found in the batch file: {}", batchOppgave.folkeregisterIdent.substring(0, 6) + "*****")
+                        secureLog.info("dnr found in the batch file: {}", batchOppgave.folkeregisterIdent().substring(0, 6) + "*****")
                 );
 
         logger.debug("batchOppgaver.size(): {}", batchOppgaver.size());
@@ -177,9 +168,9 @@ public class Batch {
         return batchOppgaver;
     }
 
-    private List<? extends Melding> parseLinjer(final List<String> linjer) {
+    private List<Melding> parseLinjer(final List<String> linjer) {
         logger.debug("Entering Batch.opprettSpesifikkeMeldinger...");
-        Function<? super String, ? extends Melding> mapper = (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) ? OsMelding::new : UrMelding::new;
+        Function<? super String, Melding> mapper = (okosynkConfiguration.getBatchType() == Constants.BATCH_TYPE.OS) ? OsMelding::new : UrMelding::new;
         return linjer.stream().map(mapper).toList();
     }
 

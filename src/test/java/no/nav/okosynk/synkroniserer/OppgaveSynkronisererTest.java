@@ -98,12 +98,12 @@ class OppgaveSynkronisererTest {
 
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
         final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
-        final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
+        final Oppgave oppdatertOppgave = ikkeOppdatertOppgave.toBuilder().beskrivelse(nyBeskrivelse).build();
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(Util.finnOppgaverSomSkalOppdateres(Collections.singleton(oppdatertOppgave), Collections.singleton(ikkeOppdatertOppgave)));
 
         @SuppressWarnings("unchecked") final ArgumentCaptor<Collection<Oppgave>> captor = forClass(Collection.class);
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
-        assertEquals(nyBeskrivelse, captor.getValue().iterator().next().beskrivelse);
+        assertEquals(nyBeskrivelse, captor.getValue().iterator().next().beskrivelse());
     }
 
     @Test
@@ -113,7 +113,7 @@ class OppgaveSynkronisererTest {
         final String oppgaveBeskrivelseLestFraDatabasen = "ANNEN KODE;; Noen har endret på dette, det blir forkastet!";
 
         final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(lokalOppgaveBeskrivelse);
-        final Oppgave oppgaveLestFraDatabasen = new Oppgave.OppgaveBuilder().withSameValuesAs(lokalOppgave).withBeskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
+        final Oppgave oppgaveLestFraDatabasen = lokalOppgave.toBuilder().beskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
         final Set<OppgaveOppdatering> oppgaver = Util.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
 
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(oppgaver);
@@ -122,7 +122,7 @@ class OppgaveSynkronisererTest {
 
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
 
-        final String actualBeskrivelse = captor.getValue().iterator().next().beskrivelse;
+        final String actualBeskrivelse = captor.getValue().iterator().next().beskrivelse();
         assertEquals(lokalOppgaveBeskrivelse, actualBeskrivelse);
     }
 
@@ -133,7 +133,7 @@ class OppgaveSynkronisererTest {
         final String oppgaveBeskrivelseLestFraDatabasen = "ikke viktig;PESYS KODE IKKEMED;Noen har endret på dette, det blir forkastet!";
         final String expectedtBeskrivelse = "Oppgavestatus;PESYS KODE;Oppsummering av meldinger som er slått sammen på oppgaven";
         final Oppgave lokalOppgave = lagOppgaveMedBeskrivelse(lokalOppgaveBeskrivelse);
-        final Oppgave oppgaveLestFraDatabasen = new Oppgave.OppgaveBuilder().withSameValuesAs(lokalOppgave).withBeskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
+        final Oppgave oppgaveLestFraDatabasen = lokalOppgave.toBuilder().beskrivelse(oppgaveBeskrivelseLestFraDatabasen).build();
         final Set<OppgaveOppdatering> oppgaver = Util.finnOppgaverSomSkalOppdateres(Collections.singleton(lokalOppgave), Collections.singleton(oppgaveLestFraDatabasen));
 
         this.oppgaveSynkronisererWithInjectedMocks.oppdaterOppgaver(oppgaver);
@@ -142,7 +142,7 @@ class OppgaveSynkronisererTest {
 
         verify(this.mockedOppgaveRestClient, atLeast(1)).patchOppgaver(captor.capture(), anyBoolean());
 
-        final String actualBeskrivelse = captor.getValue().iterator().next().beskrivelse;
+        final String actualBeskrivelse = captor.getValue().iterator().next().beskrivelse();
         assertEquals(expectedtBeskrivelse, actualBeskrivelse);
     }
 
@@ -151,7 +151,7 @@ class OppgaveSynkronisererTest {
 
         final String nyBeskrivelse = "Beskrivelsen etter endring.";
         final Oppgave ikkeOppdatertOppgave = lagOppgaveMedBruker();
-        final Oppgave oppdatertOppgave = new Oppgave.OppgaveBuilder().withSameValuesAs(ikkeOppdatertOppgave).withBeskrivelse(nyBeskrivelse).build();
+        final Oppgave oppdatertOppgave = ikkeOppdatertOppgave.toBuilder().beskrivelse(nyBeskrivelse).build();
 
         final OppgaveOppdatering oppgaveOppdatering = new OppgaveOppdatering(ikkeOppdatertOppgave, oppdatertOppgave);
 
@@ -178,7 +178,7 @@ class OppgaveSynkronisererTest {
     @Test
     void when_batch_indicates_changed_oppgavetype_then_the_oppgave_should_not_be_ferdigstilt() {
         final Oppgave oppgave = lagOppgaveMedBruker();
-        final Oppgave oppgaveMedEndretOppgaveType = new Oppgave.OppgaveBuilder().withSameValuesAs(oppgave).withOppgavetypeKode(EKSTERN_OPPGAVETYPE_KODE).build();
+        final Oppgave oppgaveMedEndretOppgaveType = oppgave.toBuilder().oppgavetypeKode(EKSTERN_OPPGAVETYPE_KODE).build();
         final Set<Oppgave> oppgaverSomSkalFerdigstilles = Util.finnOppgaverSomSkalFerdigstilles(new HashSet<>(), Collections.singleton(oppgaveMedEndretOppgaveType));
 
         this.oppgaveSynkronisererWithInjectedMocks.ferdigstillOppgaver(oppgaverSomSkalFerdigstilles);
@@ -200,18 +200,33 @@ class OppgaveSynkronisererTest {
 
     @ParameterizedTest
     @MethodSource("provideEqualsRelatedValuesForOppgave")
-    void when_finnOppgaverSomSkalFerdigstilles_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(final String behandlingstema_batch, final String behandlingstype_batch, final String ansvarligEnhetId_batch, final String aktoerId_batch, final String folkeregisterIdent_batch, final String bnr_batch, final String orgnr_batch, final String samhandlernr_batch,
-
-                                                                                                                    final String behandlingstema_db, final String behandlingstype_db, final String ansvarligEnhetId_db, final String aktoerId_db, final String folkeregisterIdent_db, final String bnr_db, final String orgnr_db, final String samhandlernr_db,
-
-                                                                                                                    final boolean shouldEqual) {
+    void when_finnOppgaverSomSkalFerdigstilles_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(
+            final String behandlingstema_batch, final String behandlingstype_batch, final String ansvarligEnhetId_batch, final String aktoerId_batch, final String folkeregisterIdent_batch, final String bnr_batch, final String orgnr_batch, final String samhandlernr_batch,
+            final String behandlingstema_db, final String behandlingstype_db, final String ansvarligEnhetId_db, final String aktoerId_db, final String folkeregisterIdent_db, final String bnr_db, final String orgnr_db, final String samhandlernr_db,
+            final boolean shouldEqual) {
         final int expectedNumberOfOppgaverSomSkalFerdigStilles = (shouldEqual ? 0 : 1);
 
-        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_batch).withBehandlingstype(behandlingstype_batch).withAnsvarligEnhetId(ansvarligEnhetId_batch).withAktoerId(aktoerId_batch).withFolkeregisterIdent(folkeregisterIdent_batch).withBnr(bnr_batch).withOrgnr(orgnr_batch).withSamhandlernr(samhandlernr_batch).build();
+        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_batch)
+                .behandlingstype(behandlingstype_batch)
+                .ansvarligEnhetId(ansvarligEnhetId_batch)
+                .aktoerId(aktoerId_batch)
+                .folkeregisterIdent(folkeregisterIdent_batch)
+                .bnr(bnr_batch)
+                .orgnr(orgnr_batch)
+                .samhandlernr(samhandlernr_batch).build();
         final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
         alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
 
-        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_db).withBehandlingstype(behandlingstype_db).withAnsvarligEnhetId(ansvarligEnhetId_db).withAktoerId(aktoerId_db).withFolkeregisterIdent(folkeregisterIdent_db).withBnr(bnr_db).withOrgnr(orgnr_db).withSamhandlernr(samhandlernr_db).build();
+        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_db)
+                .behandlingstype(behandlingstype_db)
+                .ansvarligEnhetId(ansvarligEnhetId_db)
+                .aktoerId(aktoerId_db)
+                .folkeregisterIdent(folkeregisterIdent_db)
+                .bnr(bnr_db)
+                .orgnr(orgnr_db)
+                .samhandlernr(samhandlernr_db).build();
         final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
         oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
 
@@ -229,11 +244,27 @@ class OppgaveSynkronisererTest {
                                                                                                                  final boolean shouldEqual) {
         final int expectedNumberOfOppgaverSomSkalOppdateres = (shouldEqual ? 1 : 0);
 
-        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_batch).withBehandlingstype(behandlingstype_batch).withAnsvarligEnhetId(ansvarligEnhetId_batch).withAktoerId(aktoerId_batch).withFolkeregisterIdent(folkeregisterIdent_batch).withBnr(bnr_batch).withOrgnr(orgnr_batch).withSamhandlernr(samhandlernr_batch).build();
+        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_batch)
+                .behandlingstype(behandlingstype_batch)
+                .ansvarligEnhetId(ansvarligEnhetId_batch)
+                .aktoerId(aktoerId_batch)
+                .folkeregisterIdent(folkeregisterIdent_batch)
+                .bnr(bnr_batch)
+                .orgnr(orgnr_batch)
+                .samhandlernr(samhandlernr_batch).build();
         final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
         alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
 
-        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_db).withBehandlingstype(behandlingstype_db).withAnsvarligEnhetId(ansvarligEnhetId_db).withAktoerId(aktoerId_db).withFolkeregisterIdent(folkeregisterIdent_db).withBnr(bnr_db).withOrgnr(orgnr_db).withSamhandlernr(samhandlernr_db).build();
+        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_db)
+                .behandlingstype(behandlingstype_db)
+                .ansvarligEnhetId(ansvarligEnhetId_db)
+                .aktoerId(aktoerId_db)
+                .folkeregisterIdent(folkeregisterIdent_db)
+                .bnr(bnr_db)
+                .orgnr(orgnr_db)
+                .samhandlernr(samhandlernr_db).build();
         final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
         oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
 
@@ -244,18 +275,35 @@ class OppgaveSynkronisererTest {
 
     @ParameterizedTest
     @MethodSource("provideEqualsRelatedValuesForOppgave")
-    void when_finnOppgaverSomSkalOpprettes_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(final String behandlingstema_batch, final String behandlingstype_batch, final String ansvarligEnhetId_batch, final String aktoerId_batch, final String folkeregisterIdent_batch, final String bnr_batch, final String orgnr_batch, final String samhandlernr_batch,
+    void when_finnOppgaverSomSkalOpprettes_then_only_db_oppgaver_not_matching_batch_oppgaver_should_be_selected(
+            final String behandlingstema_batch, final String behandlingstype_batch, final String ansvarligEnhetId_batch, final String aktoerId_batch, final String folkeregisterIdent_batch, final String bnr_batch, final String orgnr_batch, final String samhandlernr_batch,
 
                                                                                                                 final String behandlingstema_db, final String behandlingstype_db, final String ansvarligEnhetId_db, final String aktoerId_db, final String folkeregisterIdent_db, final String bnr_db, final String orgnr_db, final String samhandlernr_db,
 
                                                                                                                 final boolean shouldEqual) {
         final int expectedNumberOfOppgaverSomSkalOppdateres = (shouldEqual ? 0 : 1);
 
-        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_batch).withBehandlingstype(behandlingstype_batch).withAnsvarligEnhetId(ansvarligEnhetId_batch).withAktoerId(aktoerId_batch).withFolkeregisterIdent(folkeregisterIdent_batch).withBnr(bnr_batch).withOrgnr(orgnr_batch).withSamhandlernr(samhandlernr_batch).build();
+        final Oppgave oppgaveLestFraBatchen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_batch)
+                .behandlingstype(behandlingstype_batch)
+                .ansvarligEnhetId(ansvarligEnhetId_batch)
+                .aktoerId(aktoerId_batch)
+                .folkeregisterIdent(folkeregisterIdent_batch)
+                .bnr(bnr_batch)
+                .orgnr(orgnr_batch)
+                .samhandlernr(samhandlernr_batch).build();
         final Set<Oppgave> alleOppgaverLestFraBatchen = new HashSet<>();
         alleOppgaverLestFraBatchen.add(oppgaveLestFraBatchen);
 
-        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random).withBehandlingstema(behandlingstema_db).withBehandlingstype(behandlingstype_db).withAnsvarligEnhetId(ansvarligEnhetId_db).withAktoerId(aktoerId_db).withFolkeregisterIdent(folkeregisterIdent_db).withBnr(bnr_db).withOrgnr(orgnr_db).withSamhandlernr(samhandlernr_db).build();
+        final Oppgave oppgaveLestFraDatabasen = OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveSynkronisererTest.random)
+                .behandlingstema(behandlingstema_db)
+                .behandlingstype(behandlingstype_db)
+                .ansvarligEnhetId(ansvarligEnhetId_db)
+                .aktoerId(aktoerId_db)
+                .folkeregisterIdent(folkeregisterIdent_db)
+                .bnr(bnr_db)
+                .orgnr(orgnr_db)
+                .samhandlernr(samhandlernr_db).build();
         final Set<Oppgave> oppgaverLestFraDatabasen = new HashSet<>();
         oppgaverLestFraDatabasen.add(oppgaveLestFraDatabasen);
 
@@ -277,6 +325,17 @@ class OppgaveSynkronisererTest {
 
     private Oppgave lagOppgaveMedBeskrivelse(final String beskrivelse) {
 
-        return new Oppgave.OppgaveBuilder().withOppgaveId(OppgaveSynkronisererTest.OPPGAVEID).withOppgavetypeKode("OKO_OS").withFagomradeKode("BA").withPrioritetKode("LAV_OKO").withBeskrivelse(beskrivelse).withAnsvarligEnhetId("4151").withLest(false).withVersjon(1).withSistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36)).withAktivFra(LocalDate.of(1997, 2, 2)).withAktivTil(LocalDate.of(1997, 2, 9)).build();
+        return Oppgave.builder()
+                .oppgaveId(OppgaveSynkronisererTest.OPPGAVEID)
+                .oppgavetypeKode("OKO_OS")
+                .fagomradeKode("BA")
+                .prioritetKode("LAV_OKO")
+                .beskrivelse(beskrivelse)
+                .ansvarligEnhetId("4151")
+                .lest(false)
+                .versjon(1)
+                .sistEndret(LocalDateTime.of(1997, 2, 4, 7, 8, 36))
+                .aktivFra(LocalDate.of(1997, 2, 2))
+                .aktivTil(LocalDate.of(1997, 2, 9)).build();
     }
 }

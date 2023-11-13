@@ -1,6 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
 
@@ -90,7 +92,7 @@ public class UrMelding extends Melding {
         return Mappingregelverk.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(MappingRegel::ansvarligEnhetId);
     }
 
-    public UrBeskrivelseInfo urBeskrivelseInfo() {
+    public BeskrivelseInfo beskrivelseInfo() {
         return new UrBeskrivelseInfo(nyesteVentestatus,
                 arsaksTekst,
                 datoPostert,
@@ -99,6 +101,11 @@ public class UrMelding extends Melding {
                 datoForStatus,
                 mottakerId,
                 brukerId);
+    }
+
+    @Override
+    public Constants.BATCH_TYPE batchType() {
+        return Constants.BATCH_TYPE.UR;
     }
 
     @Override

@@ -2,11 +2,8 @@ package no.nav.okosynk.comm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StsOidcResponseTest {
 
@@ -25,17 +22,17 @@ class StsOidcResponseTest {
                         + "}";
 
         final StsOidcResponse actualStsOidcResponse =
-                assertDoesNotThrow(
+                Assertions.assertDoesNotThrow(
                         () ->
                                 new ObjectMapper().readValue(expectedStsOidcResponseAsString, StsOidcResponse.class)
                 );
 
         final String actualAccessToken = actualStsOidcResponse.getAccessToken();
-        assertEquals(expectedAccessToken, actualAccessToken);
+        Assertions.assertEquals(expectedAccessToken, actualAccessToken);
         final String actualTokenType = actualStsOidcResponse.getTokenType();
-        assertEquals(expectedTokenType, actualTokenType);
+        Assertions.assertEquals(expectedTokenType, actualTokenType);
         final Integer actualExpiresIn = actualStsOidcResponse.getExpiresIn();
-        assertEquals(expectedExpiresIn, actualExpiresIn);
+        Assertions.assertEquals(expectedExpiresIn, actualExpiresIn);
     }
 
     @Test
@@ -54,12 +51,12 @@ class StsOidcResponseTest {
         final String actualStsOidcResponseAsString =
                 new ObjectMapper().writeValueAsString(expectedStsOidcResponse);
 
-        assertTrue(actualStsOidcResponseAsString.contains("access_token"));
-        assertTrue(actualStsOidcResponseAsString.contains(expectedAccessToken));
-        assertTrue(actualStsOidcResponseAsString.contains("token_type"));
-        assertTrue(actualStsOidcResponseAsString.contains(expectedTokenType));
-        assertTrue(actualStsOidcResponseAsString.contains("expires_in"));
-        assertTrue(actualStsOidcResponseAsString.contains(String.valueOf(expectedExpiresIn)));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains("access_token"));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains(expectedAccessToken));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains("token_type"));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains(expectedTokenType));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains("expires_in"));
+        Assertions.assertTrue(actualStsOidcResponseAsString.contains(String.valueOf(expectedExpiresIn)));
     }
 
     @Test
@@ -77,12 +74,12 @@ class StsOidcResponseTest {
         final String stsOidcResponseAsString =
                 new ObjectMapper().writeValueAsString(expectedStsOidcResponse);
         final StsOidcResponse actualStsOidcResponse =
-                assertDoesNotThrow(
+                Assertions.assertDoesNotThrow(
                         () ->
                                 new ObjectMapper().readValue(stsOidcResponseAsString, StsOidcResponse.class)
                 );
-        assertEquals(expectedStsOidcResponse.getAccessToken(), actualStsOidcResponse.getAccessToken());
-        assertEquals(expectedStsOidcResponse.getTokenType(), actualStsOidcResponse.getTokenType());
-        assertEquals(expectedStsOidcResponse.getExpiresIn(), actualStsOidcResponse.getExpiresIn());
+        Assertions.assertEquals(expectedStsOidcResponse.getAccessToken(), actualStsOidcResponse.getAccessToken());
+        Assertions.assertEquals(expectedStsOidcResponse.getTokenType(), actualStsOidcResponse.getTokenType());
+        Assertions.assertEquals(expectedStsOidcResponse.getExpiresIn(), actualStsOidcResponse.getExpiresIn());
     }
 }
