@@ -30,7 +30,6 @@ public class OsMelding extends Melding {
     @Getter
     final String faggruppe;
     final String beregningsId;
-    @Getter
     final LocalDate beregningsDato;
     final LocalDate forsteFomIPeriode;
     final LocalDate sisteTomIPeriode;
@@ -118,4 +117,8 @@ public class OsMelding extends Melding {
         return faggruppe;
     }
 
+    @Override
+    public LocalDate sammenligningsDato() {
+        return beregningsDato;
+    }
 }

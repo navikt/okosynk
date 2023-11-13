@@ -1,5 +1,6 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
+import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
@@ -10,13 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
@@ -25,12 +27,12 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public abstract class AbstractOppgaveOppretter<T extends Melding> {
     private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
+    private final Constants.BATCH_TYPE batchType;
     private final IAktoerClient aktoerClient;
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
-    protected AbstractOppgaveOppretter(
-            final IAktoerClient aktoerClient) {
-
+    protected AbstractOppgaveOppretter(final Constants.BATCH_TYPE batchType, final IAktoerClient aktoerClient) {
+        this.batchType = batchType;
         this.aktoerClient = aktoerClient;
     }
 
@@ -39,7 +41,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
     }
 
     public Optional<Oppgave> opprettOppgave(final List<T> meldinger) {
-        meldinger.sort(getMeldingComparator());
+        meldinger.sort(comparing(Melding::sammenligningsDato, reverseOrder()));
         if (meldinger.isEmpty()) return Optional.empty();
 
         T melding = meldinger.get(0);
@@ -76,7 +78,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
         }
 
         return Optional.of(oppgaveBuilder
-                .withOppgavetypeKode(oppgaveTypeKode())
+                .withOppgavetypeKode(batchType.getOppgaveType())
                 .withFagomradeKode("OKO")
                 .withBehandlingstema(
                         isNotBlank(mappingregel.behandlingstema()) ? mappingregel.behandlingstema() : null
@@ -87,7 +89,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
                 .withPrioritetKode("LAV")
                 .withBeskrivelse(lagSamletBeskrivelse(meldinger))
                 .withAktivFra(LocalDate.now())
-                .withAktivTil(LocalDate.now().plusDays(antallDagerFrist()))
+                .withAktivTil(LocalDate.now().plusDays(batchType.getAntallDagerFrist()))
                 .withAnsvarligEnhetId(mappingregel.ansvarligEnhetId())
                 .withLest(false)
                 .withAntallMeldinger(meldinger.size())
@@ -104,11 +106,5 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
     }
 
     protected abstract String summerOgKonsolider(List<T> ts);
-
-    protected abstract String oppgaveTypeKode();
-
-    protected abstract int antallDagerFrist();
-
-    protected abstract Comparator<T> getMeldingComparator();
 
 }

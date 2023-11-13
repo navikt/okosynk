@@ -9,11 +9,14 @@ public abstract class Melding {
     protected static final String FIELD_SEPARATOR = System.lineSeparator();
     public static final String FORSTE_FELTSEPARATOR = ";;   ";
     public static final String FELTSEPARATOR = ";   ";
-    @Getter final String behandlendeEnhet;
+    @Getter
+    final String behandlendeEnhet;
     final String brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
     final LocalDate datoForStatus;
-    @Getter final String gjelderId;
-    @Getter final String nyesteVentestatus;
+    @Getter
+    final String gjelderId;
+    @Getter
+    final String nyesteVentestatus;
     final double totaltNettoBelop;
 
     protected Melding(String behandlendeEnhet,
@@ -38,4 +41,6 @@ public abstract class Melding {
     public abstract String ruleKey();
 
     public abstract String faggruppeEllerOppdragskode();
+
+    public abstract LocalDate sammenligningsDato();
 }

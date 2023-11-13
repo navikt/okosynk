@@ -111,4 +111,8 @@ public class UrMelding extends Melding {
         return oppdragsKode;
     }
 
+    @Override
+    public LocalDate sammenligningsDato() {
+        return datoPostert;
+    }
 }

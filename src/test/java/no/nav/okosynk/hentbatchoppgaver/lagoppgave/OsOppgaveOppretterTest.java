@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,8 +91,8 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applySortererSamletBeskrivelseMedNyesteBeregningsDatoForstDersomNyesteDatoLeggesInnForst() {
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(LocalDate.parse("2009-07-04"));
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(LocalDate.parse("2009-11-06"));
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_2, OS_MELDING_1)).orElseThrow();
@@ -105,8 +106,8 @@ class OsOppgaveOppretterTest {
 
     @Test
     void applySortererSamletBeskrivelseMedNyesteBeregningsDatoForstDersomNyesteDatoLeggesInnSist() {
-        final String osMelding1Beregningsdato = formatAsNorwegianDate(OS_MELDING_1.getBeregningsDato());
-        final String osMelding2Beregningsdato = formatAsNorwegianDate(OS_MELDING_2.getBeregningsDato());
+        final String osMelding1Beregningsdato = formatAsNorwegianDate(LocalDate.parse("2009-07-04"));
+        final String osMelding2Beregningsdato = formatAsNorwegianDate(LocalDate.parse("2009-11-06"));
 
         when(this.aktoerClient.hentGjeldendeAktoerId("06025812345")).thenReturn(AktoerRespons.ok("123"));
         final Oppgave oppgave = this.osOppgaveOppretter.opprettOppgave(asList(OS_MELDING_1, OS_MELDING_2)).orElseThrow();

@@ -38,35 +38,38 @@ public class Constants {
                 "bokosynk001",
                 "OKO_OS",
                 "os_mapping_regler.properties",
-                "okosynk_os_batch_alert"
+                "okosynk_os_batch_alert",
+                7
         ),
         UR(
                 "bokosynk002",
                 "OKO_UR",
                 "ur_mapping_regler.properties",
-                "okosynk_ur_batch_alert"
+                "okosynk_ur_batch_alert",
+                3
         );
 
         private final String name;
         private final String oppgaveType;
         private final String mappingRulesPropertiesFileName;
         private final String alertCollectorMetricName;
+        private final int antallDagerFrist;
 
         BATCH_TYPE(
                 final String name,
                 final String oppgaveType,
                 final String mappingRulesPropertiesFileName,
-                final String alertCollectorMetricName
-        ) {
+                final String alertCollectorMetricName,
+                int antallDagerFrist) {
             this.name = name;
             this.oppgaveType = oppgaveType;
             this.mappingRulesPropertiesFileName = mappingRulesPropertiesFileName;
             this.alertCollectorMetricName = alertCollectorMetricName;
+            this.antallDagerFrist = antallDagerFrist;
         }
 
         public String getConsumerStatisticsName() {
             return name() + " - " + getName();
         }
-
     }
 }
