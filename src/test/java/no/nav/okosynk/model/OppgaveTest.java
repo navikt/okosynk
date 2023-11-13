@@ -24,32 +24,32 @@ public class OppgaveTest {
     public static Oppgave.OppgaveBuilder generateRandomCompleteOppgaveBuilderInstance(final Random random) {
 
         return new Oppgave.OppgaveBuilder()
-                .withAktivFra(LocalDate.of(random.nextInt(2015) + 7, random.nextInt(12) + 1, random.nextInt(28) + 1))
-                .withAktivTil(LocalDate.of(random.nextInt(2015) + 11, random.nextInt(12) + 1, random.nextInt(28) + 1))
-                .withAktoerId(RandUt.constructRandomAlphaNumString(random.nextInt(13) + 1, random))
-                .withAnsvarligEnhetId(RandUt.constructRandomAlphaNumString(random.nextInt(10) + 1, random))
-                .withAnsvarligSaksbehandlerIdent(RandUt.constructRandomAlphaNumString(23, random))
-                .withAntallMeldinger(random.nextInt(103))
-                .withBehandlingstema(RandUt.constructRandomAlphaNumString(random.nextInt(7) + 1, random))
-                .withBehandlingstype(RandUt.constructRandomAlphaNumString(random.nextInt(13) + 1, random))
-                .withBeskrivelse(RandUt.constructRandomAlphaNumString(random.nextInt(219) + 1, random))
-                .withBnr(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
-                .withFagomradeKode(RandUt.constructRandomAlphaNumString(random.nextInt(17) + 1, random))
-                .withLest(RandUt.generateRandomBoolean(random))
-                .withMappeId(RandUt.constructRandomAlphaNumString(random.nextInt(19) + 1, random))
-                .withFolkeregisterIdent(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
-                .withOppgaveId(RandUt.constructRandomAlphaNumString(random.nextInt(23) + 1, random))
-                .withOppgavetypeKode(RandUt.constructRandomAlphaNumString(random.nextInt(29) + 1, random))
-                .withOrgnr(RandUt.constructRandomAlphaNumString(random.nextInt(9) + 1, random))
-                .withPrioritetKode(RandUt.constructRandomAlphaNumString(random.nextInt(7) + 1, random))
-                .withSamhandlernr(RandUt.constructRandomAlphaNumString(random.nextInt(31) + 1, random))
-                .withSistEndret(
+                .aktivFra(LocalDate.of(random.nextInt(2015) + 7, random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .aktivTil(LocalDate.of(random.nextInt(2015) + 11, random.nextInt(12) + 1, random.nextInt(28) + 1))
+                .aktoerId(RandUt.constructRandomAlphaNumString(random.nextInt(13) + 1, random))
+                .ansvarligEnhetId(RandUt.constructRandomAlphaNumString(random.nextInt(10) + 1, random))
+                .ansvarligSaksbehandlerIdent(RandUt.constructRandomAlphaNumString(23, random))
+                .antallMeldinger(random.nextInt(103))
+                .behandlingstema(RandUt.constructRandomAlphaNumString(random.nextInt(7) + 1, random))
+                .behandlingstype(RandUt.constructRandomAlphaNumString(random.nextInt(13) + 1, random))
+                .beskrivelse(RandUt.constructRandomAlphaNumString(random.nextInt(219) + 1, random))
+                .bnr(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
+                .fagomradeKode(RandUt.constructRandomAlphaNumString(random.nextInt(17) + 1, random))
+                .lest(RandUt.generateRandomBoolean(random))
+                .mappeId(RandUt.constructRandomAlphaNumString(random.nextInt(19) + 1, random))
+                .folkeregisterIdent(RandUt.constructRandomAlphaNumString(random.nextInt(11) + 1, random))
+                .oppgaveId(RandUt.constructRandomAlphaNumString(random.nextInt(23) + 1, random))
+                .oppgavetypeKode(RandUt.constructRandomAlphaNumString(random.nextInt(29) + 1, random))
+                .orgnr(RandUt.constructRandomAlphaNumString(random.nextInt(9) + 1, random))
+                .prioritetKode(RandUt.constructRandomAlphaNumString(random.nextInt(7) + 1, random))
+                .samhandlernr(RandUt.constructRandomAlphaNumString(random.nextInt(31) + 1, random))
+                .sistEndret(
                         LocalDateTime.of(
                                 LocalDate.of(random.nextInt(2015) + 7, random.nextInt(12) + 1, random.nextInt(28) + 1),
                                 LocalTime.of(random.nextInt(23) + 1, random.nextInt(59) + 1, random.nextInt(59) + 1, random.nextInt(999999999) + 1)
                         )
                 )
-                .withVersjon(1);
+                .versjon(1);
     }
 
     public static Stream<Arguments> provideEqualsRelatedValuesForOppgave() {
@@ -227,12 +227,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAnsvarligEnhetId("APAPAPAPAPA")
+                        .ansvarligEnhetId("APAPAPAPAPA")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
+                        .ansvarligEnhetId("yuyuyuyuuyuyuyu")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -243,12 +243,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withBehandlingstype("OPOPOP")
+                        .behandlingstype("OPOPOP")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withBehandlingstype("nopnopnop")
+                        .behandlingstype("nopnopnop")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -259,12 +259,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withBehandlingstema("AIAIAI")
+                        .behandlingstema("AIAIAI")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withBehandlingstema("YESSSSSS")
+                        .behandlingstema("YESSSSSS")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -275,12 +275,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withBnr("1237890")
+                        .bnr("1237890")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withBnr("0890456")
+                        .bnr("0890456")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -291,12 +291,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withOrgnr("123789")
+                        .orgnr("123789")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withOrgnr("890456")
+                        .orgnr("890456")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -308,12 +308,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withFolkeregisterIdent("17023410293")
+                        .folkeregisterIdent("17023410293")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withFolkeregisterIdent("17023410292")
+                        .folkeregisterIdent("17023410292")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -324,12 +324,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withSamhandlernr("123")
+                        .samhandlernr("123")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withSamhandlernr("456")
+                        .samhandlernr("456")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -340,12 +340,12 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("X")
+                        .aktoerId("X")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("Y")
+                        .aktoerId("Y")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -356,14 +356,14 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent(null)
+                        .aktoerId(null)
+                        .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("Y")
-                        .withFolkeregisterIdent(null)
+                        .aktoerId("Y")
+                        .folkeregisterIdent(null)
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -374,14 +374,14 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent(null)
+                        .aktoerId(null)
+                        .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent("X")
+                        .aktoerId(null)
+                        .folkeregisterIdent("X")
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -392,14 +392,14 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent("X")
+                        .aktoerId(null)
+                        .folkeregisterIdent("X")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("Y")
-                        .withFolkeregisterIdent(null)
+                        .aktoerId("Y")
+                        .folkeregisterIdent(null)
                         .build();
 
         assertNotEquals(oppgave1, oppgave2);
@@ -410,14 +410,14 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent(null)
+                        .aktoerId(null)
+                        .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId(null)
-                        .withFolkeregisterIdent(null)
+                        .aktoerId(null)
+                        .folkeregisterIdent(null)
                         .build();
 
         assertEquals(oppgave1, oppgave2);
@@ -429,26 +429,26 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("X")
-                        .withFolkeregisterIdent("10293847563")
-                        .withSamhandlernr("456")
-                        .withOrgnr("890456")
-                        .withBnr("0890456")
-                        .withBehandlingstema("YESSSSSS")
-                        .withBehandlingstype("nopnopnop")
-                        .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
+                        .aktoerId("X")
+                        .folkeregisterIdent("10293847563")
+                        .samhandlernr("456")
+                        .orgnr("890456")
+                        .bnr("0890456")
+                        .behandlingstema("YESSSSSS")
+                        .behandlingstype("nopnopnop")
+                        .ansvarligEnhetId("yuyuyuyuuyuyuyu")
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("X")
-                        .withFolkeregisterIdent("10293847563")
-                        .withSamhandlernr("456")
-                        .withOrgnr("890456")
-                        .withBnr("0890456")
-                        .withBehandlingstema("YESSSSSS")
-                        .withBehandlingstype("nopnopnop")
-                        .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
+                        .aktoerId("X")
+                        .folkeregisterIdent("10293847563")
+                        .samhandlernr("456")
+                        .orgnr("890456")
+                        .bnr("0890456")
+                        .behandlingstema("YESSSSSS")
+                        .behandlingstype("nopnopnop")
+                        .ansvarligEnhetId("yuyuyuyuuyuyuyu")
                         .build();
 
         assertEquals(oppgave1, oppgave2);
@@ -459,36 +459,36 @@ public class OppgaveTest {
 
         final Oppgave oppgave1 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("X")
-                        .withFolkeregisterIdent("10293847563")
-                        .withSamhandlernr("456")
-                        .withOrgnr("890456")
-                        .withBnr("0890456")
-                        .withBehandlingstema("YESSSSSS")
-                        .withBehandlingstype("nopnopnop")
-                        .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
-                        .withOppgavetypeKode("GHHGHGHGHGHGHG")
-                        .withBeskrivelse("ABC")
-                        .withAktivFra(LocalDate.now())
-                        .withAktivTil(LocalDate.now())
-                        .withLest(true)
+                        .aktoerId("X")
+                        .folkeregisterIdent("10293847563")
+                        .samhandlernr("456")
+                        .orgnr("890456")
+                        .bnr("0890456")
+                        .behandlingstema("YESSSSSS")
+                        .behandlingstype("nopnopnop")
+                        .ansvarligEnhetId("yuyuyuyuuyuyuyu")
+                        .oppgavetypeKode("GHHGHGHGHGHGHG")
+                        .beskrivelse("ABC")
+                        .aktivFra(LocalDate.now())
+                        .aktivTil(LocalDate.now())
+                        .lest(true)
                         .build();
 
         final Oppgave oppgave2 =
                 new Oppgave.OppgaveBuilder()
-                        .withAktoerId("X")
-                        .withFolkeregisterIdent("10293847563")
-                        .withSamhandlernr("456")
-                        .withOrgnr("890456")
-                        .withBnr("0890456")
-                        .withBehandlingstema("YESSSSSS")
-                        .withBehandlingstype("nopnopnop")
-                        .withAnsvarligEnhetId("yuyuyuyuuyuyuyu")
-                        .withOppgavetypeKode("8g876g87g87g87g87g")
-                        .withBeskrivelse("DEF")
-                        .withAktivFra(LocalDate.now().plusDays(1))
-                        .withAktivTil(LocalDate.now().plusDays(3))
-                        .withLest(false)
+                        .aktoerId("X")
+                        .folkeregisterIdent("10293847563")
+                        .samhandlernr("456")
+                        .orgnr("890456")
+                        .bnr("0890456")
+                        .behandlingstema("YESSSSSS")
+                        .behandlingstype("nopnopnop")
+                        .ansvarligEnhetId("yuyuyuyuuyuyuyu")
+                        .oppgavetypeKode("8g876g87g87g87g87g")
+                        .beskrivelse("DEF")
+                        .aktivFra(LocalDate.now().plusDays(1))
+                        .aktivTil(LocalDate.now().plusDays(3))
+                        .lest(false)
                         .build();
 
         assertEquals(oppgave1, oppgave2);
@@ -500,7 +500,7 @@ public class OppgaveTest {
         final String expectedBeskrivelse = null;
         final Oppgave oppgave =
                 new Oppgave.OppgaveBuilder()
-                        .withBeskrivelse(expectedBeskrivelse)
+                        .beskrivelse(expectedBeskrivelse)
                         .build();
 
         assertDoesNotThrow(oppgave::toString);
@@ -516,7 +516,7 @@ public class OppgaveTest {
         final String expectedBeskrivelse = originalBeskrivelse.substring(0, 30) + "...";
         final Oppgave oppgave =
                 new Oppgave.OppgaveBuilder()
-                        .withBeskrivelse(originalBeskrivelse)
+                        .beskrivelse(originalBeskrivelse)
                         .build();
 
         assertDoesNotThrow(oppgave::toString);
@@ -531,7 +531,7 @@ public class OppgaveTest {
         final String expectedBeskrivelse = "";
         final Oppgave oppgave =
                 new Oppgave.OppgaveBuilder()
-                        .withBeskrivelse(expectedBeskrivelse)
+                        .beskrivelse(expectedBeskrivelse)
                         .build();
 
         assertDoesNotThrow(oppgave::toString);
@@ -555,18 +555,18 @@ public class OppgaveTest {
 
         final Oppgave oppgave =
                 new Oppgave.OppgaveBuilder()
-                        .withAktivTil(expectedAktivTil)
-                        .withAktivFra(expectedAktivFra)
-                        .withBeskrivelse(expectedBeskrivelse)
-                        .withOppgavetypeKode(expectedOppgavetypeKode)
-                        .withAnsvarligEnhetId(expectedAnsvarligEnhetId)
-                        .withOppgaveId(expectedOppgaveId)
-                        .withFolkeregisterIdent(expectedFolkeregisterIdent)
-                        .withAktoerId(expectedAktoerId)
-                        .withSamhandlernr(expectedSamhandlernr)
-                        .withOrgnr(expectedOrgnr)
-                        .withBnr(expectedBnr)
-                        .withBehandlingstype(expectedBehandlingstype)
+                        .aktivTil(expectedAktivTil)
+                        .aktivFra(expectedAktivFra)
+                        .beskrivelse(expectedBeskrivelse)
+                        .oppgavetypeKode(expectedOppgavetypeKode)
+                        .ansvarligEnhetId(expectedAnsvarligEnhetId)
+                        .oppgaveId(expectedOppgaveId)
+                        .folkeregisterIdent(expectedFolkeregisterIdent)
+                        .aktoerId(expectedAktoerId)
+                        .samhandlernr(expectedSamhandlernr)
+                        .orgnr(expectedOrgnr)
+                        .bnr(expectedBnr)
+                        .behandlingstype(expectedBehandlingstype)
                         .build();
 
         final String presentationString = oppgave.toString();
@@ -610,26 +610,26 @@ public class OppgaveTest {
     ) {
         final Oppgave oppgave1 =
                 OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveTest.random)
-                        .withBehandlingstema(behandlingstema_batch)
-                        .withBehandlingstype(behandlingstype_batch)
-                        .withAnsvarligEnhetId(ansvarligEnhetId_batch)
-                        .withAktoerId(aktoerId_batch)
-                        .withFolkeregisterIdent(folkeregisterIdent_batch)
-                        .withBnr(bnr_batch)
-                        .withOrgnr(orgnr_batch)
-                        .withSamhandlernr(samhandlernr_batch)
+                        .behandlingstema(behandlingstema_batch)
+                        .behandlingstype(behandlingstype_batch)
+                        .ansvarligEnhetId(ansvarligEnhetId_batch)
+                        .aktoerId(aktoerId_batch)
+                        .folkeregisterIdent(folkeregisterIdent_batch)
+                        .bnr(bnr_batch)
+                        .orgnr(orgnr_batch)
+                        .samhandlernr(samhandlernr_batch)
                         .build();
 
         final Oppgave oppgave2 =
                 OppgaveTest.generateRandomCompleteOppgaveBuilderInstance(OppgaveTest.random)
-                        .withBehandlingstema(behandlingstema_db)
-                        .withBehandlingstype(behandlingstype_db)
-                        .withAnsvarligEnhetId(ansvarligEnhetId_db)
-                        .withAktoerId(aktoerId_db)
-                        .withFolkeregisterIdent(folkeregisterIdent_db)
-                        .withBnr(bnr_db)
-                        .withOrgnr(orgnr_db)
-                        .withSamhandlernr(samhandlernr_db)
+                        .behandlingstema(behandlingstema_db)
+                        .behandlingstype(behandlingstype_db)
+                        .ansvarligEnhetId(ansvarligEnhetId_db)
+                        .aktoerId(aktoerId_db)
+                        .folkeregisterIdent(folkeregisterIdent_db)
+                        .bnr(bnr_db)
+                        .orgnr(orgnr_db)
+                        .samhandlernr(samhandlernr_db)
                         .build();
 
         if (shouldEqual) {

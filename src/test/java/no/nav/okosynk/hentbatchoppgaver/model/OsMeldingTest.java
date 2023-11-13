@@ -25,17 +25,21 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class OsMeldingTest extends AbstractMeldingTest {
 
 
+    private static Stream<Arguments> getOsMeldingAndExpected() {
+        return OsMeldingTestGenerator.osMeldingAndExpectedProvider();
+    }
+
     @Test
     void osMeldingParserMeldingTilVariabler() {
 
         OsMelding melding = new OsMelding(OsMeldingTestGenerator.OsMeldingForPerson.getMelding());
 
-        assertAll("OsMelding parsing til variabler",
+        Assertions.assertAll("OsMelding parsing til variabler",
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.personGjelderId, melding.gjelderId),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.datoForStatus, melding.datoForStatus.toString()),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.nyesteVentestatus, melding.nyesteVentestatus),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.brukerId, melding.brukerId),
-                () -> Assertions.assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.totaltNettoBelop, String.valueOf(melding.totaltNettoBelop)),
+                () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.totaltNettoBelop, String.valueOf(melding.totaltNettoBelop)),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.behandleneEnhet, melding.behandlendeEnhet),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.beregningsId, melding.beregningsId),
                 () -> assertEquals(OsMeldingTestGenerator.OsMeldingForPerson.beregningsdato, melding.beregningsDato.toString()),
@@ -54,10 +58,6 @@ class OsMeldingTest extends AbstractMeldingTest {
         final GjelderIdType gjelderIdType = GjelderIdType.fra(gjelderId);
 
         assertThat(expectedGjelderIdType).isSameAs(gjelderIdType);
-    }
-
-    private static Stream<Arguments> getOsMeldingAndExpected() {
-        return OsMeldingTestGenerator.osMeldingAndExpectedProvider();
     }
 
     @Test
@@ -199,14 +199,14 @@ class OsMeldingTest extends AbstractMeldingTest {
                                 .withGjelderId(gjelderId) // Involved in equality
                                 .withBehandlendeEnhet(behandlendeEnhet) // Involved in equality
                                 .withDatoForStatus(randomLocalDateTime(random))
-                                .withNyesteVentestatus(randomAlphanumeric(totalRecordLength, random))
+                                .withNyesteVentestatus("AVAV")
                                 .withBrukerId(randomAlphanumeric(totalRecordLength, random))
                                 .withTotaltNettoBelop(randomNumeric(5, random) + "æ")
                                 .withBeregningsId(beregningsId) // Involved in equality
                                 .withBeregningsDato(beregningsDato) // Involved in equality
                                 .withFaggruppe(faggruppe) // Involved in equality
-                                .withForsteFomIPeriode(randomLocalDate(random))
-                                .withSisteTomIPeriode(randomLocalDate(random))
+                                .withForsteFomIPeriode("2006-06-06")
+                                .withSisteTomIPeriode("2006-06-06")
                                 .withFlaggFeilkonto(randomAlphanumeric(totalRecordLength, random))
                                 .withUtbetalesTilId(randomNumeric(11, random))
                                 .withEtteroppgjor(randomAlphanumeric(totalRecordLength, random))

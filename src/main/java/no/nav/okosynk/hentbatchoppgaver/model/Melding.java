@@ -1,6 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import lombok.Getter;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,4 +45,7 @@ public abstract class Melding {
     public abstract String faggruppeEllerOppdragskode();
 
     public abstract LocalDate sammenligningsDato();
+
+    public abstract BeskrivelseInfo beskrivelseInfo();
+    public abstract Constants.BATCH_TYPE batchType();
 }

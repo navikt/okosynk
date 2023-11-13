@@ -24,13 +24,12 @@ public record OppgaveOppdatering(Oppgave oppgaveLestFraBatchen, Oppgave oppgaveL
     }
 
     Oppgave createOppgaveToBePatched() {
-        return new Oppgave
-                .OppgaveBuilder()
-                .withSameValuesAs(oppgaveLestFraDatabasen)
-                .withBeskrivelse(
+        return oppgaveLestFraDatabasen
+                .toBuilder()
+                .beskrivelse(
                         createNewBeskrivelseFromOppgaveLestFraBatchenUpdatedWithAValueExtractedFromTheBeskrivelseOfOppgaveLestFraDatabasen(
-                                oppgaveLestFraBatchen.beskrivelse,
-                                oppgaveLestFraDatabasen.beskrivelse
+                                oppgaveLestFraBatchen.beskrivelse(),
+                                oppgaveLestFraDatabasen.beskrivelse()
                         )
                 )
                 .build();

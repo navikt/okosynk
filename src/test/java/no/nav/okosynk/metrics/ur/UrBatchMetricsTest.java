@@ -16,9 +16,7 @@ class UrBatchMetricsTest extends BatchMetricsTest {
 
     @Test
     void when_instantiated_then_the_batch_type_should_be_correct() {
-
         final BatchMetrics batchMetrics = assertDoesNotThrow(() -> new BatchMetrics(okosynkConfiguration));
-
         assertEquals(Constants.BATCH_TYPE.UR, batchMetrics.getBatchType());
     }
 

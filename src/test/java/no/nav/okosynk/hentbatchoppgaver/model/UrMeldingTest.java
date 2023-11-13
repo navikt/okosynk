@@ -33,6 +33,7 @@ class UrMeldingTest extends AbstractMeldingTest {
     static void init() throws IOException {
         Mappingregelverk.init(Constants.BATCH_TYPE.UR.getMappingRulesPropertiesFileName());
     }
+
     @Test
     void urMeldingParserMeldingTilVariabler() {
 

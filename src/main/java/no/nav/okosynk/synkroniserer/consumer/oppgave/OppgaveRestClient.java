@@ -286,16 +286,16 @@ public class OppgaveRestClient {
         ObjectMapper objectMapper = new ObjectMapper();
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        new URI(oppgaveUri.getPath() + String.format("/%s", oppgave.oppgaveId)),
+                        new URI(oppgaveUri.getPath() + String.format("/%s", oppgave.oppgaveId())),
                         HttpPatch::new,
                         getAzureAdAuthenticationClient()
                 );
         try {
             final ObjectNode patchOppgaverObjectNode = objectMapper.createObjectNode();
-            patchOppgaverObjectNode.put("id", oppgave.oppgaveId);
+            patchOppgaverObjectNode.put("id", oppgave.oppgaveId());
             patchOppgaverObjectNode.put("endretAvEnhetsnr", OppgaveMapper.ENHET_ID_FOR_ANDRE_EKSTERNE);
-            patchOppgaverObjectNode.put("versjon", oppgave.versjon);
-            patchOppgaverObjectNode.put("beskrivelse", oppgave.beskrivelse);
+            patchOppgaverObjectNode.put("versjon", oppgave.versjon());
+            patchOppgaverObjectNode.put("beskrivelse", oppgave.beskrivelse());
             if (ferdigstill) {
                 patchOppgaverObjectNode.put("status", FERDIGSTILT.name());
             }

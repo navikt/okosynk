@@ -1,8 +1,9 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.AktoerRespons;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.IAktoerClient;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.AggregeringsKriterier;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
 import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 import no.nav.okosynk.model.GjelderIdType;
@@ -11,28 +12,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
+import static no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo.sum;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FORSTE_FELTSEPARATOR;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public abstract class AbstractOppgaveOppretter<T extends Melding> {
-    private static final Logger log = LoggerFactory.getLogger(AbstractOppgaveOppretter.class);
-    private final Constants.BATCH_TYPE batchType;
+public class OppgaveOppretter {
+    private static final Logger log = LoggerFactory.getLogger(OppgaveOppretter.class);
     private final IAktoerClient aktoerClient;
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
 
-    protected AbstractOppgaveOppretter(final Constants.BATCH_TYPE batchType, final IAktoerClient aktoerClient) {
-        this.batchType = batchType;
+    public OppgaveOppretter(final IAktoerClient aktoerClient) {
         this.aktoerClient = aktoerClient;
     }
 
@@ -40,25 +43,25 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
         return System.getProperty("line.separator") + System.getProperty("line.separator");
     }
 
-    public Optional<Oppgave> opprettOppgave(final List<T> meldinger) {
+    public Optional<Oppgave> opprettOppgave(final List<Melding> meldinger) {
         meldinger.sort(comparing(Melding::sammenligningsDato, reverseOrder()));
         if (meldinger.isEmpty()) return Optional.empty();
 
-        T melding = meldinger.get(0);
+        Melding melding = meldinger.get(0);
         MappingRegel mappingregel = Mappingregelverk.finnRegel(melding.ruleKey()).orElse(null);
         if (Objects.isNull(mappingregel)) return Optional.empty();
 
-        Oppgave.OppgaveBuilder oppgaveBuilder = new Oppgave.OppgaveBuilder();
+        Oppgave.OppgaveBuilder oppgaveBuilder = Oppgave.builder();
 
         switch (GjelderIdType.fra(melding.getGjelderId())) {
             case BNR:
-                oppgaveBuilder.withBnr(melding.getGjelderId());
+                oppgaveBuilder.bnr(melding.getGjelderId());
                 break;
             case SAMHANDLER:
-                oppgaveBuilder.withSamhandlernr(melding.getGjelderId());
+                oppgaveBuilder.samhandlernr(melding.getGjelderId());
                 break;
             case ORGANISASJON:
-                oppgaveBuilder.withOrgnr(melding.getGjelderId());
+                oppgaveBuilder.orgnr(melding.getGjelderId());
                 break;
             case AKTORID:
                 try {
@@ -69,7 +72,7 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
                                 aktoerRespons.getFeilmelding());
                         secureLog.warn("Kunne ikke hente aktørid for: {}", melding.getGjelderId());
                     } else {
-                        oppgaveBuilder.withAktoerId(aktoerRespons.getAktoerId());
+                        oppgaveBuilder.aktoerId(aktoerRespons.getAktoerId());
                     }
                 } catch (Exception e) {
                     log.error("Ukjent feil ved konverterting av FNR -> AktoerId", e);
@@ -78,25 +81,25 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
         }
 
         return Optional.of(oppgaveBuilder
-                .withOppgavetypeKode(batchType.getOppgaveType())
-                .withFagomradeKode("OKO")
-                .withBehandlingstema(
+                .oppgavetypeKode(melding.batchType().getOppgaveType())
+                .fagomradeKode("OKO")
+                .behandlingstema(
                         isNotBlank(mappingregel.behandlingstema()) ? mappingregel.behandlingstema() : null
                 )
-                .withBehandlingstype(
+                .behandlingstype(
                         isNotBlank(mappingregel.behandlingstype()) ? mappingregel.behandlingstype() : null
                 )
-                .withPrioritetKode("LAV")
-                .withBeskrivelse(lagSamletBeskrivelse(meldinger))
-                .withAktivFra(LocalDate.now())
-                .withAktivTil(LocalDate.now().plusDays(batchType.getAntallDagerFrist()))
-                .withAnsvarligEnhetId(mappingregel.ansvarligEnhetId())
-                .withLest(false)
-                .withAntallMeldinger(meldinger.size())
+                .prioritetKode("LAV")
+                .beskrivelse(lagSamletBeskrivelse(meldinger))
+                .aktivFra(LocalDate.now())
+                .aktivTil(LocalDate.now().plusDays(melding.batchType().getAntallDagerFrist()))
+                .ansvarligEnhetId(mappingregel.ansvarligEnhetId())
+                .lest(false)
+                .antallMeldinger(meldinger.size())
                 .build());
     }
 
-    public String lagSamletBeskrivelse(final List<T> meldinger) {
+    public String lagSamletBeskrivelse(final List<Melding> meldinger) {
         return meldinger.stream()
                 .collect(groupingBy(m -> m.getNyesteVentestatus() + m.hashCode(), LinkedHashMap::new, Collectors.toList()))
                 .values().stream()
@@ -105,6 +108,36 @@ public abstract class AbstractOppgaveOppretter<T extends Melding> {
                 .replaceFirst(FELTSEPARATOR, FORSTE_FELTSEPARATOR);
     }
 
-    protected abstract String summerOgKonsolider(List<T> ts);
+    public String summerOgKonsolider(List<Melding> ts) {
+        return ts.stream()
+                .sorted(comparing(Melding::sammenligningsDato, reverseOrder()))
+                .map(Melding::beskrivelseInfo)
+                .reduce(sum)
+                .map(BeskrivelseInfo::lagBeskrivelse).orElse("");
+    }
+
+    Predicate<Melding> meldingSkalBliOppgave() {
+        return m -> Mappingregelverk.finnRegel(m.ruleKey()).isPresent();
+    }
+
+    Collection<List<Melding>> groupMeldingerSomSkalBliOppgaver(final List<Melding> ufiltrerteUrMeldinger) {
+        Map<AggregeringsKriterier, List<Melding>> collect = ufiltrerteUrMeldinger
+                .stream()
+                .distinct()
+                .filter(meldingSkalBliOppgave())
+                .collect(groupingBy(AggregeringsKriterier::new));
+        return collect
+                .values();
+    }
+
+    public List<Oppgave> lagOppgaver(final List<Melding> meldinger) {
+        Collection<List<Melding>> lists = groupMeldingerSomSkalBliOppgaver(meldinger);
+        return lists
+                .stream()
+                .map(this::opprettOppgave)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
 
 }

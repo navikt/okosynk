@@ -1,6 +1,8 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
 import lombok.Getter;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.parselinje.OsMeldingParser;
 
@@ -76,7 +78,10 @@ public class OsMelding extends Melding {
                 && this.behandlendeEnhet.equals(otherAsOsMelding.behandlendeEnhet)
                 && this.beregningsId.equals(otherAsOsMelding.beregningsId)
                 && this.beregningsDato.equals(otherAsOsMelding.beregningsDato)
-                && this.faggruppe.equals(otherAsOsMelding.faggruppe);
+                && this.forsteFomIPeriode.equals(otherAsOsMelding.forsteFomIPeriode)
+                && this.sisteTomIPeriode.equals(otherAsOsMelding.sisteTomIPeriode)
+                && this.faggruppe.equals(otherAsOsMelding.faggruppe)
+                && this.nyesteVentestatus.equals(otherAsOsMelding.nyesteVentestatus);
     }
 
     @Override
@@ -92,7 +97,7 @@ public class OsMelding extends Melding {
                 "etteroppgjor         : " + etteroppgjor);
     }
 
-    public OsBeskrivelseInfo osBeskrivelseInfo() {
+    public BeskrivelseInfo beskrivelseInfo() {
         return new OsBeskrivelseInfo(
                 nyesteVentestatus,
                 hentNettoBelopSomStreng(),
@@ -105,6 +110,11 @@ public class OsMelding extends Melding {
                 Optional.ofNullable(etteroppgjor).orElse(""),
                 utbetalesTilId,
                 brukerId);
+    }
+
+    @Override
+    public Constants.BATCH_TYPE batchType() {
+        return Constants.BATCH_TYPE.OS;
     }
 
     @Override

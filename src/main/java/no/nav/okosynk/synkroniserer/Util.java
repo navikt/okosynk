@@ -78,12 +78,12 @@ public class Util {
 
         final Integer antallMeldingerSomHarEnOppdaterOppgave = oppgaverSomSkalOppdateres.stream()
                 .map(OppgaveOppdatering::oppgaveLestFraBatchen)
-                .map(o -> o.antallMeldinger)
+                .map(Oppgave::antallMeldinger)
                 .reduce(Integer::sum)
                 .orElse(0);
 
         final Integer antallMeldingerSomHarEnOpprettOppgave = oppgaverSomSkalOpprettes.stream()
-                .map(oppgave -> oppgave.antallMeldinger)
+                .map(Oppgave::antallMeldinger)
                 .reduce(Integer::sum)
                 .orElse(0);
 

@@ -1,6 +1,7 @@
 package no.nav.okosynk;
 
 import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
@@ -11,8 +12,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.fail;
 
 class PropertiesFilTest {
 
@@ -95,7 +94,7 @@ class PropertiesFilTest {
         if (linje.contains(Character.toString(NOKKEL_VERDI_SKILLETEGN))) {
             validerProperty(linje);
         } else {
-            fail(String.format("Feil format på '%s'.", propertiesFilnavn));
+            Assertions.fail(String.format("Feil format på '%s'.", propertiesFilnavn));
         }
     }
 
@@ -106,7 +105,7 @@ class PropertiesFilTest {
         if (inneholderSkilletegn(oppdragsInformasjon, underkategoriInformasjon)) {
             sjekkOmKodeEllerEnhetErBlank(oppdragsInformasjon, underkategoriInformasjon);
         } else {
-            fail(String.format("Feil format på '%s'.", propertiesFilnavn));
+            Assertions.fail(String.format("Feil format på '%s'.", propertiesFilnavn));
         }
     }
 
@@ -121,7 +120,7 @@ class PropertiesFilTest {
         String behandlingstype = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[1];
         String ansvarligEnhet = underkategoriInformasjon.split(Character.toString(PARAMETER_SKILLETEGN))[2];
         if (StringUtils.isBlank(oppdragsKode) || StringUtils.isBlank(behandlendeEnhet) || StringUtils.isBlank(ansvarligEnhet) || StringUtils.isAllBlank(behandlingstema, behandlingstype)) {
-            fail(String.format("Mangler verdier for ett eller flere felter i '%s'.", propertiesFilnavn));
+            Assertions.fail(String.format("Mangler verdier for ett eller flere felter i '%s'.", propertiesFilnavn));
         }
     }
 
@@ -136,7 +135,7 @@ class PropertiesFilTest {
                 String nokkel = linje.split(Character.toString(NOKKEL_VERDI_SKILLETEGN))[NOKKEL_INDEKS].trim();
 
                 if (nokler.contains(nokkel)) {
-                    fail(String.format("Nøkkel '%s' forekommer flere ganger i filen '%s'.", nokkel, propertiesFilnavn));
+                    Assertions.fail(String.format("Nøkkel '%s' forekommer flere ganger i filen '%s'.", nokkel, propertiesFilnavn));
                 } else {
                     nokler.add(nokkel);
                 }

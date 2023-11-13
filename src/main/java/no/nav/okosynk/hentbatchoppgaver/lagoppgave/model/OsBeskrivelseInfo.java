@@ -10,7 +10,7 @@ import static java.util.List.of;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
 import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
 
-public class OsBeskrivelseInfo {
+public class OsBeskrivelseInfo implements BeskrivelseInfo {
 
     private final String nyesteVentestatus;
     private final String hentNettoBelopSomStreng;
@@ -38,15 +38,14 @@ public class OsBeskrivelseInfo {
         this.brukerId = brukerId;
     }
 
-    public OsBeskrivelseInfo pluss(OsBeskrivelseInfo osBeskrivelseInfo) {
+    public BeskrivelseInfo pluss(OsBeskrivelseInfo b) {
         return new OsBeskrivelseInfo(
                 this.nyesteVentestatus,
-                new BigDecimal(this.hentNettoBelopSomStreng)
-                        .add(new BigDecimal(osBeskrivelseInfo.hentNettoBelopSomStreng)).toString(),
+                new BigDecimal(this.hentNettoBelopSomStreng).add(new BigDecimal(b.hentNettoBelopSomStreng)).toString(),
                 this.beregningsId,
                 this.beregningsDato,
-                min(of(this.forsteFomIPeriode, osBeskrivelseInfo.forsteFomIPeriode), naturalOrder()),
-                max(of(this.sisteTomIPeriode, osBeskrivelseInfo.sisteTomIPeriode), naturalOrder()),
+                min(of(this.forsteFomIPeriode, b.forsteFomIPeriode), naturalOrder()),
+                max(of(this.sisteTomIPeriode, b.sisteTomIPeriode), naturalOrder()),
                 this.flaggFeilkonto,
                 this.datoForStatus,
                 this.etteroppgjor,
@@ -55,6 +54,7 @@ public class OsBeskrivelseInfo {
         );
     }
 
+    @Override
     public String lagBeskrivelse() {
         return String.join(FELTSEPARATOR,
                 nyesteVentestatus,

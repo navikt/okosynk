@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import static no.nav.okosynk.hentbatchoppgaver.model.Melding.FELTSEPARATOR;
 import static no.nav.okosynk.hentbatchoppgaver.parselinje.Util.formatAsNorwegianDate;
 
-public class UrBeskrivelseInfo {
+public class UrBeskrivelseInfo implements BeskrivelseInfo {
     private final String nyesteVentestatus;
     private final String arsaksTekst;
     private final LocalDate datoPostert;
@@ -27,18 +27,16 @@ public class UrBeskrivelseInfo {
         this.brukerId = brukerId;
     }
 
-    public static UrBeskrivelseInfo pluss(UrBeskrivelseInfo a, UrBeskrivelseInfo b) {
-        BigDecimal belopA = new BigDecimal(a.hentNettoBelopSomStreng);
-        BigDecimal belopB = new BigDecimal(b.hentNettoBelopSomStreng);
+    public BeskrivelseInfo pluss(UrBeskrivelseInfo b) {
         return new UrBeskrivelseInfo(
-                a.nyesteVentestatus,
-                a.arsaksTekst,
-                a.datoPostert,
-                a.bilagsId,
-                belopA.add(belopB).toString(),
-                a.datoForStatus,
-                a.mottakerId,
-                a.brukerId);
+                this.nyesteVentestatus,
+                this.arsaksTekst,
+                this.datoPostert,
+                this.bilagsId,
+                new BigDecimal(this.hentNettoBelopSomStreng).add(new BigDecimal(b.hentNettoBelopSomStreng)).toString(),
+                this.datoForStatus,
+                this.mottakerId,
+                this.brukerId);
     }
 
     public String lagBeskrivelse() {

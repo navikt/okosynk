@@ -1,9 +1,9 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave;
 
-import java.util.stream.Stream;
+import no.nav.okosynk.model.GjelderIdType;
 import org.junit.jupiter.params.provider.Arguments;
 
-import static no.nav.okosynk.model.GjelderIdType.*;
+import java.util.stream.Stream;
 
 public class UrMeldingTestGenerator {
 
@@ -44,7 +44,7 @@ public class UrMeldingTestGenerator {
                     mottakerId;
         }
 
-        public static String withBehandlendeEnhet(String behandlendeEnhet){
+        public static String withBehandlendeEnhet(String behandlendeEnhet) {
             return personGjelderId +
                     gjelderIdType + "      " +
                     datoForStatus +
@@ -61,10 +61,10 @@ public class UrMeldingTestGenerator {
 
     public static Stream<Arguments> urMeldingAndExpectedProvider() {
         return Stream.of(
-                Arguments.of("10108000398", AKTORID, "10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
-                Arguments.of("80123240327", SAMHANDLER, "80123240327ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
-                Arguments.of("90123240327", SAMHANDLER, "90123240327ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
-                Arguments.of("123456789", ORGANISASJON, "00123456789ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398")
+                Arguments.of("10108000398", GjelderIdType.AKTORID, "10108000398PERSON      2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
+                Arguments.of("80123240327", GjelderIdType.SAMHANDLER, "80123240327ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
+                Arguments.of("90123240327", GjelderIdType.SAMHANDLER, "90123240327ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398"),
+                Arguments.of("123456789", GjelderIdType.ORGANISASJON, "00123456789ORGANISASJON2011-01-28T18:25:5825          00000000019400æ8020INNT   UR2302011-01-21342552558Mottakers konto er oppgjort                       10108000398")
         );
     }
 }
