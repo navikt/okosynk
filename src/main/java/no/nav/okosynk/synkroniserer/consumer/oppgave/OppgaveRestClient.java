@@ -159,6 +159,7 @@ public class OppgaveRestClient {
                             objectMapper.readValue(response.getEntity().getContent(), PostOppgaveResponseJson.class));
                 }
             } catch (IOException e) {
+                log.error("Kunne ikke kalle uri: {}", this.oppgaveUri);
                 throw new IllegalStateException(MESSAGE, e);
             }
         });
