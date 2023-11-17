@@ -87,3 +87,13 @@ blir OKO.
 er LAV. 
 #### Aktiv fra og til 
 Fra dagens dato til dagens dato + 7 dager(OS) eller 3 dager(OS)
+
+## Beskrivelse
+Hver oppgave tar inn en liste med meldinger som er fra samme faggruppe/oppdragskode, gjelderId og ansvarlig enhet.
+Det kan dermed være flere forskjellige "Nyeste ventestatus", og disse skal alle være synlige i den endelige beskrivelsen.
+
+
+### Merke
+I Beskrivelsesfeltet settes det inn to semikolon etter første ventestatus. Dette er et felt
+som brukes av NØP til å merke hvorfor de ikke har lukket oppgaven ennå.
+Det er maksimalt 10 tegn.

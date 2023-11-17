@@ -286,7 +286,7 @@ public class OppgaveRestClient {
         ObjectMapper objectMapper = new ObjectMapper();
         final HttpEntityEnclosingRequestBase request =
                 createOppgaveRequestBase(
-                        new URI(oppgaveUri.getPath() + String.format("/%s", oppgave.oppgaveId())),
+                        new URI(oppgaveUri.toString() + String.format("/%s", oppgave.oppgaveId())),
                         HttpPatch::new,
                         getAzureAdAuthenticationClient()
                 );
