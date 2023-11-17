@@ -94,7 +94,7 @@ public class OppgaveRestClient {
             final Function<String, HttpEntityEnclosingRequestBase> requestCreatorFunction,
             final AzureAdAuthenticationClient azureAdAuthenticationClient
     ) throws IOException {
-        final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl.getPath());
+        final HttpEntityEnclosingRequestBase request = requestCreatorFunction.apply(oppgaveUrl.toString());
         addCorrelationIdToRequest(request);
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         request.addHeader(CONTENT_TYPE, "application/json; charset=UTF-8");
