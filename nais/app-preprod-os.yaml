@@ -61,5 +61,4 @@ spec:
         mountPath: /secrets/sftpcredentials
       - kvPath: kv/preprod/fss/okosynkos/oppgavecredentials
         mountPath: /secrets/oppgavecredentials
-    sidecar: true
 status: {}
