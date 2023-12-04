@@ -40,3 +40,11 @@ classDiagram
     Interface01 <|.. AveryLongClass
     Interface01 : size()
     Interface01 : int chimp
+```
+
+```mermaid
+flowchart 
+    test --> foo
+    
+click foo https://www.google.com
+```
