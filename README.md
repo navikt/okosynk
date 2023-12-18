@@ -1,8 +1,36 @@
-# okosynk
+# Okosynk - Funksjonell oversikt
 Applikasjon for å synkronisere oppgaver fra økonomisystemene OS (Oppdragssystemet) og UR (Utbetalingsreskontro) mot oppgave-applikasjonen (tidligere Gsak).
 Applikasjonen leser flatfiler bestående av meldinger fra OS og UR. Noen av meldingene aggregeres
 dersom de gjelder samme oppgave. Fra de resterende meldingene opprettes det oppgaver, og det er
 disse oppgavene som skal ligge i oppgave-applikasjonen.
+
+```mermaid
+flowchart LR
+    Fil{{"Fil fra OS"}} --> Okosynk
+    PDL((PDL)) --> Okosynk
+    GOSYS(("
+        Eksisterende
+        oppgaver i 
+        GOSYS")) --> Okosynk
+    Okosynk --> GOSYS2(("
+        Nye oppgaver
+        i GOSYS
+        "))
+```
+
+```mermaid
+flowchart LR
+    Fil{{"Fil fra UR"}} --> Okosynk
+    PDL((PDL)) --> Okosynk
+    GOSYS(("
+        Eksisterende
+        oppgaver i 
+        GOSYS")) --> Okosynk
+    Okosynk --> GOSYS2(("
+        Nye oppgaver
+        i GOSYS
+        "))
+```
 
 * Oppgaver som ligger i oppgave-applikasjonen, men ikke er tilstede i flatfil, ferdigstilles.
 * Oppgaver som ligger både i oppgave-applikasjonen og i flatfil oppdateres med ny informasjon.
@@ -16,6 +44,9 @@ Den kjører på nais-plattformen i to miljøer:
 Okosynk kjøres som to separate jobber, og de heter hhv. okosynkos og okosynkur (nais name). Det er samme koden som kjører, 
 men de er konfigurert forskjellig. 
 Miljø-variabelen SHOULD_RUN_OS_OR_UR styrer dette, og den kan ha verdiene "OS" eller "UR".
+
+# Teknisk oversikt
+[Teknisk oversikt](Dokumentasjon/overordnet-teknisk.md) over Okosynk
 
 # Testkjøring av batchen
 
