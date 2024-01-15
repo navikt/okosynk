@@ -97,7 +97,7 @@ public class Batch {
             boolean removedInputData = fileReader.removeInputData();
 
             batchStatus =
-                    consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet() >= 0 ? BatchStatus.ENDED_WITH_WARNING_OVER_5000_OPPGAVER_OPPRETTET
+                    consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet() > 5000 ? BatchStatus.ENDED_WITH_WARNING_OVER_5000_OPPGAVER_OPPRETTET
                     : !removedInputData ? BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN
                     : BatchStatus.ENDED_WITH_OK;
 
