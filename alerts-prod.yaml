@@ -7,10 +7,11 @@ metadata:
 spec:
   receivers: # receivers for all alerts below
     slack:
-      channel: '#oh-prod-varsling'
+      channel: '#okonomi-alerts-prod'
       prependText: 'Parts of Okosynk may have failed: '
       email_configs:
-        - to: oyvind.roth@nav.no
+        - to: lars.hartvigsen@nav.no
+        - to: steinar.hansen@nav.no
   alerts:
     - alert: okosynk_general_check_logs_prod_os
       expr: 'sum(rate(okosynk_os_batch_alert{namespace="okosynk",job="kubernetes-pods"}[24h])) > 0'

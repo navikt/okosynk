@@ -7,7 +7,7 @@ metadata:
 spec:
   receivers: # receivers for all alerts below
     slack:
-      channel: '#oh-preprod-varsling'
+      channel: '#okonomi-alerts-dev'
       prependText: 'Parts of Okosynk may have failed: '
       email_configs:
         - to: lars.hartvigsen@nav.no
