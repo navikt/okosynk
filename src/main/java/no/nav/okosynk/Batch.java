@@ -94,8 +94,12 @@ public class Batch {
             final ConsumerStatistics consumerStatistics =
                     getOppgaveSynkroniserer().synkroniser(alleOppgaverLestFraBatchen);
 
-            batchStatus = fileReader.removeInputData() ? BatchStatus.ENDED_WITH_OK
-                    : BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN;
+            boolean removedInputData = fileReader.removeInputData();
+
+            batchStatus =
+                    consumerStatistics.getAntallOppgaverSomMedSikkerhetErOpprettet() == 0 ? BatchStatus.ENDED_WITH_WARNING_OVER_5000_OPPGAVER_OPPRETTET
+                    : !removedInputData ? BatchStatus.ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN
+                    : BatchStatus.ENDED_WITH_OK;
 
             batchMetrics.setSuccessfulMetrics(consumerStatistics);
         } catch (NotFoundOkosynkIoException e) {
