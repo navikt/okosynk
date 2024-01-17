@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-project:
-    name: deploy-dev-prod
+    name: deploy-dev-manuell
     runs-on: ubuntu-latest
     permissions:
       packages: write

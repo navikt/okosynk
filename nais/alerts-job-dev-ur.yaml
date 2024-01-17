@@ -61,7 +61,7 @@ spec:
     matchers:
       - name: "okosynk_ur_type"
         matchType: "="
-        value: "okosynk-ur"
+        value: "okosynkur"
     groupInterval: 10s
     groupWait: 5s
     receiver: okosynk-ur-receiver
