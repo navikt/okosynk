@@ -1,30 +1,41 @@
-apiVersion: nais.io/v1alpha1
-kind: Alert
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
 metadata:
-  name: okosynk-alerts
+  name: okosynk-os
+  namespace: okonomi
   labels:
     team: okonomi
 spec:
+  groups:
+    - name: okosynk-alerts
+      rules:
+        - alert:
   receivers: # receivers for all alerts below
     slack:
-      channel: '#oh-preprod-varsling'
-      prependText: 'Parts of Okosynk may have failed: '
+      channel: '#team-mob-alerts-dev'
+      prependText: 'Varsel fra Okosynk: '
+      httpConfig:
+        proxyURL: http://webproxy.nais:8088
       email_configs:
-        - to: oyvind.roth@nav.no
+        - to: lars.hartvigsen@nav.no
   alerts:
     - alert: okosynk_general_check_logs_preprod_os
-      expr: 'sum(rate(okosynk_os_batch_alert{namespace="okosynk",job="kubernetes-pods"}[24h])) > 0'
+      expr: 'okosynk_job_oppgaver_opprettet{cronjob="bokosynk002"} > 5000'
       for: 5m
-      action: Se på loggene (i Kibana) etter evt. feil og advarsler fra okosynk relatert til OS i preprod
-      description: 'Relates to: Okosynk OS: It is as expected that the logs indicate that no further action needs be taken. The potential problems can have been automatically solved by e.g. retries. However, the opposite may also be the case. This alert is based on a counter that counts up for each time an OS batch fails, so it may be anything above 0. 0 indicates, of course, no errors.'
-      documentation: okosynk readme.md
-      sla: N/A
-      severity: danger
+      annotations:
+        consequence: Mange oppgaver som må håndteres manuelt
+        action: Sjekk om noe spesielt har skjedd som har ført til mange nye oppgaver
+        summary: Vet ikke hva mer jeg kan si
+      labels:
+        namespace: okonomi
+        severity: danger
     - alert: okosynk_general_check_logs_preprod_ur
-      expr: 'sum(rate(okosynk_ur_batch_alert{namespace="okosynk",job="kubernetes-pods"}[24h])) > 0'
+      expr: 'okosynk_job_oppgaver_opprettet{cronjob="bokosynk001"} > 5000'
       for: 5m
-      action: Se på loggene (i Kibana) etter evt. feil og advarsler fra okosynk relatert til UR i preprod
-      description: 'Relates to: Okosynk UR: It is as expected that the logs indicate that no further action needs be taken. The potential problems can have been automatically solved by e.g. retries. However, the opposite may also be the case. This alert is based on a counter that counts up for each time an OS batch fails, so it may be anything above 0. 0 indicates, of course, no errors.'
-      documentation: okosynk readme.md
-      sla: N/A
-      severity: danger
+      annotations:
+        consequence: Mange oppgaver som må håndteres manuelt
+        action: Sjekk om noe spesielt har skjedd som har ført til mange nye oppgaver
+        summary: Vet ikke hva mer jeg kan si
+      labels:
+        namespace: okonomi
+        severity: danger

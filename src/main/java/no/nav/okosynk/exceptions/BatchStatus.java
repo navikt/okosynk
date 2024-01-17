@@ -6,6 +6,7 @@ public enum BatchStatus {
     STARTED(false, true),
     ENDED_WITH_OK(false, false),
     ENDED_WITH_WARNING_BATCH_INPUT_DATA_COULD_NOT_BE_DELETED_AFTER_OK_RUN(false, true),
+    ENDED_WITH_WARNING_OVER_5000_OPPGAVER_OPPRETTET(false, true),
     ENDED_WITH_WARNING_INPUT_DATA_NOT_FOUND(true, false),
     ENDED_WITH_ERROR_GENERAL(true, true),
     ENDED_WITH_ERROR_INPUT_DATA(false, true),

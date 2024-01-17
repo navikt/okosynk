@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: okosynk-os
+  name: okosynkos
   namespace: okonomi
   labels:
     team: okonomi
@@ -18,7 +18,7 @@ spec:
           labels:
             namespace: okonomi
             severity: danger
-            ktor_job_example_type: okosynk-os
+            okosynk_os_type: okosynkos
             alert_type: custom
 
 ---
@@ -39,7 +39,9 @@ spec:
             name: slack-webhook
           channel: '#team-mob-alerts-dev'
           iconEmoji: ':alert:'
-          username: 'Alert dev-gcp'
+          username: 'Alert dev-fss'
+          httpConfig:
+            proxyURL: http://webproxy.nais:8088
           sendResolved: true
           title: |-
             [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
