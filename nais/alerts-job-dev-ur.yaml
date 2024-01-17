@@ -10,11 +10,11 @@ spec:
     - name: okosynk-ur-alerts
       rules:
         - alert: okosynkur naisjob mislykket
-          expr: kube_job_failed{job_name=~"^okosynkur.*", namespace="okonomi"} > 0
+          expr: okosynk_os_batch_alert > 0
           for: 1m
           annotations:
             action: "Gjør en action"
-            summary: "okosynk-ur feiler. Sjekk hvorfor a mann"
+            summary: "okosynk-ur feiler. Sjekk hvorfor pls"
           labels:
             namespace: okonomi
             severity: danger
