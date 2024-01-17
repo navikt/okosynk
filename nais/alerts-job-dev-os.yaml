@@ -9,12 +9,12 @@ spec:
   groups:
     - name: okosynk-os-alerts
       rules:
-        - alert: okosynkos naisjob mislykket
-          expr: kube_job_failed{job_name=~"^okosynkos.*", namespace="okonomi"} > 0
-          for: 2m
+        - alert: okosynk-OS sender varsel
+          expr: okosynk_os_batch_alert > 0
+          for: 1m
           annotations:
-            action: "Gjør en action"
-            summary: "okosynk-os feiler. Sjekk hvorfor"
+            action: "Sjekk hvorfor okosynk gir varsel"
+            summary: "okosynk-os gir varsel. Sjekk hvorfor"
           labels:
             namespace: okonomi
             severity: danger
@@ -38,10 +38,10 @@ spec:
             key: apiUrl
             name: slack-webhook
           channel: '#team-mob-alerts-dev'
-          iconEmoji: ':alert:'
-          username: 'Alert dev-fss'
           httpConfig:
             proxyURL: http://webproxy.nais:8088
+          iconEmoji: ':alert:'
+          username: 'Alert dev-fss'
           sendResolved: true
           title: |-
             [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
@@ -61,8 +61,9 @@ spec:
     matchers:
       - name: "okosynk_os_type"
         matchType: "="
-        value: "okosynk-os"
+        value: "okosynkos"
     groupInterval: 10s
     groupWait: 5s
     receiver: okosynk-os-receiver
-    repeatInterval: 2m
+    repeatInterval: 1440m
+

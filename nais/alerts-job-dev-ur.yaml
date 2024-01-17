@@ -10,11 +10,11 @@ spec:
     - name: okosynk-ur-alerts
       rules:
         - alert: okosynkur naisjob mislykket
-          expr: okosynk_os_batch_alert > 0
+          expr: okosynk_ur_batch_alert > 0
           for: 1m
           annotations:
-            action: "Gjør en action"
-            summary: "okosynk-ur feiler. Sjekk hvorfor pls"
+            action: "Sjekk hvorfor okosynk-ur gir varsel"
+            summary: "okosynk-ur gir varsel. Sjekk hvorfor"
           labels:
             namespace: okonomi
             severity: danger
@@ -65,4 +65,5 @@ spec:
     groupInterval: 10s
     groupWait: 5s
     receiver: okosynk-ur-receiver
-    repeatInterval: 2m
+    repeatInterval: 1440m
+
