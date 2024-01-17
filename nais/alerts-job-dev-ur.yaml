@@ -9,7 +9,7 @@ spec:
   groups:
     - name: okosynk-ur-alerts
       rules:
-        - alert: okosynkur naisjob mislykket
+        - alert: okosynk-UR sender varsel
           expr: okosynk_ur_batch_alert > 0
           for: 1m
           annotations:
