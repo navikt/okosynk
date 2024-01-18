@@ -27,9 +27,8 @@ SERVICE_CALLS_HOME_IS_UNDEFINED
 t.bat
 target
 ur.input
+os.input
 local.secret.db.access.txt
-APP_LOG_HOME_IS_UNDEFINED
 keystore.jks
-local.secret.db.access.txt
 /.java-version
 /sql.investigations.sql

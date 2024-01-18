@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - before_alerts
+      - alarmer
 
 jobs:
   deploy-alerts-dev:
@@ -26,3 +26,23 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/alerts-job-dev-os.yaml
+  deploy-alerts-prod:
+    name: Deploy alarmer til prod
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Sjekker ut kode
+        uses: actions/checkout@v3
+      - name: Deploy ur til prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: nais/alerts-job-prod-ur.yaml
+      - name: Deploy os til prod
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: nais/alerts-job-prod-os.yaml

@@ -47,11 +47,11 @@ spec:
         - apiURL:
             key: apiUrl
             name: slack-webhook
-          channel: '#team-mob-alerts-dev'
+          channel: '#team-mob-alerts-prod'
           httpConfig:
             proxyURL: http://webproxy.nais:8088
           iconEmoji: ':alert:'
-          username: 'Alert dev-fss'
+          username: 'Alert prod-fss'
           sendResolved: true
           title: |-
             [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}

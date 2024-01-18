@@ -1,57 +1,57 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: okosynkos
+  name: okosynkur
   namespace: okonomi
   labels:
     team: okonomi
 spec:
   groups:
-    - name: okosynk-os-alerts
+    - name: okosynk-ur-alerts
       rules:
-        - alert: okosynk-OS sender varsel
-          expr: okosynk_os_batch_alert > 0
+        - alert: okosynk-UR sender varsel
+          expr: okosynk_ur_batch_alert > 0
           for: 1m
           annotations:
-            action: "Sjekk hvorfor okosynk gir varsel"
-            summary: "okosynk-os gir varsel. Sjekk hvorfor"
+            action: "Sjekk hvorfor okosynk-ur gir varsel"
+            summary: "okosynk-ur gir varsel. Sjekk hvorfor"
           labels:
             namespace: okonomi
             severity: danger
-            okosynk_os_type: okosynkos
+            okosynk_ur_type: okosynkur
             alert_type: custom
-        - alert: okosynk-OS har opprettet mange oppgaver
-          expr: okosynk_job_oppgaver_opprettet{cronjob="bokosynk001"} > 5000
+        - alert: okosynk-UR har opprettet mange oppgaver
+          expr: okosynk_job_oppgaver_opprettet{cronjob="bokosynk002"} > 5000
           for: 1m
           annotations:
             action: "Sjekk om noe spesielt har skjedd som gjør at utbetalinger ikke går gjennom"
-            summary: "okosynk-OS har opprettet over 5000 oppgaver"
+            summary: "okosynk-UR har opprettet over 5000 oppgaver"
           labels:
             namespace: okonomi
             severity: danger
-            okosynk_ur_type: okosynkos
+            okosynk_ur_type: okosynkur
             alert_type: custom
 ---
 
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
-  name: okosynk-os-slack
+  name: okosynk-ur-slack
   namespace: okonomi
   labels:
-    alertmanagerConfig: okosynk-os-slack
+    alertmanagerConfig: okosynk-ur-slack
 spec:
   receivers:
-    - name: okosynk-os-receiver
+    - name: okosynk-ur-receiver
       slackConfigs:
         - apiURL:
             key: apiUrl
             name: slack-webhook
-          channel: '#team-mob-alerts-dev'
+          channel: '#team-mob-alerts-prod'
           httpConfig:
             proxyURL: http://webproxy.nais:8088
           iconEmoji: ':alert:'
-          username: 'Alert dev-fss'
+          username: 'Alert prod-fss'
           sendResolved: true
           title: |-
             [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
@@ -69,11 +69,11 @@ spec:
     groupBy:
       - alertname
     matchers:
-      - name: "okosynk_os_type"
+      - name: "okosynk_ur_type"
         matchType: "="
-        value: "okosynkos"
+        value: "okosynkur"
     groupInterval: 10s
     groupWait: 5s
-    receiver: okosynk-os-receiver
+    receiver: okosynk-ur-receiver
     repeatInterval: 1440m
 

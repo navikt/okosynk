@@ -20,7 +20,17 @@ spec:
             severity: danger
             okosynk_ur_type: okosynkur
             alert_type: custom
-
+        - alert: okosynk-UR har opprettet mange oppgaver
+          expr: okosynk_job_oppgaver_opprettet{cronjob="bokosynk002"} > 5000
+          for: 1m
+          annotations:
+            action: "Sjekk om noe spesielt har skjedd som gjør at utbetalinger ikke går gjennom"
+            summary: "okosynk-UR har opprettet over 5000 oppgaver"
+          labels:
+            namespace: okonomi
+            severity: danger
+            okosynk_ur_type: okosynkur
+            alert_type: custom
 ---
 
 apiVersion: monitoring.coreos.com/v1alpha1
