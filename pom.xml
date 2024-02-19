@@ -11,8 +11,8 @@
 
     <properties>
         <jaCoCoArgLine/>
-        <java.compilation.source.version>21</java.compilation.source.version>
-        <java.compilation.target.version>21</java.compilation.target.version>
+        <java.compilation.source.version>17</java.compilation.source.version>
+        <java.compilation.target.version>17</java.compilation.target.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <junit.version>5.10.0</junit.version>
