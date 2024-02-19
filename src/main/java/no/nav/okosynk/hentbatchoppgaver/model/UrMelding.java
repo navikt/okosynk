@@ -1,12 +1,30 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import no.nav.okosynk.hentbatchoppgaver.lagoppgave.UrMappingRegelRepository;
-import no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser;
+import no.nav.okosynk.config.Constants;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.Mappingregelverk;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.MappingRegel;
+import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.UrBeskrivelseInfo;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
-public class UrMelding extends AbstractMelding {
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseArsaksTekst;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBehandlendeEnhet;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBilagsId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseBrukerId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseDatoForStatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseDatoPostert;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseGjelderId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseGjelderIdType;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseKilde;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseMottakerId;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseNyesteVentestatus;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseOppdragsKode;
+import static no.nav.okosynk.hentbatchoppgaver.parselinje.UrMeldingParser.parseTotaltNettoBelop;
+
+public class UrMelding extends Melding {
 
     public final String oppdragsKode;
     public final String gjelderIdType;
@@ -15,85 +33,93 @@ public class UrMelding extends AbstractMelding {
     public final String bilagsId;
     public final String arsaksTekst;
     public final String mottakerId;
+    public final String navEnhet;
 
     public UrMelding(final String urMelding) {
 
-        super(urMelding, new UrMeldingParser());
+        super(parseBehandlendeEnhet(urMelding),
+                parseBrukerId(urMelding),
+                parseDatoForStatus(urMelding),
+                parseGjelderId(urMelding),
+                parseNyesteVentestatus(urMelding),
+                parseTotaltNettoBelop(urMelding));
 
-        final UrMeldingParser parser = (UrMeldingParser)getParser();
-
-        this.oppdragsKode = parser.parseOppdragsKode(urMelding);
-        this.gjelderIdType = parser.parseGjelderIdType(urMelding);
-        this.datoPostert = parser.parseDatoPostert(urMelding);
-        this.kilde = parser.parseKilde(urMelding);
-        this.bilagsId = parser.parseBilagsId(urMelding);
-        this.arsaksTekst = parser.parseArsaksTekst(urMelding);
-        this.mottakerId = parser.parseMottakerId(urMelding);
+        this.oppdragsKode = parseOppdragsKode(urMelding);
+        this.gjelderIdType = parseGjelderIdType(urMelding);
+        this.datoPostert = parseDatoPostert(urMelding);
+        this.kilde = parseKilde(urMelding);
+        this.bilagsId = parseBilagsId(urMelding);
+        this.arsaksTekst = parseArsaksTekst(urMelding);
+        this.mottakerId = parseMottakerId(urMelding);
+        this.navEnhet = navEnhet().orElse(null);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), this.gjelderIdType, this.oppdragsKode, this.datoPostert, new UrMappingRegelRepository().finnRegel(this));
+        return Objects.hash(this.gjelderId, this.gjelderIdType, this.oppdragsKode, this.datoPostert, this.navEnhet);
     }
 
     @Override
     public boolean equals(final Object other) {
-
         if (this == other) {
             return true;
-        }
-
-        if (!super.equals(other)) {
-            return false;
         }
 
         if (!(other instanceof UrMelding otherAsUrMelding)) {
             return false;
         }
 
-        return
-            this.gjelderIdType.equals(otherAsUrMelding.gjelderIdType)
-            &&
-            this.oppdragsKode.equals(otherAsUrMelding.oppdragsKode)
-            &&
-            this.datoPostert.equals(otherAsUrMelding.datoPostert)
-            &&
-            skalTilSammeNavEnhet(otherAsUrMelding)
-            ;
+        return this.gjelderId/*...*/.equals(otherAsUrMelding.gjelderId)
+                && gjelderIdType/**/.equals(otherAsUrMelding.gjelderIdType)
+                && oppdragsKode/*.*/.equals(otherAsUrMelding.oppdragsKode)
+                && datoPostert/*..*/.equals(otherAsUrMelding.datoPostert)
+                && (Objects.equals(navEnhet, otherAsUrMelding.navEnhet));
     }
 
     @Override
     public String toString() {
-        return super.toString() + FIELD_SEPARATOR +
-           "oppdragsKode     : " + oppdragsKode + FIELD_SEPARATOR +
-           "gjelderIdType    : " + gjelderIdType + FIELD_SEPARATOR +
-           "datoPostert      : " + datoPostert + FIELD_SEPARATOR +
-           "kilde            : " + kilde + FIELD_SEPARATOR +
-           "bilagsId         : " + bilagsId + FIELD_SEPARATOR +
-           "arsaksTekst      : " + arsaksTekst + FIELD_SEPARATOR +
-           "mottakerId       : " + mottakerId;
+        return String.join(FIELD_SEPARATOR, super.toString(),
+                "oppdragsKode     : " + oppdragsKode,
+                "gjelderIdType    : " + gjelderIdType,
+                "datoPostert      : " + datoPostert,
+                "kilde            : " + kilde,
+                "bilagsId         : " + bilagsId,
+                "arsaksTekst      : " + arsaksTekst,
+                "mottakerId       : " + mottakerId);
     }
 
-    private boolean skalTilSammeNavEnhet(final UrMelding other) {
-
-        final UrMappingRegelRepository urMappingRegelRepository = new UrMappingRegelRepository();
-
-        return urMappingRegelRepository
-                .finnRegel(this)
-                .map(
-                    regel
-                    ->
-                    regel.ansvarligEnhetId
-                )
-                .equals(
-                    urMappingRegelRepository
-                        .finnRegel(other)
-                        .map(
-                            otherRegel
-                            ->
-                            otherRegel.ansvarligEnhetId
-                        )
-                );
+    Optional<String> navEnhet() {
+        return Mappingregelverk.finnRegel(String.join(",", oppdragsKode, behandlendeEnhet)).map(MappingRegel::ansvarligEnhetId);
     }
 
+    public BeskrivelseInfo beskrivelseInfo() {
+        return new UrBeskrivelseInfo(nyesteVentestatus,
+                arsaksTekst,
+                datoPostert,
+                bilagsId,
+                hentNettoBelopSomStreng(),
+                datoForStatus,
+                mottakerId,
+                brukerId);
+    }
+
+    @Override
+    public Constants.BATCH_TYPE batchType() {
+        return Constants.BATCH_TYPE.UR;
+    }
+
+    @Override
+    public String ruleKey() {
+        return String.join(",", oppdragsKode, behandlendeEnhet);
+    }
+
+    @Override
+    public String faggruppeEllerOppdragskode() {
+        return oppdragsKode;
+    }
+
+    @Override
+    public LocalDate sammenligningsDato() {
+        return datoPostert;
+    }
 }

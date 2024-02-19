@@ -3,7 +3,7 @@ package no.nav.okosynk.comm;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
+import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.HttpResponseUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.StatusLine;
@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.util.Base64;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static no.nav.okosynk.config.Constants.OPPGAVE_PASSWORD;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 import static org.apache.http.HttpHeaders.ACCEPT;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
@@ -40,12 +41,10 @@ public class OidcStsClient {
     private final CloseableHttpClient httpClient;
     private String oidcToken;
 
-    public OidcStsClient(
-            final IOkosynkConfiguration okosynkConfiguration,
-            final Constants.BATCH_TYPE batchType) {
+    public OidcStsClient(final OkosynkConfiguration okosynkConfiguration) {
 
-        this.batchBruker = okosynkConfiguration.getBatchBruker(batchType);
-        final String brukerPassword = okosynkConfiguration.getBatchBrukerPassword(batchType);
+        this.batchBruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);
+        final String brukerPassword = okosynkConfiguration.getString(OPPGAVE_PASSWORD);
         this.credentials = new UsernamePasswordCredentials(this.batchBruker, brukerPassword);
 
         try {
@@ -112,22 +111,7 @@ public class OidcStsClient {
         try (final CloseableHttpResponse response = this.httpClient.execute(request)) {
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
-                String stsOidcResponseAsString = null;
-                final StsOidcResponse stsOidcResponse;
-                try {
-                    stsOidcResponseAsString =
-                            IOUtils.toString(response.getEntity().getContent(), UTF_8);
-                    stsOidcResponse =
-                            new ObjectMapper().readValue(stsOidcResponseAsString, StsOidcResponse.class);
-                } catch (IOException e) {
-                    throw new IllegalStateException(
-                            "Klarte ikke deserialisere respons fra STS. stsOidcResponseAsString: "
-                                    + System.lineSeparator()
-                                    + stsOidcResponseAsString,
-                            e
-                    );
-                }
-                return stsOidcResponse.getAccessToken();
+                return getStsOidcResponse(response).getAccessToken();
             } else {
                 final String msg =
                         "Feil oppsto under henting av token fra STS - %s"
@@ -138,4 +122,21 @@ public class OidcStsClient {
             throw new IllegalStateException(e);
         }
     }
+
+    private StsOidcResponse getStsOidcResponse(CloseableHttpResponse response) {
+        String stsOidcResponseAsString = null;
+        try {
+            stsOidcResponseAsString =
+                    IOUtils.toString(response.getEntity().getContent(), UTF_8);
+            return new ObjectMapper().readValue(stsOidcResponseAsString, StsOidcResponse.class);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                    "Klarte ikke deserialisere respons fra STS. stsOidcResponseAsString: "
+                            + System.lineSeparator()
+                            + stsOidcResponseAsString,
+                    e
+            );
+        }
+    }
+
 }

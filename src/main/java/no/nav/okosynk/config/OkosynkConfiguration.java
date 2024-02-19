@@ -1,11 +1,20 @@
 package no.nav.okosynk.config;
 
-import no.nav.okosynk.config.homemade.*;
+import no.nav.okosynk.config.homemade.BaseConfiguration;
+import no.nav.okosynk.config.homemade.CompositeConfiguration;
+import no.nav.okosynk.config.homemade.Configuration;
+import no.nav.okosynk.config.homemade.ConfigurationException;
+import no.nav.okosynk.config.homemade.Configurations;
+import no.nav.okosynk.config.homemade.EnvironmentConfiguration;
+import no.nav.okosynk.config.homemade.Quintet;
+import no.nav.okosynk.config.homemade.SystemConfiguration;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
@@ -13,35 +22,42 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
-import static no.nav.okosynk.config.Constants.*;
+import static java.util.stream.Collectors.joining;
+import static no.nav.okosynk.config.Constants.BATCH_TYPE;
+import static no.nav.okosynk.config.Constants.DISABLE_METRICS_REPORT_EXT_KEY;
+import static no.nav.okosynk.config.Constants.DISABLE_METRICS_REPORT_KEY;
+import static no.nav.okosynk.config.Constants.FTP_HOSTKEY;
+import static no.nav.okosynk.config.Constants.FTP_PRIVATEKEY;
+import static no.nav.okosynk.config.Constants.FTP_USERNAME;
+import static no.nav.okosynk.config.Constants.NAV_TRUSTSTORE_PASSWORD_KEY;
+import static no.nav.okosynk.config.Constants.NAV_TRUSTSTORE_PATH_KEY;
+import static no.nav.okosynk.config.Constants.OPPGAVE_PASSWORD;
+import static no.nav.okosynk.config.Constants.OPPGAVE_USERNAME;
+import static no.nav.okosynk.config.Constants.PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY;
+import static no.nav.okosynk.config.Constants.TILLAT_MOCK_PROPERTY_EXT_KEY;
+import static no.nav.okosynk.config.Constants.TILLAT_MOCK_PROPERTY_KEY;
 
-public class OkosynkConfiguration
-        extends AbstractOkosynkConfiguration {
+public class OkosynkConfiguration {
 
+    public static final String AZURE_APP_CLIENT_ID_KEY = "AZURE_APP_CLIENT_ID";
+    public static final String PDL_URL_KEY = "PDL_URL";
     private static final Logger logger = LoggerFactory.getLogger(OkosynkConfiguration.class);
-    private static IOkosynkConfiguration singleton = null;
+    private static OkosynkConfiguration singleton = null;
     private final CompositeConfiguration compositeConfigurationForFirstPriority = new CompositeConfiguration();
     private final CompositeConfiguration compositeConfigurationForSecondPriority = new CompositeConfiguration();
     private final SystemConfiguration systemConfiguration;
 
-    private OkosynkConfiguration(
-            final String applicationPropertiesFileName) {
-
-        super();
+    private OkosynkConfiguration(final String applicationPropertiesFileName) {
 
         this.systemConfiguration = new SystemConfiguration();
         this.compositeConfigurationForSecondPriority.addConfiguration(systemConfiguration);
-
         this.compositeConfigurationForFirstPriority.addConfiguration(new EnvironmentConfiguration());
         addVaultProperties(compositeConfigurationForFirstPriority);
         this.compositeConfigurationForSecondPriority.addConfiguration(new EnvironmentConfiguration());
 
         try {
             this.compositeConfigurationForSecondPriority
-                    .addConfiguration(
-                            new Configurations()
-                                    .properties(new File(applicationPropertiesFileName))
-                    );
+                    .addConfiguration(new Configurations().properties(new File(applicationPropertiesFileName)));
             logger.info("Konfigurasjon lastet fra {}", applicationPropertiesFileName);
         } catch (ConfigurationException e) {
             logger.info("Fant ikke {}", applicationPropertiesFileName);
@@ -50,10 +66,7 @@ public class OkosynkConfiguration
         final String pomPropertiesFileName = "properties-from-pom.properties";
         try {
             this.compositeConfigurationForSecondPriority
-                    .addConfiguration(
-                            new Configurations()
-                                    .properties(new File(pomPropertiesFileName))
-                    );
+                    .addConfiguration(new Configurations().properties(new File(pomPropertiesFileName)));
             logger.info("Konfigurasjon lastet fra {}", pomPropertiesFileName);
         } catch (ConfigurationException e) {
             logger.info("Fant ikke {}", pomPropertiesFileName);
@@ -64,36 +77,30 @@ public class OkosynkConfiguration
         logger.info("Konfigurasjon lastet fra system- og miljøvariabler");
     }
 
-    public static void createAndReplaceSingletonInstance(
-            final String applicationPropertiesFileName) {
+    public static void createAndReplaceSingletonInstance(final String applicationPropertiesFileName) {
 
         if (applicationPropertiesFileName == null) {
             final String msg = "The parameter applicationPropertiesFileName is null";
             logger.error(msg);
             throw new NullPointerException(msg);
         }
-
-        OkosynkConfiguration.singleton =
-                new OkosynkConfiguration(applicationPropertiesFileName);
+        OkosynkConfiguration.singleton = new OkosynkConfiguration(applicationPropertiesFileName);
     }
 
-    public static IOkosynkConfiguration getSingletonInstance() {
+    public static OkosynkConfiguration getSingletonInstance() {
         return OkosynkConfiguration.singleton;
     }
 
-    @Override
     public String getString(final String key) {
         return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key))
                 : compositeConfigurationForSecondPriority.getString(key);
     }
 
-    @Override
     public String getString(final String key, final String defaultValue) {
         return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key))
                 : compositeConfigurationForSecondPriority.getString(key, defaultValue);
     }
 
-    @Override
     public String getRequiredString(final String key) {
         if (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) {
             return compositeConfigurationForFirstPriority.getString(convertToFirstPriorityKey(key));
@@ -103,13 +110,11 @@ public class OkosynkConfiguration
         }
     }
 
-    @Override
     public boolean getBoolean(final String key, final boolean defaultValue) {
         return (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) ? compositeConfigurationForFirstPriority.getBoolean(convertToFirstPriorityKey(key))
                 : compositeConfigurationForSecondPriority.getBoolean(key, defaultValue);
     }
 
-    @Override
     public int getRequiredInt(final String key) {
         if (containsEnvironmentVariableCaseSensitively(convertToFirstPriorityKey(key))) {
             return compositeConfigurationForFirstPriority.getInt(convertToFirstPriorityKey(key));
@@ -119,12 +124,10 @@ public class OkosynkConfiguration
         }
     }
 
-    @Override
     public void setSystemProperty(final String key, final String value) {
         this.systemConfiguration.setProperty(key, value);
     }
 
-    @Override
     public void clearSystemProperty(final String key) {
         this.systemConfiguration.clearProperty(key);
     }
@@ -134,29 +137,16 @@ public class OkosynkConfiguration
                 "Fant ikke konfigurasjonsnøkkel %s", key);
     }
 
-    @Override
     public String getNavTrustStorePath() {
         return getRequiredString(NAV_TRUSTSTORE_PATH_KEY);
     }
 
-    @Override
     public String getNavTrustStorePassword() {
         return getRequiredString(NAV_TRUSTSTORE_PASSWORD_KEY);
     }
 
-    @Override
     public String getPrometheusAddress(final String defaultPrometheusAddress) {
         return getString(PUSH_GATEWAY_ENDPOINT_NAME_AND_PORT_KEY, defaultPrometheusAddress);
-    }
-
-    @Override
-    public String getBatchBruker(final BATCH_TYPE batchType) {
-        return getString(batchType.getBatchBrukerKey(), batchType.getBatchBrukerDefaultValue());
-    }
-
-    @Override
-    public String getBatchBrukerPassword(final BATCH_TYPE batchType) {
-        return getString(batchType.getBatchBrukerPasswordKey());
     }
 
     private void copySomePropertiesToSystemPropertiesToSatisfyExternalLibraries() {
@@ -221,16 +211,58 @@ public class OkosynkConfiguration
         return originalKey.toUpperCase().replace('.', '_');
     }
 
+    public String getNaisAppName() {
+        return getRequiredString(Constants.NAIS_APP_NAME_KEY);
+    }
+
+    public String getAzureAppWellKnownUrl() {
+        return getRequiredString("AZURE_APP_WELL_KNOWN_URL");
+    }
+
+    public String getAzureAppTenantId() {
+        return getRequiredString("AZURE_APP_TENANT_ID");
+    }
+
+    public String getAzureAppTokenUrl() {
+        final String azureAppWellKnownUrl = getAzureAppWellKnownUrl();
+        try {
+            final URL azureAppTokenUrl = new URL(azureAppWellKnownUrl);
+            return azureAppTokenUrl.getProtocol() + "://"
+                    + azureAppTokenUrl.getHost() + ":" + azureAppTokenUrl.getPort() + "/"
+                    + getAzureAppTenantId() + "/oauth2/v2.0/token";
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException("Exception received when trying to calculate the azureAppTokenUrl");
+        }
+    }
+
+    public String getAzureAppClientId() {
+        return getRequiredString(AZURE_APP_CLIENT_ID_KEY);
+    }
+
+    public String getAzureAppClientSecret() {
+        return getRequiredString("AZURE_APP_CLIENT_SECRET");
+    }
+
+    public String getAzureAppScopes() {
+        return Stream.of(getRequiredString("AZURE_APP_SCOPE_OPPGAVE")).collect(joining(" "));
+    }
+
+    public String getSecureHttpProxyUrl() {
+        return getString("HTTPS_PROXY");
+    }
+
+    public String getPdlUrl() {
+        return getRequiredString(PDL_URL_KEY);
+    }
+
     private record Tuple2(String _1, String _2) {
     }
 
     private void addVaultProperties(final CompositeConfiguration compositeConfiguration) {
         final Configuration baseConfig = new BaseConfiguration();
         Stream.of(
-                new Tuple2("SRVBOKOSYNK001_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk001/username"),
-                new Tuple2("SRVBOKOSYNK001_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk001/password"),
-                new Tuple2("SRVBOKOSYNK002_USERNAME", "/secrets/serviceuser/okosynk/srvbokosynk002/username"),
-                new Tuple2("SRVBOKOSYNK002_PASSWORD", "/secrets/serviceuser/okosynk/srvbokosynk002/password"),
+                new Tuple2(OPPGAVE_USERNAME, "/secrets/oppgavecredentials/username"),
+                new Tuple2(OPPGAVE_PASSWORD, "/secrets/oppgavecredentials/password"),
                 new Tuple2(FTP_USERNAME, "/secrets/sftpcredentials/username"),
                 new Tuple2(FTP_PRIVATEKEY, "/secrets/sftpcredentials/privateKey"),
                 new Tuple2(FTP_HOSTKEY, "/secrets/sftpcredentials/hostKey")
@@ -261,4 +293,9 @@ public class OkosynkConfiguration
         }
         return content;
     }
+
+    public BATCH_TYPE getBatchType() {
+        return getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY).equals(Constants.BATCH_TYPE.OS.name()) ? BATCH_TYPE.OS : BATCH_TYPE.UR;
+    }
+
 }

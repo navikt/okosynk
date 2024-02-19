@@ -1,21 +1,20 @@
 package no.nav.okosynk.synkroniserer.consumer;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class ConsumerStatisticsTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
 
     private static final int[] primes = {3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
             61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157,
@@ -23,8 +22,6 @@ class ConsumerStatisticsTest {
 
     @Test
     void should_throw_when_added_is_null() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final ConsumerStatistics consumerStatistics1 = ConsumerStatistics.zero("y");
         final ConsumerStatistics consumerStatistics2 = null;
@@ -37,8 +34,6 @@ class ConsumerStatisticsTest {
 
     @Test
     void should_throw_when_adding_multiple_instances_and_at_least_one_is_null() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final String consumerStatisticsName = "x";
         final ConsumerStatistics consumerStatistics1 = ConsumerStatistics.zero(consumerStatisticsName);
@@ -54,8 +49,6 @@ class ConsumerStatisticsTest {
 
     @Test
     void should_add_three_instances_correctly_when_all_are_valid() {
-
-        enteringTestHeaderLogger.debug(null);
 
         int i = 0;
         final String consumerStatisticsName = "XX";
@@ -159,8 +152,6 @@ class ConsumerStatisticsTest {
     @Test
     void when_two_with_differing_names_are_added_an_exception_should_be_thrown() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final ConsumerStatistics consumerStatistics1 =
                 ConsumerStatistics
                         .builder()
@@ -180,24 +171,18 @@ class ConsumerStatisticsTest {
     @Test
     void when_instantiating_without_a_name_an_exception_should_be_thrown() {
 
-        enteringTestHeaderLogger.debug(null);
-
         ConsumerStatistics.Builder builder = ConsumerStatistics.builder();
         assertThrows(NullPointerException.class, builder::build);
     }
 
     @Test
     void when_instantiating_with_an_empty_name_an_exception_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
         ConsumerStatistics.Builder emptyName = ConsumerStatistics.builder().name("");
         assertThrows(IllegalArgumentException.class, emptyName::build);
     }
 
     @Test
     void when_instantiating_with_a_blank_name_an_exception_should_be_thrown() {
-
-        enteringTestHeaderLogger.debug(null);
 
         ConsumerStatistics.Builder blankName = ConsumerStatistics.builder().name("   ");
         assertThrows(IllegalArgumentException.class, blankName::build);
@@ -206,16 +191,12 @@ class ConsumerStatisticsTest {
     @Test
     void when_instantiating_with_only_a_name_an_exception_should_not_be_thrown() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertDoesNotThrow(() -> ConsumerStatistics.builder().name("x").build());
         assertDoesNotThrow(() -> ConsumerStatistics.builder("y").build());
     }
 
     @Test
     void when_sufficiently_initialized_toString_should_not_throw() {
-
-        enteringTestHeaderLogger.debug(null);
 
         assertDoesNotThrow(
                 () -> {
@@ -227,8 +208,6 @@ class ConsumerStatisticsTest {
 
     @Test
     void when_stringified_then_all_field_names_and_values_should_be_present() {
-
-        enteringTestHeaderLogger.debug(null);
 
         final ConsumerStatistics consumerStatistics =
                 ConsumerStatistics.builder()
@@ -269,8 +248,6 @@ class ConsumerStatisticsTest {
     @Test
     void when_compared_to_null_should_not_be_equal() {
 
-        enteringTestHeaderLogger.debug(null);
-
         final ConsumerStatistics consumerStatistics =
                 ConsumerStatistics.builder().name("x").build();
         assertNotEquals(null, consumerStatistics);
@@ -278,8 +255,6 @@ class ConsumerStatisticsTest {
 
     @Test
     void when_all_fields_in_each_of_two_instances_are_different_only_one_instance_of_the_permutated_other_should_equal() {
-
-        enteringTestHeaderLogger.debug(null);
 
         int ix = 1;
         final Integer[] firstEverySecondPrimes = new Integer[]{

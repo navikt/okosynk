@@ -3,9 +3,8 @@ package no.nav.okosynk.synkroniserer.consumer.oppgave.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOppgaveRequestJson> {
 
@@ -18,9 +17,10 @@ class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOpp
     void when_sub_instance_is_compared_to_a_subclass_then_the_result_should_be_unequal() {
 
         final PostOppgaveRequestJson postOppgaveRequestJson1 = new PostOppgaveRequestJson();
-        final PostOppgaveRequestJson PostOppgaveRequestJson2 = new PostOppgaveRequestJson() {};
+        final PostOppgaveRequestJson PostOppgaveRequestJson2 = new PostOppgaveRequestJson() {
+        };
 
-        assertNotEquals(postOppgaveRequestJson1, PostOppgaveRequestJson2);
+        Assertions.assertNotEquals(postOppgaveRequestJson1, PostOppgaveRequestJson2);
     }
 
     @Test
@@ -32,6 +32,6 @@ class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOpp
         final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final String serializedpostOppgaveRequestJsonString = objectMapper.writeValueAsString(postOppgaveRequestJson);
         final PostOppgaveRequestJson actualDeserializedFinnOppgaveResponseJson = objectMapper.readValue(serializedpostOppgaveRequestJsonString, PostOppgaveRequestJson.class);
-        assertEquals(postOppgaveRequestJson, actualDeserializedFinnOppgaveResponseJson);
+        Assertions.assertEquals(postOppgaveRequestJson, actualDeserializedFinnOppgaveResponseJson);
     }
 }

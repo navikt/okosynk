@@ -1,10 +1,9 @@
 package no.nav.okosynk;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.config.IOkosynkConfiguration;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
-import no.nav.okosynk.hentbatchoppgaver.model.AbstractMelding;
+import no.nav.okosynk.metrics.AlertMetrics;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,39 +14,31 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class CliMain {
-
     private static final Logger logger = LoggerFactory.getLogger(CliMain.class);
-
     private static final String CLI_PROGRAM_NAME = "java -jar okosynk.jar";
-
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_KEY = "p";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_LONG_KEY = "propFile";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_DESCRIPTION = "The name of a file from which the application should read properties";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_ARG_NAME = "applicationPropertiesFileName";
     private static final String CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE = "okosynk.properties";
-
     private static final String CLI_HELP_KEY = "h";
     private static final String CLI_HELP_LONG_KEY = "help";
     private static final String CLI_HELP_DESCRIPTION = "Print this message";
-
-    private final IOkosynkConfiguration okosynkConfiguration;
+    private final OkosynkConfiguration okosynkConfiguration;
 
     public CliMain(final String applicationPropertiesFileName) {
-
-        final IOkosynkConfiguration okosynkConfiguration =
-                createOkosynkConfiguration(applicationPropertiesFileName);
-        this.okosynkConfiguration = okosynkConfiguration;
+        okosynkConfiguration = createOkosynkConfiguration(applicationPropertiesFileName);
         setUpCertificates(okosynkConfiguration);
     }
 
     @SuppressWarnings("checkstyle:MissingJavadocMethod")
-    public static void main(final String[] args) throws Exception {
+    public static void main(final String[] args)  {
         CliMain.runMain(args, CliMain::new);
     }
 
     protected static void runMain(
             final String[] args,
-            final Function<String, ? extends CliMain> mainClassCreator) throws Exception {
+            final Function<String, ? extends CliMain> mainClassCreator)  {
 
         logger.info("===== ENTERING OKOSYNK =====");
         final CommandLine commandLine = CliMain.treatCommandLineArgs(args);
@@ -56,11 +47,11 @@ public class CliMain {
         final String applicationPropertiesFileName =
                 commandLine.hasOption(CLI_APPLICATION_PROPERTIES_FILENAME_KEY)
                         ? commandLine.getOptionValue(CLI_APPLICATION_PROPERTIES_FILENAME_KEY)
-                : CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE;
+                        : CLI_APPLICATION_PROPERTIES_FILENAME_DEFAULT_VALUE;
 
         logger.info("The following properties file will be used: {}", applicationPropertiesFileName);
 
-        try (final MainContext mainContext = new MainContext(shouldRun, commandLine, applicationPropertiesFileName)){
+        try (final MainContext mainContext = new MainContext(shouldRun, commandLine, applicationPropertiesFileName)) {
             if (mainContext.shouldRun) {
                 final CliMain cliMain = mainClassCreator.apply(mainContext.applicationPropertiesFileName);
                 cliMain.runAllBatches();
@@ -71,7 +62,7 @@ public class CliMain {
         System.exit(0);
     }
 
-    private static CommandLine treatCommandLineArgs(final String[] args) throws ParseException {
+    private static CommandLine treatCommandLineArgs(final String[] args) {
 
         final Option helpOption =
                 Option
@@ -108,14 +99,13 @@ public class CliMain {
             }
         } catch (Exception e) {
             logger.error("Exception received when trying to parse the command line");
-            e.printStackTrace();
-            throw e;
+            throw new IllegalArgumentException(e);
         }
 
         return commandLine;
     }
 
-    protected IOkosynkConfiguration createOkosynkConfiguration() {
+    protected OkosynkConfiguration createOkosynkConfiguration() {
         return okosynkConfiguration;
     }
 
@@ -128,33 +118,25 @@ public class CliMain {
         final String revision = createOkosynkConfiguration().getString("revision");
         logger.info("okosynk revision (as taken from pom.xml): {}", revision == null ? "Not available" : revision);
 
-        final IOkosynkConfiguration okosynkConfigurationLocal = createOkosynkConfiguration();
-        final Collection<AbstractService<? extends AbstractMelding>> services = new ArrayList<>();
+        final OkosynkConfiguration okosynkConfigurationLocal = createOkosynkConfiguration();
+        final Collection<Service> services = new ArrayList<>();
 
-//TODO:bli kvitt shouldRun?
-// Constants.BATCH_TYPE.OS.equals(okosynkConfigurationLocal.getRequiredString(Constants.SHOULD_RUN_OS_OR_UR_KEY))
-
-        if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.OS)) {
-            logger.info("Running OS");
-            services.add(new OsService(okosynkConfigurationLocal));
-        }
-        if (okosynkConfigurationLocal.shouldRun(Constants.BATCH_TYPE.UR)) {
-            logger.info("Running UR");
-            services.add(new UrService(okosynkConfigurationLocal));
-        }
+        services.add(new Service(okosynkConfigurationLocal));
 
         final int sleepTimeBetweenRunsInMs = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_RETRY_WAIT_TIME_IN_MS_KEY);
         final int maxNumberOfRuns = okosynkConfigurationLocal.getRequiredInt(Constants.BATCH_MAX_NUMBER_OF_TRIES_KEY);
         int actualNumberOfRuns = 0;
         do {
             logger.info("About to run the batch(es) for the {}. time ...", actualNumberOfRuns + 1);
-            services.stream().filter(AbstractService::shouldRun).forEach(this::runOneBatch);
-            if (++actualNumberOfRuns < maxNumberOfRuns && services.stream().anyMatch(AbstractService::shouldRun)) {
+            services.stream().filter(Service::shouldRun).forEach(this::runOneBatch);
+            if (++actualNumberOfRuns < maxNumberOfRuns && services.stream().anyMatch(Service::shouldRun)) {
                 retrySleep(actualNumberOfRuns, maxNumberOfRuns, sleepTimeBetweenRunsInMs);
-            } else {break;}
+            } else {
+                break;
+            }
         } while (true);
 
-        services.forEach(service -> service.getAlertMetrics()
+        services.forEach(service -> AlertMetrics.getSingletonInstance(okosynkConfiguration.getPrometheusAddress("prometheus-pushgateway.nais-system:9091"), okosynkConfiguration.getBatchType())
                 .generateCheckTheLogAlertBasedOnBatchStatus(service.getLastBatchStatus())
         );
     }
@@ -177,18 +159,19 @@ public class CliMain {
                             + "I was woken up by \"something\" before {} ms had passed.",
                     sleepTimeBetweenRunsInMs
             );
+            Thread.currentThread().interrupt();
         }
         logger.info("I will try re-running the batch(es)...");
     }
 
-    private void runOneBatch(final AbstractService<? extends AbstractMelding> service) {
+    private void runOneBatch(final Service service) {
         final String batchName = service.getBatchType().getName();
         logger.info("About to run batch {}...", batchName);
         final BatchStatus batchStatus = service.run();
         logger.info("batch {} finished with BatchStatus: {}", batchName, batchStatus);
     }
 
-    private IOkosynkConfiguration createOkosynkConfiguration(
+    private OkosynkConfiguration createOkosynkConfiguration(
             final String applicationPropertiesFileName) {
 
         OkosynkConfiguration.createAndReplaceSingletonInstance(applicationPropertiesFileName);
@@ -202,7 +185,7 @@ public class CliMain {
      * javax.net.ssl.trustStore: /var/run/secrets/naisd.io/nav_truststore_path
      * javax.net.ssl.trustStorePassword: <whatever>
      */
-    private void setUpCertificates(final IOkosynkConfiguration okosynkConfiguration) {
+    private void setUpCertificates(final OkosynkConfiguration okosynkConfiguration) {
 
         logger.info("About to set up certificates...");
         final Map<String, String> env = System.getenv();

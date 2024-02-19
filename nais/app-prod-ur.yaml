@@ -56,11 +56,8 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: serviceuser/data/prod/srvbokosynk001
-        mountPath: /secrets/serviceuser/okosynk/srvbokosynk001
-      - kvPath: serviceuser/data/prod/srvbokosynk002
-        mountPath: /secrets/serviceuser/okosynk/srvbokosynk002
       - kvPath: kv/prod/fss/okosynkur/sftpcredentials
         mountPath: /secrets/sftpcredentials
-    sidecar: true
+      - kvPath: kv/prod/fss/okosynkur/oppgavecredentials
+        mountPath: /secrets/oppgavecredentials
 status: {}

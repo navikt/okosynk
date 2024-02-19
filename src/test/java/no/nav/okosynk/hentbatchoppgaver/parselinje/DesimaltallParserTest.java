@@ -2,87 +2,81 @@ package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
 import no.nav.okosynk.hentbatchoppgaver.parselinje.exceptions.IncorrectMeldingFormatException;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.text.ParseException;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DesimaltallParserTest {
-
-    private static final Logger enteringTestHeaderLogger =
-            LoggerFactory.getLogger("EnteringTestHeader");
-
-    @Test
-    void parseGirRiktigResultat() throws ParseException {
-
-        enteringTestHeaderLogger.debug(null);
-
-        assertAll("parseGirRiktigResultat",
-                () -> assertEquals(-90.00, DesimaltallParser.parse("000000000900å")),
-                () -> assertEquals(-550.00, DesimaltallParser.parse("000000005500å")),
-                () -> assertEquals(0.00, DesimaltallParser.parse("000000000000æ")),
-                () -> assertEquals(110.00, DesimaltallParser.parse("000000001100æ")),
-                () -> assertEquals(56.75, DesimaltallParser.parse("000000000567E")),
-                () -> assertEquals(41498.91, DesimaltallParser.parse("000000414989A")),
-                () -> assertEquals(182298.00, DesimaltallParser.parse("000001822980æ")),
-                () -> assertEquals(150.75, DesimaltallParser.parse("000000001507E")),
-                () -> assertEquals(476.00, DesimaltallParser.parse("000000004760æ")),
-                () -> assertEquals(-4428.00, DesimaltallParser.parse("000000044280å")),
-                () -> assertEquals(8484.01, DesimaltallParser.parse("000000084840A")),
-                () -> assertEquals(2290.02, DesimaltallParser.parse("000000022900B")),
-                () -> assertEquals(2298.03, DesimaltallParser.parse("000000022980C")),
-                () -> assertEquals(693.04, DesimaltallParser.parse("000000006930D")),
-                () -> assertEquals(1966.05, DesimaltallParser.parse("000000019660E")),
-                () -> assertEquals(999.06, DesimaltallParser.parse("000000009990F")),
-                () -> assertEquals(11640.07, DesimaltallParser.parse("000000116400G")),
-                () -> assertEquals(2268.08, DesimaltallParser.parse("000000022680H")),
-                () -> assertEquals(2320.09, DesimaltallParser.parse("000000023200I")),
-                () -> assertEquals(-11283.01, DesimaltallParser.parse("000000112830J")),
-                () -> assertEquals(-1966.02, DesimaltallParser.parse("000000019660K")),
-                () -> assertEquals(-999.03, DesimaltallParser.parse("000000009990L")),
-                () -> assertEquals(-970.04, DesimaltallParser.parse("000000009700M")),
-                () -> assertEquals(-1269.05, DesimaltallParser.parse("000000012690N")),
-                () -> assertEquals(-11858.06, DesimaltallParser.parse("000000118580O")),
-                () -> assertEquals(-1966.07, DesimaltallParser.parse("000000019660P")),
-                () -> assertEquals(-6909.08, DesimaltallParser.parse("000000069090Q")),
-                () -> assertEquals(-999.09, DesimaltallParser.parse("000000009990R"))
-        );
+    @ParameterizedTest(name = "parsedResult of {1} = {0}")
+    @MethodSource("getParsedAndFlatfilNumber")
+    void parseGirRiktigResultat(double expected, String flatFilTall) {
+        assertEquals(expected, Util.parseDouble(flatFilTall));
     }
 
     @Test
     void parseKasterMeldingFormatExceptionHvisSisteTegnErUgyldig() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertThrows(IncorrectMeldingFormatException.class, () -> {
             String strengMedUgyldigSisteTegn = "0000000009009";
-            DesimaltallParser.parse(strengMedUgyldigSisteTegn);
+            Util.parseDouble(strengMedUgyldigSisteTegn);
         });
 
         assertThrows(IncorrectMeldingFormatException.class, () -> {
             String strengMedUgyldigSisteTegn = "00000010201x";
-            DesimaltallParser.parse(strengMedUgyldigSisteTegn);
+            Util.parseDouble(strengMedUgyldigSisteTegn);
         });
     }
 
     @Test
     void parseKasterMeldingFormatExceptionForStrengSomIkkeRepresentererEtBelop() {
 
-        enteringTestHeaderLogger.debug(null);
-
         assertThrows(IncorrectMeldingFormatException.class, () -> {
             String strengSomIkkeRepresentererEtBelop = "abcdefg19660P";
-            DesimaltallParser.parse(strengSomIkkeRepresentererEtBelop);
+            Util.parseDouble(strengSomIkkeRepresentererEtBelop);
         });
     }
 
     @Test
-    void parseFungererForStorsteMuligeTall() throws ParseException {
+    void parseFungererForStorsteMuligeTall() {
 
-        enteringTestHeaderLogger.debug(null);
+        assertEquals(99999999999.99, Util.parseDouble("999999999999I"));
+    }
 
-        assertEquals(99999999999.99, DesimaltallParser.parse("999999999999I"));
+    private static Stream<Arguments> getParsedAndFlatfilNumber() {
+        return Stream.of(
+                Arguments.of(-90.00, "000000000900å"),
+                Arguments.of(-550.00, "000000005500å"),
+                Arguments.of(0.00, "000000000000æ"),
+                Arguments.of(110.00, "000000001100æ"),
+                Arguments.of(56.75, "000000000567E"),
+                Arguments.of(41498.91, "000000414989A"),
+                Arguments.of(182298.00, "000001822980æ"),
+                Arguments.of(150.75, "000000001507E"),
+                Arguments.of(476.00, "000000004760æ"),
+                Arguments.of(-4428.00, "000000044280å"),
+                Arguments.of(8484.01, "000000084840A"),
+                Arguments.of(2290.02, "000000022900B"),
+                Arguments.of(2298.03, "000000022980C"),
+                Arguments.of(693.04, "000000006930D"),
+                Arguments.of(1966.05, "000000019660E"),
+                Arguments.of(999.06, "000000009990F"),
+                Arguments.of(11640.07, "000000116400G"),
+                Arguments.of(2268.08, "000000022680H"),
+                Arguments.of(2320.09, "000000023200I"),
+                Arguments.of(-11283.01, "000000112830J"),
+                Arguments.of(-1966.02, "000000019660K"),
+                Arguments.of(-999.03, "000000009990L"),
+                Arguments.of(-970.04, "000000009700M"),
+                Arguments.of(-1269.05, "000000012690N"),
+                Arguments.of(-11858.06, "000000118580O"),
+                Arguments.of(-1966.07, "000000019660P"),
+                Arguments.of(-6909.08, "000000069090Q"),
+                Arguments.of(-999.09, "000000009990R")
+        );
     }
 }

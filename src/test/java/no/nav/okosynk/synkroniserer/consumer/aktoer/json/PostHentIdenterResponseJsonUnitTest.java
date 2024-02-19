@@ -2,19 +2,16 @@ package no.nav.okosynk.synkroniserer.consumer.aktoer.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
-import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PostPdlHentIdenterDataResponseJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PostPdlHentIdenterHentIdenterResponseJson;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer.json.PostPdlHentIdenterResponseJson;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentGruppeV2;
+import no.nav.okosynk.synkroniserer.consumer.oppgave.json.IdentJson;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.HashSet;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PostHentIdenterResponseJsonUnitTest {
 
@@ -51,11 +48,11 @@ class PostHentIdenterResponseJsonUnitTest {
         final PostPdlHentIdenterResponseJson actualPostPdlHentIdenterResponseJson =
                 objectMapper.readValue(expectedPostHentIdenterResponseJsonAsString, PostPdlHentIdenterResponseJson.class);
 
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData());
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter());
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter());
-        assertEquals(expectedIdenter.size(), actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().size());
-        assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().containsAll(expectedIdenter));
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData());
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter());
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter());
+        Assertions.assertEquals(expectedIdenter.size(), actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().size());
+        Assertions.assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().containsAll(expectedIdenter));
     }
 
     @Test
@@ -92,12 +89,12 @@ class PostHentIdenterResponseJsonUnitTest {
         final PostPdlHentIdenterResponseJson actualPostPdlHentIdenterResponseJson =
                 objectMapper.readValue(expectedPostHentIdenterResponseJsonAsString, PostPdlHentIdenterResponseJson.class);
 
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData());
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter());
-        assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter());
-        assertEquals(3, actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().size());
-        assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.AKTOERID, expectedAktoeridIdent)));
-        assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, expectedFolkeregisterIdent)));
-        assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.NPID, expectedNpidIdent)));
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData());
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter());
+        Assertions.assertNotNull(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter());
+        Assertions.assertEquals(3, actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().size());
+        Assertions.assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.AKTOERID, expectedAktoeridIdent)));
+        Assertions.assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.FOLKEREGISTERIDENT, expectedFolkeregisterIdent)));
+        Assertions.assertTrue(actualPostPdlHentIdenterResponseJson.getData().getHentIdenter().getIdenter().contains(new IdentJson(IdentGruppeV2.NPID, expectedNpidIdent)));
     }
 }

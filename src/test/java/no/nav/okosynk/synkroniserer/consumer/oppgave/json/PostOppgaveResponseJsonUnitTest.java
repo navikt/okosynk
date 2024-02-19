@@ -3,17 +3,14 @@ package no.nav.okosynk.synkroniserer.consumer.oppgave.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-
-class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostOppgaveResponseJson> {
+class PostOppgaveResponseJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOppgaveResponseJson> {
 
     @Override
     protected PostOppgaveResponseJson createEmptyInstance() {
@@ -27,7 +24,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
         final PostOppgaveResponseJson PostOppgaveResponseJson2 = new PostOppgaveResponseJson() {{
         }};
 
-        assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
     }
 
     @Test
@@ -37,7 +34,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
         fillWithAllHardCodedData(PostOppgaveResponseJson1);
         final PostOppgaveResponseJson PostOppgaveResponseJson2 = createEmptyInstance();
         fillWithAllHardCodedData(PostOppgaveResponseJson2);
-        assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
         final Collection<IdentJson> identer1 = new HashSet<>();
         {
             final IdentGruppeV2 identGruppeV2 = IdentGruppeV2.FOLKEREGISTERIDENT;
@@ -45,7 +42,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
             identer1.add(identJson);
         }
         PostOppgaveResponseJson1.setIdenter(identer1);
-        assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
 
         final Collection<IdentJson> identer2 = new HashSet<>();
         {
@@ -54,7 +51,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
             identer2.add(identJson);
         }
         PostOppgaveResponseJson2.setIdenter(identer2);
-        assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
     }
 
     @Test
@@ -64,7 +61,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
         final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final String serializedexpectedPostOppgaveResponseJsonString = objectMapper.writeValueAsString(expectedPostOppgaveResponseJson);
         final PostOppgaveResponseJson actualDeserializedPostOppgaveResponseJson = objectMapper.readValue(serializedexpectedPostOppgaveResponseJsonString, PostOppgaveResponseJson.class);
-        assertEquals(expectedPostOppgaveResponseJson, actualDeserializedPostOppgaveResponseJson);
+        Assertions.assertEquals(expectedPostOppgaveResponseJson, actualDeserializedPostOppgaveResponseJson);
     }
 
     @Test
@@ -90,7 +87,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
         final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final String serializedExpectedPostOppgaveResponseJsonString = objectMapper.writeValueAsString(expectedPostOppgaveResponseJson);
         final PostOppgaveResponseJson actualDeserializedPostOppgaveResponseJson = objectMapper.readValue(serializedExpectedPostOppgaveResponseJsonString, PostOppgaveResponseJson.class);
-        assertEquals(expectedPostOppgaveResponseJson, actualDeserializedPostOppgaveResponseJson);
+        Assertions.assertEquals(expectedPostOppgaveResponseJson, actualDeserializedPostOppgaveResponseJson);
     }
 
     @Test
@@ -110,7 +107,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
             identer.add(identJson);
             PostOppgaveResponseJson2.setIdenter(identer);
         }
-        assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
     }
 
     @Test
@@ -134,7 +131,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
             identer.add(identJson1);
             PostOppgaveResponseJson2.setIdenter(identer);
         }
-        assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
     }
 
     @Test
@@ -146,7 +143,7 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
         PostOppgaveResponseJson1.setIdenter(identer);
         final PostOppgaveResponseJson PostOppgaveResponseJson2 = createEmptyInstance();
         PostOppgaveResponseJson2.setIdenter(null);
-        assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
+        Assertions.assertNotEquals(PostOppgaveResponseJson1, PostOppgaveResponseJson2);
     }
 
     @Test
@@ -180,6 +177,6 @@ class PostOppgaveResponseJsonUnitTest  extends AbstractOppgaveJsonUnitTest<PostO
                 new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final PostOppgaveResponseJson PostOppgaveResponseJson =
                 objectMapper.readValue(finnOppgaverResponseJsonString, PostOppgaveResponseJson.class);
-        assertEquals(expectedId, PostOppgaveResponseJson.getId());
+        Assertions.assertEquals(expectedId, PostOppgaveResponseJson.getId());
     }
 }
