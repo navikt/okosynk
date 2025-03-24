@@ -1,8 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.lagoppgave.aktoer;
 
-import lombok.Getter;
-
-@Getter
 public class AktoerRespons {
 
   private final String feilmelding;
@@ -23,5 +20,13 @@ public class AktoerRespons {
 
   public boolean isOk() {
     return feilmelding == null;
+  }
+
+  public String getFeilmelding() {
+    return feilmelding;
+  }
+
+  public String getAktoerId() {
+    return aktoerId;
   }
 }

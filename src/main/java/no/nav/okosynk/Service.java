@@ -1,6 +1,5 @@
 package no.nav.okosynk;
 
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
 import no.nav.okosynk.exceptions.BatchStatus;
@@ -28,11 +27,9 @@ public class Service {
 
     private static final Logger logger = LoggerFactory.getLogger(Service.class);
 
-    @Getter
     private final Constants.BATCH_TYPE batchType;
     private final OkosynkConfiguration okosynkConfiguration;
     private boolean shouldRun;
-    @Getter
     private BatchStatus lastBatchStatus;
     private IAktoerClient aktoerClient;
     private Batch batch;
@@ -122,4 +119,11 @@ public class Service {
         this.aktoerClient = aktoerClient;
     }
 
+    public BatchStatus getLastBatchStatus() {
+        return lastBatchStatus;
+    }
+
+    public BATCH_TYPE getBatchType() {
+        return batchType;
+    }
 }

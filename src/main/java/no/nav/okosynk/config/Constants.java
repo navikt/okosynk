@@ -1,7 +1,5 @@
 package no.nav.okosynk.config;
 
-import lombok.Getter;
-
 public class Constants {
 
     public static final String AUTHORIZATION = "Authorization";
@@ -32,7 +30,6 @@ public class Constants {
     static final String TILLAT_MOCK_PROPERTY_EXT_KEY = "tillatmock";
     static final String TILLAT_MOCK_PROPERTY_KEY = "TILLATMOCK";
 
-    @Getter
     public enum BATCH_TYPE {
         OS(
                 "bokosynk001",
@@ -70,6 +67,26 @@ public class Constants {
 
         public String getConsumerStatisticsName() {
             return name() + " - " + getName();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getMappingRulesPropertiesFileName() {
+            return mappingRulesPropertiesFileName;
+        }
+
+        public String getOppgaveType() {
+            return oppgaveType;
+        }
+
+        public String getAlertCollectorMetricName() {
+            return alertCollectorMetricName;
+        }
+
+        public long getAntallDagerFrist() {
+            return antallDagerFrist;
         }
     }
 }

@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.OsBeskrivelseInfo;
@@ -29,7 +28,6 @@ public class OsMelding extends Melding {
     static final String ORGANISASJON_PREFIKS = "00";
     private static final String FLAGG_FEILKONTO_DEFAULT = " ";
 
-    @Getter
     final String faggruppe;
     final String beregningsId;
     final LocalDate beregningsDato;
@@ -56,6 +54,10 @@ public class OsMelding extends Melding {
                 .filter(f -> !isEmpty(f)).orElse(FLAGG_FEILKONTO_DEFAULT);
         this.utbetalesTilId = parseUtbetalesTilId(osMelding);
         this.etteroppgjor = parseEtteroppgjor(osMelding);
+    }
+
+    public String getFaggruppe() {
+        return faggruppe;
     }
 
     @Override

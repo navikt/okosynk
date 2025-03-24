@@ -15,7 +15,7 @@
         <java.compilation.target.version>21</java.compilation.target.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <junit.version>5.11.1</junit.version>
+        <junit.version>5.11.4</junit.version>
         <jetty.version>12.0.9</jetty.version>
         <logback.version>1.5.18</logback.version>
         <sshd.version>2.10.0</sshd.version>
@@ -100,7 +100,7 @@
             <dependency>
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
-                <version>7.3</version>
+                <version>8.0</version>
             </dependency>
 
             <dependency>
@@ -193,7 +193,7 @@
             <dependency>
                 <groupId>no.nav.security</groupId>
                 <artifactId>token-client-core</artifactId>
-                <version>5.0.19</version>
+                <version>5.0.20</version>
             </dependency>
 
         </dependencies>
@@ -378,11 +378,6 @@
             <groupId>no.nav.security</groupId>
             <artifactId>token-client-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
-        </dependency>
 
     </dependencies>
 
@@ -413,7 +408,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.1</version>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
