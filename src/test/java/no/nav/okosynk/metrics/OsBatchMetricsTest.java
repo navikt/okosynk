@@ -1,4 +1,4 @@
-package no.nav.okosynk.metrics.os;
+package no.nav.okosynk.metrics;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -6,8 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import no.nav.okosynk.config.OkosynkConfiguration;
-import no.nav.okosynk.metrics.BatchMetrics;
-import no.nav.okosynk.metrics.BatchMetricsTest;
 import no.nav.okosynk.config.Constants;
 import org.junit.jupiter.api.Test;
 

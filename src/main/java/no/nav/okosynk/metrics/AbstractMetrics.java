@@ -2,7 +2,6 @@ package no.nav.okosynk.metrics;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.exporter.PushGateway;
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +12,14 @@ abstract class AbstractMetrics {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMetrics.class);
 
-    @Getter
     private final Constants.BATCH_TYPE batchType;
     private final String pushGatewayEndpointNameAndPort;
     private final CollectorRegistry collectorRegistry;
     private final PushGateway pushGateway;
+
+    Constants.BATCH_TYPE getBatchType() {
+        return batchType;
+    }
 
     protected AbstractMetrics(String prometheusaddress, Constants.BATCH_TYPE batchType) {
 

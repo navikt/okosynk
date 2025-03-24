@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.Getter;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.model.Oppgave;
@@ -63,11 +62,14 @@ public class OppgaveRestClient {
     private final AzureAdAuthenticationClient azureAdAuthenticationClient;
     private final URI oppgaveUri;
     private final String naisAppName;
-    @Getter
     private final Constants.BATCH_TYPE batchType;
     private final CloseableHttpClient httpClient;
     private final UsernamePasswordCredentials credentials;
     private static final String MESSAGE = "Feilet ved kall mot Oppgave API";
+
+    public BATCH_TYPE getBatchType() {
+        return batchType;
+    }
 
     public OppgaveRestClient(UsernamePasswordCredentials credentials,
                              URI oppgaveUri,

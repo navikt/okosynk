@@ -21,9 +21,9 @@ public class OppgaveTest {
 
     private static final Random random = new Random(187610296876L);
 
-    public static Oppgave.OppgaveBuilder generateRandomCompleteOppgaveBuilderInstance(final Random random) {
+    public static Oppgave.Builder generateRandomCompleteOppgaveBuilderInstance(final Random random) {
 
-        return new Oppgave.OppgaveBuilder()
+        return new Oppgave.Builder()
                 .aktivFra(LocalDate.of(random.nextInt(2015) + 7, random.nextInt(12) + 1, random.nextInt(28) + 1))
                 .aktivTil(LocalDate.of(random.nextInt(2015) + 11, random.nextInt(12) + 1, random.nextInt(28) + 1))
                 .aktoerId(RandUt.constructRandomAlphaNumString(random.nextInt(13) + 1, random))
@@ -202,7 +202,7 @@ public class OppgaveTest {
     void when_an_oppgave_is_compared_to_null_it_should_differ() {
 
         final Oppgave oppgave =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .build();
 
         assertNotEquals(null, oppgave);
@@ -212,11 +212,11 @@ public class OppgaveTest {
     void when_two_empty_oppgaver_are_compared_then_it_should_equal() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .build();
 
         assertEquals(oppgave1, oppgave2);
@@ -226,12 +226,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_ansvarligEnhetId_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .ansvarligEnhetId("APAPAPAPAPA")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .ansvarligEnhetId("yuyuyuyuuyuyuyu")
                         .build();
 
@@ -242,12 +242,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_behandlingstype_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .behandlingstype("OPOPOP")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .behandlingstype("nopnopnop")
                         .build();
 
@@ -258,12 +258,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_behandlingstema_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .behandlingstema("AIAIAI")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .behandlingstema("YESSSSSS")
                         .build();
 
@@ -274,12 +274,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_bnr_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .bnr("1237890")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .bnr("0890456")
                         .build();
 
@@ -290,12 +290,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_orgnr_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .orgnr("123789")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .orgnr("890456")
                         .build();
 
@@ -307,12 +307,12 @@ public class OppgaveTest {
 
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .folkeregisterIdent("17023410293")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .folkeregisterIdent("17023410292")
                         .build();
 
@@ -323,12 +323,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_samhandlernr_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .samhandlernr("123")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .samhandlernr("456")
                         .build();
 
@@ -339,12 +339,12 @@ public class OppgaveTest {
     void when_two_oppgaver_with_differing_aktoerId_are_compared_then_they_should_differ() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("X")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("Y")
                         .build();
 
@@ -355,13 +355,13 @@ public class OppgaveTest {
     void when_only_one_aktoer_id_is_set_then_they_should_be_different() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("Y")
                         .folkeregisterIdent(null)
                         .build();
@@ -373,13 +373,13 @@ public class OppgaveTest {
     void when_only_one_fnr_is_set_then_they_should_be_different() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent("X")
                         .build();
@@ -391,13 +391,13 @@ public class OppgaveTest {
     void when_one_oppgave_has_fnr_and_the_other_aktoer_then_they_should_be_different() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent("X")
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("Y")
                         .folkeregisterIdent(null)
                         .build();
@@ -409,13 +409,13 @@ public class OppgaveTest {
     void when_no_fnr_and_no_aktoer_then_surprisingly_they_should_be_equal() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent(null)
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId(null)
                         .folkeregisterIdent(null)
                         .build();
@@ -428,7 +428,7 @@ public class OppgaveTest {
     void when_two_oppgaver_with_no_differing_important_fields_are_compared_then_they_should_equal() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("X")
                         .folkeregisterIdent("10293847563")
                         .samhandlernr("456")
@@ -440,7 +440,7 @@ public class OppgaveTest {
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("X")
                         .folkeregisterIdent("10293847563")
                         .samhandlernr("456")
@@ -458,7 +458,7 @@ public class OppgaveTest {
     void when_two_oppgaver_with_no_differing_important_fields_and_some_differing_not_so_important_fields_are_compared_then_they_should_still_equal() {
 
         final Oppgave oppgave1 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("X")
                         .folkeregisterIdent("10293847563")
                         .samhandlernr("456")
@@ -475,7 +475,7 @@ public class OppgaveTest {
                         .build();
 
         final Oppgave oppgave2 =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktoerId("X")
                         .folkeregisterIdent("10293847563")
                         .samhandlernr("456")
@@ -499,7 +499,7 @@ public class OppgaveTest {
 
         final String expectedBeskrivelse = null;
         final Oppgave oppgave =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .beskrivelse(expectedBeskrivelse)
                         .build();
 
@@ -515,7 +515,7 @@ public class OppgaveTest {
         final String originalBeskrivelse = "klmdscømsømdcølmsdløcmløsdmcølmsdølmvcølsdmølvmsdølmvølsdmølvmsølmvølsmølvmølsdmvømsdølvmøsdølvmsølmvølmsølvmølsmølvmsømvølsmdølvmsøldmvølmsdølvmølsdmøvlmsdølmvølsmølvmølsdmølvmsdlmvøsm";
         final String expectedBeskrivelse = originalBeskrivelse.substring(0, 30) + "...";
         final Oppgave oppgave =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .beskrivelse(originalBeskrivelse)
                         .build();
 
@@ -530,7 +530,7 @@ public class OppgaveTest {
 
         final String expectedBeskrivelse = "";
         final Oppgave oppgave =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .beskrivelse(expectedBeskrivelse)
                         .build();
 
@@ -554,7 +554,7 @@ public class OppgaveTest {
         final String expectedBehandlingstype = "QPWOEIRURTY";
 
         final Oppgave oppgave =
-                new Oppgave.OppgaveBuilder()
+                new Oppgave.Builder()
                         .aktivTil(expectedAktivTil)
                         .aktivFra(expectedAktivFra)
                         .beskrivelse(expectedBeskrivelse)
