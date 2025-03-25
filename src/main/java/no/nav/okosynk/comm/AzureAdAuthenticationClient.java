@@ -139,7 +139,6 @@ public class AzureAdAuthenticationClient {
                     logger.info("An Azure AD access token successfully acquired");
                 } catch (Throwable e) {
                     logger.error("Could not parse token");
-                    logger.error("entity: ", postResponseEntityAsString);
                     logger.error(e.getMessage());
                     throw new IllegalStateException("Could not parse token", e);
                 }

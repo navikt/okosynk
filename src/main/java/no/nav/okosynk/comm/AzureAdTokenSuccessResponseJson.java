@@ -14,6 +14,13 @@ public class AzureAdTokenSuccessResponseJson {
     @JsonProperty("access_token")
     private final String accessToken;
 
+    public AzureAdTokenSuccessResponseJson() {
+        this.tokenType = null;
+        this.expiresIn = 0;
+        this.extExpiresIn = 0;
+        this.accessToken = null;
+    }
+
     public AzureAdTokenSuccessResponseJson(String tokenType, int expiresIn, int extExpiresIn, String accessToken) {
         this.tokenType = tokenType;
         this.expiresIn = expiresIn;
