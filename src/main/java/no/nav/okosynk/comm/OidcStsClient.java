@@ -102,6 +102,7 @@ public class OidcStsClient {
         request.addHeader(ACCEPT, APPLICATION_JSON.getMimeType());
         try {
             request.addHeader(new BasicScheme(UTF_8).authenticate(this.credentials, request, null));
+            log.info("Added header");
         } catch (AuthenticationException e) {
             // As far as I have found out,
             // the declared exception is NEVER thrown.
@@ -111,7 +112,9 @@ public class OidcStsClient {
         try (final CloseableHttpResponse response = this.httpClient.execute(request)) {
             final StatusLine statusLine = response.getStatusLine();
             if (statusLine.getStatusCode() == HttpURLConnection.HTTP_OK) {
-                return getStsOidcResponse(response).getAccessToken();
+                String accessToken = getStsOidcResponse(response).getAccessToken();
+                log.info("Got OIDC Access Token");
+                return accessToken;
             } else {
                 final String msg =
                         "Feil oppsto under henting av token fra STS - %s"

@@ -120,27 +120,39 @@ public class AzureAdAuthenticationClient {
             logger.info("About to acquire an Azure AD access token...");
             final Map.Entry<Integer, String> postResult =
                     AzureAdAuthenticationClient.httpPost(httpPostProviderUri, httpPostProxyUrl, httpPostParameters, httpPostHeaders);
+            logger.info("Got Azure AD access token");
             // ---------------------------------------------------------------------------------------------------------
             final int httpStatusCode = postResult.getKey();
+            logger.info("Azure AD access token status: " + httpStatusCode);
             final String postResponseEntityAsString = postResult.getValue();
+            logger.info("Setting up Objectmapper...");
             final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+            logger.info("Objectmapper successfully set up");
             if (HttpStatus.SC_OK == httpStatusCode) {
                 final AzureAdTokenSuccessResponseJson azureAdTokenSuccessResponseJson;
                 try {
+                    logger.info("Trying to read Azure AD success response");
                     azureAdTokenSuccessResponseJson =
                             objectMapper.readValue(postResponseEntityAsString, AzureAdTokenSuccessResponseJson.class);
                     setLastAzureAdTokenSuccessResponseJson(azureAdTokenSuccessResponseJson);
                     token = azureAdTokenSuccessResponseJson.getAccessToken();
                     logger.info("An Azure AD access token successfully acquired");
                 } catch (Throwable e) {
+                    logger.error("Could not parse token");
+                    logger.error("entity: ", postResponseEntityAsString);
+                    logger.error(e.getMessage());
                     throw new IllegalStateException("Could not parse token", e);
                 }
             } else {
                 final AzureAdTokenErrorResponseJson azureAdTokenErrorResponseJson;
                 try {
+                    logger.info("Trying to read Azure AD error response");
                     azureAdTokenErrorResponseJson =
                             objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
+                    logger.info("An Azure AD error response acquired");
+                    logger.info(azureAdTokenErrorResponseJson.toString());
                 } catch (Throwable e) {
+                    logger.error("Could not parse token");
                     throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
                 }
                 throw new IllegalStateException("The Azure AD token provider returned an error" + azureAdTokenErrorResponseJson);
