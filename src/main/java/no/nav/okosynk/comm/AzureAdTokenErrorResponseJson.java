@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AzureAdTokenErrorResponseJson {
@@ -21,6 +22,16 @@ public class AzureAdTokenErrorResponseJson {
     private final String correlationId;
     @JsonProperty("error_uri")
     private final String errorUri;
+
+    public AzureAdTokenErrorResponseJson() {
+        this.error = "";
+        this.errorDescription = "";
+        this.errorCodes = Collections.emptyList();
+        this.timestamp = "";
+        this.traceId = "";
+        this.correlationId = "";
+        this.errorUri = "";
+    }
 
     public AzureAdTokenErrorResponseJson(String error, String errorDescription, Collection<Integer> errorCodes, String timestamp, String traceId, String correlationId, String errorUri) {
         this.error = error;

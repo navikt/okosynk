@@ -207,9 +207,9 @@ public class OppgaveRestClient {
         }
 
         if (ferdigstill) {
-            log.info("Ferdigstiller {} oppgaver", oppgaverToBePatched.size());
+            log.info("Ferdigstiller {} oppgaver", Integer.valueOf(oppgaverToBePatched.size()));
         } else {
-            log.info("Oppdaterer {} oppgaver", oppgaverToBePatched.size());
+            log.info("Oppdaterer {} oppgaver", Integer.valueOf(oppgaverToBePatched.size()));
         }
         int suksess = 0;
         int feilet = 0;
@@ -247,10 +247,11 @@ public class OppgaveRestClient {
         FinnOppgaverResponseJson finnOppgaverResponseJson = this.finnOppgaver(bulkSize, offset);
         log.info(
                 "Fant {} oppgaver av oppgaver av type: {}",
-                finnOppgaverResponseJson.getAntallTreffTotalt(), oppgavetype
+                Integer.valueOf(finnOppgaverResponseJson.getAntallTreffTotalt()), oppgavetype
         );
         while (!finnOppgaverResponseJson.getFinnOppgaveResponseJsons().isEmpty()) {
-            log.debug("Akkumulerer {} oppgaver for behandling", finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size());
+            log.debug("Akkumulerer {} oppgaver for behandling",
+                    Integer.valueOf(finnOppgaverResponseJson.getFinnOppgaveResponseJsons().size()));
 
             final List<Oppgave> oppgaver =
                     finnOppgaverResponseJson
@@ -275,9 +276,11 @@ public class OppgaveRestClient {
             }
         }
         int antallOppgaverSomSkalBehandles = oppgaverAccumulated.size() - atomicInteger.get();
-        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}", antallOppgaverSomSkalBehandles, oppgavetype);
+        log.info("Hentet totalt {} unike oppgaver som skal behandles av Økosynk med oppgavetype : {}",
+                Integer.valueOf(antallOppgaverSomSkalBehandles), oppgavetype);
         if (antallOppgaverSomSkalBehandles != finnOppgaverResponseJson.getAntallTreffTotalt()) {
-            log.warn("{} oppgaver har blitt filtrert bort fra resultatet. Disse er enten duplikater eller har blitt opprettet utenfor økosynk", finnOppgaverResponseJson.getAntallTreffTotalt() - antallOppgaverSomSkalBehandles);
+            log.warn("{} oppgaver har blitt filtrert bort fra resultatet. Disse er enten duplikater eller har blitt opprettet utenfor økosynk",
+                    Integer.valueOf(finnOppgaverResponseJson.getAntallTreffTotalt() - antallOppgaverSomSkalBehandles));
         }
         return ConsumerStatistics
                 .builder(getBatchType())
