@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -180,5 +181,34 @@ class FinnOppgaveResponseJsonUnitTest extends AbstractOppgaveJsonUnitTest<FinnOp
         final FinnOppgaveResponseJson finnOppgaveResponseJson =
                 objectMapper.readValue(finnOppgaverResponseJsonString, FinnOppgaveResponseJson.class);
         assertEquals(expectedId, finnOppgaveResponseJson.getId());
+    }
+
+    @Test
+    void jacksonShouldBeAbleToCreateObjectFromJson() {
+        assertDoesNotThrow(() -> {
+            new ObjectMapper().readValue("""
+                    {
+                        "id": "some-id",
+                        "tildeltEnhetsnr": "4819",
+                        "endretAvEnhetsnr": "9999",
+                        "opprettetAvEnhetsnr": "9999",
+                        "aktoerId": "1000023209046",
+                        "beskrivelse": "AVVE;REGNSKAP;   345kr;   beregningsdato/id:19.07.21/429386336;   periode:01.05.21-31.05.21;   feilkonto: ;   statusdato:19.07.21;   ;   UtbTil:06105630008;   A126804",
+                        "tema": "OKO",
+                        "oppgavetype": "OKO_TBK",
+                        "behandlingstype": "ae0216",
+                        "versjon": 36,
+                        "opprettetAv": "okosynkos",
+                        "endretAv": "okosynkos",
+                        "prioritet": "LAV",
+                        "status": "OPPRETTET",
+                        "metadata": {},
+                        "fristFerdigstillelse": "2021-07-21",
+                        "aktivDato": "2021-07-20",
+                        "opprettetTidspunkt": "2021-07-20T06:02:32.05+02:00",
+                        "endretTidspunkt": "2021-09-07T06:02:06.742+02:00"
+                    }                    
+                    """, FinnOppgaveResponseJson.class);
+        });
     }
 }

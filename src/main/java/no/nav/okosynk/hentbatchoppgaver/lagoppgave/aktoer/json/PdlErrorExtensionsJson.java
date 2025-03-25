@@ -7,6 +7,11 @@ public class PdlErrorExtensionsJson {
     private final String code;
     private final String classification;
 
+    public PdlErrorExtensionsJson() {
+        this.code = "";
+        this.classification = "";
+    }
+
     public PdlErrorExtensionsJson(String code, String classification) {
         this.code = code;
         this.classification = classification;

@@ -18,6 +18,12 @@ public class PdlErrorLocationJson {
         return column;
     }
 
+
+    public PdlErrorLocationJson() {
+        this.line = "";
+        this.column = "";
+    }
+
     public PdlErrorLocationJson(String line, String column) {
         this.line = line;
         this.column = column;

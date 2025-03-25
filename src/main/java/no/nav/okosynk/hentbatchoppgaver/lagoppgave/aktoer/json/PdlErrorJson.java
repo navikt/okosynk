@@ -16,6 +16,12 @@ public class PdlErrorJson {
     @JsonProperty("extensions")
     private final PdlErrorExtensionsJson extensions;
 
+    public PdlErrorJson(){
+        this.message = "";
+        this.locations = null;
+        this.path = null;
+        this.extensions = null;
+    }
     public PdlErrorJson(String message, Collection<PdlErrorLocationJson> locations, Collection<String> path, PdlErrorExtensionsJson extensions) {
         this.message = message;
         this.locations = locations;

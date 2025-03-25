@@ -14,6 +14,8 @@ public enum IdentGruppeV2 {
 
     private final String navn;
 
+    IdentGruppeV2() {this.navn = "";}
+
     IdentGruppeV2(final String navn) {
         this.navn = navn;
     }

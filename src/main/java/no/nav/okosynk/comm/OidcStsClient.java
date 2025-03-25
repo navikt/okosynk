@@ -41,6 +41,14 @@ public class OidcStsClient {
     private final CloseableHttpClient httpClient;
     private String oidcToken;
 
+    public OidcStsClient() {
+        endpointUri=null;
+        batchBruker =null;
+        credentials = null;
+        httpClient = null;
+        oidcToken = null;
+    }
+
     public OidcStsClient(final OkosynkConfiguration okosynkConfiguration) {
 
         this.batchBruker = okosynkConfiguration.getString(Constants.OPPGAVE_USERNAME);

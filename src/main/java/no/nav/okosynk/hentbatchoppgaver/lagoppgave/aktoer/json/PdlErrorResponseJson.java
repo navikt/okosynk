@@ -4,12 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collection;
+import java.util.Collections;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PdlErrorResponseJson {
 
     @JsonProperty(value = "errors", required = true)
     private final Collection<PdlErrorJson> errors;
+
+    public PdlErrorResponseJson() {this.errors = Collections.emptyList();
+    }
 
     public PdlErrorResponseJson(Collection<PdlErrorJson> errors) {
         this.errors = errors;

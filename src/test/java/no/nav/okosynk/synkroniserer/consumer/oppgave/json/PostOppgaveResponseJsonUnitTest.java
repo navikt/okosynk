@@ -3,6 +3,7 @@ package no.nav.okosynk.synkroniserer.consumer.oppgave.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -178,5 +179,35 @@ class PostOppgaveResponseJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOp
         final PostOppgaveResponseJson PostOppgaveResponseJson =
                 objectMapper.readValue(finnOppgaverResponseJsonString, PostOppgaveResponseJson.class);
         Assertions.assertEquals(expectedId, PostOppgaveResponseJson.getId());
+    }
+
+    @Test
+    void shouldBeAbleToCreateObjectFromJson() {
+        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+        Assertions.assertDoesNotThrow(() ->
+                objectMapper.readValue("""
+                        {
+                            "id": "some-id",
+                            "opprettetAv": "creator",
+                            "versjon": 1,
+                            "endretAvEnhetsnr": "unit-number",
+                            "status": "FERDIGSTILT",
+                            "endretTidspunkt": "2021-07-20T06:02:32.05+02:00",
+                            "opprettetTidspunkt": "2021-07-20T06:02:32.05+02:00",
+                            "ferdigstiltTidspunkt": "2021-07-20T06:02:32.05+02:00",
+                            "identer": [
+                                {
+                                    "ident": "12345",
+                                    "gruppe": "AKTORID"
+                                },
+                                {
+                                    "ident": "67890",
+                                    "gruppe": "AKTOERID"
+                                }
+                            ]
+                        }
+                        """, PostOppgaveResponseJson.class)
+        );
     }
 }

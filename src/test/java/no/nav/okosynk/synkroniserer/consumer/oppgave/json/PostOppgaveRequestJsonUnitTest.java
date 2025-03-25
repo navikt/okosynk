@@ -34,4 +34,22 @@ class PostOppgaveRequestJsonUnitTest extends AbstractOppgaveJsonUnitTest<PostOpp
         final PostOppgaveRequestJson actualDeserializedFinnOppgaveResponseJson = objectMapper.readValue(serializedpostOppgaveRequestJsonString, PostOppgaveRequestJson.class);
         Assertions.assertEquals(postOppgaveRequestJson, actualDeserializedFinnOppgaveResponseJson);
     }
+
+    @Test
+    void shouldBeAbleToCreateObjectFromJson() {
+        Assertions.assertDoesNotThrow(() ->
+                new ObjectMapper().readValue("""
+                        {
+                            "id": "some-id",
+                            "opprettetAv": "creator",
+                            "versjon": 1,
+                            "endretAvEnhetsnr": "unit-number",
+                            "status": "OPEN",
+                            "endretTidspunkt": "2023-10-01T12:00:00",
+                            "opprettetTidspunkt": "2023-10-01T10:00:00",
+                            "ferdigstiltTidspunkt": "2023-10-01T14:00:00"
+                        }
+                        """, PostOppgaveRequestJson.class)
+        );
+    }
 }
