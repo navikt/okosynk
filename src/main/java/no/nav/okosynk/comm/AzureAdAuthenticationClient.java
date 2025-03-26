@@ -133,6 +133,7 @@ public class AzureAdAuthenticationClient {
                     token = azureAdTokenSuccessResponseJson.getAccessToken();
                     logger.info("An Azure AD access token successfully acquired");
                 } catch (Throwable e) {
+                    logger.error("An error occurred while parsing Azure AD token response: {}", e.getMessage());
                     throw new IllegalStateException("Could not parse token", e);
                 }
             } else {
@@ -141,8 +142,10 @@ public class AzureAdAuthenticationClient {
                     azureAdTokenErrorResponseJson =
                             objectMapper.readValue(postResponseEntityAsString, AzureAdTokenErrorResponseJson.class);
                 } catch (Throwable e) {
+                    logger.error("An error occurred while parsing error: {}", e.getMessage());
                     throw new IllegalStateException("Something strange happened when trying to parse the token request error. postResponseEntityAsString: " + postResponseEntityAsString, e);
                 }
+                logger.error("A {} error occurred while fetching token from azure ad:", httpStatusCode);
                 throw new IllegalStateException("The Azure AD token provider returned an error" + azureAdTokenErrorResponseJson);
             }
         } else {

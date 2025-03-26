@@ -75,7 +75,7 @@ public class PdlRestClient implements IAktoerClient {
                 } else {
                     final String msg = String.format("Feil ved kall mot PDL for folkeregisterIdentOrAktorId: %s, Status: %d, postHentIdenterResponseAsString: %s",
                             folkeregisterIdent,
-                            postHentIdenterResponse.getStatus(),
+                            Integer.valueOf(postHentIdenterResponse.getStatus()),
                             postHentIdenterResponseAsString);
                     log.error(msg); // Change to secureLog when secureLog is working
                     throw new IllegalStateException("Feil ved kall mot PDL");

@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.model;
 
-import lombok.Getter;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.hentbatchoppgaver.lagoppgave.model.BeskrivelseInfo;
 
@@ -11,13 +10,10 @@ public abstract class Melding {
     protected static final String FIELD_SEPARATOR = System.lineSeparator();
     public static final String FORSTE_FELTSEPARATOR = ";;   ";
     public static final String FELTSEPARATOR = ";   ";
-    @Getter
     final String behandlendeEnhet;
     final String brukerId; //Dette feltet er ikke det samme som Oppgave sin "brukerId"
     final LocalDate datoForStatus;
-    @Getter
     final String gjelderId;
-    @Getter
     final String nyesteVentestatus;
     final double totaltNettoBelop;
 
@@ -48,4 +44,12 @@ public abstract class Melding {
 
     public abstract BeskrivelseInfo beskrivelseInfo();
     public abstract Constants.BATCH_TYPE batchType();
+
+    public String getGjelderId() {
+        return gjelderId;
+    }
+
+    public String getNyesteVentestatus() {
+        return nyesteVentestatus;
+    }
 }

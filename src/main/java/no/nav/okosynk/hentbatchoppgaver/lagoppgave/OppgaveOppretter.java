@@ -51,7 +51,7 @@ public class OppgaveOppretter {
         MappingRegel mappingregel = Mappingregelverk.finnRegel(melding.ruleKey()).orElse(null);
         if (Objects.isNull(mappingregel)) return Optional.empty();
 
-        Oppgave.OppgaveBuilder oppgaveBuilder = Oppgave.builder();
+        Oppgave.Builder oppgaveBuilder = Oppgave.builder();
 
         switch (GjelderIdType.fra(melding.getGjelderId())) {
             case BNR:

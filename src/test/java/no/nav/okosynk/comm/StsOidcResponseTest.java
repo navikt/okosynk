@@ -82,4 +82,17 @@ class StsOidcResponseTest {
         Assertions.assertEquals(expectedStsOidcResponse.getTokenType(), actualStsOidcResponse.getTokenType());
         Assertions.assertEquals(expectedStsOidcResponse.getExpiresIn(), actualStsOidcResponse.getExpiresIn());
     }
+
+    @Test
+    void shouldBeAbleToCreateObjectFromJson() {
+        Assertions.assertDoesNotThrow(() ->
+                new ObjectMapper().readValue("""
+                        {
+                            "access_token": "some-access-token",
+                            "token_type": "some-token-type",
+                            "expires_in": 1000
+                        }
+                        """, StsOidcResponse.class)
+        );
+    }
 }

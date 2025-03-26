@@ -1,8 +1,6 @@
-package no.nav.okosynk.metrics.ur;
+package no.nav.okosynk.metrics;
 
 import no.nav.okosynk.config.Constants;
-import no.nav.okosynk.metrics.BatchMetrics;
-import no.nav.okosynk.metrics.BatchMetricsTest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

@@ -1,6 +1,5 @@
 package no.nav.okosynk.hentbatchoppgaver.parselinje;
 
-import lombok.Getter;
 import no.nav.okosynk.hentbatchoppgaver.model.Melding;
 
 import java.util.Arrays;
@@ -12,7 +11,6 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
         U extends Melding
     > {
 
-    @Getter
     public enum SUPER_FIELD_DEF {
         GJELDER_ID(OsMeldingFormat.GJELDER_ID_START, OsMeldingFormat.GJELDER_ID_SLUTT, UrMeldingFormat.GJELDER_ID_START, UrMeldingFormat.GJELDER_ID_SLUTT),
         BEHANDLENDE_ENHET(OsMeldingFormat.BEHANDLENDE_ENHET_START, OsMeldingFormat.BEHANDLENDE_ENHET_SLUTT, UrMeldingFormat.BEHANDLENDE_ENHET_START, UrMeldingFormat.BEHANDLENDE_ENHET_SLUTT),
@@ -48,6 +46,22 @@ public abstract class AbstractMeldingBatchInputRecordBuilder<
             this.endPosInOs = endPosInOs;
             this.startPosInUr = startPosInUr;
             this.endPosInUr = endPosInUr;
+        }
+
+        public int getStartPosInOs() {
+            return startPosInOs;
+        }
+
+        public int getStartPosInUr() {
+            return startPosInUr;
+        }
+
+        public int getEndPosInOs() {
+            return endPosInOs;
+        }
+
+        public int getEndPosInUr() {
+            return endPosInUr;
         }
     }
 

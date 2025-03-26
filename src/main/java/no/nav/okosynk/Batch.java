@@ -1,7 +1,5 @@
 package no.nav.okosynk;
 
-import lombok.Getter;
-import lombok.NonNull;
 import no.nav.okosynk.comm.AzureAdAuthenticationClient;
 import no.nav.okosynk.config.Constants;
 import no.nav.okosynk.config.OkosynkConfiguration;
@@ -46,7 +44,6 @@ public class Batch {
     static final int MAX_ANTALL_LINJER = 25000;
     private static final Logger logger = LoggerFactory.getLogger(Batch.class);
     private static final Logger secureLog = LoggerFactory.getLogger("secureLog");
-    @Getter
     private final OkosynkConfiguration okosynkConfiguration;
     private BatchStatus batchStatus;
     private IMeldingLinjeFileReader fileReader;
@@ -124,6 +121,10 @@ public class Batch {
         }
     }
 
+    public OkosynkConfiguration getOkosynkConfiguration() {
+        return okosynkConfiguration;
+    }
+
     public String getBatchName() {
         return okosynkConfiguration.getBatchType().getName();
     }
@@ -178,7 +179,7 @@ public class Batch {
         return linjer.stream().map(mapper).toList();
     }
 
-    public void setFileReader(final @NonNull IMeldingLinjeFileReader fileReader) {
+    public void setFileReader(final IMeldingLinjeFileReader fileReader) {
         this.fileReader = requireNonNull(fileReader);
     }
 
