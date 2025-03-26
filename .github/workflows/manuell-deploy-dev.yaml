@@ -46,14 +46,6 @@ jobs:
           TIMEOUT: 10m
           PRINT_PAYLOAD: true
 
-      - name: deploy OS to q1
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod-os.yaml
-          TIMEOUT: 10m
-          PRINT_PAYLOAD: true
-
       - name: deploy UR to q1
         uses: nais/deploy/actions/deploy@v2
         env:
