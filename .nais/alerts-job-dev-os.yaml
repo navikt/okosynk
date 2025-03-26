@@ -18,7 +18,7 @@ spec:
           labels:
             namespace: okonomi
             severity: danger
-            ktor_job_example_type: okosynk-os
+            okosynk_os_type: okosynk-os
             alert_type: custom
 
 ---
