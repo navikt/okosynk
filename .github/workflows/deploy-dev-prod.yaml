@@ -36,7 +36,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod-os.yaml
+          RESOURCE: .nais/app-dev-os.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TIMEOUT: 10m
           PRINT_PAYLOAD: true
@@ -45,7 +45,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod-ur.yaml
+          RESOURCE: .nais/app-dev-ur.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TIMEOUT: 10m
           PRINT_PAYLOAD: true
@@ -54,7 +54,7 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-fss
-          RESOURCE: nais/app-prod-os.yaml
+          RESOURCE: .nais/app-prod-os.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TIMEOUT: 10m
           PRINT_PAYLOAD: true
@@ -63,7 +63,7 @@ jobs:
         name: deploy UR to prod-fss
         env:
           CLUSTER: prod-fss
-          RESOURCE: nais/app-prod-ur.yaml
+          RESOURCE: .nais/app-prod-ur.yaml
           IMAGE: ${{ steps.docker-push.outputs.image }}
           TIMEOUT: 10m
           PRINT_PAYLOAD: true

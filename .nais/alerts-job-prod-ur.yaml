@@ -1,0 +1,66 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: okosynk-ur
+  namespace: okonomi
+  labels:
+    team: okonomi
+spec:
+  groups:
+    - name: okosynk-ur-alerts
+      rules:
+        - alert: okosynkur naisjob mislykket
+          expr: kube_job_failed{job_name=~"^okosynkur.*", namespace="okonomi"} > 0
+          for: 2m
+          annotations:
+            action: "Gjør en action"
+            summary: "okosynk-ur feiler. Sjekk hvorfor"
+          labels:
+            namespace: okonomi
+            severity: danger
+            ktor_job_example_type: okosynk-ur
+            alert_type: custom
+
+---
+
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: okosynk-ur-slack
+  namespace: okonomi
+  labels:
+    alertmanagerConfig: okosynk-ur-slack
+spec:
+  receivers:
+    - name: okosynk-ur-receiver
+      slackConfigs:
+        - apiURL:
+            key: apiUrl
+            name: slack-webhook
+          channel: '#team-mob-alerts-prod'
+          iconEmoji: ':alert:'
+          username: 'Alert prod-fss'
+          sendResolved: true
+          title: |-
+            [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
+          text: >-
+            {{ range .Alerts }}
+            {{ if or .Annotations.summary .Annotations.message }}
+            {{ or .Annotations.summary .Annotations.message }}
+            {{ println " " }}
+            {{- end }}
+            {{- if .Annotations.action }}
+            • *action*: {{ .Annotations.action }} {{ println " " }}
+            {{- end }}
+            {{ end }}
+  route:
+    groupBy:
+      - alertname
+    matchers:
+      - name: "okosynk_ur_type"
+        matchType: "="
+        value: "okosynk-ur"
+    groupInterval: 10s
+    groupWait: 5s
+    receiver: okosynk-ur-receiver
+    repeatInterval: 2m

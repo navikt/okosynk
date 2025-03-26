@@ -1,24 +1,24 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: okosynk-ur
+  name: okosynk-os
   namespace: okonomi
   labels:
     team: okonomi
 spec:
   groups:
-    - name: okosynk-ur-alerts
+    - name: okosynk-os-alerts
       rules:
-        - alert: okosynkur naisjob mislykket
-          expr: kube_job_failed{job_name=~"^okosynkur.*", namespace="okonomi"} > 0
+        - alert: okosynkos naisjob mislykket
+          expr: kube_job_failed{job_name=~"^okosynkos.*", namespace="okonomi"} > 0
           for: 2m
           annotations:
             action: "Gjør en action"
-            summary: "okosynk-ur feiler. Sjekk hvorfor"
+            summary: "okosynk-os feiler. Sjekk hvorfor"
           labels:
             namespace: okonomi
             severity: danger
-            ktor_job_example_type: okosynk-ur
+            ktor_job_example_type: okosynk-os
             alert_type: custom
 
 ---
@@ -26,20 +26,20 @@ spec:
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
-  name: okosynk-ur-slack
+  name: okosynk-os-slack
   namespace: okonomi
   labels:
-    alertmanagerConfig: okosynk-ur-slack
+    alertmanagerConfig: okosynk-os-slack
 spec:
   receivers:
-    - name: okosynk-ur-receiver
+    - name: okosynk-os-receiver
       slackConfigs:
         - apiURL:
             key: apiUrl
             name: slack-webhook
-          channel: '#team-mob-alerts-dev'
+          channel: '#team-mob-alerts-prod'
           iconEmoji: ':alert:'
-          username: 'Alert dev-gcp'
+          username: 'Alert prod-fss'
           sendResolved: true
           title: |-
             [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
@@ -57,10 +57,10 @@ spec:
     groupBy:
       - alertname
     matchers:
-      - name: "okosynk_ur_type"
+      - name: "okosynk_os_type"
         matchType: "="
-        value: "okosynk-ur"
+        value: "okosynk-os"
     groupInterval: 10s
     groupWait: 5s
-    receiver: okosynk-ur-receiver
+    receiver: okosynk-os-receiver
     repeatInterval: 2m
