@@ -10,58 +10,60 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: read
+      id-token: write
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Setup Java and Maven
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'corretto'
+          distribution: 'temurin'
           cache: 'maven'
+
       - name: build and test
         run: mvn clean install dependency:resolve-plugins dependency:go-offline
-      - name: create docker tag
-        run: |
-          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
-          DOCKER_TAG=$(date "+%Y.%m.%d")-$(echo $GITHUB_SHA | cut -c1-7)
-          DOCKER_IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION
-          IMAGE=$DOCKER_IMAGE:$DOCKER_TAG
-          echo "APPLICATION=$APPLICATION" >> $GITHUB_ENV
-          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-      - name: build docker image
-        run: |
-          docker build --tag $IMAGE .
-      - name: login to Github Package Registry
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
-      - name: push docker image
-        run: |
-          docker push $IMAGE
+
+      - name: Build and push Docker image to GAR
+        uses: nais/docker-build-push@v0
+        id: docker-push
+        with:
+            team: okonomi
+
       - name: deploy OS to q1
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
           CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod-os.yaml
+          RESOURCE: .nais/app-dev-os.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TIMEOUT: 10m
+          PRINT_PAYLOAD: true
+
       - name: deploy UR to q1
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{secrets.NAIS_DEPLOY_APIKEY}}
           CLUSTER: dev-fss
-          RESOURCE: nais/app-preprod-ur.yaml
+          RESOURCE: .nais/app-dev-ur.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TIMEOUT: 10m
+          PRINT_PAYLOAD: true
+
       - name: deploy OS to prod-fss
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
-          RESOURCE: nais/app-prod-os.yaml
-      - uses: nais/deploy/actions/deploy@v1
+          RESOURCE: .nais/app-prod-os.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TIMEOUT: 10m
+          PRINT_PAYLOAD: true
+
+      - uses: nais/deploy/actions/deploy@v2
         name: deploy UR to prod-fss
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
-          RESOURCE: nais/app-prod-ur.yaml
+          RESOURCE: .nais/app-prod-ur.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          TIMEOUT: 10m
+          PRINT_PAYLOAD: true
