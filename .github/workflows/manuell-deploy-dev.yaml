@@ -51,5 +51,6 @@ jobs:
         env:
           CLUSTER: dev-fss
           RESOURCE: nais/app-preprod-ur.yaml
+          IMAGE: ${{ steps.docker-push.outputs.image }}
           TIMEOUT: 10m
           PRINT_PAYLOAD: true
